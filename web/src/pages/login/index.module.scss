@@ -1,10 +1,10 @@
 .pageWrap {
   display: flex;
-  margin-top: 80px;
+  margin-top: 5rem;
   justify-content: center;
 
   .loginBox {
-    width: 375px;
+    width: 23.4rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -16,23 +16,23 @@
       justify-content: center;
 
       .title {
-        margin-top: 10px;
-        font-size: 24px;
+        margin-top: 0.625rem;
+        font-size: 1.5rem;
       }
     }
 
     .signInUsername {
-      margin-top: 20px;
+      margin-top: 1.25rem;
     }
     .signInPassword {
-      margin-top: 20px;
+      margin-top: 1.25rem;
     }
     .signInRememberMe {
-      margin-top: 8px;
-      height: 42px;
+      margin-top: 0.5rem;
+      height: 2.62rem;
     }
     .signInButton {
-      margin-top: 20px;
+      margin-top: 1.25rem;
     }
   }
 }
