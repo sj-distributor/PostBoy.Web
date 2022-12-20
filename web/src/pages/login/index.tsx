@@ -1,8 +1,6 @@
 import { TextField, Checkbox, FormControlLabel, Button } from "@mui/material";
-import { useState } from "react";
 import styles from "./index.module.scss";
 const Login = () => {
-  const [boolean, setBoolean] = useState(false);
   return (
     <div className={styles.pageWrap}>
       <div className={styles.loginBox}>
@@ -12,9 +10,9 @@ const Login = () => {
         <TextField
           required
           fullWidth
-          label="Email Addres"
-          className={styles.signInUserName}
-          id="email"
+          label="Username"
+          className={styles.signInUsername}
+          id="username"
         />
         <TextField
           required
@@ -24,16 +22,7 @@ const Login = () => {
           id="password"
         />
         <FormControlLabel
-          control={
-            <Checkbox
-              checked={boolean}
-              onClick={() => {
-                setBoolean((prev: boolean) => {
-                  return !prev;
-                });
-              }}
-            />
-          }
+          control={<Checkbox />}
           className={styles.signInRememberMe}
           label="Remember me"
         />
