@@ -1,4 +1,4 @@
-import { TextField, Checkbox, FormControlLabel, Button } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import styles from "./index.module.scss";
 const Login = () => {
   return (
@@ -21,11 +21,6 @@ const Login = () => {
           type="password"
           className={styles.signInPassword}
           id="password"
-        />
-        <FormControlLabel
-          control={<Checkbox />}
-          className={styles.signInRememberMe}
-          label="Remember me"
         />
         <Button fullWidth variant="contained" className={styles.signInButton}>
           Sign in
