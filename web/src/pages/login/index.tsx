@@ -18,6 +18,7 @@ const Login = () => {
           required
           fullWidth
           label="Password"
+          type="password"
           className={styles.signInPassword}
           id="password"
         />
