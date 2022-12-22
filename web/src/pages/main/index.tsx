@@ -4,7 +4,7 @@ import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
 
 const Main = () => {
-  const [show, setShow] = useState(0);
+  const [clickIndex, setClickIndex] = useState(0);
 
   const routerTabBar = () => {
     return routerArray.map((item, index) => {
@@ -27,12 +27,12 @@ const Main = () => {
                   key={childrenIndex}
                   to={childrenItem.path}
                   onClick={() => {
-                    setShow(childrenIndex);
+                    setClickIndex(childrenIndex);
                   }}
                 >
                   <div
                     className={
-                      show === childrenIndex
+                      clickIndex === childrenIndex
                         ? styles.contentTabBarShow
                         : styles.contentTabBar
                     }
