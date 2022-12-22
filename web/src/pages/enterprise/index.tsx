@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 
-const Home = () => {
+const Enterprise = () => {
   return (
-    <div>
+    <div className="App">
       <Outlet />
     </div>
   );
 };
-export default Home;
+export default Enterprise;
