@@ -11,10 +11,9 @@ const useAction = () => {
       (x) => x.path === "/home"
     )?.children;
 
-    const index = findRouteChild?.findIndex(
-      (x) => x.path === location.pathname
+    setClickIndex(
+      findRouteChild?.findIndex((x) => x.path === location.pathname)
     );
-    setClickIndex(index);
   }, []);
 
   const [clickIndex, setClickIndex] = useState<number>();

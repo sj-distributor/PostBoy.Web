@@ -14,10 +14,6 @@ const Home = () => {
         <div key={index} className={styles.content}>
           <div className={styles.contentTab}>
             {item.children?.map((childrenItem, childrenIndex) => {
-              const nowStyle =
-                clickIndex === childrenIndex
-                  ? styles.contentTabBarShow
-                  : styles.contentTabBar;
               return (
                 <Link
                   key={childrenIndex}
@@ -25,7 +21,11 @@ const Home = () => {
                   onClick={() => {
                     setClickIndex(childrenIndex);
                   }}
-                  className={nowStyle}
+                  className={
+                    clickIndex === childrenIndex
+                      ? styles.contentTabBarShow
+                      : styles.contentTabBar
+                  }
                 >
                   {childrenItem.title}
                 </Link>
