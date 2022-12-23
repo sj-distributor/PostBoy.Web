@@ -2,57 +2,25 @@ import React, { useState } from "react";
 import styles from "./index.module.scss";
 import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
+import { RoutePrperty } from "../../assets/routeType";
 
 const Main = () => {
-  const [clickIndex, setClickIndex] = useState(0);
-
-  const routerTabBar = () => {
+  const routerTabBar = (list: RoutePrperty[]) => {
     return routerArray.map((item, index) => {
       return (
         <div key={index} className={styles.navBar}>
-          <Link to={item.path}>{item.title}</Link>
-        </div>
-      );
-    });
-  };
-
-  const routerTabBarContent = () => {
-    return routerArray.map((item, index) => {
-      return (
-        <div key={index} className={styles.content}>
-          <div className={styles.contentTab}>
-            {item.children?.map((childrenItem, childrenIndex) => {
-              return (
-                <Link
-                  key={childrenIndex}
-                  to={childrenItem.path}
-                  onClick={() => {
-                    setClickIndex(childrenIndex);
-                  }}
-                >
-                  <div
-                    className={
-                      clickIndex === childrenIndex
-                        ? styles.contentTabBarShow
-                        : styles.contentTabBar
-                    }
-                  >
-                    {childrenItem.title}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-          <Outlet />
+          <Link to={item.path}>{item.head}</Link>
         </div>
       );
     });
   };
 
   return (
-    <div className={styles.App}>
-      <div className={styles.nav}>{routerTabBar()}</div>
-      {routerTabBarContent()}
+    <div className={styles.mainBox}>
+      <div className={styles.nav}>{routerTabBar(routerArray)}</div>
+      <div className={styles.content}>
+        <Outlet />
+      </div>
     </div>
   );
 };

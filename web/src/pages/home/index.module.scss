@@ -1,0 +1,29 @@
+$contentNavActive: #000000;
+
+.content {
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .contentTab {
+    margin: 1rem 3rem;
+    display: flex;
+    flex: row;
+
+    a {
+      margin-right: 1.5rem;
+    }
+
+    .contentTabBar,
+    .contentTabBarShow {
+      display: flex;
+      flex-direction: column;
+      margin-right: 1.5rem;
+    }
+
+    .contentTabBarShow {
+      border-bottom: 0.2rem solid $contentNavActive;
+    }
+  }
+}

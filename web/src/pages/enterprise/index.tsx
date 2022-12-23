@@ -1,10 +1,4 @@
-import { Outlet } from "react-router-dom";
-
 const Enterprise = () => {
-  return (
-    <div className="App">
-      <Outlet />
-    </div>
-  );
+  return <div className="EnterpriseBox"></div>;
 };
 export default Enterprise;

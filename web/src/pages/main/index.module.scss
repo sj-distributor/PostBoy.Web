@@ -1,13 +1,12 @@
 $navBackgroundColor: #f2f3f4;
 $aColor: #000000;
-$contentNavActive: #000000;
 
 html,
 body {
   padding: 0;
   margin: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
 }
 
 a {
@@ -15,49 +14,26 @@ a {
   text-decoration: none;
 }
 
-.App {
+.mainBox {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .nav {
   background: $navBackgroundColor;
-  width: 25%;
-  position: fixed;
-  height: 100%;
+  width: 25vw;
+  height: 100vh;
   text-align: center;
 
   .navBar {
     font-size: 1rem;
-    margin-top: 30%;
+    padding: 10rem 0 0;
   }
 }
 
 .content {
   flex: 1;
-  margin-left: 25%;
-  height: 100%;
-  padding: 1.5rem;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-
-  .contentTab {
-    margin: 1rem 0;
-    display: flex;
-    flex: row;
-
-    a {
-      margin-right: 1.5rem;
-    }
-
-    .contentTabBar,
-    .contentTabBarShow {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .contentTabBarShow {
-      border-bottom: 1px solid $contentNavActive;
-    }
-  }
 }

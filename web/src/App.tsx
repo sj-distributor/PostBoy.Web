@@ -2,11 +2,12 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { routerArray } from "./router/elementRoute";
 import Login from "./pages/login";
 import Main from "./pages/main";
+import { RoutePrperty } from "./assets/routeType";
 
-const getSubRoute = () => {
+const getSubRoute = (list: RoutePrperty[]) => {
   return (
     <>
-      {routerArray.map((item, index) => {
+      {list.map((item, index) => {
         return (
           <Route key={index} path={item.path} element={item.element}>
             {item.path === "/home" && (
@@ -17,7 +18,7 @@ const getSubRoute = () => {
                 <Route
                   key={childrenIndex}
                   path={childrenItem.path}
-                  element={childrenItem.element}
+                  element={childrenItem.elementChild}
                 />
               );
             })}
@@ -28,16 +29,16 @@ const getSubRoute = () => {
   );
 };
 
-function App() {
+const App = () => {
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route element={<Main />}>{getSubRoute()}</Route>
+        <Route element={<Main />}>{getSubRoute(routerArray)}</Route>
       </Routes>
     </div>
   );
-}
+};
 
 export default App;
