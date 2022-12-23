@@ -21,13 +21,13 @@ const useMainAction = () => {
 
     setMainClickIndex(
       (routerArray.findIndex((x) => x.path === mainLocation.pathname) ===
-      RouteState.None // 当前路由下标为-1时
+      RouteState.None
         ? getMainClickIndex()
         : routerArray.findIndex(
             (x) => x.path === mainLocation.pathname
-          )) as number // 当前路由下标不是-1 返回路由数组下标 as number 转为number类型 // 1
+          )) as number
     );
-  }, []);
+  }, [mainLocation.pathname]);
 
   return {
     mainLocation,

@@ -10,24 +10,13 @@ const useAction = () => {
   const [homeClickIndex, setHomeClickIndex] = useState<number>();
 
   useEffect(() => {
-    const getHomeClickIndex = () => {
-      const getHomeSubscript = 0;
-      routerArray.map(
-        (item: RouteItem, index: number) =>
-          item?.children?.findIndex((x) => x.path === homeLocation.pathname) !==
-            RouteState.None && getHomeSubscript === index
-      );
-      return getHomeSubscript;
-    };
+    console.log(homeLocation.pathname);
     setHomeClickIndex(
-      (routerArray.findIndex((x) => x.path === homeLocation.pathname) ===
-      RouteState.None
-        ? getHomeClickIndex()
-        : routerArray.findIndex(
-            (x) => x.path === homeLocation.pathname
-          )) as number
+      routerArray
+        .find((x) => x.path === "/home")
+        ?.children?.findIndex((x) => x.path === homeLocation.pathname)
     );
-  }, []);
+  }, [homeLocation.pathname]);
 
   return {
     homeClickIndex,
