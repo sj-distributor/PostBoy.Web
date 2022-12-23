@@ -19,10 +19,13 @@ $contentNavActive: #000000;
     .contentTabBarShow {
       display: flex;
       flex-direction: column;
-      margin-right: 1.5rem;
+      margin-right: 1.6rem;
+      color: gray;
+      font-size: 1.2rem;
     }
 
     .contentTabBarShow {
+      color: #000000;
       border-bottom: 0.2rem solid $contentNavActive;
     }
   }

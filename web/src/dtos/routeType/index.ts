@@ -1,13 +1,13 @@
 import { ReactElement } from "react";
 
-export interface RoutePrperty {
+export interface RouteItem {
   path: string;
   head: string;
   element: ReactElement;
-  children?: RoutePrpertyChild[];
+  children?: childrenProps[];
 }
 
-export interface RoutePrpertyChild {
+export interface childrenProps {
   path: string;
   title: string;
   elementChild: ReactElement;

@@ -1,8 +1,8 @@
 import Home from "../pages/home";
 import Enterprise from "../pages/enterprise";
-import { RoutePrperty } from "../dtos/routeType";
+import { RouteItem } from "../dtos/routeType";
 
-export const routerArray: RoutePrperty[] = [
+export const routerArray: RouteItem[] = [
   {
     path: "/home",
     head: "信息发送",

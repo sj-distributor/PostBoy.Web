@@ -2,9 +2,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { routerArray } from "./router/elementRoute";
 import Login from "./pages/login";
 import Main from "./pages/main";
-import { RoutePrperty } from "./dtos/routeType";
+import { RouteItem } from "./dtos/routeType";
 
-const getSubRoute = (list: RoutePrperty[]) => {
+const getSubRoute = (list: RouteItem[]) => {
   return (
     <>
       {list.map((item, index) => {
