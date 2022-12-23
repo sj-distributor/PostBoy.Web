@@ -7,7 +7,7 @@ export const routerArray: RouteItem[] = [
   {
     path: "/home",
     head: "信息发送",
-    icons: "iconfont iconmdi_view-dashboard",
+    icons: "iconfont iconemail",
     element: <Home />,
     children: [
       {
