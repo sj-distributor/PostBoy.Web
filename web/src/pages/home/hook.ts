@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { RouteState } from "../../dtos/route-index";
-import { RouteItem } from "../../dtos/route-type";
 import { routerArray } from "../../router/elementRoute";
 
 const useAction = () => {
@@ -10,7 +8,6 @@ const useAction = () => {
   const [homeClickIndex, setHomeClickIndex] = useState<number>();
 
   useEffect(() => {
-    console.log(homeLocation.pathname);
     setHomeClickIndex(
       routerArray
         .find((x) => x.path === "/home")

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { RouteState } from "../../dtos/route-index";
-import { childrenProps, RouteItem } from "../../dtos/route-type";
+import { RouteItem } from "../../dtos/route-type";
 import { routerArray } from "../../router/elementRoute";
 
 const useMainAction = () => {
@@ -10,13 +10,13 @@ const useMainAction = () => {
 
   useEffect(() => {
     const getMainClickIndex = () => {
-      const getMainSubscript = 0;
+      const getMainIndex = 0;
       routerArray.map(
         (item: RouteItem, index: number) =>
           item?.children?.findIndex((x) => x.path === mainLocation.pathname) !==
-            RouteState.None && getMainSubscript === index
+            RouteState.None && getMainIndex === index
       );
-      return getMainSubscript;
+      return getMainIndex;
     };
 
     setMainClickIndex(
