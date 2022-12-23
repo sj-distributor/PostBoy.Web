@@ -32,7 +32,6 @@ const Home = () => {
               );
             })}
           </div>
-          <Outlet />
         </div>
       );
     });
