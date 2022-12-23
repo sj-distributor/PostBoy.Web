@@ -1,13 +1,12 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import { RoutePrperty } from "../../assets/routeType";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { RoutePrperty } from "../../dtos/routeType";
 import { routerArray } from "../../router/elementRoute";
 import useAction from "./hook";
 
 import styles from "./index.module.scss";
 
 const Home = () => {
-  const { clickIndex, setClickIndex } = useAction();
-  let naviger = useNavigate();
+  const { clickIndex, setClickIndex, navigate } = useAction();
 
   const routerTabBarContent = (list: RoutePrperty[]) => {
     return list.map((item, index) => {
@@ -15,23 +14,21 @@ const Home = () => {
         <div key={index} className={styles.content}>
           <div className={styles.contentTab}>
             {item.children?.map((childrenItem, childrenIndex) => {
+              const nowStyle =
+                clickIndex === childrenIndex
+                  ? styles.contentTabBarShow
+                  : styles.contentTabBar;
               return (
-                <div
+                <Link
                   key={childrenIndex}
+                  to={childrenItem.path}
                   onClick={() => {
                     setClickIndex(childrenIndex);
-                    {
-                      naviger(childrenItem.path);
-                    }
                   }}
-                  className={
-                    clickIndex === childrenIndex
-                      ? styles.contentTabBarShow
-                      : styles.contentTabBar
-                  }
+                  className={nowStyle}
                 >
                   {childrenItem.title}
-                </div>
+                </Link>
               );
             })}
           </div>

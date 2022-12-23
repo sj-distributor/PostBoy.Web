@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./index.module.scss";
 import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
-import { RoutePrperty } from "../../assets/routeType";
+import { RoutePrperty } from "../../dtos/routeType";
 
 const Main = () => {
   const routerTabBar = (list: RoutePrperty[]) => {
