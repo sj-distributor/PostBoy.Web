@@ -17,4 +17,10 @@ export const routerArray: RouteItem[] = [
       },
     ],
   },
+  {
+    path: "/home2.0",
+    head: "信息发送2",
+    icons: "iconfont iconmdi_view-dashboard",
+    element: <Home />,
+  },
 ];
