@@ -4,7 +4,7 @@ export interface RoutePrperty {
   path: string;
   head: string;
   element: ReactElement;
-  children: RoutePrpertyChild[];
+  children?: RoutePrpertyChild[];
 }
 
 export interface RoutePrpertyChild {

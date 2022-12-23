@@ -32,16 +32,12 @@ const Home = () => {
               );
             })}
           </div>
+          <Outlet />
         </div>
       );
     });
   };
 
-  return (
-    <div>
-      {routerTabBarContent(routerArray)}
-      <Outlet />
-    </div>
-  );
+  return <div>{routerTabBarContent(routerArray)}</div>;
 };
 export default Home;
