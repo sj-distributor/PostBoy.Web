@@ -1,0 +1,31 @@
+$navBackgroundColor: #f2f3f4;
+$aColor: #000000;
+
+a {
+  color: $aColor;
+  text-decoration: none;
+}
+
+.mainBox {
+  display: flex;
+  flex-direction: row;
+}
+
+.nav {
+  background: $navBackgroundColor;
+  width: 25vw;
+  height: 100vh;
+  text-align: center;
+
+  .navBar {
+    font-size: 1rem;
+    padding: 10rem 0 0;
+  }
+}
+
+.content {
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

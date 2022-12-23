@@ -1,26 +1,44 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.module.scss";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { routerArray } from "./router/elementRoute";
+import Login from "./pages/login";
+import Main from "./pages/main";
+import { RoutePrperty } from "./dtos/routeType";
 
-function App() {
+const getSubRoute = (list: RoutePrperty[]) => {
+  return (
+    <>
+      {list.map((item, index) => {
+        return (
+          <Route key={index} path={item.path} element={item.element}>
+            {item.path === "/home" && (
+              <Route path="" element={<Navigate to="/home/enterprise" />} />
+            )}
+            {item.children?.map((childrenItem, childrenIndex) => {
+              return (
+                <Route
+                  key={childrenIndex}
+                  path={childrenItem.path}
+                  element={childrenItem.elementChild}
+                />
+              );
+            })}
+          </Route>
+        );
+      })}
+    </>
+  );
+};
+
+const App = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<Main />}>{getSubRoute(routerArray)}</Route>
+      </Routes>
     </div>
   );
-}
+};
 
 export default App;
