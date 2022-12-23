@@ -1,7 +1,6 @@
 import Home from "../pages/home";
 import Enterprise from "../pages/enterprise";
 import { RoutePrperty } from "../dtos/routeType";
-import Login from "../pages/login";
 
 export const routerArray: RoutePrperty[] = [
   {
