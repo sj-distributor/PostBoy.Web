@@ -7,12 +7,10 @@ const useAction = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const findRouteChild = routerArray.find(
-      (x) => x.path === "/home"
-    )?.children;
-
     setClickIndex(
-      findRouteChild?.findIndex((x) => x.path === location.pathname)
+      routerArray
+        .find((x) => x.path === "/home")
+        ?.children?.findIndex((x) => x.path === location.pathname)
     );
   }, []);
 
