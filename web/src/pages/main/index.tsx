@@ -2,23 +2,25 @@ import React from "react";
 import styles from "./index.module.scss";
 import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
-import { RouteItem } from "../../dtos/routeType";
+import { RouteItem } from "../../dtos/route-type";
 import useMainAction from "./hook";
 
 const Main = () => {
-  const { clickIndex, setClickIndex } = useMainAction();
+  const { clickMainIndex, setMainClickIndex } = useMainAction();
 
   const routerTabBar = (list: RouteItem[]) => {
     return routerArray.map((item, index) => {
       return (
-        <div key={index} className={styles.navBar}>
+        <div key={index} className={styles.navBarItem}>
           <Link
             to={item.path}
             onClick={() => {
-              setClickIndex(index);
+              setMainClickIndex(index);
             }}
             className={
-              clickIndex === index ? styles.navBarItemClick : styles.navBarItem
+              clickMainIndex === index
+                ? styles.navBarItemClick
+                : styles.navBarItemNone
             }
           >
             <span className={item.icons} />
@@ -32,7 +34,9 @@ const Main = () => {
 
   return (
     <div className={styles.mainBox}>
-      <div className={styles.nav}>{routerTabBar(routerArray)}</div>
+      <div className={styles.nav}>
+        <div className={styles.navBar}>{routerTabBar(routerArray)}</div>
+      </div>
       <div className={styles.content}>
         <Outlet />
       </div>

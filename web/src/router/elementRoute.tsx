@@ -1,6 +1,6 @@
 import Home from "../pages/home";
 import Enterprise from "../pages/enterprise";
-import { RouteItem } from "../dtos/routeType";
+import { RouteItem } from "../dtos/route-type";
 import "../fonts/iconfont/iconfont.css";
 
 export const routerArray: RouteItem[] = [
@@ -16,11 +16,5 @@ export const routerArray: RouteItem[] = [
         elementChild: <Enterprise />,
       },
     ],
-  },
-  {
-    path: "/home2.0",
-    head: "信息发送2",
-    icons: "iconfont iconmdi_view-dashboard",
-    element: <Home />,
   },
 ];

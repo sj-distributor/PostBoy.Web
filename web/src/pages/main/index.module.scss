@@ -13,22 +13,25 @@ $aClickColor: #30cea3;
 
 .nav {
   background: $navBackgroundColor;
-  width: 20vw;
+  width: 15vw;
   height: 100vh;
   text-align: center;
-  padding: 5rem 0 0 0;
 
   .navBar {
-    font-size: 1rem;
-    padding: 2rem 0 0;
-
-    span {
-      font-size: 1rem;
-      margin: 0 0.5rem;
-    }
+    margin-top: 8rem;
   }
 
   .navBarItem {
+    font-size: 1rem;
+    margin: 0.4rem;
+
+    span {
+      font-size: 1rem;
+      margin-right: 0.3rem;
+    }
+  }
+
+  .navBarItemNone {
     color: $aColor;
   }
 
