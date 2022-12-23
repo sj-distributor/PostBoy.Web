@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "./index.module.scss";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/routeType";
 import useMainAction from "./hook";
 
 const Main = () => {
-  const { clickIndex, setClickIndex, location } = useMainAction();
-
-  useEffect(() => {
-    setClickIndex(routerArray.findIndex((x) => x.path === location.pathname));
-  }, []);
+  const { clickIndex, setClickIndex } = useMainAction();
 
   const routerTabBar = (list: RouteItem[]) => {
     return routerArray.map((item, index) => {
@@ -25,7 +21,9 @@ const Main = () => {
               clickIndex === index ? styles.navBarItemClick : styles.navBarItem
             }
           >
+            <span className={item.icons} />
             {item.head}
+            {styles.icons}
           </Link>
         </div>
       );

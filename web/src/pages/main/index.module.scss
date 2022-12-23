@@ -1,4 +1,4 @@
-$navBackgroundColor: #f2f3f4;
+$navBackgroundColor: #ffffff;
 $aColor: #000000;
 $aClickColor: #30cea3;
 
@@ -16,10 +16,16 @@ $aClickColor: #30cea3;
   width: 20vw;
   height: 100vh;
   text-align: center;
+  padding: 5rem 0 0 0;
 
   .navBar {
     font-size: 1rem;
-    padding: 10rem 0 0;
+    padding: 2rem 0 0;
+
+    span {
+      font-size: 1rem;
+      margin: 0 0.5rem;
+    }
   }
 
   .navBarItem {
