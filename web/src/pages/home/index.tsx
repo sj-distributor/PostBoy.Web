@@ -1,14 +1,14 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import { RoutePrperty } from "../../dtos/routeType";
+import { Link, Outlet } from "react-router-dom";
+import { RouteItem } from "../../dtos/route-type";
 import { routerArray } from "../../router/elementRoute";
 import useAction from "./hook";
 
 import styles from "./index.module.scss";
 
 const Home = () => {
-  const { clickIndex, setClickIndex, navigate } = useAction();
+  const { homeClickIndex, setHomeClickIndex } = useAction();
 
-  const routerTabBarContent = (list: RoutePrperty[]) => {
+  const routerTabBarContent = (list: RouteItem[]) => {
     return list.map((item, index) => {
       return (
         <div className={styles.contentTab} key={index}>
@@ -18,10 +18,10 @@ const Home = () => {
                 key={childrenIndex}
                 to={childrenItem.path}
                 onClick={() => {
-                  setClickIndex(childrenIndex);
+                  setHomeClickIndex(childrenIndex);
                 }}
                 className={
-                  clickIndex === childrenIndex
+                  homeClickIndex === childrenIndex
                     ? styles.contentTabBarShow
                     : styles.contentTabBar
                 }

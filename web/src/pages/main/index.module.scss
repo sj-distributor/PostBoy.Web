@@ -1,25 +1,42 @@
-$navBackgroundColor: #f2f3f4;
+$navBackgroundColor: #ffffff;
 $aColor: #000000;
-
-a {
-  color: $aColor;
-  text-decoration: none;
-}
+$aClickColor: #30cea3;
 
 .mainBox {
   display: flex;
   flex-direction: row;
+
+  a {
+    text-decoration: none;
+  }
 }
 
 .nav {
   background: $navBackgroundColor;
-  width: 25vw;
+  width: 15vw;
   height: 100vh;
   text-align: center;
 
   .navBar {
+    margin-top: 8rem;
+  }
+
+  .navBarItem {
     font-size: 1rem;
-    padding: 10rem 0 0;
+    margin: 0.4rem;
+
+    span {
+      font-size: 1rem;
+      margin-right: 0.3rem;
+    }
+  }
+
+  .navBarItemNone {
+    color: $aColor;
+  }
+
+  .navBarItemClick {
+    color: $aClickColor;
   }
 }
 
