@@ -25,7 +25,6 @@ const Main = () => {
           >
             <span className={item.icons} />
             {item.head}
-            {styles.icons}
           </Link>
         </div>
       );
