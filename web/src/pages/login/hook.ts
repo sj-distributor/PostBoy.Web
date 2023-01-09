@@ -9,16 +9,15 @@ const useAction = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
-  const { signIn } = useAuth();
+  const { authStatus, signIn } = useAuth();
 
   const handleLoginButton = async () => {
     const data = await AuthAccont({ username, password });
-    if (data) signIn(data, navigateTo);
-    else setOpenSnackBar(true);
+    data ? signIn(data, navigateTo) : setOpenSnackBar(true);
   };
 
   const navigateTo = () => {
-    if ((window as any).token) {
+    if (authStatus || localStorage.getItem("token")) {
       location.state?.from?.pathname
         ? navigate(location.state.from.pathname, { replace: true })
         : navigate("/home");

@@ -5,30 +5,31 @@ interface TokenContextOptions {
   token: string;
   username: string;
   authStatus: boolean;
-  signIn: (token: string, callback: Function) => void;
-  signOut: (callback: Function) => void;
+  signIn: (token: string, callback?: Function) => void;
+  signOut: (callback?: Function) => void;
 }
 
 export const TokenContext = createContext<TokenContextOptions>(null!);
 
 const TokenProvider = (props: { children: React.ReactNode }) => {
   const [username, setUsername] = useState("");
-  const [token, setToken] = useState("");
-  const [authStatus, setAuthStatus] = useState(false);
+  const defaultToken = localStorage.getItem("token") as string;
+  const [token, setToken] = useState<string>(defaultToken);
+  const [authStatus, setAuthStatus] = useState<boolean>(!!token);
 
-  const signIn = (token: string, callback: Function) => {
+  const signIn = (token: string, callback?: Function) => {
     setToken(token);
-    (window as any).token = token;
-    const tokenObj = jwt_decode<{ username: string }>(token);
-    setUsername(tokenObj.username);
+    localStorage.setItem("token", token);
+    const tokenObj = jwt_decode<{ unique_name: string }>(token);
+    setUsername(tokenObj.unique_name);
     setAuthStatus(true);
     callback && callback();
   };
 
-  const signOut = (callback: Function) => {
+  const signOut = (callback?: Function) => {
     setToken("");
     setUsername("");
-    (window as any).token = "";
+    localStorage.setItem("token", "");
     setAuthStatus(false);
     callback && callback();
   };
