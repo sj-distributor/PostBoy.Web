@@ -15,9 +15,9 @@ export interface IResponse<T> {
 }
 
 export enum ResponseCode {
-  ok = 200,
-  unauthorized = 401,
-  internalservererror = 500
+  Ok = 200,
+  Unauthorized = 401,
+  Internalservererror = 500
 }
 
 export async function base<T>(url: string, method: "get" | "post", data?: object) {
@@ -26,20 +26,18 @@ export async function base<T>(url: string, method: "get" | "post", data?: object
     method: method,
     body: data ? JSON.stringify(data) : undefined,
     headers: {
-      js_version: settings.jsVersion,
-      source_system: settings.sourceSystem,
-      Authorization: (window as any).token,
+      Authorization: localStorage.getItem("token") ? (localStorage.getItem("token") as string) : "",
       "Content-Type": "application/json"
     }
   })
     .then((res) => res.json())
     .then((res: IResponse<T>) => {
-      if (res.code === ResponseCode.ok) {
+      if (res.code === ResponseCode.Ok) {
         return res.data;
-      } else if (res.code === ResponseCode.unauthorized) {
+      } else if (res.code === ResponseCode.Unauthorized) {
         // TODO refetch data with new token
         return null;
-      } else if (res.code === ResponseCode.internalservererror) {
+      } else if (res.code === ResponseCode.Internalservererror) {
         // TODO show something error message
         return null;
       } else {
