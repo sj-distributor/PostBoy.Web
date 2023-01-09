@@ -13,7 +13,7 @@ const useAction = () => {
 
   const handleLoginButton = async () => {
     const data = await AuthAccont({ username, password });
-    data ? signIn(data, navigateTo) : setOpenSnackBar(true);
+    !!data ? signIn(data, navigateTo) : setOpenSnackBar(true);
   };
 
   const navigateTo = () => {
