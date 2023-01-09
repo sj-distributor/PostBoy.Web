@@ -1,0 +1,43 @@
+import { useEffect, useState } from "react";
+import { AuthAccont } from "../../api/login";
+import { useLocation, useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/authHook";
+
+const useAction = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
+  const { signIn } = useAuth();
+
+  const handleLoginButton = async () => {
+    const data = await AuthAccont({ username, password });
+    if (data) signIn(data, navigateTo);
+    else setOpenSnackBar(true);
+  };
+
+  const navigateTo = () => {
+    if ((window as any).token) {
+      location.state?.from?.pathname
+        ? navigate(location.state.from.pathname, { replace: true })
+        : navigate("/home");
+    }
+  };
+
+  useEffect(() => {
+    navigateTo();
+  }, []);
+
+  return {
+    username,
+    password,
+    openSnackBar,
+    setOpenSnackBar,
+    setUsername,
+    setPassword,
+    handleLoginButton
+  };
+};
+
+export default useAction;
