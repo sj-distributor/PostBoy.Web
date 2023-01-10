@@ -1,7 +1,7 @@
 import { createContext, useState } from "react";
 import jwt_decode from "jwt-decode";
 
-interface TokenContextOptions {
+interface AuthContextOptions {
   token: string;
   username: string;
   authStatus: boolean;
@@ -9,7 +9,7 @@ interface TokenContextOptions {
   signOut: (callback?: Function) => void;
 }
 
-export const TokenContext = createContext<TokenContextOptions>(null!);
+export const AuthContext = createContext<AuthContextOptions>(null!);
 
 const AuthProvider = (props: { children: React.ReactNode }) => {
   const [username, setUsername] = useState("");
@@ -35,9 +35,9 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   };
 
   return (
-    <TokenContext.Provider value={{ username, token, authStatus, signIn, signOut }}>
+    <AuthContext.Provider value={{ username, token, authStatus, signIn, signOut }}>
       {props.children}
-    </TokenContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
