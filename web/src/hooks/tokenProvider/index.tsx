@@ -17,7 +17,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     defaultToken ? jwt_decode<{ unique_name: string }>(defaultToken).unique_name : ""
   );
   const [token, setToken] = useState<string>(defaultToken);
-  const [authStatus, setAuthStatus] = useState<boolean>(!!token);
+  const [authStatus, setAuthStatus] = useState<boolean>(!!defaultToken);
 
   const signIn = (token: string, callback?: Function) => {
     setToken(token);
