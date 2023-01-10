@@ -7,8 +7,6 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useAuth from "../../auth";
 
-import TextField from "@mui/material/TextField";
-
 const User = () => {
   const { username } = useAuth();
 
@@ -16,12 +14,6 @@ const User = () => {
     <div className={styles.user}>
       <div className={styles.title}>
         <h1>{username}</h1>
-      </div>
-      <div>
-        <TextField className={styles.row} label="Outlined" variant="outlined" />
-      </div>
-      <div>
-        <TextField className={styles.row} label="Outlined" variant="outlined" />
       </div>
       <div>
         <Accordion className={styles.accordion}>
