@@ -19,9 +19,7 @@ const Main = () => {
               setMainClickIndex(index);
             }}
             className={
-              clickMainIndex === index
-                ? styles.navBarItemClick
-                : styles.navBarItemNone
+              clickMainIndex === index ? styles.itemClick : styles.itemNone
             }
           >
             <span className={item.icons} />

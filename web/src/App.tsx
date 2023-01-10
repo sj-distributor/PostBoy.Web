@@ -12,7 +12,11 @@ const App = () => {
   const getSubRoute = (list: RouteItem[]) => {
     return list.map((item, index) => {
       return (
-        <Route key={index} path={item.path} element={item.element}>
+        <Route
+          key={index}
+          path={item.path}
+          element={<IsAuthUser>{item.element}</IsAuthUser>}
+        >
           <Route path="" element={<Navigate to="/home/enterprise" />} />
 
           {item.children?.map((childrenItem, childrenIndex) => {
@@ -20,7 +24,7 @@ const App = () => {
               <Route
                 key={childrenIndex}
                 path={childrenItem.path}
-                element={<IsAuthUser>{childrenItem.elementChild}</IsAuthUser>}
+                element={childrenItem.elementChild}
               />
             );
           })}
