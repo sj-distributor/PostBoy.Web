@@ -4,7 +4,7 @@ import "./index.module.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
-import TokenProvider from "./hooks/tokenProvider";
+import TokenProvider from "./hooks/authProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(

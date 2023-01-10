@@ -19,13 +19,14 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
       : ""
   );
   const [token, setToken] = useState<string>(defaultToken);
-  const [authStatus, setAuthStatus] = useState<boolean>(!!token);
+  const [authStatus, setAuthStatus] = useState<boolean>(!!defaultToken);
 
   // cun token cizuhua
   const signIn = (token: string, callback?: Function) => {
     setToken(token);
     localStorage.setItem("token", token);
     const tokenObj = jwt_decode<{ unique_name: string }>(token);
+
     setUsername(tokenObj.unique_name);
     setAuthStatus(true);
     callback && callback();
