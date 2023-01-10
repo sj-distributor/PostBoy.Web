@@ -17,7 +17,7 @@ export interface IResponse<T> {
 export enum ResponseCode {
   Ok = 200,
   Unauthorized = 401,
-  Internalservererror = 500
+  InternalServerError = 500
 }
 
 export async function base<T>(url: string, method: "get" | "post", data?: object) {
@@ -37,7 +37,7 @@ export async function base<T>(url: string, method: "get" | "post", data?: object
       } else if (res.code === ResponseCode.Unauthorized) {
         // TODO refetch data with new token
         return null;
-      } else if (res.code === ResponseCode.Internalservererror) {
+      } else if (res.code === ResponseCode.InternalServerError) {
         // TODO show something error message
         return null;
       } else {

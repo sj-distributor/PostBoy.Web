@@ -28,6 +28,7 @@ const App = () => {
       );
     });
   };
+
   return isLoaded ? (
     <div className="App">
       <Routes>

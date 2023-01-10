@@ -11,7 +11,7 @@ interface TokenContextOptions {
 
 export const TokenContext = createContext<TokenContextOptions>(null!);
 
-const TokenProvider = (props: { children: React.ReactNode }) => {
+const AuthProvider = (props: { children: React.ReactNode }) => {
   const [username, setUsername] = useState("");
   const defaultToken = localStorage.getItem("token") as string;
   const [token, setToken] = useState<string>(defaultToken);
@@ -41,4 +41,4 @@ const TokenProvider = (props: { children: React.ReactNode }) => {
   );
 };
 
-export default TokenProvider;
+export default AuthProvider;
