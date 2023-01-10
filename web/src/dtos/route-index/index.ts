@@ -1,3 +1,3 @@
-export enum RouteState {
+export enum RouteStateEnum {
   None = -1,
 }

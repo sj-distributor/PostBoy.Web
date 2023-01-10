@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { RouteState } from "../../dtos/route-index";
-import { RouteItem } from "../../dtos/route-type";
+import { RouteStateEnum } from "../../dtos/route-index";
+import { IRouteItem } from "../../dtos/route-type";
 import { routerArray } from "../../router/elementRoute";
 
 const useMainAction = () => {
@@ -12,16 +12,16 @@ const useMainAction = () => {
     const getMainClickIndex = () => {
       const getMainIndex = 0;
       routerArray.map(
-        (item: RouteItem, index: number) =>
+        (item: IRouteItem, index: number) =>
           item?.children?.findIndex((x) => x.path === mainLocation.pathname) !==
-            RouteState.None && getMainIndex === index
+            RouteStateEnum.None && getMainIndex === index
       );
       return getMainIndex;
     };
 
     setMainClickIndex(
       (routerArray.findIndex((x) => x.path === mainLocation.pathname) ===
-      RouteState.None
+      RouteStateEnum.None
         ? getMainClickIndex()
         : routerArray.findIndex(
             (x) => x.path === mainLocation.pathname

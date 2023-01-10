@@ -3,23 +3,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
 
 const useAction = () => {
-  const homeLocation = useLocation();
-  const homeNavigate = useNavigate();
-  const [homeClickIndex, setHomeClickIndex] = useState<number>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [click, setClick] = useState<number>();
 
   useEffect(() => {
-    setHomeClickIndex(
+    setClick(
       routerArray
         .find((x) => x.path === "/home")
-        ?.children?.findIndex((x) => x.path === homeLocation.pathname)
+        ?.children?.findIndex((x) => x.path === location.pathname)
     );
-  }, [homeLocation.pathname]);
+  }, [location.pathname]);
 
   return {
-    homeClickIndex,
-    setHomeClickIndex,
-    homeNavigate,
-    homeLocation,
+    click,
+    setClick,
+    navigate,
+    location,
   };
 };
 

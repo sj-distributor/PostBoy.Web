@@ -1,30 +1,25 @@
-$contentNavActive: #000000;
-$contentBackgroundColor: #f2f3f4;
-
-.content {
-  flex: 1;
+.home {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: $contentBackgroundColor;
 
-  .contentTab {
+  .nav {
     margin: 2.5rem 5rem;
     display: flex;
     flex: row;
 
-    .contentTabBar,
-    .contentTabBarShow {
+    .navBar,
+    .navBarActive {
       display: flex;
       flex-direction: column;
       margin-right: 2rem;
-      color: gray;
+      color: #808080;
       font-size: 1.2rem;
     }
 
-    .contentTabBarShow {
+    .navBarActive {
       color: #000000;
-      border-bottom: 0.2rem solid $contentNavActive;
+      border-bottom: 0.2rem solid #000000;
     }
   }
 }

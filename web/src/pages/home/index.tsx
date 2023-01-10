@@ -1,32 +1,30 @@
 import { Link, Outlet } from "react-router-dom";
-import { RouteItem } from "../../dtos/route-type";
+import { IRouteItem } from "../../dtos/route-type";
 import { routerArray } from "../../router/elementRoute";
 import useAction from "./hook";
 
 import styles from "./index.module.scss";
 
 const Home = () => {
-  const { homeClickIndex, setHomeClickIndex } = useAction();
+  const { click, setClick } = useAction();
 
-  const routerTabBarContent = (list: RouteItem[]) => {
+  const routerTabBarContent = (list: IRouteItem[]) => {
     return list.map((item, index) => {
       return (
-        <div className={styles.contentTab} key={index}>
-          {item.children?.map((childrenItem, childrenIndex) => {
+        <div className={styles.nav} key={index}>
+          {item.children?.map((childItem, childIndex) => {
             return (
               <Link
-                key={childrenIndex}
-                to={childrenItem.path}
+                key={childIndex}
+                to={childItem.path}
                 onClick={() => {
-                  setHomeClickIndex(childrenIndex);
+                  setClick(childIndex);
                 }}
                 className={
-                  homeClickIndex === childrenIndex
-                    ? styles.contentTabBarShow
-                    : styles.contentTabBar
+                  click === childIndex ? styles.navBarActive : styles.navBar
                 }
               >
-                {childrenItem.title}
+                {childItem.title}
               </Link>
             );
           })}
@@ -36,7 +34,7 @@ const Home = () => {
   };
 
   return (
-    <div className={styles.content}>
+    <div className={styles.home}>
       {routerTabBarContent(routerArray)}
       <Outlet />
     </div>
