@@ -4,6 +4,7 @@ import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/route-type";
 import useMainAction from "./hook";
+import UserInformation from "./components/user-information";
 
 const Main = () => {
   const { clickMainIndex, setMainClickIndex } = useMainAction();
@@ -17,11 +18,7 @@ const Main = () => {
             onClick={() => {
               setMainClickIndex(index);
             }}
-            className={
-              clickMainIndex === index
-                ? styles.navBarItemClick
-                : styles.navBarItemNone
-            }
+            className={clickMainIndex === index ? styles.navBarItemClick : styles.navBarItemNone}
           >
             <span className={item.icons} />
             {item.head}
@@ -37,7 +34,12 @@ const Main = () => {
         <div className={styles.navBar}>{routerTabBar(routerArray)}</div>
       </div>
       <div className={styles.content}>
-        <Outlet />
+        <div className={styles.contextUpper}>
+          <UserInformation />
+        </div>
+        <div className={styles.contextLower}>
+          <Outlet />
+        </div>
       </div>
     </div>
   );

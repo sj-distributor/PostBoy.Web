@@ -12,8 +12,10 @@ interface AuthContextOptions {
 export const AuthContext = createContext<AuthContextOptions>(null!);
 
 const AuthProvider = (props: { children: React.ReactNode }) => {
-  const [username, setUsername] = useState("");
   const defaultToken = localStorage.getItem("token") as string;
+  const [username, setUsername] = useState(
+    defaultToken ? jwt_decode<{ unique_name: string }>(defaultToken).unique_name : ""
+  );
   const [token, setToken] = useState<string>(defaultToken);
   const [authStatus, setAuthStatus] = useState<boolean>(!!token);
 
@@ -21,6 +23,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setToken(token);
     localStorage.setItem("token", token);
     const tokenObj = jwt_decode<{ unique_name: string }>(token);
+
     setUsername(tokenObj.unique_name);
     setAuthStatus(true);
     callback && callback();

@@ -45,4 +45,10 @@ $aClickColor: #30cea3;
   height: 100vh;
   display: flex;
   flex-direction: column;
+
+  .contextUpper {
+    display: flex;
+    justify-content: end;
+    padding: 0.5rem 2rem;
+  }
 }
