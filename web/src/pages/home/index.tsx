@@ -1,5 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
-import { IRouteItem } from "../../dtos/route-type";
+import { RouteItem } from "../../dtos/route-type";
 import { routerArray } from "../../router/elementRoute";
 import useAction from "./hook";
 
@@ -8,7 +8,7 @@ import styles from "./index.module.scss";
 const Home = () => {
   const { click, setClick } = useAction();
 
-  const routerTabBarContent = (list: IRouteItem[]) => {
+  const routerTabBarContent = (list: RouteItem[]) => {
     return list.map((item, index) => {
       return (
         <div className={styles.nav} key={index}>

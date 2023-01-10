@@ -2,13 +2,13 @@ import React from "react";
 import styles from "./index.module.scss";
 import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
-import { IRouteItem } from "../../dtos/route-type";
+import { RouteItem } from "../../dtos/route-type";
 import useMainAction from "./hook";
 
 const Main = () => {
   const { clickMainIndex, setMainClickIndex } = useMainAction();
 
-  const routerTabBar = (list: IRouteItem[]) => {
+  const routerTabBar = (list: RouteItem[]) => {
     return routerArray.map((item, index) => {
       return (
         <div key={index} className={styles.item}>

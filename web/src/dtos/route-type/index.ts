@@ -1,14 +1,14 @@
 import { ReactElement } from "react";
 
-export interface IRouteItem {
+export interface RouteItem {
   path: string;
   head: string;
   icons: string;
   element: ReactElement;
-  children?: IChildProps[];
+  children?: ChildProps[];
 }
 
-export interface IChildProps {
+export interface ChildProps {
   path: string;
   title: string;
   elementChild: ReactElement;
