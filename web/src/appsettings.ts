@@ -1,8 +1,5 @@
 export interface AppSettings {
   serverUrl: string;
-  jsVersion: string;
-  sourceSystem: string;
-  languagecode: string;
 }
 
 const settings = (window as any).appSettings;

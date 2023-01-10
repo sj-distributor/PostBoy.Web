@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AuthAccont } from "../../api/login";
 import { useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../../hooks/authHook";
+import useAuth from "../../auth";
 
 const useAction = () => {
   const navigate = useNavigate();

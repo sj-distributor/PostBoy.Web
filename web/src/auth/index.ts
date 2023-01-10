@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { TokenContext } from "./tokenProvider";
+import { TokenContext } from "../hooks/tokenProvider";
 
 const useAuth = () => {
   return useContext(TokenContext);

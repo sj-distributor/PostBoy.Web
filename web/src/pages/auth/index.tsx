@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import useAuth from "../../hooks/authHook";
+import useAuth from "../../auth";
 
 const IsAuthUser = (props: { children: JSX.Element }) => {
   let { authStatus } = useAuth();
