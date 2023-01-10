@@ -12,13 +12,15 @@ const Main = () => {
   const routerTabBar = (list: RouteItem[]) => {
     return routerArray.map((item, index) => {
       return (
-        <div key={index} className={styles.navBarItem}>
+        <div key={index} className={styles.item}>
           <Link
             to={item.path}
             onClick={() => {
               setMainClickIndex(index);
             }}
-            className={clickMainIndex === index ? styles.navBarItemClick : styles.navBarItemNone}
+            className={
+              clickMainIndex === index ? styles.itemClick : styles.itemNone
+            }
           >
             <span className={item.icons} />
             {item.head}
@@ -29,8 +31,8 @@ const Main = () => {
   };
 
   return (
-    <div className={styles.mainBox}>
-      <div className={styles.nav}>
+    <div className={styles.main}>
+      <div className={styles.sideBar}>
         <div className={styles.navBar}>{routerTabBar(routerArray)}</div>
       </div>
       <div className={styles.content}>

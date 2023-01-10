@@ -5,10 +5,10 @@ export interface RouteItem {
   head: string;
   icons: string;
   element: ReactElement;
-  children?: childrenProps[];
+  children?: ChildProps[];
 }
 
-export interface childrenProps {
+export interface ChildProps {
   path: string;
   title: string;
   elementChild: ReactElement;

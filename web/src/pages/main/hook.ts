@@ -13,23 +13,26 @@ const useMainAction = () => {
       const getMainIndex = 0;
       routerArray.map(
         (item: RouteItem, index: number) =>
-          item?.children?.findIndex((x) => x.path === mainLocation.pathname) !== RouteState.None &&
-          getMainIndex === index
+          item?.children?.findIndex((x) => x.path === mainLocation.pathname) !==
+            RouteState.None && getMainIndex === index
       );
       return getMainIndex;
     };
 
     setMainClickIndex(
-      (routerArray.findIndex((x) => x.path === mainLocation.pathname) === RouteState.None
+      (routerArray.findIndex((x) => x.path === mainLocation.pathname) ===
+      RouteState.None
         ? getMainClickIndex()
-        : routerArray.findIndex((x) => x.path === mainLocation.pathname)) as number
+        : routerArray.findIndex(
+            (x) => x.path === mainLocation.pathname
+          )) as number
     );
   }, [mainLocation.pathname]);
 
   return {
     mainLocation,
     clickMainIndex,
-    setMainClickIndex
+    setMainClickIndex,
   };
 };
 
