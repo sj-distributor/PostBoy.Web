@@ -12,9 +12,6 @@ const User = () => {
 
   return (
     <div className={styles.user}>
-      <div className={styles.title}>
-        <h1>{username}</h1>
-      </div>
       <div>
         <Accordion className={styles.accordion}>
           <AccordionSummary
