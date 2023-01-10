@@ -2,7 +2,6 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { routerArray } from "./router/elementRoute";
 import Login from "./pages/login";
 import Main from "./pages/main";
-import { IRouteItem } from "./dtos/route-type";
 import useAction from "./AppHook";
 import { RouteItem } from "./dtos/route-type";
 import IsAuthUser from "./pages/auth";

@@ -3,8 +3,30 @@
     text-align: center;
   }
 
+  .tab {
+    box-shadow: none;
+  }
+
+  .row {
+    width: calc(100% - 3rem);
+    margin: 0 1.5rem 1rem;
+    background-color: #ffffff;
+    box-shadow: none;
+  }
+
   .accordion {
-    margin: 1rem auto;
-    width: 90%;
+    background-color: #f2f3f4;
+    box-shadow: none;
+
+    .accordionSummary {
+      margin: 0 1.5rem 0.8rem;
+      background-color: #ffffff;
+    }
+
+    .accordionDetails {
+      margin: 0 2rem 0.8rem;
+      width: calc(100% - 7rem);
+      background-color: #ffffff;
+    }
   }
 }
