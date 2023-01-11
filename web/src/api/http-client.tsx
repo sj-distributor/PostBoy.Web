@@ -26,7 +26,9 @@ export async function base<T>(url: string, method: "get" | "post", data?: object
     method: method,
     body: data ? JSON.stringify(data) : undefined,
     headers: {
-      Authorization: localStorage.getItem("token") ? (localStorage.getItem("token") as string) : "",
+      Authorization:
+        "Bearer " +
+        (localStorage.getItem("token") ? (localStorage.getItem("token") as string) : ""),
       "Content-Type": "application/json"
     }
   })
