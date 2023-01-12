@@ -16,3 +16,8 @@ export interface ICorpAppData {
 export interface ICorpAppListApiData {
   CorpId: string;
 }
+
+export interface IMessageType {
+  title: string;
+  groupBy: string;
+}
