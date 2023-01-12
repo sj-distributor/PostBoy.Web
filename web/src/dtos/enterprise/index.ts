@@ -1,4 +1,4 @@
-export interface ICorpsData {
+export interface ICorpData {
   corpId: string;
   corpName: string;
   id: string;
@@ -17,13 +17,13 @@ export interface ICorpAppListApiData {
   CorpId: string;
 }
 
-export interface IMessageType {
+export interface IMessageTypeData {
   title: string;
   groupBy: string;
-  type: MessageType;
+  type: MessageDataType;
 }
 
-export enum MessageType {
+export enum MessageDataType {
   Text,
   ImageText,
   Audio,

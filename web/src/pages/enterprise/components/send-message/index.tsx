@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Snackbar } from "@mui/material";
+import { Button } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import React from "react";
@@ -14,11 +14,11 @@ const SendMessage = () => {
     corpsValue,
     corpAppValue,
     messageTypeValue,
+    setCorpsValue,
     setCorpAppValue,
     setMessageParams,
     setMessageTypeValue,
-    handleSubmit,
-    handleCorpsListChange
+    handleSubmit
   } = useAction();
 
   const muiSxStyle = { width: "15vw" };
@@ -38,7 +38,7 @@ const SendMessage = () => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             renderInput={(params) => <TextField {...params} label="选择企业" />}
             onChange={(e, value) => {
-              handleCorpsListChange(value);
+              setCorpsValue(value);
             }}
           />
         )}

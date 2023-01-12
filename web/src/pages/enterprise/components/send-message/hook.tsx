@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import { GetcCorpsList, GetCorpAppList } from "../../../../api/enterprise";
 import {
   ICorpAppData,
-  ICorpsData,
-  IMessageType,
-  MessageType
+  ICorpData,
+  IMessageTypeData,
+  MessageDataType
 } from "../../../../dtos/enterprise";
 
 const useAction = () => {
-  const [corpsList, setCorpsList] = useState<ICorpsData[]>();
+  const [corpsList, setCorpsList] = useState<ICorpData[]>();
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>();
-  const messageTypeList: IMessageType[] = [
-    { title: "文本", groupBy: "", type: MessageType.Text },
-    { title: "图文", groupBy: "", type: MessageType.ImageText },
-    { title: "语音", groupBy: "文件", type: MessageType.Audio },
-    { title: "图片", groupBy: "文件", type: MessageType.Image }
+  const messageTypeList: IMessageTypeData[] = [
+    { title: "文本", groupBy: "", type: MessageDataType.Text },
+    { title: "图文", groupBy: "", type: MessageDataType.ImageText },
+    { title: "语音", groupBy: "文件", type: MessageDataType.Audio },
+    { title: "图片", groupBy: "文件", type: MessageDataType.Image }
   ];
   const [messageParams, setMessageParams] = useState<string>();
-  const [corpsValue, setCorpsValue] = useState<ICorpsData>();
+  const [corpsValue, setCorpsValue] = useState<ICorpData>();
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
-  const [messageTypeValue, setMessageTypeValue] = useState<IMessageType>(
+  const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
 
@@ -31,13 +31,6 @@ const useAction = () => {
     }
   };
 
-  const handleCorpsListChange = (data: ICorpsData | null) => {
-    if (!!data) {
-      setCorpsValue(data);
-      getCorpAppList(data.id);
-    }
-  };
-
   const handleSubmit = () => {};
 
   useEffect(() => {
@@ -45,21 +38,13 @@ const useAction = () => {
       if (data) {
         setCorpsList(data);
         setCorpsValue(data[0]);
-        getCorpAppList(data[0].id);
       }
     });
   }, []);
 
   useEffect(() => {
-    if (
-      corpsList &&
-      corpsList.length >= 1 &&
-      corpsList[0].corpName !== "None"
-    ) {
-      setCorpsValue(corpsList[0]);
-      getCorpAppList(corpsList[0].id);
-    }
-  }, [corpsList]);
+    corpsValue && getCorpAppList(corpsValue.id);
+  }, [corpsValue?.id]);
 
   return {
     corpsList,
@@ -70,11 +55,12 @@ const useAction = () => {
     corpAppValue,
     messageTypeValue,
     setMessageParams,
+    setCorpsValue,
     setCorpAppValue,
+    setCorpAppList,
     setMessageTypeValue,
     getCorpAppList,
-    handleSubmit,
-    handleCorpsListChange
+    handleSubmit
   };
 };
 
