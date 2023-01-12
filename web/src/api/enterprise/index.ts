@@ -11,6 +11,6 @@ export const GetcCorpsList = async () => {
 
 export const GetCorpAppList = async (params: ICorpAppListApiData) => {
   return await Get<ICorpAppData[]>(
-    "/api/WeChat/work/corp/apps?CorpId=" + params.CorpId
+    `/api/WeChat/work/corp/apps?CorpId=${params.CorpId}`
   );
 };
