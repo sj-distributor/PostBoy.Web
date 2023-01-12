@@ -21,7 +21,7 @@ const SendMessage = () => {
     handleSubmit
   } = useAction();
 
-  const muiSxStyle = { width: "15vw" };
+  const muiSxStyle = { width: "15rem" };
 
   return (
     <div>
