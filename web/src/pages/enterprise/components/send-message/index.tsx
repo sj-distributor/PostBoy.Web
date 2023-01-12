@@ -28,34 +28,38 @@ const SendMessage = () => {
   return (
     <div>
       <div className={styles.inputBox}>
-        <Autocomplete
-          disablePortal
-          id="Autocomplete-corpsDataId"
-          value={corpsValue}
-          disableClearable={true}
-          options={corpsList ? corpsList : []}
-          sx={muiSxStyle}
-          getOptionLabel={(option) => option.corpName}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          renderInput={(params) => <TextField {...params} label="选择企业" />}
-          onChange={(e, value) => {
-            handleCorpsListChange(value);
-          }}
-        />
-        <Autocomplete
-          disablePortal
-          id="Autocomplete-corpAppListId"
-          value={corpAppValue}
-          options={corpAppList ? corpAppList : []}
-          sx={muiSxStyle}
-          disableClearable={true}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          onChange={(e, value) => {
-            setCorpAppValue(value);
-          }}
-          renderInput={(params) => <TextField {...params} label="选择应用" />}
-        />
+        {!!corpsValue && (
+          <Autocomplete
+            disablePortal
+            id="Autocomplete-corpsDataId"
+            value={corpsValue}
+            disableClearable={true}
+            options={corpsList ? corpsList : []}
+            sx={muiSxStyle}
+            getOptionLabel={(option) => option.corpName}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderInput={(params) => <TextField {...params} label="选择企业" />}
+            onChange={(e, value) => {
+              handleCorpsListChange(value);
+            }}
+          />
+        )}
+        {!!corpAppValue && (
+          <Autocomplete
+            disablePortal
+            id="Autocomplete-corpAppListId"
+            value={corpAppValue}
+            options={corpAppList ? corpAppList : []}
+            sx={muiSxStyle}
+            disableClearable={true}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            onChange={(e, value) => {
+              setCorpAppValue(value);
+            }}
+            renderInput={(params) => <TextField {...params} label="选择应用" />}
+          />
+        )}
         <Autocomplete
           disablePortal
           id="Autocomplete-messageTypeListId"
@@ -63,12 +67,13 @@ const SendMessage = () => {
           options={messageTypeList}
           sx={muiSxStyle}
           value={messageTypeValue}
+          getOptionLabel={(option) => option.title}
+          groupBy={(option) => option.groupBy}
+          isOptionEqualToValue={(option, value) => option.type === value.type}
+          renderInput={(params) => <TextField {...params} label="消息类型" />}
           onChange={(e, value) => {
             setMessageTypeValue(value);
           }}
-          getOptionLabel={(option) => option.title}
-          groupBy={(option) => option.groupBy}
-          renderInput={(params) => <TextField {...params} label="消息类型" />}
         />
         <TextField
           id="Autocomplete-messageParamsId"

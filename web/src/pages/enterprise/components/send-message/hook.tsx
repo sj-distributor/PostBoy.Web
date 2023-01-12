@@ -10,24 +10,8 @@ import { SlideProps } from "@mui/material/Slide";
 import Slide from "@mui/material/Slide";
 
 const useAction = () => {
-  const defaultCorp: ICorpsData = {
-    id: "",
-    corpId: "",
-    corpName: "None"
-  };
-  const defaultCorpApp: ICorpAppData = {
-    id: "",
-    appId: "",
-    workWeChatCorpId: "",
-    name: "None",
-    secret: "",
-    agentId: -1
-  };
-
-  const [corpsList, setCorpsList] = useState<ICorpsData[]>([defaultCorp]);
-  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([
-    defaultCorpApp
-  ]);
+  const [corpsList, setCorpsList] = useState<ICorpsData[]>();
+  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>();
   const messageTypeList: IMessageType[] = [
     { title: "文本", groupBy: "", type: MessageType.Text },
     { title: "图文", groupBy: "", type: MessageType.ImageText },
@@ -35,10 +19,11 @@ const useAction = () => {
     { title: "图片", groupBy: "文件", type: MessageType.Image }
   ];
   const [messageParams, setMessageParams] = useState<string>();
-  const [corpsValue, setCorpsValue] = useState<ICorpsData>(defaultCorp);
-  const [corpAppValue, setCorpAppValue] =
-    useState<ICorpAppData>(defaultCorpApp);
-  const [messageTypeValue, setMessageTypeValue] = useState<IMessageType>();
+  const [corpsValue, setCorpsValue] = useState<ICorpsData>();
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
+  const [messageTypeValue, setMessageTypeValue] = useState<IMessageType>(
+    messageTypeList[0]
+  );
 
   const getCorpAppList = async (corpsDataId: string) => {
     const corpAppResult = await GetCorpAppList({ CorpId: corpsDataId });
@@ -72,7 +57,11 @@ const useAction = () => {
   }, []);
 
   useEffect(() => {
-    if (corpsList.length >= 1 && corpsList[0].corpName !== "None") {
+    if (
+      corpsList &&
+      corpsList.length >= 1 &&
+      corpsList[0].corpName !== "None"
+    ) {
       setCorpsValue(corpsList[0]);
       getCorpAppList(corpsList[0].id);
     }
