@@ -6,8 +6,6 @@ import {
   IMessageType,
   MessageType
 } from "../../../../dtos/enterprise";
-import { SlideProps } from "@mui/material/Slide";
-import Slide from "@mui/material/Slide";
 
 const useAction = () => {
   const [corpsList, setCorpsList] = useState<ICorpsData[]>();
