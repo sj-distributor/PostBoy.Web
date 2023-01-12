@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Slide, Slider, Snackbar } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import React from "react";
@@ -11,35 +11,34 @@ const SendMessage = () => {
     corpAppData,
     messageTypeList,
     messageParams,
+    corpsListLoading,
+    corpAppListLoading,
+    corAppValue,
+    isShowTips,
+    setIsShowTips,
     handleSubmit,
-    getCorpAppList,
+    setMessageParams,
+    handleCorpAppListClick,
+    TransitionLeft,
     handleCorpsListChange
   } = useAction();
 
-  let loading = false;
-
-  console.log(
-    JSON.stringify(corpsList),
-    JSON.stringify(corpAppData),
-    !!corpsList && corpsList.length > 0 && !!corpAppData && corpAppData[0].id === ""
-  );
+  const muiSxStyle = { width: "15vw" };
 
   return (
     <div>
       <div className={styles.inputBox}>
         <Autocomplete
-          className={styles.selectList}
           disablePortal
           id="combo-box-demo"
-          onChange={(e) => {
-            console.log((e.target as HTMLLIElement).textContent);
-            handleCorpsListChange((e.target as HTMLLIElement).textContent as string);
-          }}
-          options={corpsList}
-          sx={{ width: 300 }}
+          options={corpsList ? corpsList : []}
+          sx={muiSxStyle}
+          loading={corpsListLoading}
           getOptionLabel={(option) => option.corpName}
           isOptionEqualToValue={(option, value) => option.id === value.id}
-          loading={!!corpsList}
+          onChange={(e) => {
+            handleCorpsListChange((e.target as HTMLLIElement).textContent as string);
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -48,9 +47,7 @@ const SendMessage = () => {
                 ...params.InputProps,
                 endAdornment: (
                   <>
-                    {!!corpsList && corpsList.length <= 0 ? (
-                      <CircularProgress color="inherit" size={20} />
-                    ) : null}
+                    {corpsListLoading ? <CircularProgress color="inherit" size={20} /> : null}
                     {params.InputProps.endAdornment}
                   </>
                 )
@@ -59,18 +56,20 @@ const SendMessage = () => {
           )}
         />
         <Autocomplete
-          className={styles.selectList}
           disablePortal
           id="combo-box-demo"
-          options={corpAppData}
-          sx={{ width: 300 }}
+          value={corAppValue}
+          options={corpAppData ? corpAppData : []}
+          sx={muiSxStyle}
+          loading={corpAppListLoading}
           getOptionLabel={(option) => option.name}
           isOptionEqualToValue={(option, value) => option.id === value.id}
           onFocus={() => {
-            loading =
-              !!corpsList && corpsList.length > 0 && !!corpAppData && corpAppData[0].id === "";
+            handleCorpAppListClick();
           }}
-          loading={loading}
+          onBlur={() => {
+            setIsShowTips(false);
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -79,7 +78,7 @@ const SendMessage = () => {
                 ...params.InputProps,
                 endAdornment: (
                   <>
-                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                    {corpAppListLoading ? <CircularProgress color="inherit" size={20} /> : null}
                     {params.InputProps.endAdornment}
                   </>
                 )
@@ -91,39 +90,40 @@ const SendMessage = () => {
           disablePortal
           id="combo-box-demo"
           options={messageTypeList}
-          sx={{ width: 300 }}
+          sx={muiSxStyle}
+          getOptionLabel={(option) => option.title}
+          groupBy={(option) => option.groupBy}
           renderInput={(params) => <TextField {...params} label="消息类型" />}
         />
-        <Autocomplete
-          className={styles.selectList}
-          disablePortal
+        <TextField
           id="combo-box-demo"
-          options={messageParams}
-          sx={{ width: 300 }}
-          loading={!!messageParams && messageParams.length <= 0}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="消息参数"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {!!messageParams && messageParams.length <= 0 ? (
-                      <CircularProgress color="inherit" size={20} />
-                    ) : null}
-                    {params.InputProps.endAdornment}
-                  </>
-                )
-              }}
-            />
-          )}
+          label="消息参数"
+          sx={muiSxStyle}
+          value={messageParams}
+          onChange={(e) => setMessageParams((e.target as HTMLInputElement).value)}
         />
         <Button variant="contained" onClick={handleSubmit}>
           发送
         </Button>
       </div>
-      <div className={styles.textarea}></div>
+      <div className={styles.textarea}>
+        <TextField
+          className={styles.multilineTextField}
+          id="outlined-multiline-static"
+          label="参数Json"
+          multiline
+          minRows={12}
+        />
+      </div>
+      <Snackbar
+        message="请先选择企业"
+        autoHideDuration={3000}
+        TransitionComponent={TransitionLeft}
+        open={isShowTips}
+        onClose={(event, reason) => {
+          reason !== "clickaway" && setIsShowTips(false);
+        }}
+      />
     </div>
   );
 };

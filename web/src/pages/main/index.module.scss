@@ -13,9 +13,10 @@ $aClickColor: #30cea3;
 
 .sideBar {
   background: $navBackgroundColor;
-  width: 15vw;
-  height: 100vh;
+  width: 15rem;
+  height: 100%;
   text-align: center;
+  flex-shrink: 0;
 
   .navBar {
     margin-top: 8rem;
@@ -42,7 +43,7 @@ $aClickColor: #30cea3;
 
 .content {
   flex: 1;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #f2f3f4;

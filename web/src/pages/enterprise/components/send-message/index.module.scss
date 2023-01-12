@@ -5,6 +5,16 @@
   padding: 0 6rem;
 }
 
-.selectList {
-  width: 14rem;
+.textarea {
+  margin-top: 2rem;
+  padding: 0 6rem;
+
+  .multilineTextField {
+    width: 100%;
+    min-height: 20rem;
+
+    :global(.MuiInputBase-multiline) {
+      height: 100%;
+    }
+  }
 }
