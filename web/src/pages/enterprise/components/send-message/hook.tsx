@@ -12,8 +12,9 @@ const useAction = () => {
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
   const messageTypeList: IMessageTypeData[] = [
     { title: "文本", groupBy: "", type: MessageDataType.Text },
-    { title: "图文", groupBy: "", type: MessageDataType.ImageText },
-    { title: "语音", groupBy: "文件", type: MessageDataType.Audio },
+    { title: "图文", groupBy: "", type: MessageDataType.Image },
+    { title: "语音", groupBy: "文件", type: MessageDataType.Voice },
+    { title: "视频", groupBy: "文件", type: MessageDataType.Video },
     { title: "图片", groupBy: "文件", type: MessageDataType.Image }
   ];
   const [messageParams, setMessageParams] = useState<string>("");

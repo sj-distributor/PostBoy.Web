@@ -24,8 +24,9 @@ export interface IMessageTypeData {
 }
 
 export enum MessageDataType {
-  Text,
-  ImageText,
-  Audio,
-  Image
+  Image,
+  Voice,
+  Video,
+  File,
+  Text
 }
