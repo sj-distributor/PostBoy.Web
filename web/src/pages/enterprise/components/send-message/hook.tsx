@@ -33,10 +33,6 @@ const useAction = () => {
     }
   };
 
-  const TransitionLeft = (props: Omit<SlideProps, "direction">) => {
-    return <Slide {...props} direction="right" />;
-  };
-
   const handleCorpsListChange = (data: ICorpsData | null) => {
     if (!!data) {
       setCorpsValue(data);
@@ -77,11 +73,9 @@ const useAction = () => {
     messageTypeValue,
     setMessageParams,
     setCorpAppValue,
-    setCorpsValue,
     setMessageTypeValue,
     getCorpAppList,
     handleSubmit,
-    TransitionLeft,
     handleCorpsListChange
   };
 };

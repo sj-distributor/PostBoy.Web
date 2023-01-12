@@ -16,11 +16,9 @@ const SendMessage = () => {
     messageTypeValue,
     setCorpAppValue,
     setMessageParams,
-    setCorpsValue,
     setMessageTypeValue,
     handleSubmit,
-    handleCorpsListChange,
-    TransitionLeft
+    handleCorpsListChange
   } = useAction();
 
   const muiSxStyle = { width: "15vw" };
@@ -93,8 +91,8 @@ const SendMessage = () => {
           id="TextField-paramsJsonId"
           label="参数Json"
           className={styles.multilineTextField}
-          multiline
           minRows={12}
+          multiline
         />
       </div>
     </div>
