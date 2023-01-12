@@ -34,7 +34,7 @@ const SendMessage = () => {
               id="Autocomplete-corpsDataId"
               value={corpsValue}
               disableClearable={true}
-              options={corpsList ? corpsList : []}
+              options={corpsList}
               sx={muiSxStyle}
               getOptionLabel={(option) => option.corpName}
               isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -49,7 +49,7 @@ const SendMessage = () => {
               disablePortal
               id="Autocomplete-corpAppListId"
               value={corpAppValue}
-              options={corpAppList ? corpAppList : []}
+              options={corpAppList}
               sx={muiSxStyle}
               disableClearable={true}
               getOptionLabel={(option) => option.name}
@@ -65,6 +65,7 @@ const SendMessage = () => {
         )}
         <Autocomplete
           disablePortal
+          className={styles.messageTypeList}
           id="Autocomplete-messageTypeListId"
           disableClearable={true}
           options={messageTypeList}
@@ -72,8 +73,18 @@ const SendMessage = () => {
           value={messageTypeValue}
           getOptionLabel={(option) => option.title}
           groupBy={(option) => option.groupBy}
-          isOptionEqualToValue={(option, value) => option.type === value.type}
+          isOptionEqualToValue={(option, value) => option.title === value.title}
           renderInput={(params) => <TextField {...params} label="消息类型" />}
+          renderGroup={(params) => {
+            return (
+              <div key={params.key}>
+                <p className={params.group === "文件" ? styles.groupLabel : ""}>
+                  {params.group}
+                </p>
+                <span>{params.children}</span>
+              </div>
+            );
+          }}
           onChange={(e, value) => {
             setMessageTypeValue(value);
           }}
