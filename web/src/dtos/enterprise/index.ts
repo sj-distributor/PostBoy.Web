@@ -20,4 +20,12 @@ export interface ICorpAppListApiData {
 export interface IMessageType {
   title: string;
   groupBy: string;
+  type: MessageType;
+}
+
+export enum MessageType {
+  Text,
+  ImageText,
+  Audio,
+  Image
 }

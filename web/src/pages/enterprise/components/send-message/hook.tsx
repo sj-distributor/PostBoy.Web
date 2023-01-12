@@ -1,77 +1,97 @@
 import { useEffect, useState } from "react";
 import { GetcCorpsList, GetCorpAppList } from "../../../../api/enterprise";
-import { ICorpAppData, ICorpsData, IMessageType } from "../../../../dtos/enterprise";
+import {
+  ICorpAppData,
+  ICorpsData,
+  IMessageType,
+  MessageType
+} from "../../../../dtos/enterprise";
 import { SlideProps } from "@mui/material/Slide";
 import Slide from "@mui/material/Slide";
 
 const useAction = () => {
-  const [corpsList, setCorpsList] = useState<ICorpsData[]>();
-  const [corpAppData, setCorpAppData] = useState<ICorpAppData[]>();
-  const [messageTypeList, setMessageTypeList] = useState<IMessageType[]>([
-    { title: "文本", groupBy: "" },
-    { title: "图文", groupBy: "" },
-    { title: "语音", groupBy: "文件" },
-    { title: "图片", groupBy: "文件" }
-  ]);
-  const [messageParams, setMessageParams] = useState<string>();
+  const defaultCorp: ICorpsData = {
+    id: "",
+    corpId: "",
+    corpName: "None"
+  };
+  const defaultCorpApp: ICorpAppData = {
+    id: "",
+    appId: "",
+    workWeChatCorpId: "",
+    name: "None",
+    secret: "",
+    agentId: -1
+  };
 
-  const [corpsListSelected, setCorpsListSelected] = useState(false);
-  const [corAppValue, setCorAppValue] = useState<ICorpAppData>();
-  const [corpsListLoading, setCorpsListLoading] = useState<boolean>(false);
-  const [corpAppListLoading, setCorpAppListLoading] = useState<boolean>(false);
-  const [isShowTips, setIsShowTips] = useState(false);
+  const [corpsList, setCorpsList] = useState<ICorpsData[]>([defaultCorp]);
+  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([
+    defaultCorpApp
+  ]);
+  const messageTypeList: IMessageType[] = [
+    { title: "文本", groupBy: "", type: MessageType.Text },
+    { title: "图文", groupBy: "", type: MessageType.ImageText },
+    { title: "语音", groupBy: "文件", type: MessageType.Audio },
+    { title: "图片", groupBy: "文件", type: MessageType.Image }
+  ];
+  const [messageParams, setMessageParams] = useState<string>();
+  const [corpsValue, setCorpsValue] = useState<ICorpsData>(defaultCorp);
+  const [corpAppValue, setCorpAppValue] =
+    useState<ICorpAppData>(defaultCorpApp);
+  const [messageTypeValue, setMessageTypeValue] = useState<IMessageType>();
 
   const getCorpAppList = async (corpsDataId: string) => {
     const corpAppResult = await GetCorpAppList({ CorpId: corpsDataId });
     if (corpAppResult) {
-      setCorpAppData(corpAppResult);
+      setCorpAppList(corpAppResult);
+      setCorpAppValue(corpAppResult[0]);
     }
   };
 
-  const handleCorpAppListClick = () => {
-    setIsShowTips(true);
+  const TransitionLeft = (props: Omit<SlideProps, "direction">) => {
+    return <Slide {...props} direction="right" />;
   };
 
-  const handleCorpsListChange = (text: string) => {
-    let clickedCorpItem;
-    corpsList && text
-      ? (clickedCorpItem = corpsList.find((item) => item.corpName === text))
-      : setCorAppValue(undefined);
-    setCorpsListSelected(!!(corpsList && text));
-    clickedCorpItem ? getCorpAppList(clickedCorpItem.id) : setCorpAppData(undefined);
+  const handleCorpsListChange = (data: ICorpsData | null) => {
+    if (!!data) {
+      setCorpsValue(data);
+      getCorpAppList(data.id);
+    }
   };
+
+  const handleSubmit = () => {};
 
   useEffect(() => {
     GetcCorpsList().then((data) => {
-      setCorpsList(data ? data : undefined);
+      if (data) {
+        setCorpsList(data);
+        setCorpsValue(data[0]);
+        getCorpAppList(data[0].id);
+      }
     });
   }, []);
 
   useEffect(() => {
-    setCorpsListLoading(!corpsList || corpsList.length <= 0);
-    setCorpAppListLoading((!corpAppData || corpAppData.length <= 0) && !!corpsListSelected);
-  }, [corpAppData, corpsList, corpsListSelected]);
-
-  const handleSubmit = () => {};
-
-  function TransitionLeft(props: Omit<SlideProps, "direction">) {
-    return <Slide {...props} direction="right" />;
-  }
+    if (corpsList.length >= 1 && corpsList[0].corpName !== "None") {
+      setCorpsValue(corpsList[0]);
+      getCorpAppList(corpsList[0].id);
+    }
+  }, [corpsList]);
 
   return {
     corpsList,
-    corpAppData,
+    corpAppList,
     messageTypeList,
     messageParams,
-    corAppValue,
-    corpsListLoading,
-    corpAppListLoading,
-    isShowTips,
-    setIsShowTips,
+    corpsValue,
+    corpAppValue,
+    messageTypeValue,
     setMessageParams,
+    setCorpAppValue,
+    setCorpsValue,
+    setMessageTypeValue,
     getCorpAppList,
     handleSubmit,
-    handleCorpAppListClick,
     TransitionLeft,
     handleCorpsListChange
   };

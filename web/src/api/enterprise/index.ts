@@ -1,4 +1,8 @@
-import { ICorpsData, ICorpAppListApiData, ICorpAppData } from "../../dtos/enterprise";
+import {
+  ICorpsData,
+  ICorpAppListApiData,
+  ICorpAppData
+} from "../../dtos/enterprise";
 import { Get, Post } from "../http-client";
 
 export const GetcCorpsList = async () => {
@@ -6,5 +10,7 @@ export const GetcCorpsList = async () => {
 };
 
 export const GetCorpAppList = async (params: ICorpAppListApiData) => {
-  return await Get<ICorpAppData[]>("/api/WeChat/work/corp/apps?CorpId=" + params.CorpId);
+  return await Get<ICorpAppData[]>(
+    "/api/WeChat/work/corp/apps?CorpId=" + params.CorpId
+  );
 };
