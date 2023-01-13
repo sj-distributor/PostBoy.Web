@@ -2,6 +2,8 @@ import { Button } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import React from "react";
+import { MessageWidgetShowStatus } from "../../../../dtos/enterprise";
+import SelectTargetDialog from "../select-target-dialog";
 import useAction from "./hook";
 import styles from "./index.module.scss";
 
@@ -15,54 +17,90 @@ const SendMessage = () => {
     corpAppValue,
     messageTypeValue,
     isShowCorpAndApp,
+    isShowDialog,
+    isShowInputOrUpload,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
     setMessageTypeValue,
-    handleSubmit
+    handleSubmit,
+    setIsShowDialog,
+    getDialogValue,
+    setDialogValue
   } = useAction();
 
-  const muiSxStyle = { width: "15rem" };
+  const muiSxStyle = { width: "15rem", margin: "0 2rem" };
 
   return (
-    <div>
-      <div className={styles.inputBox}>
-        {isShowCorpAndApp && (
-          <>
-            <Autocomplete
-              disablePortal
-              id="Autocomplete-corpsDataId"
-              value={corpsValue}
-              disableClearable={true}
-              options={corpsList}
-              sx={muiSxStyle}
-              getOptionLabel={(option) => option.corpName}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              renderInput={(params) => (
-                <TextField {...params} label="选择企业" />
-              )}
-              onChange={(e, value) => {
-                setCorpsValue(value);
-              }}
-            />
-            <Autocomplete
-              disablePortal
-              id="Autocomplete-corpAppListId"
-              value={corpAppValue}
-              options={corpAppList}
-              sx={muiSxStyle}
-              disableClearable={true}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              onChange={(e, value) => {
-                setCorpAppValue(value);
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="选择应用" />
-              )}
-            />
-          </>
-        )}
+    <div className={styles.sendMsgBox}>
+      <div className={styles.selectInputBox}>
+        <div className={styles.inputBoxLeft}>
+          {isShowCorpAndApp && (
+            <>
+              <Autocomplete
+                disablePortal
+                id="Autocomplete-corpsDataId"
+                value={corpsValue}
+                disableClearable={true}
+                options={corpsList}
+                sx={muiSxStyle}
+                getOptionLabel={(option) => option.corpName}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                renderInput={(params) => (
+                  <TextField {...params} label="选择企业" />
+                )}
+                onChange={(e, value) => {
+                  setCorpsValue(value);
+                }}
+              />
+              <Autocomplete
+                disablePortal
+                id="Autocomplete-corpAppListId"
+                value={corpAppValue}
+                options={corpAppList}
+                sx={muiSxStyle}
+                disableClearable={true}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                onChange={(e, value) => {
+                  setCorpAppValue(value);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="选择应用" />
+                )}
+              />
+            </>
+          )}
+        </div>
+        <div className={styles.inputBoxRight}>
+          <Button
+            sx={{
+              height: "3.5rem",
+              fontSize: "1rem",
+              margin: "0 2rem"
+            }}
+            variant="contained"
+            onClick={() => {
+              setIsShowDialog(true);
+            }}
+          >
+            选择发送目标
+          </Button>
+          <Button
+            sx={{
+              height: "3.5rem",
+              width: "7rem",
+              fontSize: "1rem",
+              margin: "0 2rem"
+            }}
+            variant="contained"
+            onClick={handleSubmit}
+          >
+            发 送
+          </Button>
+        </div>
+      </div>
+      <div className={styles.messageInputBox}>
         <Autocomplete
           disablePortal
           className={styles.messageTypeList}
@@ -78,7 +116,13 @@ const SendMessage = () => {
           renderGroup={(params) => {
             return (
               <div key={params.key}>
-                <p className={params.group === "文件" ? styles.groupLabel : ""}>
+                <p
+                  className={
+                    params.group === "文件"
+                      ? styles.groupLabel
+                      : styles.noneGroupLabel
+                  }
+                >
                   {params.group}
                 </p>
                 <span>{params.children}</span>
@@ -89,18 +133,34 @@ const SendMessage = () => {
             setMessageTypeValue(value);
           }}
         />
-        <TextField
-          id="Autocomplete-messageParamsId"
-          label="消息参数"
-          sx={muiSxStyle}
-          value={messageParams}
-          onChange={(e) =>
-            setMessageParams((e.target as HTMLInputElement).value)
-          }
-        />
-        <Button variant="contained" onClick={handleSubmit}>
-          发送
-        </Button>
+        {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
+          isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
+          <TextField
+            id="Autocomplete-messageParamsId"
+            label="消息参数"
+            sx={muiSxStyle}
+            value={messageParams}
+            onChange={(e) =>
+              setMessageParams((e.target as HTMLInputElement).value)
+            }
+          />
+        )}
+        {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
+          isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
+          <Button
+            variant="contained"
+            component="label"
+            sx={{
+              height: "3.5rem",
+              width: "7rem",
+              fontSize: "1rem",
+              margin: "0 2rem"
+            }}
+          >
+            Upload
+            <input hidden accept="image/*" multiple type="file" />
+          </Button>
+        )}
       </div>
       <div className={styles.textarea}>
         <TextField
@@ -111,6 +171,14 @@ const SendMessage = () => {
           multiline
         />
       </div>
+      {isShowDialog && (
+        <SelectTargetDialog
+          open={isShowDialog}
+          setOpenFunction={setIsShowDialog}
+          setDialogValue={setDialogValue}
+          getDialogValue={getDialogValue}
+        />
+      )}
     </div>
   );
 };

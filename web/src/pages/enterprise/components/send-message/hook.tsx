@@ -4,7 +4,9 @@ import {
   ICorpAppData,
   ICorpData,
   IMessageTypeData,
-  MessageDataType
+  ITargetDialogValue,
+  MessageDataType,
+  MessageWidgetShowStatus
 } from "../../../../dtos/enterprise";
 
 const useAction = () => {
@@ -13,17 +15,34 @@ const useAction = () => {
   const messageTypeList: IMessageTypeData[] = [
     { title: "文本", groupBy: "", type: MessageDataType.Text },
     { title: "图文", groupBy: "", type: MessageDataType.Image },
+    { title: "图片", groupBy: "文件", type: MessageDataType.Image },
     { title: "语音", groupBy: "文件", type: MessageDataType.Voice },
     { title: "视频", groupBy: "文件", type: MessageDataType.Video },
-    { title: "图片", groupBy: "文件", type: MessageDataType.Image }
+    { title: "文件", groupBy: "文件", type: MessageDataType.File }
   ];
   const [messageParams, setMessageParams] = useState<string>("");
+
   const [corpsValue, setCorpsValue] = useState<ICorpData>();
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
-  const [isShowCorpAndApp, setIsShowCorpAndApp] = useState(false);
+  const [memberValue, setMemberValue] = useState<string>("");
+  const [departmentValue, setDepartmentValue] = useState<string>("");
+  const [tagsValue, setTagsValue] = useState<string>("");
+
+  const [isShowCorpAndApp, setIsShowCorpAndApp] = useState<boolean>(false);
+  const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
+  const [isShowInputOrUpload, setIsShowInputOrUpload] =
+    useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll);
+
+  const setDialogValue = { memberValue, departmentValue, tagsValue };
+
+  const getDialogValue = (dialogData: ITargetDialogValue) => {
+    setMemberValue(dialogData.memberValue);
+    setDepartmentValue(dialogData.departmentValue);
+    setTagsValue(dialogData.tagsValue);
+  };
 
   const handleSubmit = () => {};
 
@@ -54,6 +73,14 @@ const useAction = () => {
       setIsShowCorpAndApp(true);
   }, [corpsValue, corpAppValue]);
 
+  useEffect(() => {
+    messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
+      ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowAll)
+      : messageTypeValue.type === MessageDataType.Text
+      ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowInput)
+      : setIsShowInputOrUpload(MessageWidgetShowStatus.ShowUpload);
+  }, [messageTypeValue]);
+
   return {
     corpsList,
     corpAppList,
@@ -63,12 +90,17 @@ const useAction = () => {
     corpAppValue,
     messageTypeValue,
     isShowCorpAndApp,
+    isShowDialog,
+    isShowInputOrUpload,
     setMessageParams,
+    setCorpAppList,
     setCorpsValue,
     setCorpAppValue,
-    setCorpAppList,
     setMessageTypeValue,
-    handleSubmit
+    handleSubmit,
+    setIsShowDialog,
+    getDialogValue,
+    setDialogValue
   };
 };
 

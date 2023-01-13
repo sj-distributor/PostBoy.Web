@@ -1,26 +1,48 @@
-.inputBox {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 6rem;
-}
-
-.textarea {
-  margin-top: 2rem;
+.sendMsgBox {
   padding: 0 6rem;
 
-  .multilineTextField {
-    width: 100%;
-    min-height: 20rem;
+  .inputBox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 -2rem;
+  }
 
-    :global(.MuiInputBase-multiline) {
-      height: 100%;
+  .selectInputBox {
+    @extend .inputBox;
+
+    & > div {
+      display: flex;
+      align-items: center;
     }
   }
-}
 
-.groupLabel {
-  margin: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 0.1rem solid #eee;
+  .messageInputBox {
+    @extend .inputBox;
+    padding: 2rem 0;
+    justify-content: start;
+  }
+
+  .textarea {
+    .multilineTextField {
+      width: 100%;
+      min-height: 20rem;
+
+      :global(.MuiInputBase-multiline) {
+        height: 100%;
+      }
+    }
+  }
+
+  .groupLabel {
+    margin: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 0.1rem solid #eee;
+  }
+
+  .noneGroupLabel {
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
 }
