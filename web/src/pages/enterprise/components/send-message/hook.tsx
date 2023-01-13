@@ -25,15 +25,6 @@ const useAction = () => {
   );
   const [isShowCorpAndApp, setIsShowCorpAndApp] = useState(false);
 
-  const getCorpAppList = async (corpsDataId: string) => {
-    GetCorpAppList({ CorpId: corpsDataId }).then((corpAppResult) => {
-      if (corpAppResult) {
-        setCorpAppList(corpAppResult);
-        setCorpAppValue(corpAppResult[0]);
-      }
-    });
-  };
-
   const handleSubmit = () => {};
 
   useEffect(() => {
@@ -46,6 +37,14 @@ const useAction = () => {
   }, []);
 
   useEffect(() => {
+    const getCorpAppList = async (corpsDataId: string) => {
+      GetCorpAppList({ CorpId: corpsDataId }).then((corpAppResult) => {
+        if (corpAppResult) {
+          setCorpAppList(corpAppResult);
+          setCorpAppValue(corpAppResult[0]);
+        }
+      });
+    };
     corpsValue && getCorpAppList(corpsValue.id);
   }, [corpsValue?.id]);
 
@@ -69,7 +68,6 @@ const useAction = () => {
     setCorpAppValue,
     setCorpAppList,
     setMessageTypeValue,
-    getCorpAppList,
     handleSubmit
   };
 };
