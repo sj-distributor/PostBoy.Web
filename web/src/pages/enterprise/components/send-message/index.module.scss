@@ -1,36 +1,16 @@
 .sendMsgBox {
   padding: 0 6rem;
 
-  .inputBox {
+  .selectInputBox {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     margin: 0 -2rem;
-  }
-
-  .selectInputBox {
-    @extend .inputBox;
-
-    & > div {
-      display: flex;
-      align-items: center;
-    }
-  }
-
-  .messageInputBox {
-    @extend .inputBox;
-    padding: 2rem 0;
-    justify-content: start;
   }
 
   .textarea {
     .multilineTextField {
+      margin-top: 1rem;
       width: 100%;
-      min-height: 20rem;
-
-      :global(.MuiInputBase-multiline) {
-        height: 100%;
-      }
     }
   }
 

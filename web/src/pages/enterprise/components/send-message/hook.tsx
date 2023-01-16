@@ -35,6 +35,8 @@ const useAction = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
     useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll);
+  const [isShowMessageParams, setIsShowMessageParams] =
+    useState<boolean>(false);
 
   const setDialogValue = { memberValue, departmentValue, tagsValue };
 
@@ -78,7 +80,10 @@ const useAction = () => {
       ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowAll)
       : messageTypeValue.type === MessageDataType.Text
       ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowInput)
-      : setIsShowInputOrUpload(MessageWidgetShowStatus.ShowUpload);
+      : (() => {
+          setIsShowInputOrUpload(MessageWidgetShowStatus.ShowUpload);
+          setMessageParams("");
+        })();
   }, [messageTypeValue]);
 
   return {
@@ -92,6 +97,8 @@ const useAction = () => {
     isShowCorpAndApp,
     isShowDialog,
     isShowInputOrUpload,
+    setDialogValue,
+    isShowMessageParams,
     setMessageParams,
     setCorpAppList,
     setCorpsValue,
@@ -100,7 +107,7 @@ const useAction = () => {
     handleSubmit,
     setIsShowDialog,
     getDialogValue,
-    setDialogValue
+    setIsShowMessageParams
   };
 };
 
