@@ -22,16 +22,25 @@ const useAction = (props: {
   );
   const [deptOrUserValueList, setDeptOrUserValueList] = useState<
     IDepartmentAndUserListValue[]
-  >(setDialogValue.deptOrUserValueList);
+  >([]);
   const [tagsValue, setTagsValue] = useState<string>(setDialogValue.tagsValue);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleUserClick = (user: IDepartmentAndUserListValue) => {
-    !deptOrUserValueList.find((e) => e.id === user.id) &&
-      setDeptOrUserValueList((prev) => [...prev, user]);
+    const resultIndex = deptOrUserValueList.findIndex((e) => e.id === user.id);
+    resultIndex <= -1
+      ? setDeptOrUserValueList((prev) => [...prev, user])
+      : setDeptOrUserValueList((prev) => {
+          const newValue = prev.filter((e) => !!e);
+          newValue.splice(resultIndex, 1);
+          return newValue;
+        });
   };
 
   const handleDepartmentClick = (department: IDepartmentListData) => {
+    const resultIndex = deptOrUserValueList.findIndex(
+      (e) => e.id === department.id
+    );
     setDepartmentList(
       departmentList.map((item) => {
         if (item.id === department.id) {
@@ -40,17 +49,22 @@ const useAction = (props: {
         return item;
       })
     );
-    !deptOrUserValueList.find((e) => e.id === department.id) &&
-      setDeptOrUserValueList((prev) => {
-        const newValue = prev.filter((e) => !!e);
-        newValue.push({
-          id: department.id,
-          name: department.name,
-          type: DepartmentAndUserType.Department,
-          parentid: department.parentid
+    resultIndex <= -1
+      ? setDeptOrUserValueList((prev) => {
+          const newValue = prev.filter((e) => !!e);
+          newValue.push({
+            id: department.id,
+            name: department.name,
+            type: DepartmentAndUserType.Department,
+            parentid: department.parentid
+          });
+          return newValue;
+        })
+      : setDeptOrUserValueList((prev) => {
+          const newValue = prev.filter((e) => !!e);
+          newValue.splice(resultIndex, 1);
+          return newValue;
         });
-        return newValue;
-      });
   };
 
   const asyncSettingDepartmentList = async () => {
@@ -86,6 +100,7 @@ const useAction = (props: {
         return e;
       });
     });
+    setDeptOrUserValueList(setDialogValue.deptOrUserValueList);
   }, [open]);
 
   useEffect(() => {

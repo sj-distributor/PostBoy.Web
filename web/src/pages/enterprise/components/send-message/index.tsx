@@ -34,7 +34,7 @@ const SendMessage = () => {
     setIsShowMessageParams
   } = useAction();
 
-  const muiSxStyle = { width: "15rem", margin: "0 2rem" };
+  const muiSxStyle = { width: "15rem" };
 
   return (
     <div className={styles.sendMsgBox}>
@@ -134,7 +134,7 @@ const SendMessage = () => {
         </Button>
       </div>
       <div className={styles.checkboxAndUploadBox}>
-        <FormGroup sx={{}}>
+        <FormGroup>
           <FormControlLabel
             control={
               <Switch

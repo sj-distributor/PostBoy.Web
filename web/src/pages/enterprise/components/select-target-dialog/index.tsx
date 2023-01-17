@@ -51,7 +51,9 @@ const SelectTargetDialog = memo(
                           }}
                         >
                           <ListItemText primary={department.name} />
-                          {department.isCollapse ? (
+                          {!!deptOrUserValueList.find(
+                            (item) => item.id === department.id
+                          ) ? (
                             <ExpandLess />
                           ) : (
                             <ExpandMore />
@@ -60,7 +62,11 @@ const SelectTargetDialog = memo(
 
                         {department.departmentUserList && (
                           <Collapse
-                            in={department.isCollapse}
+                            in={
+                              !!deptOrUserValueList.find(
+                                (item) => item.id === department.id
+                              )
+                            }
                             timeout="auto"
                             unmountOnExit
                           >
