@@ -3,6 +3,7 @@ import { GetcCorpsList, GetCorpAppList } from "../../../../api/enterprise";
 import {
   ICorpAppData,
   ICorpData,
+  IDepartmentUsersData,
   IMessageTypeData,
   ITargetDialogValue,
   MessageDataType,
@@ -27,8 +28,8 @@ const useAction = () => {
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
-  const [memberValue, setMemberValue] = useState<string>("");
-  const [departmentValue, setDepartmentValue] = useState<string>("");
+  const [departmentUserValue, setDepartmentUserValue] =
+    useState<IDepartmentUsersData>();
   const [tagsValue, setTagsValue] = useState<string>("");
 
   const [isShowCorpAndApp, setIsShowCorpAndApp] = useState<boolean>(false);
@@ -38,11 +39,12 @@ const useAction = () => {
   const [isShowMessageParams, setIsShowMessageParams] =
     useState<boolean>(false);
 
-  const setDialogValue = { memberValue, departmentValue, tagsValue };
+  const [departmentApiAppId, setDepartmentApiAppId] = useState<string>("");
+
+  const setDialogValue = { departmentUserValue, tagsValue };
 
   const getDialogValue = (dialogData: ITargetDialogValue) => {
-    setMemberValue(dialogData.memberValue);
-    setDepartmentValue(dialogData.departmentValue);
+    setDepartmentUserValue(dialogData.departmentUserValue);
     setTagsValue(dialogData.tagsValue);
   };
 
@@ -68,6 +70,10 @@ const useAction = () => {
     };
     corpsValue && getCorpAppList(corpsValue.id);
   }, [corpsValue?.id]);
+
+  useEffect(() => {
+    corpAppValue && setDepartmentApiAppId(corpAppValue.appId);
+  }, [corpAppValue]);
 
   useEffect(() => {
     corpsValue !== undefined &&
@@ -99,10 +105,10 @@ const useAction = () => {
     isShowInputOrUpload,
     setDialogValue,
     isShowMessageParams,
-    setMessageParams,
-    setCorpAppList,
+    departmentApiAppId,
     setCorpsValue,
     setCorpAppValue,
+    setMessageParams,
     setMessageTypeValue,
     handleSubmit,
     setIsShowDialog,

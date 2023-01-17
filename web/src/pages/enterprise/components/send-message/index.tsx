@@ -23,6 +23,7 @@ const SendMessage = () => {
     isShowInputOrUpload,
     setDialogValue,
     isShowMessageParams,
+    departmentApiAppId,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
@@ -169,12 +170,10 @@ const SendMessage = () => {
           <TextField
             id="Autocomplete-messageParamsId"
             label="消息参数"
-            minRows={12}
             multiline
             value={messageParams}
             className={styles.multilineTextField}
             rows={12}
-            maxRows={12}
             onChange={(e) =>
               setMessageParams((e.target as HTMLInputElement).value)
             }
@@ -189,18 +188,16 @@ const SendMessage = () => {
             className={styles.multilineTextField}
             multiline
             rows={12}
-            maxRows={12}
           />
         </div>
       )}
-      {isShowDialog && (
-        <SelectTargetDialog
-          open={isShowDialog}
-          setOpenFunction={setIsShowDialog}
-          setDialogValue={setDialogValue}
-          getDialogValue={getDialogValue}
-        />
-      )}
+      <SelectTargetDialog
+        open={isShowDialog}
+        AppId={departmentApiAppId}
+        setOpenFunction={setIsShowDialog}
+        setDialogValue={setDialogValue}
+        getDialogValue={getDialogValue}
+      />
     </div>
   );
 };
