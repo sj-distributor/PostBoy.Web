@@ -7,7 +7,7 @@ import {
   IDepartmentResponse,
   IDepartmentUsersResonse
 } from "../../dtos/enterprise";
-import { CombineParams, Get, Post } from "../http-client";
+import { Get, Post } from "../http-client";
 
 export const GetcCorpsList = async () => {
   return await Get<ICorpData[]>("/api/WeChat/work/corps");
@@ -15,13 +15,15 @@ export const GetcCorpsList = async () => {
 
 export const GetCorpAppList = async (params: ICorpAppListApiData) => {
   return await Get<ICorpAppData[]>(
-    `/api/WeChat/work/corp/apps?${CombineParams(params)}`
+    `/api/WeChat/work/corp/apps?CorpId=${params.CorpId}`
   );
 };
 
 export const GetDepartmentList = async (params: IDepartmentListApiData) => {
   return await Get<IDepartmentResponse>(
-    `/api/WeChat/work/departments?${CombineParams(params)}`
+    `/api/WeChat/work/departments?AppId=${params.AppId}${
+      !!params.Id ? `&Id=${params.Id}` : ``
+    }`
   );
 };
 
@@ -29,6 +31,6 @@ export const GetDepartmentUsersList = async (
   params: IDepartmentUsersListApiData
 ) => {
   return await Get<IDepartmentUsersResonse>(
-    `/api/WeChat/work/department/users?${CombineParams(params)}`
+    `/api/WeChat/work/department/users?DepartmentId=${params.DepartmentId}&AppId=${params.AppId}`
   );
 };

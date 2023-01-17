@@ -5,8 +5,9 @@ import {
 } from "../../../../api/enterprise";
 import {
   IDepartmentListData,
-  IDepartmentUsersData,
-  ITargetDialogValue
+  IDepartmentAndUserListValue,
+  ITargetDialogValue,
+  DepartmentAndUserType
 } from "../../../../dtos/enterprise";
 
 const useAction = (props: {
@@ -19,24 +20,37 @@ const useAction = (props: {
   const [departmentList, setDepartmentList] = useState<IDepartmentListData[]>(
     []
   );
-  const [departmentUserValue, setDepartmentUserValue] =
-    useState<IDepartmentUsersData>();
+  const [deptOrUserValueList, setDeptOrUserValueList] = useState<
+    IDepartmentAndUserListValue[]
+  >(setDialogValue.deptOrUserValueList);
   const [tagsValue, setTagsValue] = useState<string>(setDialogValue.tagsValue);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleUserClick = (user: IDepartmentUsersData) => {
-    setDepartmentUserValue(user);
+  const handleUserClick = (user: IDepartmentAndUserListValue) => {
+    !deptOrUserValueList.find((e) => e.id === user.id) &&
+      setDeptOrUserValueList((prev) => [...prev, user]);
   };
 
   const handleDepartmentClick = (department: IDepartmentListData) => {
-    setDepartmentList((prevList) => {
-      return prevList.map((item) => {
+    setDepartmentList(
+      departmentList.map((item) => {
         if (item.id === department.id) {
           item.isCollapse = !item.isCollapse;
         }
         return item;
+      })
+    );
+    !deptOrUserValueList.find((e) => e.id === department.id) &&
+      setDeptOrUserValueList((prev) => {
+        const newValue = prev.filter((e) => !!e);
+        newValue.push({
+          id: department.id,
+          name: department.name,
+          type: DepartmentAndUserType.Department,
+          parentid: department.parentid
+        });
+        return newValue;
       });
-    });
   };
 
   const asyncSettingDepartmentList = async () => {
@@ -65,7 +79,13 @@ const useAction = (props: {
   };
 
   useEffect(() => {
-    setDepartmentUserValue(setDialogValue.departmentUserValue);
+    setDepartmentList((prev) => {
+      const newValue = prev.filter((e) => !!e);
+      return newValue.map((e) => {
+        e.isCollapse = !!deptOrUserValueList.find((item) => item.id === e.id);
+        return e;
+      });
+    });
   }, [open]);
 
   useEffect(() => {
@@ -77,7 +97,7 @@ const useAction = (props: {
   return {
     departmentList,
     tagsValue,
-    departmentUserValue,
+    deptOrUserValueList,
     isLoading,
     setTagsValue,
     handleDepartmentClick,

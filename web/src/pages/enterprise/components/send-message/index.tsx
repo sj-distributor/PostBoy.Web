@@ -107,22 +107,6 @@ const SendMessage = () => {
             setMessageTypeValue(value);
           }}
         />
-        {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
-          isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
-          <Button
-            variant="contained"
-            component="label"
-            sx={{
-              height: "3.5rem",
-              width: "7rem",
-              fontSize: "1rem",
-              margin: "0 2rem"
-            }}
-          >
-            Upload
-            <input hidden accept="image/*" multiple type="file" />
-          </Button>
-        )}
         <Button
           sx={{
             height: "3.5rem",
@@ -149,27 +133,47 @@ const SendMessage = () => {
           发 送
         </Button>
       </div>
-      <FormGroup
-        sx={{ display: "inline-block", userSelect: "none", marginTop: "1rem" }}
-      >
-        <FormControlLabel
-          control={
-            <Switch
-              value={isShowMessageParams}
-              onChange={(e) => {
-                setIsShowMessageParams((e.target as HTMLInputElement).checked);
-              }}
-            />
-          }
-          label="查看完整参数"
-        />
-      </FormGroup>
+      <div className={styles.checkboxAndUploadBox}>
+        <FormGroup sx={{}}>
+          <FormControlLabel
+            control={
+              <Switch
+                value={isShowMessageParams}
+                onChange={(e) => {
+                  setIsShowMessageParams(
+                    (e.target as HTMLInputElement).checked
+                  );
+                }}
+              />
+            }
+            label="查看完整参数"
+          />
+        </FormGroup>
+
+        {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
+          isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
+          <Button
+            variant="contained"
+            component="label"
+            sx={{
+              height: "3.5rem",
+              width: "7rem",
+              fontSize: "1rem",
+              margin: "0 2rem"
+            }}
+          >
+            Upload
+            <input hidden accept="image/*" multiple type="file" />
+          </Button>
+        )}
+      </div>
+
       <div className={styles.textarea}>
         {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
           isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
           <TextField
             id="Autocomplete-messageParamsId"
-            label="消息参数"
+            label="发送内容"
             multiline
             value={messageParams}
             className={styles.multilineTextField}

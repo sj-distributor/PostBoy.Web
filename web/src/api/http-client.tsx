@@ -8,20 +8,6 @@ export async function Post<T>(url: string, data?: object) {
   return base<T>(url, "post", data);
 }
 
-export function CombineParams(params: any) {
-  let paramsString: string = "";
-  for (const key in params) {
-    if (Object.prototype.hasOwnProperty.call(params, key)) {
-      const element = params[key];
-      if (!!element) {
-        paramsString += `${key}=${element}&`;
-      }
-    }
-  }
-  paramsString = paramsString.slice(0, paramsString.length - 1);
-  return paramsString;
-}
-
 export interface IResponse<T> {
   code: ResponseCode;
   msg: string;

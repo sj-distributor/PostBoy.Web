@@ -14,6 +14,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import useAction from "./hook";
 import {
+  DepartmentAndUserType,
   IDepartmentUsersData,
   ITargetDialogProps
 } from "../../../../dtos/enterprise";
@@ -26,7 +27,7 @@ const SelectTargetDialog = memo(
     const {
       departmentList,
       tagsValue,
-      departmentUserValue,
+      deptOrUserValueList,
       isLoading,
       setTagsValue,
       handleDepartmentClick,
@@ -73,13 +74,18 @@ const SelectTargetDialog = memo(
                                     <ListItemButton
                                       key={userIndex}
                                       selected={
-                                        !!departmentUserValue &&
-                                        departmentUserValue.userid ===
-                                          user.userid
+                                        !!deptOrUserValueList.find(
+                                          (item) => item.id === user.userid
+                                        )
                                       }
                                       sx={{ pl: 4 }}
                                       onClick={(e) => {
-                                        handleUserClick(user);
+                                        handleUserClick({
+                                          id: user.userid,
+                                          name: user.name,
+                                          type: DepartmentAndUserType.User,
+                                          parentid: user.department[0]
+                                        });
                                       }}
                                     >
                                       <ListItemText primary={user.name} />
@@ -120,7 +126,7 @@ const SelectTargetDialog = memo(
               onClick={() => {
                 setOpenFunction(false);
                 getDialogValue({
-                  departmentUserValue,
+                  deptOrUserValueList,
                   tagsValue
                 });
               }}

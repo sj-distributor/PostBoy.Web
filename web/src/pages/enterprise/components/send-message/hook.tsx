@@ -3,7 +3,7 @@ import { GetcCorpsList, GetCorpAppList } from "../../../../api/enterprise";
 import {
   ICorpAppData,
   ICorpData,
-  IDepartmentUsersData,
+  IDepartmentAndUserListValue,
   IMessageTypeData,
   ITargetDialogValue,
   MessageDataType,
@@ -28,8 +28,9 @@ const useAction = () => {
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
-  const [departmentUserValue, setDepartmentUserValue] =
-    useState<IDepartmentUsersData>();
+  const [deptOrUserValueList, setDeptOrUserValueList] = useState<
+    IDepartmentAndUserListValue[]
+  >([]);
   const [tagsValue, setTagsValue] = useState<string>("");
 
   const [isShowCorpAndApp, setIsShowCorpAndApp] = useState<boolean>(false);
@@ -41,10 +42,10 @@ const useAction = () => {
 
   const [departmentApiAppId, setDepartmentApiAppId] = useState<string>("");
 
-  const setDialogValue = { departmentUserValue, tagsValue };
+  const setDialogValue = { deptOrUserValueList, tagsValue };
 
   const getDialogValue = (dialogData: ITargetDialogValue) => {
-    setDepartmentUserValue(dialogData.departmentUserValue);
+    setDeptOrUserValueList(dialogData.deptOrUserValueList);
     setTagsValue(dialogData.tagsValue);
   };
 

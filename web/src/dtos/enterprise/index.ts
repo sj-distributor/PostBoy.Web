@@ -41,6 +41,25 @@ export interface IDepartmentListData extends IDepartmentData {
   isCollapse: boolean;
 }
 
+export interface IDepartmentUsersData {
+  name: string;
+  userid: string;
+  department: number[];
+  open_userid: string;
+}
+
+export interface IDepartmentAndUserListValue {
+  id: number | string;
+  name: string;
+  type: DepartmentAndUserType;
+  parentid: number;
+}
+
+export enum DepartmentAndUserType {
+  Department,
+  User
+}
+
 export interface IDepartmentResponse {
   errcode: number;
   errmsg: string;
@@ -51,13 +70,6 @@ export interface IDepartmentUsersResonse {
   errcode: number;
   errmsg: string;
   userlist: IDepartmentUsersData[];
-}
-
-export interface IDepartmentUsersData {
-  name: string;
-  userid: string;
-  department: number[];
-  open_userid: string;
 }
 
 export interface IMessageTypeData {
@@ -83,7 +95,7 @@ export interface ITargetDialogProps {
 }
 
 export interface ITargetDialogValue {
-  departmentUserValue: IDepartmentUsersData | undefined;
+  deptOrUserValueList: IDepartmentAndUserListValue[];
   tagsValue: string;
 }
 
