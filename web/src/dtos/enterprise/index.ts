@@ -34,11 +34,7 @@ export interface IDepartmentData {
   name_en: null;
   order: number;
   parentid: number;
-}
-
-export interface IDepartmentListData extends IDepartmentData {
   departmentUserList: IDepartmentUsersData[];
-  isCollapse: boolean;
 }
 
 export interface IDepartmentUsersData {

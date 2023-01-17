@@ -30,8 +30,7 @@ const SelectTargetDialog = memo(
       deptOrUserValueList,
       isLoading,
       setTagsValue,
-      handleDepartmentClick,
-      handleUserClick
+      handleDeptOrUserClick
     } = useAction({ open, setDialogValue, AppId });
 
     return (
@@ -47,7 +46,12 @@ const SelectTargetDialog = memo(
                       <div key={departmentIndex}>
                         <ListItemButton
                           onClick={() => {
-                            handleDepartmentClick(department);
+                            handleDeptOrUserClick({
+                              id: department.id,
+                              name: department.name,
+                              type: DepartmentAndUserType.Department,
+                              parentid: department.parentid
+                            });
                           }}
                         >
                           <ListItemText primary={department.name} />
@@ -86,7 +90,7 @@ const SelectTargetDialog = memo(
                                       }
                                       sx={{ pl: 4 }}
                                       onClick={(e) => {
-                                        handleUserClick({
+                                        handleDeptOrUserClick({
                                           id: user.userid,
                                           name: user.name,
                                           type: DepartmentAndUserType.User,
