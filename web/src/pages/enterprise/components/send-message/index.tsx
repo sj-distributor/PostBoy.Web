@@ -110,8 +110,7 @@ const SendMessage = () => {
         <Button
           sx={{
             height: "3.5rem",
-            fontSize: "1rem",
-            margin: "0 2rem"
+            fontSize: "1rem"
           }}
           variant="contained"
           onClick={() => {
@@ -124,8 +123,7 @@ const SendMessage = () => {
           sx={{
             height: "3.5rem",
             width: "7rem",
-            fontSize: "1rem",
-            margin: "0 2rem"
+            fontSize: "1rem"
           }}
           variant="contained"
           onClick={handleSubmit}
