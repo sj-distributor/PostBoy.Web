@@ -18,34 +18,39 @@ const useAction = (props: {
   const { open, setDialogValue, AppId } = props;
 
   const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
-  const [deptOrUserValueList, setDeptOrUserValueList] = useState<
-    IDepartmentAndUserListValue[]
-  >([]);
   const [tagsValue, setTagsValue] = useState<string>(setDialogValue.tagsValue);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleDeptOrUserClick = (clickedItem: IDepartmentAndUserListValue) => {
-    const resultIndex = deptOrUserValueList.findIndex(
-      (e) => e.id === clickedItem.id
-    );
-    resultIndex <= -1
-      ? clickedItem.type === DepartmentAndUserType.Department
-        ? setDeptOrUserValueList((prev) => {
-            const newValue = prev.filter((e) => !!e);
-            newValue.push({
-              id: clickedItem.id,
-              name: clickedItem.name,
-              type: DepartmentAndUserType.Department,
-              parentid: clickedItem.parentid
-            });
-            return newValue;
-          })
-        : setDeptOrUserValueList((prev) => [...prev, clickedItem])
-      : setDeptOrUserValueList((prev) => {
+    let resultIndex: number;
+    if (clickedItem.type === DepartmentAndUserType.Department) {
+      resultIndex = departmentList.findIndex((e) => e.id === clickedItem.id);
+      setDepartmentList((prev) => {
+        const newValue = prev.filter((e) => !!e);
+        newValue[resultIndex].selected = !newValue[resultIndex].selected;
+        return newValue;
+      });
+    } else {
+      const userList = departmentList.find(
+        (e) => e.id === clickedItem.parentid
+      );
+      if (userList) {
+        resultIndex = userList.departmentUserList.findIndex(
+          (e) => e.userid === clickedItem.id
+        );
+        setDepartmentList((prev) => {
           const newValue = prev.filter((e) => !!e);
-          newValue.splice(resultIndex, 1);
+          const newUserList = newValue.find(
+            (e) => e.id === clickedItem.parentid
+          );
+          if (newUserList) {
+            newUserList.departmentUserList[resultIndex].selected =
+              !newUserList.departmentUserList[resultIndex].selected;
+          }
           return newValue;
         });
+      }
+    }
   };
 
   const loadDeptUsers = async () => {
@@ -62,7 +67,11 @@ const useAction = (props: {
             const newValue = prevList.filter((e) => !!e);
             newValue.push({
               ...department,
-              departmentUserList: userList.userlist
+              departmentUserList: userList.userlist.map((e) => {
+                e.selected = false;
+                return e;
+              }),
+              selected: false
             });
             return newValue;
           });
@@ -73,7 +82,7 @@ const useAction = (props: {
   };
 
   useEffect(() => {
-    setDeptOrUserValueList(setDialogValue.deptOrUserValueList);
+    setDepartmentList(setDialogValue.deptAndUserValueList);
   }, [open]);
 
   useEffect(() => {
@@ -85,7 +94,6 @@ const useAction = (props: {
   return {
     departmentList,
     tagsValue,
-    deptOrUserValueList,
     isLoading,
     setTagsValue,
     handleDeptOrUserClick

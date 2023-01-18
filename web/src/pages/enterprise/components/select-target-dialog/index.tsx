@@ -27,7 +27,6 @@ const SelectTargetDialog = memo(
     const {
       departmentList,
       tagsValue,
-      deptOrUserValueList,
       isLoading,
       setTagsValue,
       handleDeptOrUserClick
@@ -55,9 +54,7 @@ const SelectTargetDialog = memo(
                           }}
                         >
                           <ListItemText primary={department.name} />
-                          {!!deptOrUserValueList.find(
-                            (item) => item.id === department.id
-                          ) ? (
+                          {!!department.selected ? (
                             <ExpandLess />
                           ) : (
                             <ExpandMore />
@@ -66,11 +63,7 @@ const SelectTargetDialog = memo(
 
                         {department.departmentUserList && (
                           <Collapse
-                            in={
-                              !!deptOrUserValueList.find(
-                                (item) => item.id === department.id
-                              )
-                            }
+                            in={!!department.selected}
                             timeout="auto"
                             unmountOnExit
                           >
@@ -79,29 +72,23 @@ const SelectTargetDialog = memo(
                                 (
                                   user: IDepartmentUsersData,
                                   userIndex: number
-                                ) => {
-                                  return (
-                                    <ListItemButton
-                                      key={userIndex}
-                                      selected={
-                                        !!deptOrUserValueList.find(
-                                          (item) => item.id === user.userid
-                                        )
-                                      }
-                                      sx={{ pl: 4 }}
-                                      onClick={(e) => {
-                                        handleDeptOrUserClick({
-                                          id: user.userid,
-                                          name: user.name,
-                                          type: DepartmentAndUserType.User,
-                                          parentid: user.department[0]
-                                        });
-                                      }}
-                                    >
-                                      <ListItemText primary={user.name} />
-                                    </ListItemButton>
-                                  );
-                                }
+                                ) => (
+                                  <ListItemButton
+                                    key={userIndex}
+                                    selected={!!user.selected}
+                                    sx={{ pl: 4 }}
+                                    onClick={(e) => {
+                                      handleDeptOrUserClick({
+                                        id: user.userid,
+                                        name: user.name,
+                                        type: DepartmentAndUserType.User,
+                                        parentid: user.department[0]
+                                      });
+                                    }}
+                                  >
+                                    <ListItemText primary={user.name} />
+                                  </ListItemButton>
+                                )
                               )}
                             </List>
                           </Collapse>
@@ -136,7 +123,7 @@ const SelectTargetDialog = memo(
               onClick={() => {
                 setOpenFunction(false);
                 getDialogValue({
-                  deptOrUserValueList,
+                  deptAndUserValueList: departmentList,
                   tagsValue
                 });
               }}

@@ -35,6 +35,7 @@ export interface IDepartmentData {
   order: number;
   parentid: number;
   departmentUserList: IDepartmentUsersData[];
+  selected: boolean;
 }
 
 export interface IDepartmentUsersData {
@@ -42,6 +43,7 @@ export interface IDepartmentUsersData {
   userid: string;
   department: number[];
   open_userid: string;
+  selected: boolean;
 }
 
 export interface IDepartmentAndUserListValue {
@@ -91,7 +93,7 @@ export interface ITargetDialogProps {
 }
 
 export interface ITargetDialogValue {
-  deptOrUserValueList: IDepartmentAndUserListValue[];
+  deptAndUserValueList: IDepartmentData[];
   tagsValue: string;
 }
 
