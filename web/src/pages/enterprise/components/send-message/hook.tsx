@@ -61,7 +61,7 @@ const useAction = () => {
   }, []);
 
   useEffect(() => {
-    const getCorpAppList = async (corpsDataId: string) => {
+    const getCorpAppList = (corpsDataId: string) => {
       GetCorpAppList({ CorpId: corpsDataId }).then((corpAppResult) => {
         if (corpAppResult) {
           setCorpAppList(corpAppResult);
