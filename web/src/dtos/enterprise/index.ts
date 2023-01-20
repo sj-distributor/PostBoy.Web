@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ICorpData {
   corpId: string;
   corpName: string;
@@ -86,8 +88,9 @@ export enum MessageDataType {
 
 export interface ITargetDialogProps {
   open: boolean;
-  setDialogValue: ITargetDialogValue;
+  departmentList: IDepartmentData[];
   AppId: string;
+  isLoading: boolean;
   setOpenFunction: (open: boolean) => void;
   getDialogValue: (data: ITargetDialogValue) => void;
 }

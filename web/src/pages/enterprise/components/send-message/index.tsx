@@ -13,17 +13,17 @@ const SendMessage = () => {
   const {
     corpsList,
     corpAppList,
-    messageTypeList,
-    messageParams,
     corpsValue,
     corpAppValue,
+    messageTypeList,
+    messageParams,
     messageTypeValue,
-    isShowCorpAndApp,
     isShowDialog,
     isShowInputOrUpload,
     setDialogValue,
     isShowMessageParams,
-    departmentApiAppId,
+    departmentList,
+    isTreeViewLoading,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
@@ -34,12 +34,12 @@ const SendMessage = () => {
     setIsShowMessageParams
   } = useAction();
 
-  const muiSxStyle = { width: "15rem" };
+  const muiSxStyle = { width: "15rem", margin: "0 2rem" };
 
   return (
     <div className={styles.sendMsgBox}>
       <div className={styles.selectInputBox}>
-        {isShowCorpAndApp && (
+        {corpsValue !== undefined && corpAppValue !== undefined && (
           <>
             <Autocomplete
               disablePortal
@@ -62,15 +62,20 @@ const SendMessage = () => {
               id="Autocomplete-corpAppListId"
               value={corpAppValue}
               options={corpAppList}
-              sx={muiSxStyle}
-              disableClearable={true}
+              sx={Object.assign(muiSxStyle, { textAlign: "left" })}
+              disableClearable
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               onChange={(e, value) => {
                 setCorpAppValue(value);
               }}
               renderInput={(params) => (
-                <TextField {...params} label="选择应用" />
+                <TextField
+                  {...params}
+                  className={styles.corpAppInput}
+                  type="button"
+                  label="选择应用"
+                />
               )}
             />
           </>
@@ -110,7 +115,9 @@ const SendMessage = () => {
         <Button
           sx={{
             height: "3.5rem",
-            fontSize: "1rem"
+            fontSize: "1rem",
+            flexShrink: "0",
+            margin: "0 2rem"
           }}
           variant="contained"
           onClick={() => {
@@ -123,7 +130,8 @@ const SendMessage = () => {
           sx={{
             height: "3.5rem",
             width: "7rem",
-            fontSize: "1rem"
+            fontSize: "1rem",
+            margin: "0 2rem"
           }}
           variant="contained"
           onClick={handleSubmit}
@@ -195,9 +203,10 @@ const SendMessage = () => {
       )}
       <SelectTargetDialog
         open={isShowDialog}
-        AppId={departmentApiAppId}
+        AppId={corpAppValue ? corpAppValue.appId : ""}
+        departmentList={departmentList}
+        isLoading={isTreeViewLoading}
         setOpenFunction={setIsShowDialog}
-        setDialogValue={setDialogValue}
         getDialogValue={getDialogValue}
       />
     </div>

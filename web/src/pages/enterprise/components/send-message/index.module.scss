@@ -1,22 +1,37 @@
 .sendMsgBox {
-  padding: 0 6rem;
+  width: 80rem;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
 
   .selectInputBox {
+    width: 80rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+
+    .corpAppInput {
+      :global(input[type="button" i]) {
+        text-align: left;
+        cursor: pointer;
+      }
+    }
   }
 
   .checkboxAndUploadBox {
-    margin-top: 1.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0 2rem;
     display: flex;
     align-items: center;
-    min-height: 3.5rem;
+    height: 3.5rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .textarea {
+    margin: 1.5rem auto 0;
+    width: 76rem;
+
     .multilineTextField {
-      margin-top: 1.5rem;
       width: 100%;
     }
   }

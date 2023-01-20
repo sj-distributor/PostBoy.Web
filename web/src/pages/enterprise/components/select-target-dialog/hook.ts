@@ -9,92 +9,57 @@ import {
   ITargetDialogValue,
   DepartmentAndUserType
 } from "../../../../dtos/enterprise";
+import { clone } from "ramda";
 
 const useAction = (props: {
   open: boolean;
-  setDialogValue: ITargetDialogValue;
+  departmentList: IDepartmentData[];
   AppId: string;
 }) => {
-  const { open, setDialogValue, AppId } = props;
+  const { open, departmentList } = props;
 
-  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
-  const [tagsValue, setTagsValue] = useState<string>(setDialogValue.tagsValue);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [newDepartmentList, setNewDepartmentList] = useState<IDepartmentData[]>(
+    []
+  );
+  const [tagsValue, setTagsValue] = useState<string>("");
 
   const handleDeptOrUserClick = (clickedItem: IDepartmentAndUserListValue) => {
-    let resultIndex: number;
+    let departmentIndex: number;
     if (clickedItem.type === DepartmentAndUserType.Department) {
-      resultIndex = departmentList.findIndex((e) => e.id === clickedItem.id);
-      setDepartmentList((prev) => {
+      departmentIndex = newDepartmentList.findIndex(
+        (e) => e.id === clickedItem.id
+      );
+      setNewDepartmentList((prev) => {
         const newValue = prev.filter((e) => !!e);
-        newValue[resultIndex].selected = !newValue[resultIndex].selected;
+        newValue[departmentIndex].selected =
+          !newValue[departmentIndex].selected;
         return newValue;
       });
     } else {
-      const userList = departmentList.find(
+      departmentIndex = newDepartmentList.findIndex(
         (e) => e.id === clickedItem.parentid
       );
-      if (userList) {
-        resultIndex = userList.departmentUserList.findIndex(
-          (e) => e.userid === clickedItem.id
-        );
-        setDepartmentList((prev) => {
-          const newValue = prev.filter((e) => !!e);
-          const newUserList = newValue.find(
-            (e) => e.id === clickedItem.parentid
-          );
-          if (newUserList) {
-            newUserList.departmentUserList[resultIndex].selected =
-              !newUserList.departmentUserList[resultIndex].selected;
-          }
-          return newValue;
-        });
-      }
-    }
-  };
-
-  const loadDeptUsers = async () => {
-    const departmentList = !!AppId ? await GetDepartmentList({ AppId }) : null;
-    if (!!departmentList && departmentList.errcode === 0) {
-      for (const department of departmentList.department) {
-        const userList = await GetDepartmentUsersList({
-          AppId,
-          DepartmentId: department.id
-        });
-        !!userList &&
-          userList.errcode === 0 &&
-          setDepartmentList((prevList) => {
-            const newValue = prevList.filter((e) => !!e);
-            newValue.push({
-              ...department,
-              departmentUserList: userList.userlist.map((e) => {
-                e.selected = false;
-                return e;
-              }),
-              selected: false
-            });
-            return newValue;
-          });
-        departmentList.department[departmentList.department.length - 1] ===
-          department && setIsLoading(false);
-      }
+      const userIndex = newDepartmentList[
+        departmentIndex
+      ].departmentUserList.findIndex((e) => e.userid === clickedItem.id);
+      setNewDepartmentList((prev) => {
+        const newValue = prev.filter((e) => !!e);
+        newValue[departmentIndex]["departmentUserList"][userIndex]["selected"] =
+          !newValue[departmentIndex]["departmentUserList"][userIndex][
+            "selected"
+          ];
+        return newValue;
+      });
     }
   };
 
   useEffect(() => {
-    setDepartmentList(setDialogValue.deptAndUserValueList);
-  }, [open]);
-
-  useEffect(() => {
-    setDepartmentList([]);
-    setIsLoading(true);
-    loadDeptUsers();
-  }, [AppId]);
+    setNewDepartmentList(clone(departmentList));
+  }, [open, departmentList]);
 
   return {
-    departmentList,
     tagsValue,
-    isLoading,
+    newDepartmentList,
     setTagsValue,
     handleDeptOrUserClick
   };

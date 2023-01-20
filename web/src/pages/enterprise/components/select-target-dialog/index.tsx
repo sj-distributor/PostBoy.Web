@@ -22,80 +22,96 @@ import { memo } from "react";
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
-    const { open, setDialogValue, AppId, setOpenFunction, getDialogValue } =
-      props;
     const {
+      open,
       departmentList,
-      tagsValue,
+      AppId,
       isLoading,
+      setOpenFunction,
+      getDialogValue
+    } = props;
+    const {
+      tagsValue,
+      newDepartmentList,
       setTagsValue,
       handleDeptOrUserClick
-    } = useAction({ open, setDialogValue, AppId });
+    } = useAction({
+      open,
+      AppId,
+      departmentList
+    });
 
     return (
       <div>
-        <Dialog open={open} onClose={() => setOpenFunction(false)}>
+        <Dialog
+          open={open}
+          onClose={() => {
+            setOpenFunction(false);
+          }}
+        >
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
-            {!!departmentList && departmentList.length > 0 && !isLoading ? (
+            {newDepartmentList.length > 0 && !isLoading ? (
               <>
                 <List dense sx={{ height: "15rem", overflowY: "auto" }}>
-                  {departmentList.map((department, departmentIndex: number) => {
-                    return (
-                      <div key={departmentIndex}>
-                        <ListItemButton
-                          onClick={() => {
-                            handleDeptOrUserClick({
-                              id: department.id,
-                              name: department.name,
-                              type: DepartmentAndUserType.Department,
-                              parentid: department.parentid
-                            });
-                          }}
-                        >
-                          <ListItemText primary={department.name} />
-                          {!!department.selected ? (
-                            <ExpandLess />
-                          ) : (
-                            <ExpandMore />
-                          )}
-                        </ListItemButton>
-
-                        {department.departmentUserList && (
-                          <Collapse
-                            in={!!department.selected}
-                            timeout="auto"
-                            unmountOnExit
+                  {newDepartmentList.map(
+                    (department, departmentIndex: number) => {
+                      return (
+                        <div key={departmentIndex}>
+                          <ListItemButton
+                            onClick={() => {
+                              handleDeptOrUserClick({
+                                id: department.id,
+                                name: department.name,
+                                type: DepartmentAndUserType.Department,
+                                parentid: department.parentid
+                              });
+                            }}
                           >
-                            <List component="div" disablePadding dense>
-                              {department.departmentUserList.map(
-                                (
-                                  user: IDepartmentUsersData,
-                                  userIndex: number
-                                ) => (
-                                  <ListItemButton
-                                    key={userIndex}
-                                    selected={!!user.selected}
-                                    sx={{ pl: 4 }}
-                                    onClick={(e) => {
-                                      handleDeptOrUserClick({
-                                        id: user.userid,
-                                        name: user.name,
-                                        type: DepartmentAndUserType.User,
-                                        parentid: user.department[0]
-                                      });
-                                    }}
-                                  >
-                                    <ListItemText primary={user.name} />
-                                  </ListItemButton>
-                                )
-                              )}
-                            </List>
-                          </Collapse>
-                        )}
-                      </div>
-                    );
-                  })}
+                            <ListItemText primary={department.name} />
+                            {!!department.selected ? (
+                              <ExpandLess />
+                            ) : (
+                              <ExpandMore />
+                            )}
+                          </ListItemButton>
+
+                          {department.departmentUserList && (
+                            <Collapse
+                              in={!!department.selected}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <List component="div" disablePadding dense>
+                                {department.departmentUserList.map(
+                                  (
+                                    user: IDepartmentUsersData,
+                                    userIndex: number
+                                  ) => (
+                                    <ListItemButton
+                                      key={userIndex}
+                                      selected={!!user.selected}
+                                      sx={{ pl: 4 }}
+                                      onClick={(e) => {
+                                        handleDeptOrUserClick({
+                                          id: user.userid,
+                                          name: user.name,
+                                          type: DepartmentAndUserType.User,
+                                          parentid: user.department[0]
+                                        });
+                                      }}
+                                    >
+                                      <ListItemText primary={user.name} />
+                                    </ListItemButton>
+                                  )
+                                )}
+                              </List>
+                            </Collapse>
+                          )}
+                        </div>
+                      );
+                    }
+                  )}
                 </List>
                 <Divider />
               </>
@@ -118,12 +134,18 @@ const SelectTargetDialog = memo(
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenFunction(false)}>取消</Button>
+            <Button
+              onClick={() => {
+                setOpenFunction(false);
+              }}
+            >
+              取消
+            </Button>
             <Button
               onClick={() => {
                 setOpenFunction(false);
                 getDialogValue({
-                  deptAndUserValueList: departmentList,
+                  deptAndUserValueList: newDepartmentList,
                   tagsValue
                 });
               }}
@@ -136,7 +158,10 @@ const SelectTargetDialog = memo(
     );
   },
   (prevProps, nextProps) => {
-    return prevProps.open === nextProps.open;
+    return (
+      prevProps.open === nextProps.open &&
+      prevProps.departmentList === nextProps.departmentList
+    );
   }
 );
 

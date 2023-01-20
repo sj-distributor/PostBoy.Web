@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { GetcCorpsList, GetCorpAppList } from "../../../../api/enterprise";
+import {
+  GetCorpAppList,
+  GetCorpsList,
+  GetDepartmentList,
+  GetDepartmentUsersList
+} from "../../../../api/enterprise";
 import {
   ICorpAppData,
   ICorpData,
@@ -11,8 +16,6 @@ import {
 } from "../../../../dtos/enterprise";
 
 const useAction = () => {
-  const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
-  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
   const messageTypeList: IMessageTypeData[] = [
     { title: "文本", groupBy: "", type: MessageDataType.Text },
     { title: "图文", groupBy: "", type: MessageDataType.Image },
@@ -23,36 +26,29 @@ const useAction = () => {
   ];
   const [messageParams, setMessageParams] = useState<string>("");
 
-  const [corpsValue, setCorpsValue] = useState<ICorpData>();
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
-  const [deptAndUserValueList, setDeptAndUserValueList] = useState<
-    IDepartmentData[]
-  >([]);
   const [tagsValue, setTagsValue] = useState<string>("");
 
-  const [isShowCorpAndApp, setIsShowCorpAndApp] = useState<boolean>(false);
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
     useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll);
   const [isShowMessageParams, setIsShowMessageParams] =
     useState<boolean>(false);
 
-  const [departmentApiAppId, setDepartmentApiAppId] = useState<string>("");
+  const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
+  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
+  const [corpsValue, setCorpsValue] = useState<ICorpData>(corpsList[0]);
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>(
+    corpAppList[0]
+  );
+  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
 
-  const setDialogValue = { deptAndUserValueList, tagsValue };
-
-  const getDialogValue = (dialogData: ITargetDialogValue) => {
-    setDeptAndUserValueList(dialogData.deptAndUserValueList);
-    setTagsValue(dialogData.tagsValue);
-  };
-
-  const handleSubmit = () => {};
+  const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    GetcCorpsList().then((data) => {
+    GetCorpsList().then((data) => {
       if (data) {
         setCorpsList(data);
         setCorpsValue(data[0]);
@@ -61,26 +57,56 @@ const useAction = () => {
   }, []);
 
   useEffect(() => {
-    const getCorpAppList = (corpsDataId: string) => {
-      GetCorpAppList({ CorpId: corpsDataId }).then((corpAppResult) => {
+    corpsValue &&
+      GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
         if (corpAppResult) {
           setCorpAppList(corpAppResult);
           setCorpAppValue(corpAppResult[0]);
         }
       });
-    };
-    corpsValue && getCorpAppList(corpsValue.id);
   }, [corpsValue?.id]);
 
   useEffect(() => {
-    corpAppValue && setDepartmentApiAppId(corpAppValue.appId);
-  }, [corpAppValue]);
+    const loadDeptUsers = async (AppId: string) => {
+      const deptListResponse = await GetDepartmentList({ AppId });
+      if (!!deptListResponse && deptListResponse.errcode === 0) {
+        for (const department of deptListResponse.department) {
+          const userList = await GetDepartmentUsersList({
+            AppId,
+            DepartmentId: department.id
+          });
+          if (!!userList && userList.errcode === 0) {
+            setDepartmentList((prev) => {
+              const newValue = prev.filter((e) => !!e);
+              newValue.push({
+                ...department,
+                departmentUserList: userList.userlist.map((e) => {
+                  e.selected = false;
+                  return e;
+                }),
+                selected: false
+              });
+              return newValue;
+            });
+            deptListResponse.department[
+              deptListResponse.department.length - 1
+            ] === department && setIsTreeViewLoading(false);
+          }
+        }
+      }
+    };
+    setIsTreeViewLoading(true);
+    !!corpAppValue && loadDeptUsers(corpAppValue.appId);
+  }, [corpAppValue?.appId]);
 
-  useEffect(() => {
-    corpsValue !== undefined &&
-      corpAppValue !== undefined &&
-      setIsShowCorpAndApp(true);
-  }, [corpsValue, corpAppValue]);
+  const setDialogValue = { deptAndUserValueList: departmentList, tagsValue };
+
+  const getDialogValue = (dialogData: ITargetDialogValue) => {
+    setDepartmentList(dialogData.deptAndUserValueList);
+    setTagsValue(dialogData.tagsValue);
+  };
+
+  const handleSubmit = () => {};
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
@@ -96,17 +122,17 @@ const useAction = () => {
   return {
     corpsList,
     corpAppList,
-    messageTypeList,
-    messageParams,
     corpsValue,
     corpAppValue,
+    messageTypeList,
+    messageParams,
     messageTypeValue,
-    isShowCorpAndApp,
     isShowDialog,
     isShowInputOrUpload,
     setDialogValue,
     isShowMessageParams,
-    departmentApiAppId,
+    departmentList,
+    isTreeViewLoading,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,

@@ -9,7 +9,7 @@ import {
 } from "../../dtos/enterprise";
 import { Get, Post } from "../http-client";
 
-export const GetcCorpsList = async () => {
+export const GetCorpsList = async () => {
   return await Get<ICorpData[]>("/api/WeChat/work/corps");
 };
 
