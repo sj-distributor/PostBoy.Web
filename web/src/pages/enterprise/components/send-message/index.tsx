@@ -51,7 +51,12 @@ const SendMessage = () => {
               getOptionLabel={(option) => option.corpName}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
-                <TextField {...params} label="选择企业" />
+                <TextField
+                  {...params}
+                  className={styles.corpInput}
+                  type="button"
+                  label="选择企业"
+                />
               )}
               onChange={(e, value) => {
                 setCorpsValue(value);
@@ -72,7 +77,7 @@ const SendMessage = () => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  className={styles.corpAppInput}
+                  className={styles.corpInput}
                   type="button"
                   label="选择应用"
                 />
@@ -91,7 +96,14 @@ const SendMessage = () => {
           getOptionLabel={(option) => option.title}
           groupBy={(option) => option.groupBy}
           isOptionEqualToValue={(option, value) => option.title === value.title}
-          renderInput={(params) => <TextField {...params} label="消息类型" />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              className={styles.corpInput}
+              type="button"
+              label="消息类型"
+            />
+          )}
           renderGroup={(params) => {
             return (
               <div key={params.key}>
