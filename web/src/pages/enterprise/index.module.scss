@@ -1,0 +1,12 @@
+.enterpriseBox {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+
+  .switchSend {
+    display: flex;
+    margin-left: 4.5rem;
+    width: 5.5rem;
+    color: black;
+  }
+}

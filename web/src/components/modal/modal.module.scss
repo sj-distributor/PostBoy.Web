@@ -1,0 +1,77 @@
+.modalBox {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background-color: #00000065;
+
+  .BoxWrap {
+    display: flex;
+    flex-direction: column;
+    max-width: 90rem;
+    background-color: white;
+    border-radius: 0.3rem;
+
+    .boxTitle {
+      width: 100%;
+      height: 2rem;
+      padding: 0.3rem 0rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top-left-radius: 0.3rem;
+      border-top-right-radius: 0.3rem;
+      background-color: #0072e3;
+
+      .boxTitleText {
+        padding-left: 1.6rem;
+        font-size: 1rem;
+        color: white;
+      }
+
+      .cancle {
+        cursor: pointer;
+
+        .icon {
+          z-index: 60;
+          padding-right: 1rem;
+          color: white;
+        }
+      }
+
+      .cancle:hover {
+        cursor: pointer;
+
+        .icon {
+          z-index: 60;
+          color: #5c5c5c;
+          color: rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+
+    .boxBody {
+      align-items: flex-start;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .boxBody::-webkit-scrollbar {
+      background-color: white;
+      width: 0.6rem;
+    }
+
+    .boxBody::-webkit-scrollbar-thumb {
+      border-radius: 3rem;
+      background: #e4e4e4;
+      box-shadow: inset 0 0 6px rgba(205, 205, 205, 0.3);
+    }
+  }
+}

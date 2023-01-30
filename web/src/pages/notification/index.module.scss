@@ -1,0 +1,71 @@
+.tableWrap {
+  width: 100%;
+  height: 100%;
+
+  .selectStyle {
+    vertical-align: bottom !important;
+  }
+
+  .tableBoxWrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+
+    .tableBox {
+      padding: 0rem 5rem;
+      width: 100%;
+      height: 20rem;
+
+      .createNoticeWrap {
+        display: flex;
+        justify-content: end;
+        margin: 1.8rem 4rem;
+        font-size: 0.9rem;
+
+        .createNotice:hover {
+          cursor: pointer;
+        }
+      }
+
+      .title {
+        text-align: center;
+        width: 100%;
+        white-space: normal;
+        word-wrap: break-word;
+      }
+
+      .tooltip {
+        text-align: center;
+        width: 100%;
+        padding: 0 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .operate {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+
+        .text:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .boxButtonWrap {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 1.5rem;
+    padding-top: 1rem;
+    margin-right: 1rem;
+
+    .boxButton {
+      height: 1.5rem;
+      margin: 0rem 2rem;
+    }
+  }
+}

@@ -1,0 +1,159 @@
+.noticeWrap {
+  width: 45rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  padding-top: 2rem;
+  padding-bottom: 0.8rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+
+  .objectWrap {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+
+    .objectTittle {
+      margin-right: 1rem;
+      margin-top: 0.5rem;
+      width: 2rem;
+    }
+
+    .objectContentWrap {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      .objectContent {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+
+        .email {
+          width: 5rem;
+          text-align: right;
+          font-size: 0.9rem;
+          color: rgb(31, 31, 31);
+        }
+      }
+
+      .enterpriseWeChatWrap {
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+
+        .enterpriseWeChat {
+          width: 5rem;
+          text-align: right;
+          font-size: 0.9rem;
+          color: rgb(31, 31, 31);
+        }
+      }
+
+      .groupAndPersonalWrap {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        margin-top: 2rem;
+
+        .groupAndPersonal {
+          padding: 0.1rem 1rem;
+          text-align: center;
+          color: rgb(31, 31, 31);
+          background-color: rgb(229, 229, 229);
+          margin-right: 0.8rem;
+          margin-left: 0.4rem;
+          border-radius: 0.2rem;
+        }
+
+        .groupAndPersonalInput {
+          word-break: break-all;
+          width: 40rem;
+        }
+      }
+    }
+  }
+
+  .noticeRow {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1.5rem;
+    align-items: center;
+
+    .cycleWrap {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .noticeTittle {
+        height: 1.7rem;
+        width: 5rem;
+        text-align: right;
+      }
+
+      .weekWrap {
+        width: 33rem;
+        margin-right: 2rem;
+        display: flex;
+        align-items: center;
+
+        .noticeTittle {
+          height: 1.7rem;
+          width: 5rem;
+          text-align: right;
+        }
+      }
+
+      .daySelect {
+        display: flex;
+        align-items: center;
+        margin-right: 1rem;
+      }
+    }
+
+    .input {
+      flex: 1;
+      height: 2rem;
+      border: 0.1rem #c4c4c4 solid;
+      word-break: break-all;
+      border-radius: 0.2rem;
+    }
+
+    .areaInput {
+      flex: 1;
+      width: 37rem;
+      border: 0.1rem #c4c4c4 solid;
+      word-break: break-all;
+      border-radius: 0.2rem;
+      position: relative;
+    }
+
+    .nameList {
+      width: 8rem;
+      height: 10rem;
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+      position: absolute;
+      z-index: 1;
+
+      .nameItem {
+        background-color: white;
+        border: #c4c4c4 0.1rem solid;
+        padding: 1rem 0.2rem;
+      }
+
+      .nameItem:hover {
+        cursor: pointer;
+        background-color: rgb(235, 235, 235);
+        border: #c4c4c4 0.1rem solid;
+        padding: 1rem 0.2rem;
+      }
+    }
+
+    .nameList::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
