@@ -20,7 +20,6 @@ const SendMessage = () => {
     messageTypeValue,
     isShowDialog,
     isShowInputOrUpload,
-    setDialogValue,
     isShowMessageParams,
     departmentList,
     isTreeViewLoading,

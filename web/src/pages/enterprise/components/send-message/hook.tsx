@@ -39,10 +39,8 @@ const useAction = () => {
 
   const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
-  const [corpsValue, setCorpsValue] = useState<ICorpData>(corpsList[0]);
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>(
-    corpAppList[0]
-  );
+  const [corpsValue, setCorpsValue] = useState<ICorpData>();
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
   const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
@@ -68,6 +66,7 @@ const useAction = () => {
 
   useEffect(() => {
     const loadDeptUsers = async (AppId: string) => {
+      setDepartmentList([]);
       const deptListResponse = await GetDepartmentList({ AppId });
       if (!!deptListResponse && deptListResponse.errcode === 0) {
         for (const department of deptListResponse.department) {

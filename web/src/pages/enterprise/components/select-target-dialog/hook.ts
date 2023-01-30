@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  GetDepartmentList,
-  GetDepartmentUsersList
-} from "../../../../api/enterprise";
-import {
   IDepartmentData,
   IDepartmentAndUserListValue,
-  ITargetDialogValue,
   DepartmentAndUserType
 } from "../../../../dtos/enterprise";
 import { clone } from "ramda";
