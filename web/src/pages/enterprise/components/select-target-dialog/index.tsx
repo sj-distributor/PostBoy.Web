@@ -12,7 +12,10 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
+import Autocomplete from "@mui/material/Autocomplete";
 import useAction from "./hook";
+import styles from "./index.module.scss";
+
 import {
   DepartmentAndUserType,
   IDepartmentUsersData,
@@ -27,6 +30,8 @@ const SelectTargetDialog = memo(
       departmentList,
       AppId,
       isLoading,
+      tagsList,
+      flattenDepartmentList,
       setOpenFunction,
       getDialogValue
     } = props;
@@ -45,6 +50,11 @@ const SelectTargetDialog = memo(
       <div>
         <Dialog
           open={open}
+          PaperProps={{
+            sx: {
+              overflowY: "unset"
+            }
+          }}
           onClose={() => {
             setOpenFunction(false);
           }}
@@ -120,16 +130,45 @@ const SelectTargetDialog = memo(
                 <CircularProgress />
               </div>
             )}
-            <TextField
-              margin="dense"
+
+            <Autocomplete
+              disablePortal
+              id="sreach-input"
+              sx={{
+                marginTop: "2rem"
+              }}
+              options={flattenDepartmentList}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              groupBy={(option) => option.parentid as string}
+              renderInput={(params) => (
+                <TextField {...params} label="部门与用户搜索" />
+              )}
+              onChange={(e, value) => {
+                console.log(value);
+              }}
+            />
+
+            <Autocomplete
+              disablePortal
               id="tags-list"
-              label="标签列表"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={tagsValue}
-              onChange={(e) => {
-                setTagsValue((e.target as HTMLInputElement).value);
+              disableClearable={true}
+              options={tagsList}
+              getOptionLabel={(option) => option.tagName}
+              isOptionEqualToValue={(option, value) =>
+                option.tagId === value.tagId
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  className={styles.InputButton}
+                  margin="dense"
+                  type="button"
+                  label="标签列表"
+                />
+              )}
+              onChange={(e, value) => {
+                setTagsValue(value);
               }}
             />
           </DialogContent>
@@ -146,7 +185,7 @@ const SelectTargetDialog = memo(
                 setOpenFunction(false);
                 getDialogValue({
                   deptAndUserValueList: newDepartmentList,
-                  tagsValue
+                  tagsValue: tagsValue ? tagsValue : tagsList[0]
                 });
               }}
             >

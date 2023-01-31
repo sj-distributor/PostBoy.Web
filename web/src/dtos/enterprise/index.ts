@@ -1,5 +1,7 @@
-import React from "react";
-
+export interface IResponseMsg {
+  errcode: number;
+  errmsg: string;
+}
 export interface ICorpData {
   corpId: string;
   corpName: string;
@@ -51,8 +53,8 @@ export interface IDepartmentUsersData {
 export interface IDepartmentAndUserListValue {
   id: number | string;
   name: string;
-  type: DepartmentAndUserType;
-  parentid: number;
+  type?: DepartmentAndUserType;
+  parentid: number | string;
 }
 
 export enum DepartmentAndUserType {
@@ -60,15 +62,11 @@ export enum DepartmentAndUserType {
   User
 }
 
-export interface IDepartmentResponse {
-  errcode: number;
-  errmsg: string;
+export interface IDepartmentResponse extends IResponseMsg {
   department: IDepartmentData[];
 }
 
-export interface IDepartmentUsersResonse {
-  errcode: number;
-  errmsg: string;
+export interface IDepartmentUsersResonse extends IResponseMsg {
   userlist: IDepartmentUsersData[];
 }
 
@@ -89,19 +87,30 @@ export enum MessageDataType {
 export interface ITargetDialogProps {
   open: boolean;
   departmentList: IDepartmentData[];
+  flattenDepartmentList: IDepartmentAndUserListValue[];
   AppId: string;
   isLoading: boolean;
+  tagsList: ITagsList[];
   setOpenFunction: (open: boolean) => void;
   getDialogValue: (data: ITargetDialogValue) => void;
 }
 
 export interface ITargetDialogValue {
   deptAndUserValueList: IDepartmentData[];
-  tagsValue: string;
+  tagsValue: ITagsList;
 }
 
 export enum MessageWidgetShowStatus {
   ShowInput,
   ShowUpload,
   ShowAll
+}
+
+export interface ITagsListResponse extends IResponseMsg {
+  taglist: ITagsList[];
+}
+
+export interface ITagsList {
+  tagId: number;
+  tagName: string;
 }

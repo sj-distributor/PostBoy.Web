@@ -3,17 +3,21 @@ import {
   GetCorpAppList,
   GetCorpsList,
   GetDepartmentList,
-  GetDepartmentUsersList
+  GetDepartmentUsersList,
+  GetTagsList
 } from "../../../../api/enterprise";
 import {
   ICorpAppData,
   ICorpData,
+  IDepartmentAndUserListValue,
   IDepartmentData,
   IMessageTypeData,
+  ITagsList,
   ITargetDialogValue,
   MessageDataType,
   MessageWidgetShowStatus
 } from "../../../../dtos/enterprise";
+import { flatten } from "ramda";
 
 const useAction = () => {
   const messageTypeList: IMessageTypeData[] = [
@@ -29,7 +33,7 @@ const useAction = () => {
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
-  const [tagsValue, setTagsValue] = useState<string>("");
+  const [tagsValue, setTagsValue] = useState<ITagsList>();
 
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
@@ -42,8 +46,12 @@ const useAction = () => {
   const [corpsValue, setCorpsValue] = useState<ICorpData>();
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
   const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
+  const [flattenDepartmentList, setFlattenDepartmentList] = useState<
+    IDepartmentAndUserListValue[]
+  >([]);
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
+  const [tagsList, setTagsList] = useState<ITagsList[]>([]);
 
   useEffect(() => {
     GetCorpsList().then((data) => {
@@ -60,6 +68,9 @@ const useAction = () => {
         if (corpAppResult) {
           setCorpAppList(corpAppResult);
           setCorpAppValue(corpAppResult[0]);
+          GetTagsList({ AppId: corpAppResult[0].appId }).then((tagsData) => {
+            tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist);
+          });
         }
       });
   }, [corpsValue?.id]);
@@ -87,6 +98,17 @@ const useAction = () => {
               });
               return newValue;
             });
+            setFlattenDepartmentList((prev) => {
+              return [
+                ...prev,
+                ...flatten(userList.userlist).map((item) => ({
+                  id: item.userid,
+                  name: item.name,
+                  parentid: department.name
+                }))
+              ];
+            });
+
             deptListResponse.department[
               deptListResponse.department.length - 1
             ] === department && setIsTreeViewLoading(false);
@@ -94,8 +116,11 @@ const useAction = () => {
         }
       }
     };
-    setIsTreeViewLoading(true);
-    !!corpAppValue && loadDeptUsers(corpAppValue.appId);
+    if (!!corpAppValue) {
+      setIsTreeViewLoading(true);
+
+      loadDeptUsers(corpAppValue.appId);
+    }
   }, [corpAppValue?.appId]);
 
   const setDialogValue = { deptAndUserValueList: departmentList, tagsValue };
@@ -132,6 +157,8 @@ const useAction = () => {
     isShowMessageParams,
     departmentList,
     isTreeViewLoading,
+    tagsList,
+    flattenDepartmentList,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,

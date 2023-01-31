@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import {
   IDepartmentData,
   IDepartmentAndUserListValue,
-  DepartmentAndUserType
+  DepartmentAndUserType,
+  ITagsList
 } from "../../../../dtos/enterprise";
 import { clone } from "ramda";
 
@@ -16,7 +17,10 @@ const useAction = (props: {
   const [newDepartmentList, setNewDepartmentList] = useState<IDepartmentData[]>(
     []
   );
-  const [tagsValue, setTagsValue] = useState<string>("");
+  const [tagsValue, setTagsValue] = useState<ITagsList>({
+    tagId: 0,
+    tagName: ""
+  });
 
   const handleDeptOrUserClick = (clickedItem: IDepartmentAndUserListValue) => {
     let departmentIndex: number;

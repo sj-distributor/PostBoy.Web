@@ -23,6 +23,8 @@ const SendMessage = () => {
     isShowMessageParams,
     departmentList,
     isTreeViewLoading,
+    flattenDepartmentList,
+    tagsList,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
@@ -216,7 +218,9 @@ const SendMessage = () => {
         open={isShowDialog}
         AppId={corpAppValue ? corpAppValue.appId : ""}
         departmentList={departmentList}
+        flattenDepartmentList={flattenDepartmentList}
         isLoading={isTreeViewLoading}
+        tagsList={tagsList}
         setOpenFunction={setIsShowDialog}
         getDialogValue={getDialogValue}
       />
