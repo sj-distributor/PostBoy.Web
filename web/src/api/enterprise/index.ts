@@ -29,9 +29,12 @@ export const GetDepartmentList = async (params: IDepartmentListApiData) => {
 };
 
 export const GetDepartmentUsersList = async (
-  params: IDepartmentUsersListApiData,
+  params: IDepartmentUsersListApiData
 ) => {
   return await Get<IDepartmentUsersResonse>(
+    `/api/WeChat/work/department/users?DepartmentId=${params.DepartmentId}&AppId=${params.AppId}`
+  );
+};
 
 export const GetTagsList = async (params: { AppId: string }) => {
   return await Get<ITagsListResponse>(
