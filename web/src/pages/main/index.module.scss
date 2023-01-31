@@ -6,7 +6,9 @@ $aClickColor: #30cea3;
   display: flex;
   flex-direction: row;
   height: 100vh;
+  overflow: auto;
   background-color: #f2f3f4;
+
   a {
     text-decoration: none;
   }
@@ -26,21 +28,16 @@ $aClickColor: #30cea3;
         .itemNone {
           color: $aColor;
           text-decoration: none;
-
-          span {
-            font-size: 1rem;
-            margin-right: 0.3rem;
-          }
         }
 
         .itemClick {
           color: $aClickColor;
           text-decoration: none;
+        }
 
-          span {
-            font-size: 1rem;
-            margin-right: 0.3rem;
-          }
+        span {
+          font-size: 1rem;
+          margin-right: 0.3rem;
         }
       }
     }

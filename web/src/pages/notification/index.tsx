@@ -34,6 +34,76 @@ const rows: GridRowsProp = [
     cycle: "",
     createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
   },
+  {
+    id: 4,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 5,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 6,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 7,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 8,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 9,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 10,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 11,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 12,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    id: 13,
+    title: "MUI",
+    content: "大家好,关于这件事情123123123123 ",
+    cycle: "",
+    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
+  },
 ];
 
 const SendNotice = () => {
@@ -139,8 +209,9 @@ const SendNotice = () => {
             columns={columns}
             showCellRightBorder
             showColumnRightBorder
-            hideFooter={true}
-            autoHeight={true}
+            rowHeight={56}
+            style={{ height: 680 }}
+            pageSize={10}
           />
         </div>
       </div>
