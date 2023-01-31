@@ -41,18 +41,16 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = forwardRef(
         {visible && (
           <div className={style.modalBox}>
             <div className={style.boxWrap}>
-              <div className={style.boxTitle}>
-                {headComponent ? (
-                  headComponent
-                ) : (
-                  <>
-                    <span className={style.boxTitleText}>{title}</span>
-                    <div className={style.cancle}>
-                      <Close className={style.icon} onClick={onCancel} />
-                    </div>
-                  </>
-                )}
-              </div>
+              {headComponent ? (
+                headComponent
+              ) : (
+                <div className={style.boxTitle}>
+                  <span className={style.boxTitleText}>{title}</span>
+                  <div className={style.cancle}>
+                    <Close className={style.icon} onClick={onCancel} />
+                  </div>
+                </div>
+              )}
               <div className={style.boxBody}>{children}</div>
               {footerComponent && footerComponent}
             </div>
