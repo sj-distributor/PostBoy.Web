@@ -126,9 +126,13 @@ const SendNotice = () => {
       <div className={styles.tableBoxWrap}>
         <div className={styles.tableBox}>
           <div className={styles.createNoticeWrap}>
-            <span className={styles.createNotice} onClick={onSetting}>
-              【 + 新建通知 】
-            </span>
+            <Button
+              className={styles.createNotice}
+              onClick={onSetting}
+              variant="contained"
+            >
+              + 新建通知
+            </Button>
           </div>
           <DataGrid
             rows={rows}

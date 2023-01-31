@@ -48,12 +48,10 @@ const NoticeSetting = () => {
       <div className={styles.noticeRow}>
         <div onBlur={() => setIsShowName.setFalse()}>
           <TextField
-            // ref={textInput}
             required
             inputRef={textInput}
             label="内容"
             style={{ width: 720 }}
-            // inputRef={(input) => input && input.focus()}
             id="outlined-multiline-static"
             multiline
             rows={4}
@@ -72,7 +70,7 @@ const NoticeSetting = () => {
           {isShowName && (
             <div
               className={styles.nameList}
-              onClick={() => textInput.current.focus()}
+              onClick={() => textInput.current?.focus()}
             >
               {nameList.map((item, index) => (
                 <div

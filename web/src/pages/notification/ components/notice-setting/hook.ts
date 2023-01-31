@@ -1,5 +1,5 @@
 import { useBoolean } from "ahooks";
-import { RefAttributes, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CycleOptionType, WeekDayType } from "../../props";
 
 const enterpriseWeChatList = [
@@ -175,8 +175,8 @@ export const useAction = () => {
   const [isShowName, setIsShowName] = useBoolean(false);
   const [data, setData] = useState<number>(1);
   const [textFieldData, setTextFieldData] = useState<number>();
-  const [enterpriseWeChatValue, setEnterpriseWeChatValue] = useState<any>();
-  const textInput = useRef<any>(null);
+  const [enterpriseWeChatValue, setEnterpriseWeChatValue] = useState<number>();
+  const textInput = useRef<HTMLDivElement>(null);
   const [click, clickAction] = useBoolean(false);
   const [selectWeekDay, setSelectWeekDay] = useState({
     sun: false,
@@ -273,7 +273,7 @@ export const useAction = () => {
 
   useEffect(() => {
     if (click && isShowName) {
-      textInput.current.focus();
+      textInput.current?.focus();
     }
   }, [click, isShowName]);
 

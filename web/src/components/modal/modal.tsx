@@ -40,7 +40,7 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = forwardRef(
       <div>
         {visible && (
           <div className={style.modalBox}>
-            <div className={style.BoxWrap}>
+            <div className={style.boxWrap}>
               <div className={style.boxTitle}>
                 {headComponent ? (
                   headComponent
@@ -48,10 +48,7 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = forwardRef(
                   <>
                     <span className={style.boxTitleText}>{title}</span>
                     <div className={style.cancle}>
-                      <Close
-                        className={style.icon}
-                        onClick={() => onCancel()}
-                      />
+                      <Close className={style.icon} onClick={onCancel} />
                     </div>
                   </>
                 )}
