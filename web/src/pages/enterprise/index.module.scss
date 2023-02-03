@@ -2,6 +2,8 @@
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
+  overflow: scroll;
+  max-height: calc(100vh - 10rem);
 
   .switchSend {
     display: flex;
@@ -9,4 +11,7 @@
     width: 5.5rem;
     color: black;
   }
+}
+.enterpriseBox::-webkit-scrollbar {
+  display: none;
 }

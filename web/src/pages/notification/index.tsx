@@ -11,102 +11,10 @@ import { useAction } from "./hook";
 import ModalBox from "../../components/modal/modal";
 import NoticeSetting from "./ components/notice-setting";
 import SendRecord from "./ components/send-record";
+import { IMessageJobDto } from "../../dtos/enterprise";
 
-const rows: GridRowsProp = [
-  {
-    id: 1,
-    title: "Hell313132132131234324234234o",
-    content: "大家好,以下是本周需要update的事情",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 2,
-    title: "DataGridPro",
-    content: "is Awesome31231313123123",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 3,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 4,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 5,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 6,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 7,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 8,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 9,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 10,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 11,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 12,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-  {
-    id: 13,
-    title: "MUI",
-    content: "大家好,关于这件事情123123123123 ",
-    cycle: "",
-    createTime: moment.utc(new Date()).local().format("YYYY-MM-DD HH:mm"),
-  },
-];
-
-const SendNotice = () => {
+const SendNotice = (props: { rowList: IMessageJobDto[] }) => {
+  // const rowList = props;
   const {
     onSetting,
     onSend,
@@ -115,7 +23,10 @@ const SendNotice = () => {
     onNoticeCancel,
     noticeSettingRef,
     sendRecordRef,
-  } = useAction();
+    rowListChange,
+    settingId,
+    list,
+  } = useAction(props.rowList);
 
   const asyncTootip = (title: string, styles: string) => {
     return (
@@ -137,7 +48,7 @@ const SendNotice = () => {
       headerClassName: styles.tableBoxHeader,
     },
     {
-      field: "content",
+      field: "commandJson",
       headerName: "内容",
       width: 300,
       headerAlign: "center",
@@ -149,7 +60,7 @@ const SendNotice = () => {
         asyncTootip(params.row.content, styles.tooltip),
     },
     {
-      field: "cycle",
+      field: "jobSettingJson",
       headerName: "周期",
       width: 320,
       headerAlign: "center",
@@ -158,7 +69,7 @@ const SendNotice = () => {
       headerClassName: styles.tableBoxHeader,
     },
     {
-      field: "createTime",
+      field: "createdDate",
       headerName: "创建时间",
       width: 300,
       headerAlign: "center",
@@ -180,7 +91,7 @@ const SendNotice = () => {
           <p className={styles.text} onClick={onSetting}>
             【设置】
           </p>
-          <p className={styles.text} onClick={onSend}>
+          <p className={styles.text} onClick={() => onSend(params.row)}>
             【发送记录】
           </p>
           <p className={styles.text} onClick={() => console.log(789)}>
@@ -195,17 +106,8 @@ const SendNotice = () => {
     <div className={styles.tableWrap}>
       <div className={styles.tableBoxWrap}>
         <div className={styles.tableBox}>
-          <div className={styles.createNoticeWrap}>
-            <Button
-              className={styles.createNotice}
-              onClick={onSetting}
-              variant="contained"
-            >
-              + 新建通知
-            </Button>
-          </div>
           <DataGrid
-            rows={rows}
+            rows={props.rowList}
             columns={columns}
             showCellRightBorder
             showColumnRightBorder
@@ -247,7 +149,7 @@ const SendNotice = () => {
         onCancel={onNoticeCancel}
         title={"发送记录"}
       >
-        <SendRecord />
+        <SendRecord list={list} />
       </ModalBox>
     </div>
   );

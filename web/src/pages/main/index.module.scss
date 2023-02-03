@@ -5,9 +5,8 @@ $aClickColor: #30cea3;
 .main {
   display: flex;
   flex-direction: row;
-  height: 100vh;
-  overflow: auto;
   background-color: #f2f3f4;
+  height: 100vh;
 
   a {
     text-decoration: none;
@@ -47,6 +46,7 @@ $aClickColor: #30cea3;
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: calc(100vw - 15rem);
 
     .contextUpper {
       display: flex;

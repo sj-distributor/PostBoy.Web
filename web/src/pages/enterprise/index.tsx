@@ -1,11 +1,12 @@
-import SendNotice from "../notification";
+import SendMessage from "./components/send-message";
 import styles from "./index.module.scss";
 
 const Enterprise = () => {
   return (
     <div className={styles.enterpriseBox}>
-      <SendNotice />
+      <SendMessage />
     </div>
   );
 };
+
 export default Enterprise;

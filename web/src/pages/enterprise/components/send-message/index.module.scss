@@ -1,0 +1,57 @@
+.sendMsgBox {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 3rem 1rem 5rem;
+  display: flex;
+
+  .selectInputBox {
+    display: flex;
+    flex-wrap: wrap;
+
+    .corpInput {
+      margin-bottom: 1rem;
+      :global(input[type="button" i]) {
+        text-align: left;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .checkboxAndUploadBox {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .textarea {
+    margin: 1rem auto 0;
+    width: 100%;
+
+    .multilineTextField {
+      width: 100%;
+    }
+  }
+
+  .dateInput {
+    width: 12rem;
+    height: 2rem;
+  }
+
+  .cycleSelectWrap {
+    width: 100%;
+  }
+
+  .groupLabel {
+    margin: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 0.1rem solid #eee;
+  }
+
+  .noneGroupLabel {
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
