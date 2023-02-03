@@ -1,13 +1,13 @@
-import Button from "@mui/material/Button";
-import Switch from "@mui/material/Switch";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import { MessageWidgetShowStatus } from "../../../../dtos/enterprise";
-import SelectTargetDialog from "../select-target-dialog";
-import useAction from "./hook";
-import styles from "./index.module.scss";
+import Button from "@mui/material/Button"
+import Switch from "@mui/material/Switch"
+import Autocomplete from "@mui/material/Autocomplete"
+import TextField from "@mui/material/TextField"
+import FormGroup from "@mui/material/FormGroup"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import { MessageWidgetShowStatus } from "../../../../dtos/enterprise"
+import SelectTargetDialog from "../select-target-dialog"
+import useAction from "./hook"
+import styles from "./index.module.scss"
 
 const SendMessage = () => {
   const {
@@ -25,7 +25,7 @@ const SendMessage = () => {
     isTreeViewLoading,
     flattenDepartmentList,
     tagsList,
-    tagsValue,
+    departmentKeyValue,
     setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
@@ -36,9 +36,9 @@ const SendMessage = () => {
     setIsShowMessageParams,
     onScrolling,
     setTagsValue
-  } = useAction();
+  } = useAction()
 
-  const muiSxStyle = { width: "15rem", margin: "0 2rem" };
+  const muiSxStyle = { width: "15rem", margin: "0 2rem" }
 
   return (
     <div className={styles.sendMsgBox}>
@@ -64,7 +64,7 @@ const SendMessage = () => {
                 />
               )}
               onChange={(e, value) => {
-                setCorpsValue(value);
+                setCorpsValue(value)
               }}
             />
             <Autocomplete
@@ -78,7 +78,7 @@ const SendMessage = () => {
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               onChange={(e, value) => {
-                setCorpAppValue(value);
+                setCorpAppValue(value)
               }}
               renderInput={(params) => (
                 <TextField
@@ -125,10 +125,10 @@ const SendMessage = () => {
                 </p>
                 <span>{params.children}</span>
               </div>
-            );
+            )
           }}
           onChange={(e, value) => {
-            setMessageTypeValue(value);
+            setMessageTypeValue(value)
           }}
         />
         <Button
@@ -140,7 +140,7 @@ const SendMessage = () => {
           }}
           variant="contained"
           onClick={() => {
-            setIsShowDialog(true);
+            setIsShowDialog(true)
           }}
         >
           选择发送目标
@@ -165,9 +165,7 @@ const SendMessage = () => {
               <Switch
                 value={isShowMessageParams}
                 onChange={(e) => {
-                  setIsShowMessageParams(
-                    (e.target as HTMLInputElement).checked
-                  );
+                  setIsShowMessageParams((e.target as HTMLInputElement).checked)
                 }}
               />
             }
@@ -224,16 +222,16 @@ const SendMessage = () => {
         open={isShowDialog}
         AppId={corpAppValue ? corpAppValue.appId : ""}
         departmentAndUserList={departmentAndUserList}
+        departmentKeyValue={departmentKeyValue}
         flattenDepartmentList={flattenDepartmentList}
         isLoading={isTreeViewLoading}
         tagsList={tagsList}
         setOpenFunction={setIsShowDialog}
         setDeptUserList={setDepartmentAndUserList}
-        tagsValue={tagsValue}
-        setTagsValue={setTagsValue}
         listScroll={onScrolling}
+        setOuterTagsValue={setTagsValue}
       />
     </div>
-  );
-};
-export default SendMessage;
+  )
+}
+export default SendMessage

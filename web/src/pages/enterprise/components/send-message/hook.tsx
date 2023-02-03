@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -12,6 +12,7 @@ import {
   ICorpData,
   IDepartmentAndUserListValue,
   IDepartmentData,
+  IDepartmentKeyControl,
   IMessageTypeData,
   ISendMsgData,
   ITagsList,
@@ -47,7 +48,7 @@ const useAction = () => {
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
   const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
-    IDepartmentData[]
+    IDepartmentKeyControl[]
   >([]);
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     IDepartmentAndUserListValue[]
@@ -88,15 +89,32 @@ const useAction = () => {
       });
       if (!!userList && userList.errcode === 0) {
         setDepartmentAndUserList((prev) => {
-          const newValue = prev.filter((e) => !!e);
-          newValue.push({
-            ...department,
-            departmentUserList: userList.userlist.map((e) => {
-              e.selected = false;
-              return e;
-            }),
-            selected: false
-          });
+          let newValue = prev.filter((e) => !!e);
+          const hasData = newValue.find((e) => e.key === AppId);
+          if (hasData) {
+            hasData.data.push({
+              ...department,
+              departmentUserList: userList.userlist.map((e) => {
+                e.selected = false;
+                return e;
+              }),
+              selected: false
+            });
+          } else {
+            newValue.push({
+              key: AppId,
+              data: [
+                {
+                  ...department,
+                  departmentUserList: userList.userlist.map((e) => {
+                    e.selected = false;
+                    return e;
+                  }),
+                  selected: false
+                }
+              ]
+            });
+          }
           return newValue;
         });
         setFlattenDepartmentList((prev) => {
@@ -116,20 +134,26 @@ const useAction = () => {
 
   const handleSubmit = async () => {
     let toUsers: string[] = [];
-    departmentAndUserList.forEach((department) => {
-      toUsers = toUsers.concat(
-        department.departmentUserList
-          .filter((user) => user.selected)
-          .map((e) => e.userid)
-      );
+    let toParties: string[] = [];
+    departmentAndUserList.forEach((data) => {
+      if (data.key === corpAppValue?.appId) {
+        toParties = data.data
+          .filter((e) => e.selected)
+          .map((e) => String(e.id));
+        data.data.forEach((department) => {
+          toUsers = toUsers.concat(
+            department.departmentUserList
+              .filter((user) => user.selected)
+              .map((e) => e.userid)
+          );
+        });
+      }
     });
     const data: ISendMsgData = {
       appId: corpAppValue?.appId,
       toTags: tagsValue.map((e) => String(e.tagId)),
       toUsers,
-      toParties: departmentAndUserList
-        .filter((e) => e.selected)
-        .map((e) => String(e.id))
+      toParties
     };
 
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
@@ -157,6 +181,13 @@ const useAction = () => {
 
     // const response = await SendMessage(data);
   };
+
+  const departmentKeyValue = useMemo(() => {
+    const result = departmentAndUserList.find(
+      (e) => e.key === corpAppValue?.appId
+    );
+    return result as IDepartmentKeyControl;
+  }, [departmentAndUserList]);
 
   useEffect(() => {
     GetCorpsList().then((data) => {
@@ -228,7 +259,7 @@ const useAction = () => {
     isTreeViewLoading,
     tagsList,
     flattenDepartmentList,
-    tagsValue,
+    departmentKeyValue,
     setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,

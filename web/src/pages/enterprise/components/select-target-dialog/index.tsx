@@ -1,29 +1,29 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import TextField from "@mui/material/TextField";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import List from "@mui/material/List";
-import Collapse from "@mui/material/Collapse";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
-import Autocomplete from "@mui/material/Autocomplete";
-import Checkbox from "@mui/material/Checkbox";
-import useAction from "./hook";
-import styles from "./index.module.scss";
+import Button from "@mui/material/Button"
+import Dialog from "@mui/material/Dialog"
+import TextField from "@mui/material/TextField"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogActions from "@mui/material/DialogActions"
+import DialogContent from "@mui/material/DialogContent"
+import List from "@mui/material/List"
+import Collapse from "@mui/material/Collapse"
+import ListItemButton from "@mui/material/ListItemButton"
+import ListItemText from "@mui/material/ListItemText"
+import ExpandLess from "@mui/icons-material/ExpandLess"
+import ExpandMore from "@mui/icons-material/ExpandMore"
+import CircularProgress from "@mui/material/CircularProgress"
+import Divider from "@mui/material/Divider"
+import Autocomplete from "@mui/material/Autocomplete"
+import Checkbox from "@mui/material/Checkbox"
+import useAction from "./hook"
+import styles from "./index.module.scss"
 
 import {
   DepartmentAndUserType,
   IDepartmentUsersData,
   ITargetDialogProps
-} from "../../../../dtos/enterprise";
-import { memo } from "react";
-import { throttle } from "throttle-typescript";
+} from "../../../../dtos/enterprise"
+import { memo } from "react"
+import { debounce } from "ts-debounce"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -34,23 +34,27 @@ const SelectTargetDialog = memo(
       isLoading,
       tagsList,
       flattenDepartmentList,
-      tagsValue,
+      departmentKeyValue,
       setOpenFunction,
       setDeptUserList,
       listScroll,
-      setTagsValue
-    } = props;
+      setOuterTagsValue
+    } = props
     const {
       departmentSelectedList,
+      tagsValue,
       handleDeptOrUserClick,
-      setSearchToDeptValue
+      setSearchToDeptValue,
+      setTagsValue
     } = useAction({
+      open,
       AppId,
+      departmentKeyValue,
       departmentAndUserList,
       isLoading,
       setDeptUserList,
-      setTagsValue
-    });
+      setOuterTagsValue
+    })
 
     return (
       <div>
@@ -62,94 +66,97 @@ const SelectTargetDialog = memo(
             }
           }}
           onClose={() => {
-            setOpenFunction(false);
+            setOpenFunction(false)
           }}
         >
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
-            {departmentAndUserList.length > 0 && !isLoading ? (
+            {departmentKeyValue?.data &&
+            departmentKeyValue.data.length > 0 &&
+            !isLoading ? (
               <div
                 style={{ height: "15rem", overflowY: "auto" }}
                 onScroll={(e) => {
-                  throttle(listScroll, 2200)(
+                  debounce(listScroll, 1200)(
                     (e.target as HTMLDivElement).scrollHeight,
                     (e.target as HTMLDivElement).scrollTop,
                     (e.target as HTMLDivElement).clientHeight
-                  );
+                  )
                 }}
               >
                 <List dense>
-                  {departmentAndUserList.map(
-                    (department, departmentIndex: number) => {
-                      return (
-                        <div key={departmentIndex}>
-                          <ListItemButton
-                            sx={{ height: "2.2rem" }}
-                            onClick={() => {
-                              handleDeptOrUserClick({
-                                id: department.id,
-                                name: department.name,
-                                type: DepartmentAndUserType.Department,
-                                parentid: department.parentid
-                              });
-                            }}
-                          >
-                            <Checkbox
-                              edge="start"
-                              checked={department.selected}
-                              tabIndex={-1}
-                              disableRipple
-                            />
-                            <ListItemText primary={department.name} />
-                            {!!department.selected ? (
-                              <ExpandLess />
-                            ) : (
-                              <ExpandMore />
-                            )}
-                          </ListItemButton>
-
-                          {department.departmentUserList && (
-                            <Collapse
-                              in={!!department.selected}
-                              timeout="auto"
-                              unmountOnExit
+                  {departmentKeyValue?.data &&
+                    departmentKeyValue.data.map(
+                      (department, departmentIndex: number) => {
+                        return (
+                          <div key={departmentIndex}>
+                            <ListItemButton
+                              sx={{ height: "2.2rem" }}
+                              onClick={() => {
+                                handleDeptOrUserClick({
+                                  id: department.id,
+                                  name: department.name,
+                                  type: DepartmentAndUserType.Department,
+                                  parentid: department.parentid
+                                })
+                              }}
                             >
-                              <List component="div" disablePadding dense>
-                                {department.departmentUserList.map(
-                                  (
-                                    user: IDepartmentUsersData,
-                                    userIndex: number
-                                  ) => (
-                                    <ListItemButton
-                                      key={userIndex}
-                                      selected={!!user.selected}
-                                      sx={{ pl: 4, height: "2.2rem" }}
-                                      onClick={(e) => {
-                                        handleDeptOrUserClick({
-                                          id: user.userid,
-                                          name: user.name,
-                                          type: DepartmentAndUserType.User,
-                                          parentid: department.name
-                                        });
-                                      }}
-                                    >
-                                      <Checkbox
-                                        edge="start"
-                                        checked={user.selected}
-                                        tabIndex={-1}
-                                        disableRipple
-                                      />
-                                      <ListItemText primary={user.name} />
-                                    </ListItemButton>
-                                  )
-                                )}
-                              </List>
-                            </Collapse>
-                          )}
-                        </div>
-                      );
-                    }
-                  )}
+                              <Checkbox
+                                edge="start"
+                                checked={department.selected}
+                                tabIndex={-1}
+                                disableRipple
+                              />
+                              <ListItemText primary={department.name} />
+                              {!!department.selected ? (
+                                <ExpandLess />
+                              ) : (
+                                <ExpandMore />
+                              )}
+                            </ListItemButton>
+
+                            {department.departmentUserList && (
+                              <Collapse
+                                in={!!department.selected}
+                                timeout="auto"
+                                unmountOnExit
+                              >
+                                <List component="div" disablePadding dense>
+                                  {department.departmentUserList.map(
+                                    (
+                                      user: IDepartmentUsersData,
+                                      userIndex: number
+                                    ) => (
+                                      <ListItemButton
+                                        key={userIndex}
+                                        selected={!!user.selected}
+                                        sx={{ pl: 4, height: "2.2rem" }}
+                                        onClick={(e) => {
+                                          handleDeptOrUserClick({
+                                            id: user.userid,
+                                            name: user.name,
+                                            type: DepartmentAndUserType.User,
+                                            parentid: department.name
+                                          })
+                                        }}
+                                      >
+                                        <Checkbox
+                                          edge="start"
+                                          checked={user.selected}
+                                          tabIndex={-1}
+                                          disableRipple
+                                        />
+                                        <ListItemText primary={user.name} />
+                                      </ListItemButton>
+                                    )
+                                  )}
+                                </List>
+                              </Collapse>
+                            )}
+                          </div>
+                        )
+                      }
+                    )}
                 </List>
                 <Divider />
               </div>
@@ -178,7 +185,7 @@ const SelectTargetDialog = memo(
                 <TextField {...params} label="部门与用户搜索" />
               )}
               onChange={(e, value) => {
-                value && setSearchToDeptValue(value);
+                value && setSearchToDeptValue(value)
               }}
             />
 
@@ -188,7 +195,7 @@ const SelectTargetDialog = memo(
               openOnFocus
               multiple
               disableCloseOnSelect
-              disableClearable={true}
+              disableClearable
               limitTags={2}
               value={tagsValue}
               options={tagsList}
@@ -206,21 +213,21 @@ const SelectTargetDialog = memo(
                 />
               )}
               onChange={(e, value) => {
-                setTagsValue(value);
+                setTagsValue(value)
               }}
             />
           </DialogContent>
           <DialogActions>
             <Button
               onClick={() => {
-                setOpenFunction(false);
+                setOpenFunction(false)
               }}
             >
               取消
             </Button>
             <Button
               onClick={() => {
-                setOpenFunction(false);
+                setOpenFunction(false)
               }}
             >
               确定
@@ -228,14 +235,14 @@ const SelectTargetDialog = memo(
           </DialogActions>
         </Dialog>
       </div>
-    );
+    )
   },
   (prevProps, nextProps) => {
     return (
       prevProps.open === nextProps.open &&
       prevProps.departmentAndUserList === nextProps.departmentAndUserList
-    );
+    )
   }
-);
+)
 
-export default SelectTargetDialog;
+export default SelectTargetDialog
