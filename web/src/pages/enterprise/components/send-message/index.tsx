@@ -21,18 +21,21 @@ const SendMessage = () => {
     isShowDialog,
     isShowInputOrUpload,
     isShowMessageParams,
-    departmentList,
+    departmentAndUserList,
     isTreeViewLoading,
     flattenDepartmentList,
     tagsList,
+    tagsValue,
+    setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
     setMessageTypeValue,
     handleSubmit,
     setIsShowDialog,
-    getDialogValue,
-    setIsShowMessageParams
+    setIsShowMessageParams,
+    onScrolling,
+    setTagsValue
   } = useAction();
 
   const muiSxStyle = { width: "15rem", margin: "0 2rem" };
@@ -43,6 +46,7 @@ const SendMessage = () => {
         {corpsValue !== undefined && corpAppValue !== undefined && (
           <>
             <Autocomplete
+              openOnFocus
               disablePortal
               id="Autocomplete-corpsDataId"
               value={corpsValue}
@@ -64,6 +68,7 @@ const SendMessage = () => {
               }}
             />
             <Autocomplete
+              openOnFocus
               disablePortal
               id="Autocomplete-corpAppListId"
               value={corpAppValue}
@@ -87,6 +92,7 @@ const SendMessage = () => {
           </>
         )}
         <Autocomplete
+          openOnFocus
           disablePortal
           className={styles.messageTypeList}
           id="Autocomplete-messageTypeListId"
@@ -217,12 +223,15 @@ const SendMessage = () => {
       <SelectTargetDialog
         open={isShowDialog}
         AppId={corpAppValue ? corpAppValue.appId : ""}
-        departmentList={departmentList}
+        departmentAndUserList={departmentAndUserList}
         flattenDepartmentList={flattenDepartmentList}
         isLoading={isTreeViewLoading}
         tagsList={tagsList}
         setOpenFunction={setIsShowDialog}
-        getDialogValue={getDialogValue}
+        setDeptUserList={setDepartmentAndUserList}
+        tagsValue={tagsValue}
+        setTagsValue={setTagsValue}
+        listScroll={onScrolling}
       />
     </div>
   );

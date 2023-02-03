@@ -6,7 +6,9 @@ import {
   IDepartmentUsersListApiData,
   IDepartmentResponse,
   IDepartmentUsersResonse,
-  ITagsListResponse
+  ITagsListResponse,
+  ISendMsgData,
+  ISendMsgResponse
 } from "../../dtos/enterprise";
 import { Get, Post } from "../http-client";
 
@@ -40,4 +42,8 @@ export const GetTagsList = async (params: { AppId: string }) => {
   return await Get<ITagsListResponse>(
     `/api/WeChat/work/tags?AppId=${params.AppId}`
   );
+};
+
+export const SendMessage = async (data: ISendMsgData) => {
+  return await Post<ISendMsgResponse>("/api/Message/send", data);
 };

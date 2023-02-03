@@ -5,43 +5,39 @@ import {
   DepartmentAndUserType,
   ITagsList
 } from "../../../../dtos/enterprise";
-import { clone } from "ramda";
 
 const useAction = (props: {
-  open: boolean;
-  departmentList: IDepartmentData[];
+  departmentAndUserList: IDepartmentData[];
   AppId: string;
+  isLoading: boolean;
+  setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
+  setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentData[]>>;
 }) => {
-  const { open, departmentList } = props;
-
-  const [newDepartmentList, setNewDepartmentList] = useState<IDepartmentData[]>(
-    []
-  );
-  const [tagsValue, setTagsValue] = useState<ITagsList>({
-    tagId: 0,
-    tagName: ""
-  });
+  const { departmentAndUserList, AppId, isLoading, setDeptUserList } = props;
+  const [departmentSelectedList, setDepartmentSelectedList] = useState<
+    IDepartmentAndUserListValue[]
+  >([]);
 
   const handleDeptOrUserClick = (clickedItem: IDepartmentAndUserListValue) => {
     let departmentIndex: number;
     if (clickedItem.type === DepartmentAndUserType.Department) {
-      departmentIndex = newDepartmentList.findIndex(
+      departmentIndex = departmentAndUserList.findIndex(
         (e) => e.id === clickedItem.id
       );
-      setNewDepartmentList((prev) => {
+      setDeptUserList((prev) => {
         const newValue = prev.filter((e) => !!e);
         newValue[departmentIndex].selected =
           !newValue[departmentIndex].selected;
         return newValue;
       });
     } else {
-      departmentIndex = newDepartmentList.findIndex(
-        (e) => e.id === clickedItem.parentid
+      departmentIndex = departmentAndUserList.findIndex(
+        (e) => e.name === clickedItem.parentid
       );
-      const userIndex = newDepartmentList[
+      const userIndex = departmentAndUserList[
         departmentIndex
       ].departmentUserList.findIndex((e) => e.userid === clickedItem.id);
-      setNewDepartmentList((prev) => {
+      setDeptUserList((prev) => {
         const newValue = prev.filter((e) => !!e);
         newValue[departmentIndex]["departmentUserList"][userIndex]["selected"] =
           !newValue[departmentIndex]["departmentUserList"][userIndex][
@@ -52,15 +48,66 @@ const useAction = (props: {
     }
   };
 
+  const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
+    valueArr.length <= 0
+      ? setDepartmentSelectedList([])
+      : setDepartmentSelectedList(valueArr);
+
+    setDeptUserList((prev) => {
+      const newValue = prev.filter((e) => !!e);
+      valueArr.length <= 0
+        ? newValue.forEach((department) => {
+            department.departmentUserList.forEach((user) => {
+              user.selected = false;
+            });
+          })
+        : newValue.forEach((department) => {
+            department.departmentUserList.forEach((user) => {
+              if (valueArr.find((e) => e.id === user.userid)) {
+                user.selected = true;
+              } else {
+                user.selected = false;
+              }
+            });
+          });
+      return newValue;
+    });
+  };
+
   useEffect(() => {
-    setNewDepartmentList(clone(departmentList));
-  }, [open, departmentList]);
+    departmentAndUserList.length > 0 &&
+      !isLoading &&
+      setDepartmentSelectedList((prev) => {
+        const newValue = prev.filter((e) => !!e);
+        departmentAndUserList.forEach((department) => {
+          department.departmentUserList.forEach((user) => {
+            const hasItemIndex = newValue.findIndex(
+              (item) => item.id === user.userid
+            );
+            user.selected
+              ? hasItemIndex <= -1 &&
+                newValue.push({
+                  id: user.userid,
+                  name: user.name,
+                  parentid: department.name
+                })
+              : hasItemIndex > -1 &&
+                newValue[hasItemIndex].parentid === department.name &&
+                newValue.splice(hasItemIndex, 1);
+          });
+        });
+        return newValue;
+      });
+  }, [departmentAndUserList]);
+
+  useEffect(() => {
+    setDepartmentSelectedList([]);
+  }, [AppId]);
 
   return {
-    tagsValue,
-    newDepartmentList,
-    setTagsValue,
-    handleDeptOrUserClick
+    departmentSelectedList,
+    handleDeptOrUserClick,
+    setSearchToDeptValue
   };
 };
 export default useAction;

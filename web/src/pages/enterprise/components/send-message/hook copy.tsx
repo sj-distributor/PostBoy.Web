@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   GetCorpAppList,
   GetCorpsList,
   GetDepartmentList,
   GetDepartmentUsersList,
-  GetTagsList,
-  SendMessage
+  GetTagsList
 } from "../../../../api/enterprise";
 import {
   ICorpAppData,
@@ -13,8 +12,8 @@ import {
   IDepartmentAndUserListValue,
   IDepartmentData,
   IMessageTypeData,
-  ISendMsgData,
   ITagsList,
+  ITargetDialogValue,
   MessageDataType,
   MessageWidgetShowStatus
 } from "../../../../dtos/enterprise";
@@ -34,6 +33,7 @@ const useAction = () => {
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
   );
+  const [tagsValue, setTagsValue] = useState<ITagsList>();
 
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
@@ -52,35 +52,40 @@ const useAction = () => {
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     IDepartmentAndUserListValue[]
   >([]);
-  const [departmentPage, setDepartmentPage] = useState(0);
+  const [departmentPage, setDepartmentPage] = useState({
+    pageNumber: 0,
+    listLength: 0
+  });
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
   const [tagsList, setTagsList] = useState<ITagsList[]>([]);
-  const [tagsValue, setTagsValue] = useState<ITagsList[]>([]);
 
   const onScrolling = (
     scrollHeight: number,
     scrollTop: number,
     clientHeight: number
   ) => {
-    if (scrollTop + clientHeight >= scrollHeight - 2) {
-      setDepartmentPage((prev) =>
-        prev + 10 >= departmentList.length ? departmentList.length : prev + 10
-      );
+    if (scrollTop + clientHeight >= scrollHeight - 1) {
+      setDepartmentPage((prev) => ({
+        ...prev,
+        pageNumber:
+          prev.pageNumber + 10 >= departmentList.length - 1
+            ? departmentList.length - 1
+            : prev.pageNumber + 10
+      }));
     }
   };
 
   const loadDeptUsers = async (
-    departmentPage: number,
     AppId: string,
     deptListResponse: IDepartmentData[]
   ) => {
     const limit =
-      departmentPage + 10 >= deptListResponse.length
-        ? deptListResponse.length
-        : departmentPage + 10;
+      departmentPage.pageNumber + 10 >= deptListResponse.length - 1
+        ? deptListResponse.length - 1
+        : departmentPage.pageNumber + 10;
 
-    for (let index = departmentPage; index < limit; index++) {
+    for (let index = departmentPage.pageNumber; index <= limit; index++) {
       const department = deptListResponse[index];
       const userList = await GetDepartmentUsersList({
         AppId,
@@ -114,49 +119,9 @@ const useAction = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    let toUsers: string[] = [];
-    departmentAndUserList.forEach((department) => {
-      toUsers = toUsers.concat(
-        department.departmentUserList
-          .filter((user) => user.selected)
-          .map((e) => e.userid)
-      );
-    });
-    const data: ISendMsgData = {
-      appId: corpAppValue?.appId,
-      toTags: tagsValue.map((e) => String(e.tagId)),
-      toUsers,
-      toParties: departmentAndUserList
-        .filter((e) => e.selected)
-        .map((e) => String(e.id))
-    };
-
-    messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
-      ? (data.mpNews = {
-          articles: [
-            {
-              title: "",
-              author: "",
-              digest: "",
-              content: "",
-              fileContent: "",
-              contentSourceUrl: ""
-            }
-          ]
-        })
-      : messageTypeValue.type === MessageDataType.Text
-      ? (data.text = {
-          content: ""
-        })
-      : (data.file = {
-          fileName: "",
-          fileContent: "",
-          fileType: messageTypeValue.type
-        });
-
-    // const response = await SendMessage(data);
-  };
+  useEffect(() => {
+    corpAppValue && loadDeptUsers(corpAppValue.appId, departmentList);
+  }, [departmentPage.pageNumber]);
 
   useEffect(() => {
     GetCorpsList().then((data) => {
@@ -181,26 +146,26 @@ const useAction = () => {
   }, [corpsValue?.id]);
 
   useEffect(() => {
-    setDepartmentAndUserList([]);
-    setDepartmentPage(0);
     const loadDepartment = async (AppId: string) => {
       const deptListResponse = await GetDepartmentList({ AppId });
       if (!!deptListResponse && deptListResponse.errcode === 0) {
+        setDepartmentPage((prev) => ({
+          ...prev,
+          listLength: deptListResponse.department.length
+        }));
         setDepartmentList(deptListResponse.department);
-        loadDeptUsers(0, AppId, deptListResponse.department);
+        loadDeptUsers(AppId, deptListResponse.department);
       }
     };
+    setDepartmentAndUserList([]);
+    setDepartmentPage((prev) => ({ ...prev, pageNumber: 0 }));
     if (!!corpAppValue) {
       setIsTreeViewLoading(true);
       loadDepartment(corpAppValue.appId);
     }
   }, [corpAppValue?.appId]);
 
-  useEffect(() => {
-    corpAppValue &&
-      departmentPage !== 0 &&
-      loadDeptUsers(departmentPage, corpAppValue.appId, departmentList);
-  }, [departmentPage]);
+  const handleSubmit = () => {};
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
@@ -228,7 +193,6 @@ const useAction = () => {
     isTreeViewLoading,
     tagsList,
     flattenDepartmentList,
-    tagsValue,
     setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
@@ -237,8 +201,7 @@ const useAction = () => {
     handleSubmit,
     setIsShowDialog,
     setIsShowMessageParams,
-    onScrolling,
-    setTagsValue
+    onScrolling
   };
 };
 

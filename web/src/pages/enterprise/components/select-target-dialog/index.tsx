@@ -13,6 +13,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import Autocomplete from "@mui/material/Autocomplete";
+import Checkbox from "@mui/material/Checkbox";
 import useAction from "./hook";
 import styles from "./index.module.scss";
 
@@ -22,28 +23,33 @@ import {
   ITargetDialogProps
 } from "../../../../dtos/enterprise";
 import { memo } from "react";
+import { throttle } from "throttle-typescript";
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
     const {
       open,
-      departmentList,
+      departmentAndUserList,
       AppId,
       isLoading,
       tagsList,
       flattenDepartmentList,
+      tagsValue,
       setOpenFunction,
-      getDialogValue
+      setDeptUserList,
+      listScroll,
+      setTagsValue
     } = props;
     const {
-      tagsValue,
-      newDepartmentList,
-      setTagsValue,
-      handleDeptOrUserClick
+      departmentSelectedList,
+      handleDeptOrUserClick,
+      setSearchToDeptValue
     } = useAction({
-      open,
       AppId,
-      departmentList
+      departmentAndUserList,
+      isLoading,
+      setDeptUserList,
+      setTagsValue
     });
 
     return (
@@ -61,14 +67,24 @@ const SelectTargetDialog = memo(
         >
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
-            {newDepartmentList.length > 0 && !isLoading ? (
-              <>
-                <List dense sx={{ height: "15rem", overflowY: "auto" }}>
-                  {newDepartmentList.map(
+            {departmentAndUserList.length > 0 && !isLoading ? (
+              <div
+                style={{ height: "15rem", overflowY: "auto" }}
+                onScroll={(e) => {
+                  throttle(listScroll, 2200)(
+                    (e.target as HTMLDivElement).scrollHeight,
+                    (e.target as HTMLDivElement).scrollTop,
+                    (e.target as HTMLDivElement).clientHeight
+                  );
+                }}
+              >
+                <List dense>
+                  {departmentAndUserList.map(
                     (department, departmentIndex: number) => {
                       return (
                         <div key={departmentIndex}>
                           <ListItemButton
+                            sx={{ height: "2.2rem" }}
                             onClick={() => {
                               handleDeptOrUserClick({
                                 id: department.id,
@@ -78,6 +94,12 @@ const SelectTargetDialog = memo(
                               });
                             }}
                           >
+                            <Checkbox
+                              edge="start"
+                              checked={department.selected}
+                              tabIndex={-1}
+                              disableRipple
+                            />
                             <ListItemText primary={department.name} />
                             {!!department.selected ? (
                               <ExpandLess />
@@ -101,16 +123,22 @@ const SelectTargetDialog = memo(
                                     <ListItemButton
                                       key={userIndex}
                                       selected={!!user.selected}
-                                      sx={{ pl: 4 }}
+                                      sx={{ pl: 4, height: "2.2rem" }}
                                       onClick={(e) => {
                                         handleDeptOrUserClick({
                                           id: user.userid,
                                           name: user.name,
                                           type: DepartmentAndUserType.User,
-                                          parentid: user.department[0]
+                                          parentid: department.name
                                         });
                                       }}
                                     >
+                                      <Checkbox
+                                        edge="start"
+                                        checked={user.selected}
+                                        tabIndex={-1}
+                                        disableRipple
+                                      />
                                       <ListItemText primary={user.name} />
                                     </ListItemButton>
                                   )
@@ -124,7 +152,7 @@ const SelectTargetDialog = memo(
                   )}
                 </List>
                 <Divider />
-              </>
+              </div>
             ) : (
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <CircularProgress />
@@ -132,11 +160,16 @@ const SelectTargetDialog = memo(
             )}
 
             <Autocomplete
-              disablePortal
               id="sreach-input"
+              disablePortal
+              openOnFocus
+              multiple
+              disableCloseOnSelect
+              limitTags={2}
               sx={{
-                marginTop: "2rem"
+                margin: "1rem 0 1rem"
               }}
+              value={departmentSelectedList}
               options={flattenDepartmentList}
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -145,14 +178,19 @@ const SelectTargetDialog = memo(
                 <TextField {...params} label="部门与用户搜索" />
               )}
               onChange={(e, value) => {
-                console.log(value);
+                value && setSearchToDeptValue(value);
               }}
             />
 
             <Autocomplete
-              disablePortal
               id="tags-list"
+              disablePortal
+              openOnFocus
+              multiple
+              disableCloseOnSelect
               disableClearable={true}
+              limitTags={2}
+              value={tagsValue}
               options={tagsList}
               getOptionLabel={(option) => option.tagName}
               isOptionEqualToValue={(option, value) =>
@@ -183,10 +221,6 @@ const SelectTargetDialog = memo(
             <Button
               onClick={() => {
                 setOpenFunction(false);
-                getDialogValue({
-                  deptAndUserValueList: newDepartmentList,
-                  tagsValue: tagsValue ? tagsValue : tagsList[0]
-                });
               }}
             >
               确定
@@ -199,7 +233,7 @@ const SelectTargetDialog = memo(
   (prevProps, nextProps) => {
     return (
       prevProps.open === nextProps.open &&
-      prevProps.departmentList === nextProps.departmentList
+      prevProps.departmentAndUserList === nextProps.departmentAndUserList
     );
   }
 );

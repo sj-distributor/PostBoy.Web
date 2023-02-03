@@ -86,13 +86,20 @@ export enum MessageDataType {
 
 export interface ITargetDialogProps {
   open: boolean;
-  departmentList: IDepartmentData[];
+  departmentAndUserList: IDepartmentData[];
   flattenDepartmentList: IDepartmentAndUserListValue[];
   AppId: string;
   isLoading: boolean;
   tagsList: ITagsList[];
+  tagsValue: ITagsList[];
   setOpenFunction: (open: boolean) => void;
-  getDialogValue: (data: ITargetDialogValue) => void;
+  setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
+  setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentData[]>>;
+  listScroll: (
+    scrollHeight: number,
+    scrollTop: number,
+    clientHeight: number
+  ) => void;
 }
 
 export interface ITargetDialogValue {
@@ -114,3 +121,33 @@ export interface ITagsList {
   tagId: number;
   tagName: string;
 }
+
+export interface ISendMsgData {
+  appId?: string;
+  chatId?: string;
+  toTags?: string[];
+  toUsers?: string[];
+  toParties?: string[];
+  text?: {
+    content: string;
+  };
+  file?: {
+    fileName: string;
+    fileContent: string;
+    fileType: MessageDataType;
+  };
+  mpNews?: {
+    articles: [
+      {
+        title: string;
+        author: string;
+        digest: string;
+        content: string;
+        fileContent: string;
+        contentSourceUrl: string;
+      }
+    ];
+  };
+}
+
+export interface ISendMsgResponse extends IResponseMsg {}
