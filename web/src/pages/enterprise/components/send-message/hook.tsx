@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -7,12 +7,14 @@ import {
   GetMessageJob,
   GetTagsList,
   PostMessageSend,
-} from "../../../../api/enterprise";
+} from "../../../../api/enterprise"
 import {
   ICorpAppData,
   ICorpData,
   IDepartmentAndUserListValue,
   IDepartmentData,
+  IDtoExtend,
+  ILastShowTableData,
   IMessageJobDto,
   IMessageTypeData,
   ISendMessageCommand,
@@ -23,9 +25,9 @@ import {
   MessageWidgetShowStatus,
   SendType,
   TimeType,
-} from "../../../../dtos/enterprise";
-import { flatten } from "ramda";
-import moment from "moment";
+} from "../../../../dtos/enterprise"
+import { flatten } from "ramda"
+import moment from "moment"
 // import { v4 as uuidv4 } from "uuid";
 
 const useAction = () => {
@@ -33,12 +35,12 @@ const useAction = () => {
     { text: "即时发送", value: SendType.InstantSend },
     { text: "指定日期", value: SendType.SpecifiedDate },
     { text: "周期发送", value: SendType.SendPeriodically },
-  ];
+  ]
 
   const timeZone = [
     { title: "UTC", value: TimeType.UTC },
     { title: "America/Los_Angeles", value: TimeType.America },
-  ];
+  ]
 
   const messageTypeList: IMessageTypeData[] = [
     { title: "文本", groupBy: "", type: MessageDataType.Text },
@@ -47,92 +49,91 @@ const useAction = () => {
     { title: "语音", groupBy: "文件", type: MessageDataType.Voice },
     { title: "视频", groupBy: "文件", type: MessageDataType.Video },
     { title: "文件", groupBy: "文件", type: MessageDataType.File },
-  ];
+  ]
 
-  const [messageParams, setMessageParams] = useState<string>("");
-  const [titleParams, setTitleParams] = useState<string>("");
+  const [messageParams, setMessageParams] = useState<string>("")
+  const [titleParams, setTitleParams] = useState<string>("")
 
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
-  );
+  )
 
-  const [tagsValue, setTagsValue] = useState<ITagsList>();
+  const [tagsValue, setTagsValue] = useState<ITagsList>()
 
-  const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
+  const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
-    useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll);
-  const [isShowMessageParams, setIsShowMessageParams] =
-    useState<boolean>(false);
+    useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll)
+  const [isShowMessageParams, setIsShowMessageParams] = useState<boolean>(false)
 
-  const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
-  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
-  const [corpsValue, setCorpsValue] = useState<ICorpData>();
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>();
-  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([]);
+  const [corpsList, setCorpsList] = useState<ICorpData[]>([])
+  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
+  const [corpsValue, setCorpsValue] = useState<ICorpData>()
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
+  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([])
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     IDepartmentAndUserListValue[]
-  >([]);
+  >([])
 
-  const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
-  const [tagsList, setTagsList] = useState<ITagsList[]>([]);
+  const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
+  const [tagsList, setTagsList] = useState<ITagsList[]>([])
 
-  const muiSxStyle = { width: "13rem", marginLeft: "1.5rem" };
-  const [cronExp, setCronExp] = useState("0 0 * * *"); //mark 初始值应该为null
-  const [cronError, setCronError] = useState("");
-  const [isAdmin, setIsAdmin] = useState(true);
-  const [dateValue, setDateValue] = useState<any>();
-  const [rowList, setRowList] = useState<IMessageJobDto[]>([]);
-  const [sendTypeValue, setSendTypeValue] = useState(sendTypeList[0]);
-  const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value);
-  const [sendMessageList, setSendMessageList] = useState<ISendMessageCommand>();
-  const [selectUserList, setSelectUserList] = useState<string[]>();
-  const [selectPartiesList, setSelectPartiesList] = useState<string[]>();
+  const muiSxStyle = { width: "13rem", marginLeft: "1.5rem" }
+  const [cronExp, setCronExp] = useState("0 0 * * *") //mark 初始值应该为null
+  const [cronError, setCronError] = useState("")
+  const [isAdmin, setIsAdmin] = useState(true)
+  const [dateValue, setDateValue] = useState<any>()
+  const [rowList, setRowList] = useState<IMessageJobDto[]>([])
+  const [sendTypeValue, setSendTypeValue] = useState(sendTypeList[0])
+  const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
+  const [sendMessageList, setSendMessageList] = useState<ISendMessageCommand>()
+  const [selectUserList, setSelectUserList] = useState<string[]>()
+  const [selectPartiesList, setSelectPartiesList] = useState<string[]>()
 
   useEffect(() => {
     GetCorpsList().then((data) => {
       if (data) {
-        setCorpsList(data);
-        setCorpsValue(data[0]);
+        setCorpsList(data)
+        setCorpsValue(data[0])
       }
-    });
-  }, []);
+    })
+  }, [])
 
   useEffect(() => {
     corpsValue &&
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
         if (corpAppResult) {
-          setCorpAppList(corpAppResult);
-          setCorpAppValue(corpAppResult[0]);
+          setCorpAppList(corpAppResult)
+          setCorpAppValue(corpAppResult[0])
           GetTagsList({ AppId: corpAppResult[0].appId }).then((tagsData) => {
-            tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist);
-          });
+            tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
+          })
         }
-      });
-  }, [corpsValue?.id]);
+      })
+  }, [corpsValue?.id])
 
   useEffect(() => {
     const loadDeptUsers = async (AppId: string) => {
-      setDepartmentList([]);
-      const deptListResponse = await GetDepartmentList({ AppId });
+      setDepartmentList([])
+      const deptListResponse = await GetDepartmentList({ AppId })
       if (!!deptListResponse && deptListResponse.errcode === 0) {
         for (const department of deptListResponse.department) {
           const userList = await GetDepartmentUsersList({
             AppId,
             DepartmentId: department.id,
-          });
+          })
           if (!!userList && userList.errcode === 0) {
             setDepartmentList((prev) => {
-              const newValue = prev.filter((e) => !!e);
+              const newValue = prev.filter((e) => !!e)
               newValue.push({
                 ...department,
                 departmentUserList: userList.userlist.map((e) => {
-                  e.selected = false;
-                  return e;
+                  e.selected = false
+                  return e
                 }),
                 selected: false,
-              });
-              return newValue;
-            });
+              })
+              return newValue
+            })
             setFlattenDepartmentList((prev) => {
               return [
                 ...prev,
@@ -141,19 +142,19 @@ const useAction = () => {
                   name: item.name,
                   parentid: department.name,
                 })),
-              ];
-            });
+              ]
+            })
 
             deptListResponse.department[
               deptListResponse.department.length - 1
-            ] === department && setIsTreeViewLoading(false);
+            ] === department && setIsTreeViewLoading(false)
 
             // 选择的群组
             setSelectPartiesList(
               deptListResponse.department
                 .filter((x) => x.selected === true)
                 .map((item) => item.name)
-            );
+            )
             // 选择的用户
             // deptListResponse?.department?.forEach((item) => {
             //   const useridList: string[] = [];
@@ -171,24 +172,24 @@ const useAction = () => {
               if (item.name === "HERRY.H") {
                 // console.log("item", item);
               }
-            });
+            })
           }
         }
       }
-    };
-    if (!!corpAppValue) {
-      setIsTreeViewLoading(true);
-
-      loadDeptUsers(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId]);
+    if (!!corpAppValue) {
+      setIsTreeViewLoading(true)
 
-  const setDialogValue = { deptAndUserValueList: departmentList, tagsValue };
+      loadDeptUsers(corpAppValue.appId)
+    }
+  }, [corpAppValue?.appId])
+
+  const setDialogValue = { deptAndUserValueList: departmentList, tagsValue }
 
   const getDialogValue = (dialogData: ITargetDialogValue) => {
-    setDepartmentList(dialogData.deptAndUserValueList);
-    setTagsValue(dialogData.tagsValue);
-  };
+    setDepartmentList(dialogData.deptAndUserValueList)
+    setTagsValue(dialogData.tagsValue)
+  }
 
   const handleSubmit = (sendType: SendType, correlationId?: string) => {
     // const messageList = {
@@ -291,11 +292,11 @@ const useAction = () => {
             //   ]
             // }
           },
-        };
-      console.log("data", JSON.stringify(data));
+        }
+      console.log("data", JSON.stringify(data))
       PostMessageSend(data)
         .then((res) => console.log("res", res))
-        .catch((error) => console.log("error1", error.message));
+        .catch((error) => console.log("error1", error.message))
     }
 
     // 周期
@@ -343,7 +344,7 @@ const useAction = () => {
     //   },
     // });
     // }
-  };
+  }
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
@@ -351,32 +352,77 @@ const useAction = () => {
       : messageTypeValue.type === MessageDataType.Text
       ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowInput)
       : (() => {
-          setIsShowInputOrUpload(MessageWidgetShowStatus.ShowUpload);
-          setMessageParams("");
-        })();
-  }, [messageTypeValue]);
+          setIsShowInputOrUpload(MessageWidgetShowStatus.ShowUpload)
+          setMessageParams("")
+        })()
+  }, [messageTypeValue])
 
   useEffect(() => {
-    (sendTypeValue.value === SendType.SendPeriodically ||
-      sendTypeValue.value === SendType.SpecifiedDate) &&
-      GetMessageJob(MessageJobDestination.WorkWeChat).then((res) => {
-        !!res && setRowList(res);
-        console.log("res", res);
-        const newList = [];
-        res?.forEach((item) => {
-          newList.push({
-            id: 13,
-            title: item.messageJobs[0].metadata[0].key,
-            content: item.messageJobs[0].metadata[0].value,
-            cycle: item.messageJobs[0].jobSettingJson,
-            createTime: moment
-              .utc(item.messageJobs[0].createdDate)
-              .local()
-              .format("YYYY-MM-DD HH:mm"),
-          });
-        });
-      });
-  }, [sendTypeValue]);
+    if (
+      sendTypeValue.value === SendType.SendPeriodically ||
+      sendTypeValue.value === SendType.SpecifiedDate
+    )
+      getMessageJob()
+  }, [sendTypeValue])
+
+  const getMessageJob = () => {
+    updateData("loading", true)
+    GetMessageJob(dto.page, dto.pageSize, 0)
+      .then((res) => {
+        if (!!res) {
+          setTimeout(() => {
+            updateData("rowCount", res.count)
+            updateData("messageJobs", res.messageJobs)
+            updateData("loading", false)
+          }, 100)
+        }
+      })
+      .catch((err) => {
+        setTimeout(() => {
+          updateData("rowCount", 0)
+          updateData("messageJobs", [])
+          updateData("loading", false)
+        }, 100)
+      })
+  }
+
+  const [dto, setDto] = useState<IDtoExtend>({
+    loading: true,
+    messageJobs: [],
+    rowCount: 0,
+    pageSize: 15,
+    page: 1,
+  })
+
+  useEffect(() => {
+    getMessageJob()
+  }, [dto.page, dto.pageSize])
+
+  const updateData = (k: keyof IDtoExtend, v: any) =>
+    setDto((prev) => ({ ...prev, [k]: v }))
+
+  const lastShowTableData = useMemo(() => {
+    const array: ILastShowTableData[] = []
+    if (dto.messageJobs.length > 0) {
+      dto.messageJobs.forEach((item) =>
+        array.push({
+          id: item.id,
+          jobId: item.jobId,
+          createdDate: item.createdDate,
+          correlationId: item.correlationId,
+          userAccountId: item.userAccountId,
+          commandJson: item.commandJson,
+          jobType: item.jobType,
+          jobSettingJson: item.jobSettingJson,
+          destination: item.destination,
+          title: item.metadata.filter((item) => item.key === "title")[0]?.value,
+          content: item.metadata.filter((item) => item.key === "content")[0]
+            ?.value,
+        })
+      )
+    }
+    return array
+  }, [dto.messageJobs])
 
   return {
     corpsList,
@@ -418,7 +464,11 @@ const useAction = () => {
     setDateValue,
     setTimeZoneValue,
     setTitleParams,
-  };
-};
+    lastShowTableData,
+    dto,
+    updateData,
+    getMessageJob,
+  }
+}
 
-export default useAction;
+export default useAction

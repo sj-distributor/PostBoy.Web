@@ -1,18 +1,17 @@
-import Button from "@mui/material/Button";
-import Switch from "@mui/material/Switch";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import { MessageWidgetShowStatus, SendType } from "../../../../dtos/enterprise";
-import SelectTargetDialog from "../select-target-dialog";
-import useAction from "./hook";
-import styles from "./index.module.scss";
-import SendNotice from "../../../notification";
-import Scheduler from "smart-cron";
-import { useState } from "react";
-import moment from "moment";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import Button from "@mui/material/Button"
+import Switch from "@mui/material/Switch"
+import Autocomplete from "@mui/material/Autocomplete"
+import TextField from "@mui/material/TextField"
+import FormGroup from "@mui/material/FormGroup"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import { MessageWidgetShowStatus, SendType } from "../../../../dtos/enterprise"
+import SelectTargetDialog from "../select-target-dialog"
+import useAction from "./hook"
+import styles from "./index.module.scss"
+import SendNotice from "../../../notification"
+import Scheduler from "smart-cron"
+import moment from "moment"
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 
 const SendMessage = () => {
   const {
@@ -54,7 +53,11 @@ const SendMessage = () => {
     setDateValue,
     setTimeZoneValue,
     setTitleParams,
-  } = useAction();
+    lastShowTableData,
+    dto,
+    updateData,
+    getMessageJob,
+  } = useAction()
 
   return (
     <div className={styles.sendMsgBox}>
@@ -79,7 +82,7 @@ const SendMessage = () => {
                 />
               )}
               onChange={(e, value) => {
-                setCorpsValue(value);
+                setCorpsValue(value)
               }}
             />
             <Autocomplete
@@ -92,7 +95,7 @@ const SendMessage = () => {
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               onChange={(e, value) => {
-                setCorpAppValue(value);
+                setCorpAppValue(value)
               }}
               renderInput={(params) => (
                 <TextField
@@ -138,10 +141,10 @@ const SendMessage = () => {
                 </p>
                 <span>{params.children}</span>
               </div>
-            );
+            )
           }}
           onChange={(e, value) => {
-            setMessageTypeValue(value);
+            setMessageTypeValue(value)
           }}
         />
 
@@ -155,7 +158,7 @@ const SendMessage = () => {
           getOptionLabel={(option) => option.text}
           isOptionEqualToValue={(option, value) => option.value === value.value}
           onChange={(e, value) => {
-            setSendTypeValue(value);
+            setSendTypeValue(value)
           }}
           renderInput={(params) => (
             <TextField
@@ -174,7 +177,7 @@ const SendMessage = () => {
             value={timeZoneValue}
             label="时区"
             onChange={(e) => {
-              setTimeZoneValue(Number(e.target.value));
+              setTimeZoneValue(Number(e.target.value))
             }}
           >
             {timeZone.map((item, key) => (
@@ -193,7 +196,7 @@ const SendMessage = () => {
           }}
           variant="contained"
           onClick={() => {
-            setIsShowDialog(true);
+            setIsShowDialog(true)
           }}
         >
           选择发送目标
@@ -218,9 +221,7 @@ const SendMessage = () => {
               <Switch
                 value={isShowMessageParams}
                 onChange={(e) => {
-                  setIsShowMessageParams(
-                    (e.target as HTMLInputElement).checked
-                  );
+                  setIsShowMessageParams((e.target as HTMLInputElement).checked)
                 }}
               />
             }
@@ -324,9 +325,14 @@ const SendMessage = () => {
       />
       {(sendTypeValue.value === SendType.SpecifiedDate ||
         sendTypeValue.value === SendType.SendPeriodically) && (
-        <SendNotice rowList={rowList} />
+        <SendNotice
+          rowList={lastShowTableData}
+          dto={dto}
+          updateData={updateData}
+          getMessageJob={getMessageJob}
+        />
       )}
     </div>
-  );
-};
-export default SendMessage;
+  )
+}
+export default SendMessage

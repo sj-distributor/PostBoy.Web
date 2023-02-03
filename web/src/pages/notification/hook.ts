@@ -1,56 +1,86 @@
-import moment from "moment";
-import { useEffect, useRef, useState } from "react";
-import { GetMessageJobRecords } from "../../api/enterprise";
-import { IMessageJobDto } from "../../dtos/enterprise";
-import { ModalBoxRef } from "../../dtos/modal";
+import { useEffect, useMemo, useRef, useState } from "react"
+import {
+  GetMessageJobRecords,
+  PostMessagejobDelete,
+} from "../../api/enterprise"
+import { IMessageJobRecord, ISendRecordDto } from "../../dtos/enterprise"
+import { ModalBoxRef } from "../../dtos/modal"
 
-export const useAction = (rowList: IMessageJobDto[]) => {
-  const [rowListChange, setRowListChange] = useState<any[]>();
-  const noticeSettingRef = useRef<ModalBoxRef>(null);
-  const sendRecordRef = useRef<ModalBoxRef>(null);
-  const [settingId, setSettingId] = useState<any>();
-  const [list, setList] = useState<any>();
+export interface HookProps {
+  getMessageJob: () => void
+}
+
+export const useAction = ({ getMessageJob }: HookProps) => {
+  const noticeSettingRef = useRef<ModalBoxRef>(null)
+  const sendRecordRef = useRef<ModalBoxRef>(null)
+  const [settingId, setSettingId] = useState<any>()
+  const [sendRecordList, setSendRecordList] = useState<IMessageJobRecord[]>([])
+  const [clickSendRecordItemUsers, setClickSendRecordItemUsers] = useState<
+    string[]
+  >([])
 
   const onNoticeCancel = () => {
-    noticeSettingRef.current?.close();
-  };
+    noticeSettingRef.current?.close()
+  }
 
   const onSendCancel = () => {
-    sendRecordRef.current?.close();
-  };
+    sendRecordRef.current?.close()
+  }
 
   const onConfirm = () => {
-    alert("click");
-  };
+    alert("click")
+  }
 
   const onSetting = (item: any) => {
-    noticeSettingRef.current?.open();
-  };
+    noticeSettingRef.current?.open()
+  }
 
   const onSend = (item: any) => {
-    sendRecordRef.current?.open();
+    sendRecordRef.current?.open()
+    // setClickSendRecordItemUsers(
+    //   JSON.parse(item.commandJson)?.WorkWeChatAppNotification?.ToUsers
+    // )
+    console.log(
+      JSON.parse(item.commandJson)?.WorkWeChatAppNotification?.ToUsers
+    )
     GetMessageJobRecords(item.correlationId).then((res) => {
-      setList(res);
-      console.log("res", res);
-    });
-  };
+      if (!!res) {
+        setSendRecordList(res)
+      }
+    })
+  }
 
-  useEffect(() => {
-    const newList: any[] = [];
-    rowList?.forEach((item) => {
-      newList.push({
-        id: 13,
-        title: item.messageJobs[0].metadata[0].key,
-        content: item.messageJobs[0].metadata[0].value,
-        cycle: item.messageJobs[0].jobSettingJson,
-        createTime: moment
-          .utc(item.messageJobs[0].createdDate)
-          .local()
-          .format("YYYY-MM-DD HH:mm"),
-      });
-    });
-    !!newList && setRowListChange(newList);
-  }, [rowList]);
+  const onDeleteMessageJob = (id: string) => {
+    console.log(id)
+    PostMessagejobDelete({ MessageJobId: id })
+      .then((res) => {
+        console.log("删除成功")
+        getMessageJob()
+      })
+      .catch((err) => {
+        throw Error(err)
+      })
+  }
+
+  const sendRecord = useMemo(() => {
+    const sendRecordArray: ISendRecordDto[] = []
+    if (sendRecordList.length > 0) {
+      sendRecordList.forEach((item) => {
+        sendRecordArray.push({
+          id: item.id,
+          createdDate: item.createdDate,
+          correlationId: item.correlationId,
+          result: item.result,
+          sendTheObject: clickSendRecordItemUsers,
+          errorSendtheobject:
+            JSON.parse(item.responseJson).invaliduser !== null
+              ? JSON.parse(item.responseJson).invaliduser
+              : [],
+        })
+      })
+    }
+    return sendRecordArray
+  }, [sendRecordList, clickSendRecordItemUsers])
 
   return {
     onSetting,
@@ -60,8 +90,8 @@ export const useAction = (rowList: IMessageJobDto[]) => {
     onNoticeCancel,
     noticeSettingRef,
     sendRecordRef,
-    rowListChange,
     settingId,
-    list,
-  };
-};
+    sendRecord,
+    onDeleteMessageJob,
+  }
+}
