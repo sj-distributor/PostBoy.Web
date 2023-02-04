@@ -145,5 +145,3 @@ export interface ISendMsgData {
     ]
   }
 }
-
-export interface ISendMsgResponse extends IResponseMsg {}
