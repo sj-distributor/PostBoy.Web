@@ -194,6 +194,7 @@ const useAction = () => {
 
   useEffect(() => {
     setDepartmentAndUserList([])
+    setFlattenDepartmentList([])
     setDepartmentPage(0)
     const loadDepartment = async (AppId: string) => {
       const deptListResponse = await GetDepartmentList({ AppId })
