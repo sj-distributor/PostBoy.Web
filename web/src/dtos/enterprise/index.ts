@@ -139,12 +139,8 @@ export interface ISendMsgData {
   mpNews?: {
     articles: [
       {
-        title: string
-        author: string
-        digest: string
         content: string
         fileContent: string
-        contentSourceUrl: string
       }
     ]
   }
