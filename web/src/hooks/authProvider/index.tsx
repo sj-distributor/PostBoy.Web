@@ -14,14 +14,11 @@ export const AuthContext = createContext<AuthContextOptions>(null!);
 const AuthProvider = (props: { children: React.ReactNode }) => {
   const defaultToken = localStorage.getItem("token") as string;
   const [username, setUsername] = useState(
-    defaultToken
-      ? jwt_decode<{ unique_name: string }>(defaultToken).unique_name
-      : ""
+    defaultToken ? jwt_decode<{ unique_name: string }>(defaultToken).unique_name : ""
   );
   const [token, setToken] = useState<string>(defaultToken);
   const [authStatus, setAuthStatus] = useState<boolean>(!!defaultToken);
 
-  // cun token cizuhua
   const signIn = (token: string, callback?: Function) => {
     setToken(token);
     localStorage.setItem("token", token);
@@ -41,9 +38,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ username, token, authStatus, signIn, signOut }}
-    >
+    <AuthContext.Provider value={{ username, token, authStatus, signIn, signOut }}>
       {props.children}
     </AuthContext.Provider>
   );

@@ -20,13 +20,21 @@ export enum ResponseCode {
   InternalServerError = 500
 }
 
-export async function base<T>(url: string, method: "get" | "post", data?: object) {
+export async function base<T>(
+  url: string,
+  method: "get" | "post",
+  data?: object
+) {
   const settings = (window as any).appSettings as AppSettings;
   return await fetch(`${settings.serverUrl}${url}`, {
     method: method,
     body: data ? JSON.stringify(data) : undefined,
     headers: {
-      Authorization: localStorage.getItem("token") ? (localStorage.getItem("token") as string) : "",
+      Authorization:
+        "Bearer " +
+        (localStorage.getItem("token")
+          ? (localStorage.getItem("token") as string)
+          : ""),
       "Content-Type": "application/json"
     }
   })
