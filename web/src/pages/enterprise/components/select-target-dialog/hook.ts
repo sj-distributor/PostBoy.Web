@@ -3,9 +3,7 @@ import {
   IDepartmentAndUserListValue,
   DepartmentAndUserType,
   ITagsList,
-  IDepartmentKeyControl,
-  IDepartmentData,
-  IDepartmentUsersData
+  IDepartmentKeyControl
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {

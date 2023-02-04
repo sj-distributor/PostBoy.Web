@@ -130,8 +130,7 @@ const useAction = () => {
 
   const handleSubmit = async () => {
     let toUsers: string[] = []
-    let toParties: string[] = []
-    toParties = departmentKeyValue.data
+    const toParties = departmentKeyValue.data
       .filter((e) => e.selected)
       .map((e) => String(e.id))
     departmentKeyValue.data.forEach((department) => {

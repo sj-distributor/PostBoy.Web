@@ -40,6 +40,7 @@ const SelectTargetDialog = memo(
       listScroll,
       setOuterTagsValue
     } = props
+
     const {
       departmentSelectedList,
       tagsValue,
