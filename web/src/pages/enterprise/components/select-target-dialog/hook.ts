@@ -79,19 +79,17 @@ const useAction = (props: {
     setDeptUserList((prev) => {
       const newValue = prev.filter((e) => !!e)
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
-      activeData &&
+      if (activeData) {
         activeData.data.forEach((department) => {
           department.departmentUserList.forEach((user) => {
-            if (
-              valueArr.find((e) => e.id === user.userid) &&
-              valueArr.length <= 0
-            ) {
+            if (valueArr.find((e) => e.id === user.userid)) {
               user.selected = true
             } else {
               user.selected = false
             }
           })
         })
+      }
       return newValue
     })
   }
