@@ -31,7 +31,7 @@ const SendMessage = () => {
     isShowDialog,
     isShowInputOrUpload,
     isShowMessageParams,
-    departmentList,
+    departmentAndUserList,
     isTreeViewLoading,
     flattenDepartmentList,
     tagsList,
@@ -46,13 +46,14 @@ const SendMessage = () => {
     dto,
     openError,
     openSuccess,
+    departmentKeyValue,
+    setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
     setMessageTypeValue,
     handleSubmit,
     setIsShowDialog,
-    getDialogValue,
     setIsShowMessageParams,
     setSendTypeValue,
     setCronExp,
@@ -63,6 +64,8 @@ const SendMessage = () => {
     updateData,
     getMessageJob,
     onUploadFile,
+    onScrolling,
+    setTagsValue,
   } = useAction()
 
   return (
@@ -90,6 +93,7 @@ const SendMessage = () => {
         {corpsValue !== undefined && corpAppValue !== undefined && (
           <>
             <Autocomplete
+              openOnFocus
               disablePortal
               id="Autocomplete-corpsDataId"
               value={corpsValue}
@@ -111,6 +115,7 @@ const SendMessage = () => {
               }}
             />
             <Autocomplete
+              openOnFocus
               disablePortal
               id="Autocomplete-corpAppListId"
               value={corpAppValue}
@@ -134,6 +139,7 @@ const SendMessage = () => {
           </>
         )}
         <Autocomplete
+          openOnFocus
           disablePortal
           id="Autocomplete-messageTypeListId"
           disableClearable={true}
@@ -348,12 +354,15 @@ const SendMessage = () => {
       <SelectTargetDialog
         open={isShowDialog}
         AppId={corpAppValue ? corpAppValue.appId : ""}
-        departmentList={departmentList}
+        departmentAndUserList={departmentAndUserList}
+        departmentKeyValue={departmentKeyValue}
         flattenDepartmentList={flattenDepartmentList}
         isLoading={isTreeViewLoading}
         tagsList={tagsList}
         setOpenFunction={setIsShowDialog}
-        getDialogValue={getDialogValue}
+        setDeptUserList={setDepartmentAndUserList}
+        listScroll={onScrolling}
+        setOuterTagsValue={setTagsValue}
       />
       {(sendTypeValue === SendType.SpecifiedDate ||
         sendTypeValue === SendType.SendPeriodically) && (

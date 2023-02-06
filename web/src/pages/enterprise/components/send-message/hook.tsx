@@ -1,5 +1,5 @@
-import { flatten } from "ramda"
-import { useEffect, useState } from "react"
+import { flatten, isEmpty } from "ramda"
+import { useEffect, useMemo, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -7,29 +7,30 @@ import {
   GetDepartmentUsersList,
   GetMessageJob,
   GetTagsList,
+  PostMessageSend,
 } from "../../../../api/enterprise"
 import {
-  FileDto,
   ICorpAppData,
   ICorpData,
   IDepartmentAndUserListValue,
   IDepartmentData,
+  IDepartmentKeyControl,
+  IMessageTypeData,
+  ITagsList,
+  MessageDataType,
+  MessageWidgetShowStatus,
   IDtoExtend,
   IJobSettingDto,
   ILastShowTableData,
   IMessageJob,
-  IMessageTypeData,
+  FileDto,
   ISendMessageCommand,
-  ITagsList,
-  ITargetDialogValue,
   IWorkWeChatAppNotificationDto,
-  MessageDataType,
-  MessageWidgetShowStatus,
   SendType,
   SendTypeCustomListDto,
-  TextDto,
   TimeType,
   TimeZoneCustomListDto,
+  ITargetDialogValue,
 } from "../../../../dtos/enterprise"
 import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
@@ -93,8 +94,6 @@ const useAction = () => {
     messageTypeList[0]
   )
 
-  const [tagsValue, setTagsValue] = useState<ITagsList>()
-
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
     useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll)
@@ -105,12 +104,17 @@ const useAction = () => {
   const [corpsValue, setCorpsValue] = useState<ICorpData>()
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
   const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([])
+  const [departmentAndUserList, setDepartmentAndUserList] = useState<
+    IDepartmentKeyControl[]
+  >([])
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     IDepartmentAndUserListValue[]
   >([])
+  const [departmentPage, setDepartmentPage] = useState(0)
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
+  const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
 
   const [cronExp, setCronExp] = useState<string>("0 0 * * *") //mark 初始值应该为null
   const [cronError, setCronError] = useState<string>("")
@@ -120,8 +124,6 @@ const useAction = () => {
     sendTypeList[0].value
   )
   const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
-  const [selectUserList, setSelectUserList] = useState<string[]>([])
-  const [selectPartiesList, setSelectPartiesList] = useState<string[]>([])
   const [fileList, setFileList] = useState<FileDto>()
   const [openError, openErrorAction] = useBoolean(false)
   const [openSuccess, openSuccessAction] = useBoolean(false)
@@ -130,19 +132,132 @@ const useAction = () => {
     openSuccessAction.setFalse()
   }, 4000)
 
-  const handleSubmit = (sendType: SendType, correlationId?: string) => {
-    console.log("selectUserList", selectUserList)
-    if (selectUserList) {
+  const departmentKeyValue = useMemo(() => {
+    const result = departmentAndUserList.find(
+      (e) => e.key === corpAppValue?.appId
+    )
+    return result as IDepartmentKeyControl
+  }, [departmentAndUserList])
+
+  const onScrolling = (
+    scrollHeight: number,
+    scrollTop: number,
+    clientHeight: number
+  ) => {
+    if (scrollTop + clientHeight >= scrollHeight - 2) {
+      setDepartmentPage((prev) =>
+        prev + 10 >= departmentList.length ? departmentList.length : prev + 10
+      )
+    }
+  }
+
+  const loadDeptUsers = async (
+    departmentPage: number,
+    AppId: string,
+    deptListResponse: IDepartmentData[]
+  ) => {
+    const limit =
+      departmentPage + 10 >= deptListResponse.length
+        ? deptListResponse.length
+        : departmentPage + 10
+
+    for (let index = departmentPage; index < limit; index++) {
+      const department = deptListResponse[index]
+      const userList = await GetDepartmentUsersList({
+        AppId,
+        DepartmentId: department.id,
+      })
+      if (!!userList && userList.errcode === 0) {
+        setDepartmentAndUserList((prev) => {
+          let newValue = prev.filter((e) => !!e)
+          const hasData = newValue.find((e) => e.key === AppId)
+          const insertNewData = {
+            ...department,
+            departmentUserList: userList.userlist.map((e) => ({
+              ...e,
+              selected: false,
+            })),
+            selected: false,
+          }
+          hasData
+            ? hasData.data.push(insertNewData)
+            : newValue.push({
+                key: AppId,
+                data: [insertNewData],
+              })
+          return newValue
+        })
+        setFlattenDepartmentList((prev) => {
+          return [
+            ...prev,
+            ...flatten(userList.userlist).map((item) => ({
+              id: item.userid,
+              name: item.name,
+              parentid: department.name,
+            })),
+          ]
+        })
+        index === limit - 1 && setIsTreeViewLoading(false)
+      }
+    }
+  }
+
+  const onUploadFile = async (files: FileList) => {
+    const file = files[0]
+    const base64 = await convertBase64(file)
+    setFileList({
+      fileName: file.name,
+      fileContent: base64 as string,
+      fileType: messageTypeValue.type,
+    })
+  }
+
+  const handleSubmit = async (sendType: number) => {
+    let toUsers: string[] = []
+    const toParties = departmentKeyValue.data
+      .filter((e) => e.selected)
+      .map((e) => String(e.id))
+    departmentKeyValue.data.forEach((department) => {
+      toUsers = toUsers.concat(
+        department.departmentUserList
+          .filter((user) => user.selected)
+          .map((e) => e.userid)
+      )
+    })
+
+    if (isEmpty(toUsers)) {
       openErrorAction.setTrue()
     } else {
       let workWeChatAppNotification: IWorkWeChatAppNotificationDto = {
-        appId: "c1sAspdXz3ok",
-        toUsers: selectUserList,
+        appId: corpAppValue?.appId,
+        toUsers,
       }
 
-      let text: TextDto = {
-        content: messageParams,
+      if (!isEmpty(tagsValue)) {
+        workWeChatAppNotification.toTags = tagsValue.map((e) => String(e.tagId))
+      } else if (toParties) {
+        workWeChatAppNotification.toParties = toParties
       }
+
+      messageTypeValue.type === MessageDataType.Image &&
+      !messageTypeValue.groupBy
+        ? (workWeChatAppNotification.mpNews = {
+            articles: [
+              {
+                title: titleParams,
+                author: "string",
+                digest: "string", //图文消息的描述
+                content: messageParams, //图文消息的内容
+                fileContent: "string", //图文消息缩略图的BASE64
+                contentSourceUrl: "string", //图文消息点击“阅读原文”之后的页面链接
+              },
+            ],
+          })
+        : messageTypeValue.type === MessageDataType.Text
+        ? (workWeChatAppNotification.text = {
+            content: messageParams,
+          })
+        : (workWeChatAppNotification.file = fileList)
 
       const data: ISendMessageCommand = {
         correlationId: uuidv4(),
@@ -157,51 +272,26 @@ const useAction = () => {
           },
           {
             key: "to",
-            value: `${!!selectUserList && selectUserList}${
-              !!selectPartiesList && selectPartiesList
-            }`,
+            value: `${!!toUsers && toUsers}${!!toParties && toParties}`,
           },
         ],
         workWeChatAppNotification,
       }
 
-      if (messageTypeValue.type === MessageDataType.Text) {
-        // 文字
-        const timezone = timeZone[timeZoneValue].title
-        let jobSetting: IJobSettingDto = {
-          timezone,
-        }
-        if (sendType === SendType.SpecifiedDate) {
-          jobSetting.delayedJob = {
-            enqueueAt: moment(dateValue).toDate(),
-          }
-        } else if (sendType === SendType.SendPeriodically) {
-          jobSetting.recurringJob = {
-            cronExpression: `0 ${cronExp}`,
-          }
-        }
-        data.jobSetting = jobSetting
-        workWeChatAppNotification.text = text
-      } else if (messageTypeValue.type === MessageDataType.Image) {
-        // 图文
-        if (messageTypeValue.groupBy === "") {
-          workWeChatAppNotification.mpNews = {
-            articles: [
-              {
-                title: titleParams,
-                author: "string",
-                digest: "string", //图文消息的描述
-                content: messageParams, //图文消息的内容
-                fileContent: "string", //图文消息缩略图的BASE64
-                contentSourceUrl: "string", //图文消息点击“阅读原文”之后的页面链接
-              },
-            ],
-          }
-        }
-        // 文件
-        workWeChatAppNotification.file = fileList
+      const timezone = timeZone[timeZoneValue].title
+      let jobSetting: IJobSettingDto = {
+        timezone,
       }
-      data.workWeChatAppNotification = workWeChatAppNotification
+      if (sendType === SendType.SpecifiedDate) {
+        jobSetting.delayedJob = {
+          enqueueAt: moment(dateValue).toDate(),
+        }
+      } else if (sendType === SendType.SendPeriodically) {
+        jobSetting.recurringJob = {
+          cronExpression: `0 ${cronExp}`,
+        }
+      }
+      data.jobSetting = jobSetting
 
       console.log("send", data)
       openSuccessAction.setTrue()
@@ -210,16 +300,6 @@ const useAction = () => {
       //   .then((res) => openSuccessAction.setTrue())
       //   .catch((error) => console.log("error1", error.message))
     }
-  }
-
-  const onUploadFile = async (files: FileList) => {
-    const file = files[0]
-    const base64 = await convertBase64(file)
-    setFileList({
-      fileName: file.name,
-      fileContent: base64 as string,
-      fileType: messageTypeValue.type,
-    })
   }
 
   useEffect(() => {
@@ -245,65 +325,19 @@ const useAction = () => {
   }, [corpsValue?.id])
 
   useEffect(() => {
-    const loadDeptUsers = async (AppId: string) => {
-      setDepartmentList([])
+    setDepartmentAndUserList([])
+    setFlattenDepartmentList([])
+    setDepartmentPage(0)
+    const loadDepartment = async (AppId: string) => {
       const deptListResponse = await GetDepartmentList({ AppId })
       if (!!deptListResponse && deptListResponse.errcode === 0) {
-        for (const department of deptListResponse.department) {
-          const userList = await GetDepartmentUsersList({
-            AppId,
-            DepartmentId: department.id,
-          })
-          if (!!userList && userList.errcode === 0) {
-            setDepartmentList((prev) => {
-              const newValue = prev.filter((e) => !!e)
-              newValue.push({
-                ...department,
-                departmentUserList: userList.userlist.map((e) => {
-                  e.selected = false
-                  return e
-                }),
-                selected: false,
-              })
-              return newValue
-            })
-            setFlattenDepartmentList((prev) => {
-              return [
-                ...prev,
-                ...flatten(userList.userlist).map((item) => ({
-                  id: item.userid,
-                  name: item.name,
-                  parentid: department.name,
-                })),
-              ]
-            })
-
-            deptListResponse.department[
-              deptListResponse.department.length - 1
-            ] === department && setIsTreeViewLoading(false)
-          }
-        }
-        // 选择的群组
-        setSelectPartiesList(
-          deptListResponse.department
-            .filter((x) => x.selected === true)
-            .map((item) => item.name)
-        )
-        // 选择的用户
-        deptListResponse?.department?.forEach((item) => {
-          const useridList: string[] = []
-          item?.departmentUserList?.forEach((item) => {
-            if (item.selected === true) {
-              useridList.push(item.userid)
-            }
-          })
-          setSelectUserList(useridList)
-        })
+        setDepartmentList(deptListResponse.department)
+        loadDeptUsers(0, AppId, deptListResponse.department)
       }
     }
     if (!!corpAppValue) {
       setIsTreeViewLoading(true)
-      loadDeptUsers(corpAppValue.appId)
+      loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue])
 
@@ -313,6 +347,12 @@ const useAction = () => {
     setDepartmentList(dialogData.deptAndUserValueList)
     setTagsValue(dialogData.tagsValue)
   }
+
+  useEffect(() => {
+    corpAppValue &&
+      departmentPage !== 0 &&
+      loadDeptUsers(departmentPage, corpAppValue.appId, departmentList)
+  }, [departmentPage])
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
@@ -378,9 +418,8 @@ const useAction = () => {
     messageTypeValue,
     isShowDialog,
     isShowInputOrUpload,
-    setDialogValue,
     isShowMessageParams,
-    departmentList,
+    departmentAndUserList,
     isTreeViewLoading,
     tagsList,
     flattenDepartmentList,
@@ -395,13 +434,14 @@ const useAction = () => {
     dto,
     openError,
     openSuccess,
+    departmentKeyValue,
+    setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
     setMessageTypeValue,
     handleSubmit,
     setIsShowDialog,
-    getDialogValue,
     setIsShowMessageParams,
     setSendTypeValue,
     setCronExp,
@@ -412,6 +452,9 @@ const useAction = () => {
     updateData,
     getMessageJob,
     onUploadFile,
+    onScrolling,
+    setTagsValue,
+    setDialogValue,
   }
 }
 

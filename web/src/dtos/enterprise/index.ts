@@ -32,6 +32,11 @@ export interface IDepartmentUsersListApiData {
   AppId: string
 }
 
+export interface IDepartmentKeyControl {
+  data: IDepartmentData[]
+  key: string
+}
+
 export interface IDepartmentData {
   department_leader: []
   id: number
@@ -87,18 +92,25 @@ export enum MessageDataType {
 
 export interface ITargetDialogProps {
   open: boolean
-  departmentList: IDepartmentData[]
+  departmentAndUserList: IDepartmentKeyControl[]
+  departmentKeyValue: IDepartmentKeyControl
   flattenDepartmentList: IDepartmentAndUserListValue[]
   AppId: string
   isLoading: boolean
   tagsList: ITagsList[]
   setOpenFunction: (open: boolean) => void
-  getDialogValue: (data: ITargetDialogValue) => void
+  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
+  setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
+  listScroll: (
+    scrollHeight: number,
+    scrollTop: number,
+    clientHeight: number
+  ) => void
 }
 
 export interface ITargetDialogValue {
   deptAndUserValueList: IDepartmentData[]
-  tagsValue: ITagsList
+  tagsValue: ITagsList[]
 }
 
 export enum MessageWidgetShowStatus {
