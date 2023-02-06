@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from "react"
+import { useBoolean } from "ahooks"
+import { useEffect, useRef, useState } from "react"
 import {
   GetMessageJobRecords,
   PostMessagejobDelete,
@@ -7,20 +8,24 @@ import {
   ILastShowTableData,
   IMessageJobRecord,
   ISendRecordDto,
+  MessageJobType,
+  messageSendResultType,
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
-
-export interface HookProps {
-  getMessageJob: () => void
-}
+import { HookProps } from "./props"
 
 export const useAction = ({ getMessageJob }: HookProps) => {
   const noticeSettingRef = useRef<ModalBoxRef>(null)
   const sendRecordRef = useRef<ModalBoxRef>(null)
-  const [sendRecordList, setSendRecordList] = useState<IMessageJobRecord[]>([])
-  const [clickSendRecordItemUsers, setClickSendRecordItemUsers] = useState<
-    string[]
-  >([])
+  const [settingId, setSettingId] = useState<any>()
+  const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([])
+  const [clickSendRecordItemUsers, setClickSendRecordItemUsers] =
+    useState<string>("")
+
+  const [alertShow, setAlertShow] = useBoolean(false)
+
+  const [updateMessageJobInformation, setUpdateMessageJobInformation] =
+    useState<ILastShowTableData>()
 
   const onNoticeCancel = () => {
     noticeSettingRef.current?.close()
@@ -34,30 +39,49 @@ export const useAction = ({ getMessageJob }: HookProps) => {
     alert("click")
   }
 
-  const onSetting = () => {
-    noticeSettingRef.current?.open()
+  const onSetting = (item: ILastShowTableData) => {
+    if (item.jobType !== MessageJobType.Fire) {
+      setUpdateMessageJobInformation(item)
+      noticeSettingRef.current?.open()
+      return
+    }
+    setAlertShow.setTrue()
   }
 
-  const onSend = (item: ILastShowTableData) => {
+  const messageRecordConvertType = (arr: IMessageJobRecord[]) => {
+    const sendRecordArray: ISendRecordDto[] = []
+    if (arr.length > 0) {
+      arr.forEach((item) => {
+        sendRecordArray.push({
+          id: item.id,
+          createdDate: item.createdDate,
+          correlationId: item.correlationId,
+          result: item.result,
+          state: messageSendResultType[item.result],
+          sendTheObject: clickSendRecordItemUsers,
+          errorSendtheobject:
+            JSON.parse(item.responseJson).invaliduser !== null
+              ? "未发送成功的对象" + JSON.parse(item.responseJson).invaliduser
+              : "",
+        })
+      })
+    }
+    return sendRecordArray
+  }
+
+  const onSend = (toUsers: string, id: string) => {
     sendRecordRef.current?.open()
-    // setClickSendRecordItemUsers(
-    //   JSON.parse(item.commandJson)?.WorkWeChatAppNotification?.ToUsers
-    // )
-    console.log(
-      JSON.parse(item.commandJson)?.WorkWeChatAppNotification?.ToUsers
-    )
-    GetMessageJobRecords(item.correlationId).then((res) => {
+    setClickSendRecordItemUsers(toUsers)
+    GetMessageJobRecords(id).then((res) => {
       if (!!res) {
-        setSendRecordList(res)
+        setSendRecordList(messageRecordConvertType(res))
       }
     })
   }
 
   const onDeleteMessageJob = (id: string) => {
-    console.log(id)
-    PostMessagejobDelete({ MessageJobId: id })
+    PostMessagejobDelete(id)
       .then((res) => {
-        console.log("删除成功")
         getMessageJob()
       })
       .catch((err) => {
@@ -65,35 +89,26 @@ export const useAction = ({ getMessageJob }: HookProps) => {
       })
   }
 
-  const sendRecord = useMemo(() => {
-    const sendRecordArray: ISendRecordDto[] = []
-    if (sendRecordList.length > 0) {
-      sendRecordList.forEach((item) => {
-        sendRecordArray.push({
-          id: item.id,
-          createdDate: item.createdDate,
-          correlationId: item.correlationId,
-          result: item.result,
-          sendTheObject: clickSendRecordItemUsers,
-          errorSendtheobject:
-            JSON.parse(item.responseJson).invaliduser !== null
-              ? JSON.parse(item.responseJson).invaliduser
-              : [],
-        })
-      })
+  useEffect(() => {
+    if (alertShow) {
+      setTimeout(() => {
+        setAlertShow.setFalse()
+      }, 1200)
     }
-    return sendRecordArray
-  }, [sendRecordList, clickSendRecordItemUsers])
+  }, [alertShow])
 
   return {
     noticeSettingRef,
     sendRecordRef,
-    sendRecord,
     onSetting,
     onSend,
     onConfirm,
     onSendCancel,
     onNoticeCancel,
+    settingId,
     onDeleteMessageJob,
+    sendRecordList,
+    updateMessageJobInformation,
+    alertShow,
   }
 }

@@ -146,6 +146,7 @@ export interface IMessageJobSame {
   commandJson: string
   jobType: MessageJobType
   jobSettingJson: string
+  cronExpressionDescriptor: string
   destination: MessageJobDestination
 }
 
@@ -173,6 +174,11 @@ export interface IMessageJobRecordSame {
 export enum MessageSendResult {
   Ok,
   Failed,
+}
+
+export const messageSendResultType = {
+  [MessageSendResult.Ok]: "已发送",
+  [MessageSendResult.Failed]: "异常",
 }
 
 export interface ISendMessageCommand {
@@ -231,17 +237,19 @@ export interface IDtoExtend {
   rowCount: number
   pageSize: number
   page: number
-  messageJobs: IMessageJob[]
+  messageJobs: ILastShowTableData[]
 }
 
 export interface ILastShowTableData extends IMessageJobSame {
   title: string
   content: string
+  toUsers: string
 }
 
 export interface ISendRecordDto extends IMessageJobRecordSame {
-  sendTheObject: string[] | string
-  errorSendtheobject: string[] | string
+  sendTheObject: string
+  errorSendtheobject: string
+  state: string
 }
 
 export interface SendTypeCustomListDto {

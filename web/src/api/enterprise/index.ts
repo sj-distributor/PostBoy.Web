@@ -65,6 +65,6 @@ export const PostMessageSend = async (data: ISendMessageCommand) => {
   return await Post(`/api/Message/send`, data)
 }
 
-export const PostMessagejobDelete = async (data: { MessageJobId: string }) => {
-  return await Post(`/api/Message/job/delete`, data)
+export const PostMessagejobDelete = async (messageJobId: string) => {
+  return await Post(`/api/Message/job/delete?MessageJobId=${messageJobId}`)
 }

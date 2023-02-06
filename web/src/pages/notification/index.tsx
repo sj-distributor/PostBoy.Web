@@ -1,4 +1,4 @@
-import { Button, Tooltip } from "@mui/material"
+import { Alert, Button, Tooltip } from "@mui/material"
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid"
 import styles from "./index.module.scss"
 import moment from "moment"
@@ -6,44 +6,35 @@ import { useAction } from "./hook"
 import ModalBox from "../../components/modal/modal"
 import NoticeSetting from "./ components/notice-setting"
 import SendRecord from "./ components/send-record"
-import {
-  IDtoExtend,
-  ILastShowTableData,
-  IMessageJob,
-} from "../../dtos/enterprise"
-import { memo } from "react"
+import React from "react"
+import { SendNoticeProps } from "./props"
 
-const SendNotice = memo(
-  (props: {
-    rowList: ILastShowTableData[]
-    dto: IDtoExtend
-    updateData: (
-      k: keyof IDtoExtend,
-      v: number | boolean | IMessageJob[]
-    ) => void
-    getMessageJob: () => void
-  }) => {
+const asyncTootip = (title: string, styles: string) => {
+  return (
+    <Tooltip title={title} className={styles}>
+      <span>{title}</span>
+    </Tooltip>
+  )
+}
+
+const SendNotice = React.memo(
+  (props: SendNoticeProps) => {
     const { dto, updateData, getMessageJob } = props
 
     const {
-      noticeSettingRef,
-      sendRecordRef,
-      sendRecord,
       onSetting,
       onSend,
       onConfirm,
       onSendCancel,
       onNoticeCancel,
+      noticeSettingRef,
+      sendRecordRef,
+      settingId,
       onDeleteMessageJob,
+      sendRecordList,
+      updateMessageJobInformation,
+      alertShow,
     } = useAction({ getMessageJob })
-
-    const asyncTootip = (title: string, styles: string) => {
-      return (
-        <Tooltip title={title} className={styles}>
-          <span>{title}</span>
-        </Tooltip>
-      )
-    }
 
     const columns: GridColDef[] = [
       {
@@ -69,7 +60,7 @@ const SendNotice = memo(
           asyncTootip(params.row.content, styles.tooltip),
       },
       {
-        field: "jobSettingJson",
+        field: "cronExpressionDescriptor",
         headerName: "周期",
         width: 320,
         headerAlign: "center",
@@ -86,9 +77,8 @@ const SendNotice = memo(
         sortable: false,
         align: "center",
         headerClassName: styles.tableBoxHeader,
-        renderCell: (params: GridCellParams) => (
-          <div>{moment(params.row.createdDate).format("YYYY/MM/DD mm:ss")}</div>
-        ),
+        renderCell: (params: GridCellParams) =>
+          moment(params.row.createdDate).format("YYYY/MM/DD mm:ss"),
       },
       {
         field: "operate",
@@ -100,10 +90,15 @@ const SendNotice = memo(
         headerClassName: styles.tableBoxHeader,
         renderCell: (params: GridCellParams) => (
           <div className={styles.operate}>
-            <p className={styles.text} onClick={onSetting}>
+            <p className={styles.text} onClick={() => onSetting(params.row)}>
               【设置】
             </p>
-            <p className={styles.text} onClick={() => onSend(params.row)}>
+            <p
+              className={styles.text}
+              onClick={() =>
+                onSend(params.row.toUsers, params.row.correlationId)
+              }
+            >
               【发送记录】
             </p>
             <p
@@ -119,6 +114,12 @@ const SendNotice = memo(
 
     return (
       <div className={styles.tableWrap}>
+        {alertShow && (
+          <Alert severity="error" className={styles.alert}>
+            该MessageJob暂时设置不了!
+          </Alert>
+        )}
+
         <div className={styles.tableBoxWrap}>
           <div className={styles.tableBox}>
             <DataGrid
@@ -130,15 +131,14 @@ const SendNotice = memo(
               rowsPerPageOptions={[5, 10, 15, 20]}
               disableSelectionOnClick
               pagination
+              paginationMode="server"
               rowHeight={56}
+              page={dto.page}
               style={{ height: 680 }}
-              page={dto.page - 1}
               rowCount={dto.rowCount}
-              onPageChange={(value) => {
-                updateData("page", value)
-                console.log(value, "page")
-              }}
+              onPageChange={(value) => updateData("page", value)}
               onPageSizeChange={(value) => updateData("pageSize", value)}
+              loading={dto.loading}
             />
           </div>
         </div>
@@ -166,7 +166,13 @@ const SendNotice = memo(
             </div>
           }
         >
-          <NoticeSetting />
+          <>
+            {!!updateMessageJobInformation && (
+              <NoticeSetting
+                updateMessageJobInformation={updateMessageJobInformation}
+              />
+            )}
+          </>
         </ModalBox>
 
         <ModalBox
@@ -174,10 +180,13 @@ const SendNotice = memo(
           onCancel={onNoticeCancel}
           title={"发送记录"}
         >
-          <SendRecord list={sendRecord} />
+          <SendRecord sendRecordList={sendRecordList} />
         </ModalBox>
       </div>
     )
+  },
+  (prevProps, nextProps) => {
+    return prevProps.dto === nextProps.dto
   }
 )
 

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
+import { flatten } from "ramda"
+import { useEffect, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -6,7 +7,6 @@ import {
   GetDepartmentUsersList,
   GetMessageJob,
   GetTagsList,
-  PostMessageSend,
 } from "../../../../api/enterprise"
 import {
   FileDto,
@@ -18,14 +18,12 @@ import {
   IJobSettingDto,
   ILastShowTableData,
   IMessageJob,
-  IMessageJobDto,
   IMessageTypeData,
   ISendMessageCommand,
   ITagsList,
   ITargetDialogValue,
   IWorkWeChatAppNotificationDto,
   MessageDataType,
-  MessageJobDestination,
   MessageWidgetShowStatus,
   SendType,
   SendTypeCustomListDto,
@@ -33,11 +31,39 @@ import {
   TimeType,
   TimeZoneCustomListDto,
 } from "../../../../dtos/enterprise"
-import { flatten } from "ramda"
 import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
 import { convertBase64 } from "../../../../uilts/convert-base64"
 import { useBoolean } from "ahooks"
+
+// 转换数组类型返回
+const messageJobConvertType = (arr: IMessageJob[]) => {
+  const array: ILastShowTableData[] = []
+  if (arr.length > 0) {
+    arr.forEach((item) =>
+      array.push({
+        id: item.id,
+        jobId: item.jobId,
+        createdDate: item.createdDate,
+        correlationId: item.correlationId,
+        userAccountId: item.userAccountId,
+        commandJson: item.commandJson,
+        jobType: item.jobType,
+        jobSettingJson: item.jobSettingJson,
+        // 待定
+        cronExpressionDescriptor: item.cronExpressionDescriptor,
+        // ----------------
+
+        destination: item.destination,
+        title: item.metadata.filter((item) => item.key === "title")[0]?.value,
+        content: item.metadata.filter((item) => item.key === "content")[0]
+          ?.value,
+        toUsers: item.metadata.filter((item) => item.key === "to")[0]?.value,
+      })
+    )
+  }
+  return array
+}
 
 const useAction = () => {
   const sendTypeList: SendTypeCustomListDto[] = [
@@ -299,23 +325,15 @@ const useAction = () => {
         })()
   }, [messageTypeValue])
 
-  useEffect(() => {
-    if (
-      sendTypeValue === SendType.SendPeriodically ||
-      sendTypeValue === SendType.SpecifiedDate
-    ) {
-      getMessageJob()
-    }
-  }, [sendTypeValue])
-
+  // 获取MessageJob 数组
   const getMessageJob = () => {
     updateData("loading", true)
-    GetMessageJob(dto.page, dto.pageSize, 0)
+    GetMessageJob(dto.page + 1, dto.pageSize, 0)
       .then((res) => {
         if (!!res) {
           setTimeout(() => {
             updateData("rowCount", res.count)
-            updateData("messageJobs", res.messageJobs)
+            updateData("messageJobs", messageJobConvertType(res.messageJobs))
             updateData("loading", false)
           }, 100)
         }
@@ -333,41 +351,22 @@ const useAction = () => {
     loading: true,
     messageJobs: [],
     rowCount: 0,
-    pageSize: 15,
-    page: 1,
+    pageSize: 10,
+    page: 0,
   })
 
   useEffect(() => {
-    getMessageJob()
-  }, [dto.page, dto.pageSize])
+    if (
+      sendTypeValue === SendType.SendPeriodically ||
+      sendTypeValue === SendType.SpecifiedDate
+    )
+      getMessageJob()
+  }, [dto.page, dto.pageSize, sendTypeValue])
 
-  const updateData = (
-    k: keyof IDtoExtend,
-    v: number | boolean | IMessageJob[]
-  ) => setDto((prev) => ({ ...prev, [k]: v }))
-
-  const lastShowTableData = useMemo(() => {
-    const array: ILastShowTableData[] = []
-    if (dto.messageJobs.length > 0) {
-      dto.messageJobs.forEach((item) =>
-        array.push({
-          id: item.id,
-          jobId: item.jobId,
-          createdDate: item.createdDate,
-          correlationId: item.correlationId,
-          userAccountId: item.userAccountId,
-          commandJson: item.commandJson,
-          jobType: item.jobType,
-          jobSettingJson: item.jobSettingJson,
-          destination: item.destination,
-          title: item.metadata.filter((item) => item.key === "title")[0]?.value,
-          content: item.metadata.filter((item) => item.key === "content")[0]
-            ?.value,
-        })
-      )
-    }
-    return array
-  }, [dto.messageJobs])
+  // 更新MessageJob table参数
+  const updateData = (k: keyof IDtoExtend, v: any) => {
+    setDto((prev) => ({ ...prev, [k]: v }))
+  }
 
   return {
     corpsList,
@@ -393,7 +392,6 @@ const useAction = () => {
     timeZone,
     timeZoneValue,
     titleParams,
-    lastShowTableData,
     dto,
     openError,
     openSuccess,

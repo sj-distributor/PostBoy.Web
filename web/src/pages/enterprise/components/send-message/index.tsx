@@ -18,7 +18,6 @@ import {
   Select,
   Snackbar,
 } from "@mui/material"
-import { memo } from "react"
 
 const SendMessage = () => {
   const {
@@ -44,7 +43,6 @@ const SendMessage = () => {
     timeZone,
     timeZoneValue,
     titleParams,
-    lastShowTableData,
     dto,
     openError,
     openSuccess,
@@ -360,7 +358,6 @@ const SendMessage = () => {
       {(sendTypeValue === SendType.SpecifiedDate ||
         sendTypeValue === SendType.SendPeriodically) && (
         <SendNotice
-          rowList={lastShowTableData}
           dto={dto}
           updateData={updateData}
           getMessageJob={getMessageJob}
