@@ -1,9 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import {
   GetMessageJobRecords,
   PostMessagejobDelete,
 } from "../../api/enterprise"
-import { IMessageJobRecord, ISendRecordDto } from "../../dtos/enterprise"
+import {
+  ILastShowTableData,
+  IMessageJobRecord,
+  ISendRecordDto,
+} from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
 
 export interface HookProps {
@@ -13,7 +17,6 @@ export interface HookProps {
 export const useAction = ({ getMessageJob }: HookProps) => {
   const noticeSettingRef = useRef<ModalBoxRef>(null)
   const sendRecordRef = useRef<ModalBoxRef>(null)
-  const [settingId, setSettingId] = useState<any>()
   const [sendRecordList, setSendRecordList] = useState<IMessageJobRecord[]>([])
   const [clickSendRecordItemUsers, setClickSendRecordItemUsers] = useState<
     string[]
@@ -31,11 +34,11 @@ export const useAction = ({ getMessageJob }: HookProps) => {
     alert("click")
   }
 
-  const onSetting = (item: any) => {
+  const onSetting = () => {
     noticeSettingRef.current?.open()
   }
 
-  const onSend = (item: any) => {
+  const onSend = (item: ILastShowTableData) => {
     sendRecordRef.current?.open()
     // setClickSendRecordItemUsers(
     //   JSON.parse(item.commandJson)?.WorkWeChatAppNotification?.ToUsers
@@ -83,15 +86,14 @@ export const useAction = ({ getMessageJob }: HookProps) => {
   }, [sendRecordList, clickSendRecordItemUsers])
 
   return {
+    noticeSettingRef,
+    sendRecordRef,
+    sendRecord,
     onSetting,
     onSend,
     onConfirm,
     onSendCancel,
     onNoticeCancel,
-    noticeSettingRef,
-    sendRecordRef,
-    settingId,
-    sendRecord,
     onDeleteMessageJob,
   }
 }

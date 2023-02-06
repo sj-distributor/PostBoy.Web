@@ -1,22 +1,10 @@
 import { Box, Tooltip } from "@mui/material"
 import { DataGrid, GridCellParams, GridColumns } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
 import { GetMessageJobRecords } from "../../../../api/enterprise"
 import { IMessageJobRecord, ISendRecordDto } from "../../../../dtos/enterprise"
-// import useAction from "../../../main/components/user-information/hook";
 import styles from "./index.module.scss"
 
 const SendRecord = (props: { list: ISendRecordDto[] }) => {
-  // const {} = useActiosn();
-  // const [list, setList] = useState<any>();
-  // useEffect(() => {
-  //   !!settingId &&
-  //     GetMessageJobRecords(settingId).then((res) => {
-  //       setList(res);
-  //       console.log("res", res);
-  //     });
-  // }, [settingId]);
-
   const columns: GridColumns = [
     {
       field: "createdDate",

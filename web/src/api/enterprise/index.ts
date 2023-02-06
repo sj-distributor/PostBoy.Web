@@ -62,7 +62,7 @@ export const GetMessageJobRecords = async (correlationId: string) => {
 }
 
 export const PostMessageSend = async (data: ISendMessageCommand) => {
-  return await Post<any>(`/api/Message/send`, data)
+  return await Post(`/api/Message/send`, data)
 }
 
 export const PostMessagejobDelete = async (data: { MessageJobId: string }) => {

@@ -9,35 +9,44 @@ import {
   PostMessageSend,
 } from "../../../../api/enterprise"
 import {
+  FileDto,
   ICorpAppData,
   ICorpData,
   IDepartmentAndUserListValue,
   IDepartmentData,
   IDtoExtend,
+  IJobSettingDto,
   ILastShowTableData,
+  IMessageJob,
   IMessageJobDto,
   IMessageTypeData,
   ISendMessageCommand,
   ITagsList,
   ITargetDialogValue,
+  IWorkWeChatAppNotificationDto,
   MessageDataType,
   MessageJobDestination,
   MessageWidgetShowStatus,
   SendType,
+  SendTypeCustomListDto,
+  TextDto,
   TimeType,
+  TimeZoneCustomListDto,
 } from "../../../../dtos/enterprise"
 import { flatten } from "ramda"
 import moment from "moment"
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"
+import { convertBase64 } from "../../../../uilts/convert-base64"
+import { useBoolean } from "ahooks"
 
 const useAction = () => {
-  const sendTypeList = [
-    { text: "即时发送", value: SendType.InstantSend },
-    { text: "指定日期", value: SendType.SpecifiedDate },
-    { text: "周期发送", value: SendType.SendPeriodically },
+  const sendTypeList: SendTypeCustomListDto[] = [
+    { title: "即时发送", value: SendType.InstantSend },
+    { title: "指定日期", value: SendType.SpecifiedDate },
+    { title: "周期发送", value: SendType.SendPeriodically },
   ]
 
-  const timeZone = [
+  const timeZone: TimeZoneCustomListDto[] = [
     { title: "UTC", value: TimeType.UTC },
     { title: "America/Los_Angeles", value: TimeType.America },
   ]
@@ -77,17 +86,115 @@ const useAction = () => {
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
 
-  const muiSxStyle = { width: "13rem", marginLeft: "1.5rem" }
-  const [cronExp, setCronExp] = useState("0 0 * * *") //mark 初始值应该为null
-  const [cronError, setCronError] = useState("")
-  const [isAdmin, setIsAdmin] = useState(true)
-  const [dateValue, setDateValue] = useState<any>()
-  const [rowList, setRowList] = useState<IMessageJobDto[]>([])
-  const [sendTypeValue, setSendTypeValue] = useState(sendTypeList[0])
+  const [cronExp, setCronExp] = useState<string>("0 0 * * *") //mark 初始值应该为null
+  const [cronError, setCronError] = useState<string>("")
+  const [isAdmin, setIsAdmin] = useState<boolean>(true)
+  const [dateValue, setDateValue] = useState<string>()
+  const [sendTypeValue, setSendTypeValue] = useState<number>(
+    sendTypeList[0].value
+  )
   const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
-  const [sendMessageList, setSendMessageList] = useState<ISendMessageCommand>()
-  const [selectUserList, setSelectUserList] = useState<string[]>()
-  const [selectPartiesList, setSelectPartiesList] = useState<string[]>()
+  const [selectUserList, setSelectUserList] = useState<string[]>([])
+  const [selectPartiesList, setSelectPartiesList] = useState<string[]>([])
+  const [fileList, setFileList] = useState<FileDto>()
+  const [openError, openErrorAction] = useBoolean(false)
+  const [openSuccess, openSuccessAction] = useBoolean(false)
+  setTimeout(() => {
+    openErrorAction.setFalse()
+    openSuccessAction.setFalse()
+  }, 4000)
+
+  const handleSubmit = (sendType: SendType, correlationId?: string) => {
+    console.log("selectUserList", selectUserList)
+    if (selectUserList) {
+      openErrorAction.setTrue()
+    } else {
+      let workWeChatAppNotification: IWorkWeChatAppNotificationDto = {
+        appId: "c1sAspdXz3ok",
+        toUsers: selectUserList,
+      }
+
+      let text: TextDto = {
+        content: messageParams,
+      }
+
+      const data: ISendMessageCommand = {
+        correlationId: uuidv4(),
+        metadata: [
+          {
+            key: "title",
+            value: titleParams,
+          },
+          {
+            key: "content",
+            value: messageParams,
+          },
+          {
+            key: "to",
+            value: `${!!selectUserList && selectUserList}${
+              !!selectPartiesList && selectPartiesList
+            }`,
+          },
+        ],
+        workWeChatAppNotification,
+      }
+
+      if (messageTypeValue.type === MessageDataType.Text) {
+        // 文字
+        const timezone = timeZone[timeZoneValue].title
+        let jobSetting: IJobSettingDto = {
+          timezone,
+        }
+        if (sendType === SendType.SpecifiedDate) {
+          jobSetting.delayedJob = {
+            enqueueAt: moment(dateValue).toDate(),
+          }
+        } else if (sendType === SendType.SendPeriodically) {
+          jobSetting.recurringJob = {
+            cronExpression: `0 ${cronExp}`,
+          }
+        }
+        data.jobSetting = jobSetting
+        workWeChatAppNotification.text = text
+      } else if (messageTypeValue.type === MessageDataType.Image) {
+        // 图文
+        if (messageTypeValue.groupBy === "") {
+          workWeChatAppNotification.mpNews = {
+            articles: [
+              {
+                title: titleParams,
+                author: "string",
+                digest: "string", //图文消息的描述
+                content: messageParams, //图文消息的内容
+                fileContent: "string", //图文消息缩略图的BASE64
+                contentSourceUrl: "string", //图文消息点击“阅读原文”之后的页面链接
+              },
+            ],
+          }
+        }
+        // 文件
+        workWeChatAppNotification.file = fileList
+      }
+      data.workWeChatAppNotification = workWeChatAppNotification
+
+      console.log("send", data)
+      openSuccessAction.setTrue()
+
+      // PostMessageSend(data)
+      //   .then((res) => openSuccessAction.setTrue())
+      //   .catch((error) => console.log("error1", error.message))
+    }
+  }
+
+  const onUploadFile = async (files: FileList) => {
+    const file = files[0]
+    const base64 = await convertBase64(file)
+    setFileList({
+      fileName: file.name,
+      fileContent: base64 as string,
+      fileType: messageTypeValue.type,
+    })
+  }
 
   useEffect(() => {
     GetCorpsList().then((data) => {
@@ -137,7 +244,7 @@ const useAction = () => {
             setFlattenDepartmentList((prev) => {
               return [
                 ...prev,
-                ...flatten(userList.userlist).map((item: any) => ({
+                ...flatten(userList.userlist).map((item) => ({
                   id: item.userid,
                   name: item.name,
                   parentid: department.name,
@@ -148,202 +255,37 @@ const useAction = () => {
             deptListResponse.department[
               deptListResponse.department.length - 1
             ] === department && setIsTreeViewLoading(false)
-
-            // 选择的群组
-            setSelectPartiesList(
-              deptListResponse.department
-                .filter((x) => x.selected === true)
-                .map((item) => item.name)
-            )
-            // 选择的用户
-            // deptListResponse?.department?.forEach((item) => {
-            //   const useridList: string[] = [];
-            //   item?.departmentUserList?.forEach((item) => {
-            //     if (item.selected === true) {
-            //       useridList.push(item.userid);
-            //       console.log("userid", item.userid);
-            //     }
-            //   });
-            //   setSelectUserList(["TRACY"]);
-            // });
-            // console.log("reeeerrr", userList.userlist);
-
-            userList.userlist.map((item) => {
-              if (item.name === "HERRY.H") {
-                // console.log("item", item);
-              }
-            })
           }
         }
+        // 选择的群组
+        setSelectPartiesList(
+          deptListResponse.department
+            .filter((x) => x.selected === true)
+            .map((item) => item.name)
+        )
+        // 选择的用户
+        deptListResponse?.department?.forEach((item) => {
+          const useridList: string[] = []
+          item?.departmentUserList?.forEach((item) => {
+            if (item.selected === true) {
+              useridList.push(item.userid)
+            }
+          })
+          setSelectUserList(useridList)
+        })
       }
     }
     if (!!corpAppValue) {
       setIsTreeViewLoading(true)
-
       loadDeptUsers(corpAppValue.appId)
     }
-  }, [corpAppValue?.appId])
+  }, [corpAppValue])
 
   const setDialogValue = { deptAndUserValueList: departmentList, tagsValue }
 
   const getDialogValue = (dialogData: ITargetDialogValue) => {
     setDepartmentList(dialogData.deptAndUserValueList)
     setTagsValue(dialogData.tagsValue)
-  }
-
-  const handleSubmit = (sendType: SendType, correlationId?: string) => {
-    // const messageList = {
-    //   correlationId: !!correlationId ? correlationId : "",
-    //   jobSetting: {
-    //     timezone: timeZoneValue,
-    //     delayedJob: {
-    //       enqueueAt: dateValue,
-    //     },
-    //     recurringJob: {
-    //       cronExpression: cronExp,
-    //     },
-    //   },
-    //   metadata: {
-    //     key: titleParams,
-    //     value: messageParams,
-    //   },
-    //   workWeChatAppNotification: {
-    //     appId: corpAppList[0].appId, //mark
-    //     toUsers: selectUserList,
-    //   },
-    // };
-    // 指定日期
-    if (sendType === SendType.SpecifiedDate) {
-      const data =
-        // {
-        //   correlationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        //   jobSetting: {
-        //     // timezone: "UTC",
-        //     // delayedJob: {
-        //     // enqueueAt: "2023-02-02 10:40:24.651",
-        //     // enqueueAt: moment.utc(dateValue).toISOString(),
-        //     // },
-        //     recurringJob: {
-        //       cronExpression: "* * * * * * ",
-        //     },
-        //   },
-        //   metadata: [
-        //     {
-        //       // key: titleParams,
-        //       // value: messageParams,
-        //       key: "test",
-        //       value: "test",
-        //     },
-        //   ],
-        //   workWeChatAppNotification: {
-        //     appId: corpAppList[0].appId,
-        //     chatId: corpAppList[0].workWeChatCorpId,
-        //     toUsers: ["TRACY.W"],
-        //     text: {
-        //       content: "111",
-        //     },
-        //   },
-        // };
-        {
-          correlationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-          jobSetting: {
-            timezone: "UTC",
-            delayedJob: {
-              enqueueAt: "2023-02-03T02:53:18.911Z",
-            },
-            // recurringJob: {
-            //   cronExpression: "string"
-            // }
-          },
-          metadata: [
-            {
-              key: "string",
-              value: "string",
-            },
-          ],
-          workWeChatAppNotification: {
-            appId: "c1sAspdXz3ok",
-            // chatId: "string",
-            // toTags: [
-            //   "string"
-            // ],
-            toUsers: ["TRACY"],
-            // toParties: [
-            //   "string"
-            // ],
-            text: {
-              content: "string",
-            },
-            // file: {
-            //   fileName: "string",
-            //   fileContent: "string",
-            //   fileType: 0
-            // },
-            // mpNews: {
-            //   articles: [
-            //     {
-            //       title: "string",
-            //       author: "string",
-            //       digest: "string",
-            //       content: "string",
-            //       fileContent: "string",
-            //       contentSourceUrl: "string"
-            //     }
-            //   ]
-            // }
-          },
-        }
-      console.log("data", JSON.stringify(data))
-      PostMessageSend(data)
-        .then((res) => console.log("res", res))
-        .catch((error) => console.log("error1", error.message))
-    }
-
-    // 周期
-    // if (sendType === SendType.SendPeriodically) {
-    //   const data = {
-    //     correlationId: !!correlationId ? correlationId : "",
-    //     jobSetting: {
-    //       timezone: timeZone[timeZoneValue].title,
-    //       recurringJob: {
-    //         cronExpression: cronExp,
-    //       },
-    //     },
-    //     metadata: [
-    //       {
-    //         key: titleParams,
-    //         value: messageParams,
-    //       },
-    //     ],
-    //     workWeChatAppNotification: {
-    //       appId: corpAppList[0].appId, //mark
-    //       toUsers: selectUserList ? selectUserList : ["WaiTouHeWaiErDuo"],
-    //     },
-    //   };
-    //   alert(`${data}`);
-    // PostMessageSend({
-    //   correlationId: !!correlationId ? correlationId : "",
-    //   jobSetting: {
-    //     timezone: timeZone[timeZoneValue].title,
-    //     delayedJob: {
-    //       enqueueAt: "",
-    //     },
-    //     recurringJob: {
-    //       cronExpression: cronExp,
-    //     },
-    //   },
-    //   metadata: [
-    //     {
-    //       key: titleParams,
-    //       value: messageParams,
-    //     },
-    //   ],
-    //   workWeChatAppNotification: {
-    //     appId: corpAppList[0].appId, //mark
-    //     toUsers: selectUserList ? selectUserList : ["WaiTouHeWaiErDuo"],
-    //   },
-    // });
-    // }
   }
 
   useEffect(() => {
@@ -359,10 +301,11 @@ const useAction = () => {
 
   useEffect(() => {
     if (
-      sendTypeValue.value === SendType.SendPeriodically ||
-      sendTypeValue.value === SendType.SpecifiedDate
-    )
+      sendTypeValue === SendType.SendPeriodically ||
+      sendTypeValue === SendType.SpecifiedDate
+    ) {
       getMessageJob()
+    }
   }, [sendTypeValue])
 
   const getMessageJob = () => {
@@ -398,8 +341,10 @@ const useAction = () => {
     getMessageJob()
   }, [dto.page, dto.pageSize])
 
-  const updateData = (k: keyof IDtoExtend, v: any) =>
-    setDto((prev) => ({ ...prev, [k]: v }))
+  const updateData = (
+    k: keyof IDtoExtend,
+    v: number | boolean | IMessageJob[]
+  ) => setDto((prev) => ({ ...prev, [k]: v }))
 
   const lastShowTableData = useMemo(() => {
     const array: ILastShowTableData[] = []
@@ -442,14 +387,16 @@ const useAction = () => {
     flattenDepartmentList,
     sendTypeList,
     sendTypeValue,
-    rowList,
     cronExp,
     isAdmin,
     dateValue,
-    muiSxStyle,
     timeZone,
     timeZoneValue,
     titleParams,
+    lastShowTableData,
+    dto,
+    openError,
+    openSuccess,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
@@ -464,10 +411,9 @@ const useAction = () => {
     setDateValue,
     setTimeZoneValue,
     setTitleParams,
-    lastShowTableData,
-    dto,
     updateData,
     getMessageJob,
+    onUploadFile,
   }
 }
 

@@ -185,7 +185,7 @@ export interface ISendMessageCommand {
 export interface IJobSettingDto {
   timezone?: string
   delayedJob?: {
-    enqueueAt: string
+    enqueueAt: Date
   }
   recurringJob?: {
     cronExpression: string
@@ -198,10 +198,8 @@ export interface IWorkWeChatAppNotificationDto {
   toTags?: string[]
   toUsers: string[]
   toParties?: string[]
-  text?: {
-    content: string
-  }
-  file?: { fileName: string; fileContent: string; fileType: MessageDataType }
+  text?: TextDto
+  file?: FileDto
   mpNews?: {
     articles: {
       title: string
@@ -212,6 +210,15 @@ export interface IWorkWeChatAppNotificationDto {
       contentSourceUrl: string
     }[]
   }
+}
+export interface TextDto {
+  content: string
+}
+
+export interface FileDto {
+  fileName: string
+  fileContent: string
+  fileType: MessageDataType
 }
 
 export enum TimeType {
@@ -235,4 +242,14 @@ export interface ILastShowTableData extends IMessageJobSame {
 export interface ISendRecordDto extends IMessageJobRecordSame {
   sendTheObject: string[] | string
   errorSendtheobject: string[] | string
+}
+
+export interface SendTypeCustomListDto {
+  title: string
+  value: SendType
+}
+
+export interface TimeZoneCustomListDto {
+  title: string
+  value: TimeType
 }

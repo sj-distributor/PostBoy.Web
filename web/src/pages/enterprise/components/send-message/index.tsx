@@ -10,8 +10,15 @@ import useAction from "./hook"
 import styles from "./index.module.scss"
 import SendNotice from "../../../notification"
 import Scheduler from "smart-cron"
-import moment from "moment"
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
+import {
+  Alert,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+} from "@mui/material"
+import { memo } from "react"
 
 const SendMessage = () => {
   const {
@@ -31,14 +38,16 @@ const SendMessage = () => {
     tagsList,
     sendTypeList,
     sendTypeValue,
-    rowList,
     cronExp,
     isAdmin,
     dateValue,
-    muiSxStyle,
     timeZone,
     timeZoneValue,
     titleParams,
+    lastShowTableData,
+    dto,
+    openError,
+    openSuccess,
     setCorpsValue,
     setCorpAppValue,
     setMessageParams,
@@ -53,14 +62,32 @@ const SendMessage = () => {
     setDateValue,
     setTimeZoneValue,
     setTitleParams,
-    lastShowTableData,
-    dto,
     updateData,
     getMessageJob,
+    onUploadFile,
   } = useAction()
 
   return (
     <div className={styles.sendMsgBox}>
+      <Snackbar
+        message="Please choose who to send."
+        open={openError}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
+      <Snackbar
+        open={openSuccess}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          send success!
+        </Alert>
+      </Snackbar>
       <div className={styles.selectInputBox}>
         {corpsValue !== undefined && corpAppValue !== undefined && (
           <>
@@ -70,7 +97,7 @@ const SendMessage = () => {
               value={corpsValue}
               disableClearable={true}
               options={corpsList}
-              sx={muiSxStyle}
+              className={styles.inputWrap}
               getOptionLabel={(option) => option.corpName}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
@@ -90,7 +117,7 @@ const SendMessage = () => {
               id="Autocomplete-corpAppListId"
               value={corpAppValue}
               options={corpAppList}
-              sx={Object.assign(muiSxStyle, { textAlign: "left" })}
+              className={styles.inputWrap}
               disableClearable
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -110,11 +137,10 @@ const SendMessage = () => {
         )}
         <Autocomplete
           disablePortal
-          className={styles.messageTypeList}
           id="Autocomplete-messageTypeListId"
           disableClearable={true}
           options={messageTypeList}
-          sx={muiSxStyle}
+          className={styles.inputWrap}
           value={messageTypeValue}
           getOptionLabel={(option) => option.title}
           groupBy={(option) => option.groupBy}
@@ -148,28 +174,26 @@ const SendMessage = () => {
           }}
         />
 
-        <Autocomplete
-          disablePortal
-          id="Autocomplete-corpAppListId"
-          value={sendTypeValue}
-          options={sendTypeList}
-          sx={Object.assign(muiSxStyle, { textAlign: "left" })}
-          disableClearable
-          getOptionLabel={(option) => option.text}
-          isOptionEqualToValue={(option, value) => option.value === value.value}
-          onChange={(e, value) => {
-            setSendTypeValue(value)
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              className={styles.corpInput}
-              type="button"
-              label="发送类型"
-            />
-          )}
-        />
-        <FormControl sx={Object.assign(muiSxStyle, { textAlign: "left" })}>
+        <FormControl className={styles.inputWrap}>
+          <InputLabel id="demo-simple-select-label">发送类型</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={sendTypeValue}
+            label="发送类型"
+            onChange={(e) => {
+              setSendTypeValue(Number(e.target.value))
+            }}
+          >
+            {sendTypeList.map((item, key) => (
+              <MenuItem key={key} value={item.value}>
+                {item.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl className={styles.inputWrap}>
           <InputLabel id="demo-simple-select-label">时区</InputLabel>
           <Select
             labelId="demo-simple-select-label"
@@ -209,7 +233,7 @@ const SendMessage = () => {
             margin: "0 2rem",
           }}
           variant="contained"
-          onClick={() => handleSubmit(sendTypeValue.value)}
+          onClick={() => handleSubmit(sendTypeValue)}
         >
           发 送
         </Button>
@@ -242,13 +266,19 @@ const SendMessage = () => {
             }}
           >
             Upload
-            <input hidden accept="image/*" multiple type="file" />
+            <input
+              hidden
+              accept="image/*"
+              multiple
+              type="file"
+              onChange={(e) => !!e.target.files && onUploadFile(e.target.files)}
+            />
           </Button>
         )}
       </div>
 
       <div className={styles.cycleSelectWrap}>
-        {sendTypeValue.value === SendType.SpecifiedDate && (
+        {sendTypeValue === SendType.SpecifiedDate && (
           <>
             <span>发送时间：</span>
             <input
@@ -263,7 +293,7 @@ const SendMessage = () => {
             />
           </>
         )}
-        {sendTypeValue.value === SendType.SendPeriodically && (
+        {sendTypeValue === SendType.SendPeriodically && (
           <Scheduler
             cron={cronExp}
             setCron={setCronExp}
@@ -274,17 +304,21 @@ const SendMessage = () => {
         )}
       </div>
 
-      {(sendTypeValue.value === SendType.SpecifiedDate ||
-        sendTypeValue.value === SendType.SendPeriodically) && (
-        <TextField
-          id="Autocomplete-messageParamsId"
-          label="标题"
-          multiline
-          value={titleParams}
-          style={{ width: 1550, marginTop: 10 }}
-          onChange={(e) => setTitleParams((e.target as HTMLInputElement).value)}
-        />
-      )}
+      {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
+        isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) &&
+        (sendTypeValue === SendType.SpecifiedDate ||
+          sendTypeValue === SendType.SendPeriodically) && (
+          <TextField
+            id="Autocomplete-messageParamsId"
+            label="标题"
+            multiline
+            value={titleParams}
+            style={{ width: 1550, marginTop: 10 }}
+            onChange={(e) =>
+              setTitleParams((e.target as HTMLInputElement).value)
+            }
+          />
+        )}
 
       <div className={styles.textarea}>
         {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
@@ -323,8 +357,8 @@ const SendMessage = () => {
         setOpenFunction={setIsShowDialog}
         getDialogValue={getDialogValue}
       />
-      {(sendTypeValue.value === SendType.SpecifiedDate ||
-        sendTypeValue.value === SendType.SendPeriodically) && (
+      {(sendTypeValue === SendType.SpecifiedDate ||
+        sendTypeValue === SendType.SendPeriodically) && (
         <SendNotice
           rowList={lastShowTableData}
           dto={dto}
