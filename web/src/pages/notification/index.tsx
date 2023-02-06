@@ -8,6 +8,8 @@ import NoticeSetting from "./ components/notice-setting"
 import SendRecord from "./ components/send-record"
 import React from "react"
 import { SendNoticeProps } from "./props"
+import LoadingButton from "@mui/lab/LoadingButton"
+import RestartAltIcon from "@mui/icons-material/RestartAlt"
 
 const asyncTootip = (title: string, styles: string) => {
   return (
@@ -34,7 +36,17 @@ const SendNotice = React.memo(
       sendRecordList,
       updateMessageJobInformation,
       alertShow,
+      loading,
+      setLoading,
     } = useAction({ getMessageJob })
+
+    const handleClick = async () => {
+      setLoading.setTrue()
+      getMessageJob()
+      setTimeout(() => {
+        setLoading.setFalse()
+      }, 500)
+    }
 
     const columns: GridColDef[] = [
       {
@@ -119,7 +131,15 @@ const SendNotice = React.memo(
             该MessageJob暂时设置不了!
           </Alert>
         )}
-
+        <LoadingButton
+          onClick={handleClick}
+          endIcon={<RestartAltIcon />}
+          loading={loading}
+          loadingPosition="end"
+          variant="contained"
+        >
+          <span>Loading</span>
+        </LoadingButton>
         <div className={styles.tableBoxWrap}>
           <div className={styles.tableBox}>
             <DataGrid

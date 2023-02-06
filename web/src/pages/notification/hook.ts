@@ -23,6 +23,7 @@ export const useAction = ({ getMessageJob }: HookProps) => {
     useState<string>("")
 
   const [alertShow, setAlertShow] = useBoolean(false)
+  const [loading, setLoading] = useBoolean(false)
 
   const [updateMessageJobInformation, setUpdateMessageJobInformation] =
     useState<ILastShowTableData>()
@@ -36,7 +37,7 @@ export const useAction = ({ getMessageJob }: HookProps) => {
   }
 
   const onConfirm = () => {
-    alert("click")
+    noticeSettingRef.current?.close()
   }
 
   const onSetting = (item: ILastShowTableData) => {
@@ -61,7 +62,7 @@ export const useAction = ({ getMessageJob }: HookProps) => {
           sendTheObject: clickSendRecordItemUsers,
           errorSendtheobject:
             JSON.parse(item.responseJson).invaliduser !== null
-              ? "未发送成功的对象" + JSON.parse(item.responseJson).invaliduser
+              ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
               : "",
         })
       })
@@ -110,5 +111,7 @@ export const useAction = ({ getMessageJob }: HookProps) => {
     sendRecordList,
     updateMessageJobInformation,
     alertShow,
+    loading,
+    setLoading,
   }
 }

@@ -67,6 +67,14 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
 }
 
 const useAction = () => {
+  const [dto, setDto] = useState<IDtoExtend>({
+    loading: true,
+    messageJobs: [],
+    rowCount: 0,
+    pageSize: 10,
+    page: 0,
+  })
+
   const sendTypeList: SendTypeCustomListDto[] = [
     { title: "即时发送", value: SendType.InstantSend },
     { title: "指定日期", value: SendType.SpecifiedDate },
@@ -98,6 +106,8 @@ const useAction = () => {
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
     useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll)
   const [isShowMessageParams, setIsShowMessageParams] = useState<boolean>(false)
+  const [isShowParameterOrTable, setIsShowParameterOrTable] =
+    useState<boolean>(false)
 
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
@@ -375,7 +385,7 @@ const useAction = () => {
             updateData("rowCount", res.count)
             updateData("messageJobs", messageJobConvertType(res.messageJobs))
             updateData("loading", false)
-          }, 100)
+          }, 500)
         }
       })
       .catch((err) => {
@@ -383,25 +393,13 @@ const useAction = () => {
           updateData("rowCount", 0)
           updateData("messageJobs", [])
           updateData("loading", false)
-        }, 100)
+        }, 500)
       })
   }
 
-  const [dto, setDto] = useState<IDtoExtend>({
-    loading: true,
-    messageJobs: [],
-    rowCount: 0,
-    pageSize: 10,
-    page: 0,
-  })
-
   useEffect(() => {
-    if (
-      sendTypeValue === SendType.SendPeriodically ||
-      sendTypeValue === SendType.SpecifiedDate
-    )
-      getMessageJob()
-  }, [dto.page, dto.pageSize, sendTypeValue])
+    if (isShowParameterOrTable) getMessageJob()
+  }, [dto.page, dto.pageSize, , isShowParameterOrTable])
 
   // 更新MessageJob table参数
   const updateData = (k: keyof IDtoExtend, v: any) => {
@@ -455,6 +453,8 @@ const useAction = () => {
     onScrolling,
     setTagsValue,
     setDialogValue,
+    isShowParameterOrTable,
+    setIsShowParameterOrTable,
   }
 }
 

@@ -2,8 +2,6 @@ import Button from "@mui/material/Button"
 import Switch from "@mui/material/Switch"
 import Autocomplete from "@mui/material/Autocomplete"
 import TextField from "@mui/material/TextField"
-import FormGroup from "@mui/material/FormGroup"
-import FormControlLabel from "@mui/material/FormControlLabel"
 import { MessageWidgetShowStatus, SendType } from "../../../../dtos/enterprise"
 import SelectTargetDialog from "../select-target-dialog"
 import useAction from "./hook"
@@ -66,6 +64,8 @@ const SendMessage = () => {
     onUploadFile,
     onScrolling,
     setTagsValue,
+    isShowParameterOrTable,
+    setIsShowParameterOrTable,
   } = useAction()
 
   return (
@@ -242,115 +242,6 @@ const SendMessage = () => {
           发 送
         </Button>
       </div>
-      <div className={styles.checkboxAndUploadBox}>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                value={isShowMessageParams}
-                onChange={(e) => {
-                  setIsShowMessageParams((e.target as HTMLInputElement).checked)
-                }}
-              />
-            }
-            label="查看完整参数"
-          />
-        </FormGroup>
-
-        {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
-          isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
-          <Button
-            variant="contained"
-            component="label"
-            sx={{
-              height: "3.5rem",
-              width: "7rem",
-              fontSize: "1rem",
-              margin: "0 2rem",
-            }}
-          >
-            Upload
-            <input
-              hidden
-              accept="image/*"
-              multiple
-              type="file"
-              onChange={(e) => !!e.target.files && onUploadFile(e.target.files)}
-            />
-          </Button>
-        )}
-      </div>
-
-      <div className={styles.cycleSelectWrap}>
-        {sendTypeValue === SendType.SpecifiedDate && (
-          <>
-            <span>发送时间：</span>
-            <input
-              type="datetime-local"
-              id="meeting-time"
-              name="meeting-time"
-              value={dateValue}
-              onChange={(e) =>
-                setDateValue((e.target as HTMLInputElement).value)
-              }
-              className={styles.dateInput}
-            />
-          </>
-        )}
-        {sendTypeValue === SendType.SendPeriodically && (
-          <Scheduler
-            cron={cronExp}
-            setCron={setCronExp}
-            setCronError={setCronError}
-            isAdmin={isAdmin}
-            locale={"zh_CN"}
-          />
-        )}
-      </div>
-
-      {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
-        isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) &&
-        (sendTypeValue === SendType.SpecifiedDate ||
-          sendTypeValue === SendType.SendPeriodically) && (
-          <TextField
-            id="Autocomplete-messageParamsId"
-            label="标题"
-            multiline
-            value={titleParams}
-            style={{ width: 1550, marginTop: 10 }}
-            onChange={(e) =>
-              setTitleParams((e.target as HTMLInputElement).value)
-            }
-          />
-        )}
-
-      <div className={styles.textarea}>
-        {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
-          isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
-          <TextField
-            id="Autocomplete-messageParamsId"
-            label="发送内容"
-            multiline
-            value={messageParams}
-            className={styles.multilineTextField}
-            rows={12}
-            onChange={(e) =>
-              setMessageParams((e.target as HTMLInputElement).value)
-            }
-          />
-        )}
-      </div>
-      {isShowMessageParams && (
-        <div className={styles.textarea}>
-          <TextField
-            id="TextField-paramsJsonId"
-            label="参数Json"
-            className={styles.multilineTextField}
-            multiline
-            rows={12}
-          />
-        </div>
-      )}
       <SelectTargetDialog
         open={isShowDialog}
         AppId={corpAppValue ? corpAppValue.appId : ""}
@@ -364,13 +255,129 @@ const SendMessage = () => {
         listScroll={onScrolling}
         setOuterTagsValue={setTagsValue}
       />
-      {(sendTypeValue === SendType.SpecifiedDate ||
-        sendTypeValue === SendType.SendPeriodically) && (
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        {!isShowParameterOrTable && (
+          <Switch
+            value={isShowMessageParams}
+            onChange={(e) => {
+              setIsShowMessageParams((e.target as HTMLInputElement).checked)
+            }}
+          />
+        )}
+        <Switch
+          value={isShowParameterOrTable}
+          onChange={(e) => {
+            setIsShowParameterOrTable((e.target as HTMLInputElement).checked)
+          }}
+        />
+      </div>
+
+      {isShowParameterOrTable ? (
         <SendNotice
           dto={dto}
           updateData={updateData}
           getMessageJob={getMessageJob}
         />
+      ) : (
+        <>
+          <div className={styles.checkboxAndUploadBox}>
+            {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
+              isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
+              <Button
+                variant="contained"
+                component="label"
+                sx={{
+                  height: "3.5rem",
+                  width: "7rem",
+                  fontSize: "1rem",
+                  margin: "0 2rem",
+                }}
+              >
+                Upload
+                <input
+                  hidden
+                  accept="image/*"
+                  multiple
+                  type="file"
+                  onChange={(e) =>
+                    !!e.target.files && onUploadFile(e.target.files)
+                  }
+                />
+              </Button>
+            )}
+          </div>
+
+          <div className={styles.cycleSelectWrap}>
+            {sendTypeValue === SendType.SpecifiedDate && (
+              <>
+                <span>发送时间：</span>
+                <input
+                  type="datetime-local"
+                  id="meeting-time"
+                  name="meeting-time"
+                  value={dateValue}
+                  onChange={(e) =>
+                    setDateValue((e.target as HTMLInputElement).value)
+                  }
+                  className={styles.dateInput}
+                />
+              </>
+            )}
+            {sendTypeValue === SendType.SendPeriodically && (
+              <Scheduler
+                cron={cronExp}
+                setCron={setCronExp}
+                setCronError={setCronError}
+                isAdmin={isAdmin}
+                locale={"zh_CN"}
+              />
+            )}
+          </div>
+
+          {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
+            isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) &&
+            (sendTypeValue === SendType.SpecifiedDate ||
+              sendTypeValue === SendType.SendPeriodically) && (
+              <TextField
+                id="Autocomplete-messageParamsId"
+                label="标题"
+                multiline
+                value={titleParams}
+                style={{ width: 1550, marginTop: 10 }}
+                onChange={(e) =>
+                  setTitleParams((e.target as HTMLInputElement).value)
+                }
+              />
+            )}
+
+          <div className={styles.textarea}>
+            {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
+              isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
+              <TextField
+                id="Autocomplete-messageParamsId"
+                label="发送内容"
+                multiline
+                value={messageParams}
+                className={styles.multilineTextField}
+                rows={12}
+                onChange={(e) =>
+                  setMessageParams((e.target as HTMLInputElement).value)
+                }
+              />
+            )}
+          </div>
+          {isShowMessageParams && (
+            <div className={styles.textarea}>
+              <TextField
+                id="TextField-paramsJsonId"
+                label="参数Json"
+                className={styles.multilineTextField}
+                multiline
+                rows={12}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )

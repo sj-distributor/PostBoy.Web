@@ -1,12 +1,12 @@
-import { Link, Outlet } from "react-router-dom";
-import { RouteItem } from "../../dtos/route-type";
-import { routerArray } from "../../router/elementRoute";
-import useAction from "./hook";
+import { Link, Outlet } from "react-router-dom"
+import { RouteItem } from "../../dtos/route-type"
+import { routerArray } from "../../router/elementRoute"
+import useAction from "./hook"
 
-import styles from "./index.module.scss";
+import styles from "./index.module.scss"
 
 const Home = () => {
-  const { click, setClick } = useAction();
+  const { click, setClick } = useAction()
 
   const routerTabBarContent = (list: RouteItem[]) => {
     return list.map((item, index) => {
@@ -18,7 +18,7 @@ const Home = () => {
                 key={childIndex}
                 to={childItem.path}
                 onClick={() => {
-                  setClick(childIndex);
+                  setClick(childIndex)
                 }}
                 className={
                   click === childIndex ? styles.navBarActive : styles.navBar
@@ -26,19 +26,21 @@ const Home = () => {
               >
                 {childItem.title}
               </Link>
-            );
+            )
           })}
         </div>
-      );
-    });
-  };
+      )
+    })
+  }
 
   return (
     <div className={styles.home}>
       {routerTabBarContent(routerArray)}
-      <Outlet />
+      <div className={styles.outlet}>
+        <Outlet />
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
