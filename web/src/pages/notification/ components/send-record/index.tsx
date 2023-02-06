@@ -53,7 +53,7 @@ const SendRecord = memo(
       {
         field: "state",
         headerName: "状态",
-        type: "MessageSendState",
+        type: "string",
         editable: false,
         headerAlign: "center",
         align: "center",
@@ -62,7 +62,7 @@ const SendRecord = memo(
         width: 100,
       },
       {
-        field: "abnormal",
+        field: "errorSendtheobject",
         headerName: "异常",
         type: "string",
         editable: false,

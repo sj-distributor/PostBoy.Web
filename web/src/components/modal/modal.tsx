@@ -30,7 +30,7 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
 
       const close = () => {
         setVisible(false)
-        onCancel()
+        onCancel && onCancel()
       }
 
       useImperativeHandle(ref, () => ({
