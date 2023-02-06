@@ -8,7 +8,9 @@ import {
   useImperativeHandle,
   useState,
   memo,
+  useEffect,
 } from "react"
+import { useUnmount } from "ahooks"
 
 const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
   forwardRef(
@@ -23,15 +25,27 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
       ref
     ) => {
       const [visible, setVisible] = useState<boolean>(false)
+      const [index, setIndex] = useState<number>(0)
 
       const open = () => {
         setVisible(true)
+        setIndex((prev) => prev + 1)
       }
 
       const close = () => {
         setVisible(false)
-        onCancel && onCancel()
+        setIndex(0)
       }
+
+      useUnmount(() => {
+        setIndex(0)
+      })
+
+      useEffect(() => {
+        if (index === 1 && !setVisible) {
+          onCancel()
+        }
+      }, [index, setVisible])
 
       useImperativeHandle(ref, () => ({
         open,
@@ -49,7 +63,12 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
                   <div className={style.boxTitle}>
                     <span className={style.boxTitleText}>{title}</span>
                     <div className={style.cancle}>
-                      <Close className={style.icon} onClick={onCancel} />
+                      <Close
+                        className={style.icon}
+                        onClick={() => {
+                          close()
+                        }}
+                      />
                     </div>
                   </div>
                 )}

@@ -145,7 +145,7 @@ const SendNotice = React.memo(
 
         <ModalBox
           ref={noticeSettingRef}
-          onCancel={onSendCancel}
+          onCancel={onNoticeCancel}
           title={"通知设置"}
           footerComponent={
             <div className={styles.boxButtonWrap}>
@@ -159,7 +159,7 @@ const SendNotice = React.memo(
               <Button
                 variant="contained"
                 className={styles.boxButton}
-                onClick={() => onSendCancel()}
+                onClick={onNoticeCancel}
               >
                 取消
               </Button>
@@ -177,7 +177,7 @@ const SendNotice = React.memo(
 
         <ModalBox
           ref={sendRecordRef}
-          onCancel={onNoticeCancel}
+          onCancel={onSendCancel}
           title={"发送记录"}
         >
           <SendRecord sendRecordList={sendRecordList} />
