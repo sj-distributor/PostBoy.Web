@@ -64,8 +64,9 @@
     }
 
     .boxBody::-webkit-scrollbar {
-      background-color: white;
-      width: 0.6rem;
+      // background-color: white;
+      // width: 0.6rem;
+      display: none;
     }
 
     .boxBody::-webkit-scrollbar-thumb {

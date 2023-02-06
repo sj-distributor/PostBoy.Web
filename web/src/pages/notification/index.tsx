@@ -131,15 +131,24 @@ const SendNotice = React.memo(
             该MessageJob暂时设置不了!
           </Alert>
         )}
-        <LoadingButton
-          onClick={handleClick}
-          endIcon={<RestartAltIcon />}
-          loading={loading}
-          loadingPosition="end"
-          variant="contained"
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            paddingTop: "0.5rem",
+          }}
         >
-          <span>Loading</span>
-        </LoadingButton>
+          <LoadingButton
+            onClick={handleClick}
+            endIcon={<RestartAltIcon />}
+            loading={loading}
+            loadingPosition="end"
+            variant="outlined"
+          >
+            <span>Loading</span>
+          </LoadingButton>
+        </div>
+
         <div className={styles.tableBoxWrap}>
           <div className={styles.tableBox}>
             <DataGrid
@@ -154,7 +163,7 @@ const SendNotice = React.memo(
               paginationMode="server"
               rowHeight={56}
               page={dto.page}
-              style={{ height: 680 }}
+              style={{ height: 675, width: "100%" }}
               rowCount={dto.rowCount}
               onPageChange={(value) => updateData("page", value)}
               onPageSizeChange={(value) => updateData("pageSize", value)}

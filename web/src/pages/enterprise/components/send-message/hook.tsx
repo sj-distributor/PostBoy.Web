@@ -1,5 +1,5 @@
 import { flatten, isEmpty } from "ramda"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -36,6 +36,7 @@ import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
 import { convertBase64 } from "../../../../uilts/convert-base64"
 import { useBoolean } from "ahooks"
+import { ModalBoxRef } from "../../../../dtos/modal"
 
 // 转换数组类型返回
 const messageJobConvertType = (arr: IMessageJob[]) => {
@@ -106,8 +107,6 @@ const useAction = () => {
   const [isShowInputOrUpload, setIsShowInputOrUpload] =
     useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll)
   const [isShowMessageParams, setIsShowMessageParams] = useState<boolean>(false)
-  const [isShowParameterOrTable, setIsShowParameterOrTable] =
-    useState<boolean>(false)
 
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
@@ -137,6 +136,8 @@ const useAction = () => {
   const [fileList, setFileList] = useState<FileDto>()
   const [openError, openErrorAction] = useBoolean(false)
   const [openSuccess, openSuccessAction] = useBoolean(false)
+
+  const sendRecordRef = useRef<ModalBoxRef>(null)
   setTimeout(() => {
     openErrorAction.setFalse()
     openSuccessAction.setFalse()
@@ -397,9 +398,16 @@ const useAction = () => {
       })
   }
 
+  const sendRecordOpen = () => {
+    sendRecordRef?.current?.open()
+  }
+  const sendRecordClose = () => {
+    sendRecordRef?.current?.close()
+  }
+
   useEffect(() => {
-    if (isShowParameterOrTable) getMessageJob()
-  }, [dto.page, dto.pageSize, , isShowParameterOrTable])
+    getMessageJob()
+  }, [dto.page, dto.pageSize])
 
   // 更新MessageJob table参数
   const updateData = (k: keyof IDtoExtend, v: any) => {
@@ -453,8 +461,9 @@ const useAction = () => {
     onScrolling,
     setTagsValue,
     setDialogValue,
-    isShowParameterOrTable,
-    setIsShowParameterOrTable,
+    sendRecordRef,
+    sendRecordOpen,
+    sendRecordClose,
   }
 }
 

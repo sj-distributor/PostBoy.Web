@@ -1,6 +1,8 @@
 .tableWrap {
-  width: 100%;
-  height: 100%;
+  width: 90rem;
+  height: 46rem;
+  display: flex;
+  flex-direction: column;
 
   .alert {
     position: absolute;
@@ -14,8 +16,7 @@
   }
 
   .tableBoxWrap {
-    width: 100%;
-    height: 100%;
+    flex: 1;
     display: flex;
     justify-content: center;
 
