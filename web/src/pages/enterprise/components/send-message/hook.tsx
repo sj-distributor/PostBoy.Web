@@ -60,11 +60,44 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         content: item.metadata.filter((item) => item.key === "content")[0]
           ?.value,
         toUsers: item.metadata.filter((item) => item.key === "to")[0]?.value,
+        enterprise: {
+          name: item.metadata.filter((item) => item.key === "enterpriseName")[0]
+            ?.value,
+          id: item.metadata.filter((item) => item.key === "enterpriseId")[0]
+            ?.value,
+        },
+        app: {
+          name: item.metadata.filter((item) => item.key === "appName")[0]
+            ?.value,
+          id: item.metadata.filter((item) => item.key === "appId")[0]?.value,
+          appId: item.metadata.filter((item) => item.key === "weChatAppId")[0]
+            ?.value,
+        },
       })
     )
   }
   return array
 }
+
+export const sendTypeList: SendTypeCustomListDto[] = [
+  { title: "即时发送", value: SendType.InstantSend },
+  { title: "指定日期", value: SendType.SpecifiedDate },
+  { title: "周期发送", value: SendType.SendPeriodically },
+]
+
+export const timeZone: TimeZoneCustomListDto[] = [
+  { title: "UTC", value: TimeType.UTC },
+  { title: "America/Los_Angeles", value: TimeType.America },
+]
+
+export const messageTypeList: IMessageTypeData[] = [
+  { title: "文本", groupBy: "", type: MessageDataType.Text },
+  { title: "图文", groupBy: "", type: MessageDataType.Image },
+  { title: "图片", groupBy: "文件", type: MessageDataType.Image },
+  { title: "语音", groupBy: "文件", type: MessageDataType.Voice },
+  { title: "视频", groupBy: "文件", type: MessageDataType.Video },
+  { title: "文件", groupBy: "文件", type: MessageDataType.File },
+]
 
 const useAction = () => {
   const [dto, setDto] = useState<IDtoExtend>({
@@ -74,26 +107,6 @@ const useAction = () => {
     pageSize: 10,
     page: 0,
   })
-
-  const sendTypeList: SendTypeCustomListDto[] = [
-    { title: "即时发送", value: SendType.InstantSend },
-    { title: "指定日期", value: SendType.SpecifiedDate },
-    { title: "周期发送", value: SendType.SendPeriodically },
-  ]
-
-  const timeZone: TimeZoneCustomListDto[] = [
-    { title: "UTC", value: TimeType.UTC },
-    { title: "America/Los_Angeles", value: TimeType.America },
-  ]
-
-  const messageTypeList: IMessageTypeData[] = [
-    { title: "文本", groupBy: "", type: MessageDataType.Text },
-    { title: "图文", groupBy: "", type: MessageDataType.Image },
-    { title: "图片", groupBy: "文件", type: MessageDataType.Image },
-    { title: "语音", groupBy: "文件", type: MessageDataType.Voice },
-    { title: "视频", groupBy: "文件", type: MessageDataType.Video },
-    { title: "文件", groupBy: "文件", type: MessageDataType.File },
-  ]
 
   const [messageParams, setMessageParams] = useState<string>("")
   const [titleParams, setTitleParams] = useState<string>("")
@@ -111,14 +124,12 @@ const useAction = () => {
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
   const [corpsValue, setCorpsValue] = useState<ICorpData>()
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
-  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([])
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
     IDepartmentKeyControl[]
   >([])
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     IDepartmentAndUserListValue[]
   >([])
-  const [departmentPage, setDepartmentPage] = useState(0)
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
@@ -148,18 +159,6 @@ const useAction = () => {
     )
     return result as IDepartmentKeyControl
   }, [departmentAndUserList])
-
-  const onScrolling = (
-    scrollHeight: number,
-    scrollTop: number,
-    clientHeight: number
-  ) => {
-    if (scrollTop + clientHeight >= scrollHeight - 2) {
-      setDepartmentPage((prev) =>
-        prev + 10 >= departmentList.length ? departmentList.length : prev + 10
-      )
-    }
-  }
 
   const loadDeptUsers = async (
     departmentPage: number,
@@ -324,8 +323,12 @@ const useAction = () => {
   useEffect(() => {
     GetCorpsList().then((data) => {
       if (data) {
-        setCorpsList(data)
-        setCorpsValue(data[0])
+        const array: { id: string; corpName: string }[] = []
+        data.forEach((item) =>
+          array.push({ id: item.id, corpName: item.corpName })
+        )
+        setCorpsList(array)
+        setCorpsValue(array[0])
       }
     })
   }, [])
@@ -334,9 +337,18 @@ const useAction = () => {
     corpsValue &&
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
         if (corpAppResult) {
-          setCorpAppList(corpAppResult)
-          setCorpAppValue(corpAppResult[0])
-          GetTagsList({ AppId: corpAppResult[0].appId }).then((tagsData) => {
+          const array: { id: string; name: string; appId: string }[] = []
+          corpAppResult.forEach((item) =>
+            array.push({
+              id: item.id,
+              name: item.name,
+              appId: item.appId,
+            })
+          )
+
+          setCorpAppList(array)
+          setCorpAppValue(array[0])
+          GetTagsList({ AppId: array[0].appId }).then((tagsData) => {
             tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
           })
         }
@@ -346,11 +358,9 @@ const useAction = () => {
   useEffect(() => {
     setDepartmentAndUserList([])
     setFlattenDepartmentList([])
-    setDepartmentPage(0)
     const loadDepartment = async (AppId: string) => {
       const deptListResponse = await GetDepartmentList({ AppId })
       if (!!deptListResponse && deptListResponse.errcode === 0) {
-        setDepartmentList(deptListResponse.department)
         loadDeptUsers(0, AppId, deptListResponse.department)
       }
     }
@@ -359,12 +369,6 @@ const useAction = () => {
       loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue])
-
-  useEffect(() => {
-    corpAppValue &&
-      departmentPage !== 0 &&
-      loadDeptUsers(departmentPage, corpAppValue.appId, departmentList)
-  }, [departmentPage])
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy

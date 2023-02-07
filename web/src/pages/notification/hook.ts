@@ -3,10 +3,12 @@ import { useEffect, useRef, useState } from "react"
 import {
   GetMessageJobRecords,
   PostMessageJobDelete,
+  PostMessageJobUpdate,
 } from "../../api/enterprise"
 import {
   ILastShowTableData,
   IMessageJobRecord,
+  ISendMessageCommand,
   ISendRecordDto,
   MessageJobType,
   messageSendResultType,
@@ -95,10 +97,24 @@ export const useAction = ({ getMessageJob }: HookProps) => {
       })
   }
 
+  const onUpdateMessageJob = (data: ISendMessageCommand) => {
+    PostMessageJobUpdate(data)
+      .then(() => {
+        // ref.current.close()
+      })
+      .catch((err) => {
+        throw Error(err)
+      })
+  }
+
   const onDeleteMessageJobConfirm = (id: string) => {
     deleteConfirmRef.current?.open()
     setDeleteId(id)
   }
+
+  //获取企业
+
+  //获取应用
 
   useEffect(() => {
     if (alertShow) {
