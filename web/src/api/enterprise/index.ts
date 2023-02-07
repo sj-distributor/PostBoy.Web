@@ -10,6 +10,7 @@ import {
   IMessageJobRecord,
   IMessageJobDto,
   ISendMessageCommand,
+  MessageJobDestination,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -48,7 +49,7 @@ export const GetTagsList = async (params: { AppId: string }) => {
 export const GetMessageJob = async (
   pageIndex: number,
   pageSize: number,
-  destination: number
+  destination: MessageJobDestination
 ) => {
   return await Get<IMessageJobDto>(
     `/api/Message/jobs?PageIndex=${pageIndex}&PageSize=${pageSize}&Destination=${destination}`
@@ -65,6 +66,10 @@ export const PostMessageSend = async (data: ISendMessageCommand) => {
   return await Post(`/api/Message/send`, data)
 }
 
-export const PostMessagejobDelete = async (messageJobId: string) => {
-  return await Post(`/api/Message/job/delete?MessageJobId=${messageJobId}`)
+export const PostMessageJobDelete = async (data: { MessageJobId: string }) => {
+  return await Post(`/api/Message/job/delete`, data)
+}
+
+export const PostMessageJobUpdate = async (data: ISendMessageCommand) => {
+  return await Post(`/api/Message/job/update`, data)
 }

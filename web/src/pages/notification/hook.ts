@@ -2,7 +2,7 @@ import { useBoolean } from "ahooks"
 import { useEffect, useRef, useState } from "react"
 import {
   GetMessageJobRecords,
-  PostMessagejobDelete,
+  PostMessageJobDelete,
 } from "../../api/enterprise"
 import {
   ILastShowTableData,
@@ -84,7 +84,9 @@ export const useAction = ({ getMessageJob }: HookProps) => {
 
   const onDeleteMessageJob = (id: string) => {
     deleteConfirmRef.current?.close()
-    PostMessagejobDelete(id)
+    PostMessageJobDelete({
+      MessageJobId: id,
+    })
       .then((res) => {
         getMessageJob()
       })

@@ -29,6 +29,7 @@ import {
   SendTypeCustomListDto,
   TimeType,
   TimeZoneCustomListDto,
+  MessageJobDestination,
 } from "../../../../dtos/enterprise"
 import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
@@ -379,7 +380,7 @@ const useAction = () => {
   // 获取MessageJob 数组
   const getMessageJob = () => {
     updateData("loading", true)
-    GetMessageJob(dto.page + 1, dto.pageSize, 0)
+    GetMessageJob(dto.page + 1, dto.pageSize, MessageJobDestination.WorkWeChat)
       .then((res) => {
         if (!!res) {
           setTimeout(() => {

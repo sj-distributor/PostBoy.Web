@@ -169,6 +169,7 @@ export enum MessageJobType {
 }
 
 export enum MessageJobDestination {
+  Email,
   WorkWeChat,
 }
 
@@ -197,6 +198,13 @@ export interface ISendMessageCommand {
   correlationId: string
   jobSetting?: IJobSettingDto
   metadata: { key: string; value: string }[]
+  emailNotification?: {
+    senderId: string
+    subject: string
+    body: string
+    to: string[]
+    cc: string
+  }
   workWeChatAppNotification: IWorkWeChatAppNotificationDto
 }
 
