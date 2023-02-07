@@ -33,7 +33,7 @@ const SendMessage = () => {
     isShowMessageParams,
     departmentAndUserList,
     isTreeViewLoading,
-    flattenDepartmentList,
+    searchKeyValue,
     tagsList,
     sendTypeList,
     sendTypeValue,
@@ -64,7 +64,6 @@ const SendMessage = () => {
     updateData,
     getMessageJob,
     onUploadFile,
-    onScrolling,
     setTagsValue,
     sendRecordRef,
     sendRecordOpen,
@@ -277,20 +276,6 @@ const SendMessage = () => {
         </Button>
       </div>
 
-      <SelectTargetDialog
-        open={isShowDialog}
-        AppId={corpAppValue ? corpAppValue.appId : ""}
-        departmentAndUserList={departmentAndUserList}
-        departmentKeyValue={departmentKeyValue}
-        flattenDepartmentList={flattenDepartmentList}
-        isLoading={isTreeViewLoading}
-        tagsList={tagsList}
-        setOpenFunction={setIsShowDialog}
-        setDeptUserList={setDepartmentAndUserList}
-        listScroll={onScrolling}
-        setOuterTagsValue={setTagsValue}
-      />
-
       <div className={styles.checkboxAndUploadBox}>
         {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
           isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
@@ -383,7 +368,6 @@ const SendMessage = () => {
           />
         </div>
       )}
-
       <ModalBox
         ref={sendRecordRef}
         onCancel={() => sendRecordClose}
@@ -411,6 +395,19 @@ const SendMessage = () => {
           setIsShowDialog={setIsShowDialog}
         />
       </ModalBox>
+
+      <SelectTargetDialog
+        open={isShowDialog}
+        AppId={corpAppValue ? corpAppValue.appId : ""}
+        departmentAndUserList={departmentAndUserList}
+        departmentKeyValue={departmentKeyValue}
+        flattenDepartmentList={searchKeyValue}
+        isLoading={isTreeViewLoading}
+        tagsList={tagsList}
+        setOpenFunction={setIsShowDialog}
+        setDeptUserList={setDepartmentAndUserList}
+        setOuterTagsValue={setTagsValue}
+      />
     </div>
   )
 }
