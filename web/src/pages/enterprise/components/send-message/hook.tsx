@@ -4,8 +4,7 @@ import {
   GetCorpsList,
   GetDepartmentList,
   GetDepartmentUsersList,
-  GetTagsList,
-  SendMessage
+  GetTagsList
 } from "../../../../api/enterprise"
 import {
   DepartmentAndUserType,
