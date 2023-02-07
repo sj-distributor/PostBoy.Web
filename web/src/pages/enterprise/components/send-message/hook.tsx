@@ -46,14 +46,12 @@ const useAction = () => {
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
   const [corpsValue, setCorpsValue] = useState<ICorpData>()
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
-  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([])
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
     IDepartmentKeyControl[]
   >([])
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     IDepartmentAndUserListValue[]
   >([])
-  const [departmentPage, setDepartmentPage] = useState(0)
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
@@ -270,11 +268,9 @@ const useAction = () => {
   useEffect(() => {
     setDepartmentAndUserList([])
     setFlattenDepartmentList([])
-    setDepartmentPage(0)
     const loadDepartment = async (AppId: string) => {
       const deptListResponse = await GetDepartmentList({ AppId })
       if (!!deptListResponse && deptListResponse.errcode === 0) {
-        setDepartmentList(deptListResponse.department)
         loadDeptUsers(0, AppId, deptListResponse.department)
       }
     }
@@ -283,12 +279,6 @@ const useAction = () => {
       loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue?.appId])
-
-  useEffect(() => {
-    corpAppValue &&
-      departmentPage !== 0 &&
-      loadDeptUsers(departmentPage, corpAppValue.appId, departmentList)
-  }, [departmentPage])
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
