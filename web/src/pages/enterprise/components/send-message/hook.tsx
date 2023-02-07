@@ -4,22 +4,23 @@ import {
   GetCorpsList,
   GetDepartmentList,
   GetDepartmentUsersList,
-  GetTagsList,
-  SendMessage
+  GetTagsList
 } from "../../../../api/enterprise"
 import {
+  DepartmentAndUserType,
   ICorpAppData,
   ICorpData,
   IDepartmentAndUserListValue,
   IDepartmentData,
   IDepartmentKeyControl,
   IMessageTypeData,
+  ISearchList,
   ISendMsgData,
   ITagsList,
   MessageDataType,
   MessageWidgetShowStatus
 } from "../../../../dtos/enterprise"
-import { flatten } from "ramda"
+import { clone, flatten, uniqWith } from "ramda"
 
 const useAction = () => {
   const messageTypeList: IMessageTypeData[] = [
@@ -45,14 +46,12 @@ const useAction = () => {
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
   const [corpsValue, setCorpsValue] = useState<ICorpData>()
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
-  const [departmentList, setDepartmentList] = useState<IDepartmentData[]>([])
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
     IDepartmentKeyControl[]
   >([])
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-    IDepartmentAndUserListValue[]
+    ISearchList[]
   >([])
-  const [departmentPage, setDepartmentPage] = useState(0)
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
@@ -65,16 +64,40 @@ const useAction = () => {
     return result as IDepartmentKeyControl
   }, [departmentAndUserList])
 
-  const onScrolling = (
-    scrollHeight: number,
-    scrollTop: number,
-    clientHeight: number
+  const searchKeyValue = useMemo(() => {
+    const result = flattenDepartmentList.find(
+      (e) => e.key === corpAppValue?.appId
+    )
+    return result?.data as IDepartmentAndUserListValue[]
+  }, [flattenDepartmentList])
+
+  const recursiveDeptList = (
+    hasData: IDepartmentAndUserListValue[],
+    defaultChild: IDepartmentAndUserListValue,
+    department: IDepartmentData,
+    parentRouteId: number[]
   ) => {
-    if (scrollTop + clientHeight >= scrollHeight - 2) {
-      setDepartmentPage((prev) =>
-        prev + 10 >= departmentList.length ? departmentList.length : prev + 10
-      )
+    for (const key in hasData) {
+      const e = hasData[key]
+      parentRouteId.push(Number(e.id))
+      if (e.id === department.parentid) {
+        e.children.push(defaultChild)
+        return parentRouteId
+      }
+      if (e.children.length > 0) {
+        const idList: number[] = recursiveDeptList(
+          e.children,
+          defaultChild,
+          department,
+          [...parentRouteId]
+        )
+        if (idList.length !== parentRouteId.length) return idList
+        parentRouteId.pop()
+      } else {
+        parentRouteId.pop()
+      }
     }
+    return parentRouteId
   }
 
   const loadDeptUsers = async (
@@ -82,71 +105,139 @@ const useAction = () => {
     AppId: string,
     deptListResponse: IDepartmentData[]
   ) => {
-    const limit =
-      departmentPage + 10 >= deptListResponse.length
-        ? deptListResponse.length
-        : departmentPage + 10
-
-    for (let index = departmentPage; index < limit; index++) {
+    for (let index = departmentPage; index < deptListResponse.length; index++) {
       const department = deptListResponse[index]
+      // referIndexList储存从嵌套数组顶部到当前部门的ID路径
+      let referIndexList: number[] = []
+      const defaultChild = {
+        id: department.id,
+        name: department.name,
+        type: DepartmentAndUserType.Department,
+        parentid: String(department.parentid),
+        selected: false,
+        children: []
+      }
+      setDepartmentAndUserList((prev) => {
+        const newValue = clone(prev)
+        const hasData = newValue.find((e) => e.key === AppId)
+        if (hasData && hasData.data.length > 0) {
+          // 实现查找parentid等于当前部门id后插入chilrden
+          const idList = recursiveDeptList(
+            hasData.data,
+            defaultChild,
+            department,
+            []
+          )
+          referIndexList = referIndexList.concat(idList, [department.id])
+        } else {
+          referIndexList = referIndexList.concat(department.id)
+          newValue.push({ key: AppId, data: [defaultChild] })
+        }
+        return newValue
+      })
+
       const userList = await GetDepartmentUsersList({
         AppId,
         DepartmentId: department.id
       })
       if (!!userList && userList.errcode === 0) {
         setDepartmentAndUserList((prev) => {
-          let newValue = prev.filter((e) => !!e)
+          const newValue = clone(prev)
           const hasData = newValue.find((e) => e.key === AppId)
-          const insertNewData = {
-            ...department,
-            departmentUserList: userList.userlist.map((e) => ({
-              ...e,
-              selected: false
-            })),
-            selected: false
+          if (hasData) {
+            let result: IDepartmentAndUserListValue | undefined
+            referIndexList.forEach((number, index) => {
+              if (index !== 0) {
+                result = result?.children.find((item) => number === item.id)
+              } else {
+                result = hasData.data.find(
+                  (item) => referIndexList[0] === item.id
+                )
+              }
+            })
+            if (result)
+              result.children = userList.userlist.map((e) => ({
+                id: e.userid,
+                name: e.name,
+                type: DepartmentAndUserType.User,
+                parentid: String(department.id),
+                selected: false,
+                children: []
+              }))
           }
-          hasData
-            ? hasData.data.push(insertNewData)
-            : newValue.push({
-                key: AppId,
-                data: [insertNewData]
-              })
           return newValue
         })
         setFlattenDepartmentList((prev) => {
-          return [
-            ...prev,
-            ...flatten(userList.userlist).map((item) => ({
-              id: item.userid,
-              name: item.name,
-              parentid: department.name
-            }))
+          const newValue = clone(prev)
+          let hasData = newValue.find((e) => e.key === AppId)
+          const insertData = [
+            {
+              id: department.id,
+              name: department.name,
+              parentid: department.name,
+              type: DepartmentAndUserType.Department,
+              selected: false,
+              children: []
+            },
+            ...flatten(
+              userList.userlist.map((item) => ({
+                id: item.userid,
+                name: item.name,
+                parentid: department.name,
+                type: DepartmentAndUserType.User,
+                selected: false,
+                children: []
+              }))
+            )
           ]
+          if (hasData) {
+            hasData.data = [...hasData.data, ...insertData]
+          } else {
+            newValue.push({
+              key: AppId,
+              data: insertData
+            })
+          }
+          return newValue
         })
-        index === limit - 1 && setIsTreeViewLoading(false)
+        index === deptListResponse.length - 1 && setIsTreeViewLoading(false)
       }
     }
   }
 
+  const recursiveGetSelectedList = (
+    hasData: IDepartmentAndUserListValue[],
+    selectedList: IDepartmentAndUserListValue[]
+  ) => {
+    for (const key in hasData) {
+      const e = hasData[key]
+      if (e.selected) {
+        selectedList.push(e)
+      }
+      if (e.children.length > 0) {
+        selectedList = recursiveGetSelectedList(e.children, [...selectedList])
+      }
+    }
+    return selectedList
+  }
+
   const handleSubmit = async () => {
-    let toUsers: string[] = []
-    const toParties = departmentKeyValue.data
-      .filter((e) => e.selected)
-      .map((e) => String(e.id))
-    departmentKeyValue.data.forEach((department) => {
-      toUsers = toUsers.concat(
-        department.departmentUserList
-          .filter((user) => user.selected)
-          .map((e) => e.userid)
-      )
-    })
+    const selectedList = uniqWith(
+      (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
+        return a.id === b.id
+      }
+    )(recursiveGetSelectedList(departmentKeyValue.data, []))
+
     const data: ISendMsgData = {
       appId: corpAppValue?.appId,
       toTags: tagsValue.map((e) => String(e.tagId)),
-      toUsers,
-      toParties
+      toUsers: selectedList
+        .filter((e) => e.type === DepartmentAndUserType.User)
+        .map((e) => String(e.id)),
+      toParties: selectedList
+        .filter((e) => e.type === DepartmentAndUserType.Department)
+        .map((e) => String(e.id))
     }
-
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
       ? (data.mpNews = {
           articles: [
@@ -165,7 +256,6 @@ const useAction = () => {
           fileContent: "",
           fileType: messageTypeValue.type
         })
-
     // TODO 发送接口
     // const response = await SendMessage(data);
   }
@@ -195,11 +285,9 @@ const useAction = () => {
   useEffect(() => {
     setDepartmentAndUserList([])
     setFlattenDepartmentList([])
-    setDepartmentPage(0)
     const loadDepartment = async (AppId: string) => {
       const deptListResponse = await GetDepartmentList({ AppId })
       if (!!deptListResponse && deptListResponse.errcode === 0) {
-        setDepartmentList(deptListResponse.department)
         loadDeptUsers(0, AppId, deptListResponse.department)
       }
     }
@@ -208,12 +296,6 @@ const useAction = () => {
       loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue?.appId])
-
-  useEffect(() => {
-    corpAppValue &&
-      departmentPage !== 0 &&
-      loadDeptUsers(departmentPage, corpAppValue.appId, departmentList)
-  }, [departmentPage])
 
   useEffect(() => {
     messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
@@ -240,7 +322,7 @@ const useAction = () => {
     departmentAndUserList,
     isTreeViewLoading,
     tagsList,
-    flattenDepartmentList,
+    searchKeyValue,
     departmentKeyValue,
     setDepartmentAndUserList,
     setCorpsValue,
@@ -250,7 +332,6 @@ const useAction = () => {
     handleSubmit,
     setIsShowDialog,
     setIsShowMessageParams,
-    onScrolling,
     setTagsValue
   }
 }

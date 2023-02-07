@@ -32,8 +32,13 @@ export interface IDepartmentUsersListApiData {
 }
 
 export interface IDepartmentKeyControl {
-  data: IDepartmentData[]
+  data: IDepartmentAndUserListValue[]
   key: string
+}
+
+export interface IDeptTreeList {
+  data: IDepartmentData[]
+  children: IDeptTreeList[]
 }
 
 export interface IDepartmentData {
@@ -59,7 +64,10 @@ export interface IDepartmentAndUserListValue {
   id: number | string
   name: string
   type?: DepartmentAndUserType
-  parentid: number | string
+  parentid: string
+  selected: boolean
+  isCollapsed?: boolean
+  children: IDepartmentAndUserListValue[]
 }
 
 export enum DepartmentAndUserType {
@@ -100,11 +108,6 @@ export interface ITargetDialogProps {
   setOpenFunction: (open: boolean) => void
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
-  listScroll: (
-    scrollHeight: number,
-    scrollTop: number,
-    clientHeight: number
-  ) => void
 }
 
 export enum MessageWidgetShowStatus {
@@ -115,6 +118,11 @@ export enum MessageWidgetShowStatus {
 
 export interface ITagsListResponse extends IResponseMsg {
   taglist: ITagsList[]
+}
+
+export interface ISearchList {
+  key: string
+  data: IDepartmentAndUserListValue[]
 }
 
 export interface ITagsList {
@@ -144,4 +152,9 @@ export interface ISendMsgData {
       }
     ]
   }
+}
+
+export enum ClickType {
+  Collapse,
+  Select
 }

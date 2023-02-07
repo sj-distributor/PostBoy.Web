@@ -3,7 +3,8 @@ import {
   IDepartmentAndUserListValue,
   DepartmentAndUserType,
   ITagsList,
-  IDepartmentKeyControl
+  IDepartmentKeyControl,
+  ClickType
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -29,46 +30,42 @@ const useAction = (props: {
   >([])
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
 
-  const handleDeptOrUserClick = (clickedItem: IDepartmentAndUserListValue) => {
-    let departmentIndex: number
-    if (clickedItem.type === DepartmentAndUserType.Department) {
-      departmentIndex = departmentKeyValue.data.findIndex(
-        (e) => e.id === clickedItem.id
-      )
-      setDeptUserList((prev) => {
-        const newValue = prev.filter((e) => !!e)
-        const activeData = newValue.find(
-          (e) => e.key === departmentKeyValue.key
-        )
-        if (activeData?.data) {
-          activeData.data[departmentIndex].selected =
-            !activeData.data[departmentIndex].selected
-        }
-        return newValue
-      })
-    } else {
-      departmentIndex = departmentKeyValue.data.findIndex(
-        (e) => e.name === clickedItem.parentid
-      )
-      const userIndex = departmentKeyValue.data[
-        departmentIndex
-      ].departmentUserList.findIndex((e) => e.userid === clickedItem.id)
-      setDeptUserList((prev) => {
-        const newValue = prev.filter((e) => !!e)
-        const activeData = newValue.find(
-          (e) => e.key === departmentKeyValue.key
-        )
-        if (activeData) {
-          activeData.data[departmentIndex].departmentUserList[userIndex][
-            "selected"
-          ] =
-            !activeData.data[departmentIndex].departmentUserList[userIndex][
-              "selected"
-            ]
-        }
-        return newValue
-      })
+  const recursiveSeachDeptOrUser = (
+    hasData: IDepartmentAndUserListValue[],
+    item: IDepartmentAndUserListValue,
+    callback: (
+      e: IDepartmentAndUserListValue,
+      item: IDepartmentAndUserListValue
+    ) => void
+  ) => {
+    for (const key in hasData) {
+      const e = hasData[key]
+      callback(e, item)
+      if (e.children.length > 0) {
+        recursiveSeachDeptOrUser(e.children, item, callback)
+      }
     }
+  }
+
+  const handleDeptOrUserClick = (
+    type: ClickType,
+    clickedItem: IDepartmentAndUserListValue
+  ) => {
+    setDeptUserList((prev) => {
+      const newValue = prev.filter((e) => !!e)
+      const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
+      activeData &&
+        recursiveSeachDeptOrUser(activeData.data, clickedItem, (e, item) => {
+          if (e.id === item.id) {
+            if (type === ClickType.Collapse) {
+              e.isCollapsed = !e.isCollapsed
+            } else {
+              e.selected = !e.selected
+            }
+          }
+        })
+      return newValue
+    })
   }
 
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -79,45 +76,52 @@ const useAction = (props: {
     setDeptUserList((prev) => {
       const newValue = prev.filter((e) => !!e)
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
-      activeData &&
-        activeData.data.forEach((department) => {
-          department.departmentUserList.forEach((user) => {
-            if (
-              valueArr.find((e) => e.id === user.userid) &&
-              valueArr.length <= 0
-            ) {
-              user.selected = true
-            } else {
-              user.selected = false
-            }
-          })
-        })
+      if (activeData) {
+        valueArr.length > 0
+          ? valueArr.forEach((item) => {
+              recursiveSeachDeptOrUser(activeData.data, item, (user) => {
+                user.selected = !!valueArr.find((e) => e.id === user.id)
+              })
+            })
+          : recursiveSeachDeptOrUser(
+              activeData.data,
+              activeData.data[0],
+              (user) => {
+                user.selected = false
+              }
+            )
+      }
       return newValue
     })
   }
 
   useEffect(() => {
+    const recursiveDeptList = (
+      hasData: IDepartmentAndUserListValue[],
+      changeList: IDepartmentAndUserListValue[]
+    ) => {
+      for (const key in hasData) {
+        const e = hasData[key]
+        const hasItemIndex = changeList.findIndex((item) => item.id === e.id)
+        e.selected
+          ? hasItemIndex <= -1 &&
+            changeList.push({
+              id: e.id,
+              name: e.name,
+              type: DepartmentAndUserType.User,
+              parentid: String(e.parentid),
+              selected: e.selected,
+              children: []
+            })
+          : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1)
+        e.children.length > 0 && recursiveDeptList(e.children, changeList)
+      }
+    }
     departmentKeyValue?.data.length > 0 &&
       !isLoading &&
       setDepartmentSelectedList((prev) => {
         const newValue = prev.filter((e) => !!e)
-        departmentKeyValue.data.forEach((department) => {
-          department.departmentUserList.forEach((user) => {
-            const hasItemIndex = newValue.findIndex(
-              (item) => item.id === user.userid
-            )
-            user.selected
-              ? hasItemIndex <= -1 &&
-                newValue.push({
-                  id: user.userid,
-                  name: user.name,
-                  parentid: department.name
-                })
-              : hasItemIndex > -1 &&
-                newValue[hasItemIndex].parentid === department.name &&
-                newValue.splice(hasItemIndex, 1)
-          })
-        })
+        recursiveDeptList(departmentKeyValue.data, newValue)
         return newValue
       })
   }, [departmentAndUserList])
