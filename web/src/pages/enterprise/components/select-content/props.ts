@@ -1,33 +1,13 @@
 import {
   ICorpAppData,
   ICorpData,
-  IDtoExtend,
   IMessageTypeData,
   SendTypeCustomListDto,
   TimeZoneCustomListDto,
-} from "../../dtos/enterprise"
+} from "../../../../dtos/enterprise"
 
-export enum CycleOptionType {
-  PerMonth = 10,
-  PerTwoweeks = 20,
-  PerWeek = 30,
-  PerDay = 40,
-}
-
-export enum WeekDayType {
-  Sun,
-  Mon,
-  Tue,
-  Wed,
-  Thu,
-  Fri,
-  Sat,
-}
-
-export interface SendNoticeProps {
-  dto: IDtoExtend
-  updateData: (k: keyof IDtoExtend, v: any) => void
-  getMessageJob: () => void
+export interface SelectContentProps {
+  inputClassName: string
   corpAppValue: ICorpAppData | undefined
   corpsList: ICorpData[]
   corpAppList: ICorpAppData[]
@@ -46,8 +26,4 @@ export interface SendNoticeProps {
   setSendTypeValue: React.Dispatch<React.SetStateAction<number>>
   setTimeZoneValue: React.Dispatch<React.SetStateAction<number>>
   setIsShowDialog: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export interface HookProps {
-  getMessageJob: () => void
 }

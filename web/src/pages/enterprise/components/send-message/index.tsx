@@ -1,6 +1,5 @@
 import Button from "@mui/material/Button"
 import Switch from "@mui/material/Switch"
-import Autocomplete from "@mui/material/Autocomplete"
 import TextField from "@mui/material/TextField"
 import { MessageWidgetShowStatus, SendType } from "../../../../dtos/enterprise"
 import SelectTargetDialog from "../select-target-dialog"
@@ -8,15 +7,9 @@ import useAction from "./hook"
 import styles from "./index.module.scss"
 import SendNotice from "../../../notification"
 import Scheduler from "smart-cron"
-import {
-  Alert,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Snackbar,
-} from "@mui/material"
+import { Alert, Snackbar } from "@mui/material"
 import ModalBox from "../../../../components/modal/modal"
+import SelectContent from "../select-content"
 
 const SendMessage = () => {
   const {
@@ -92,150 +85,31 @@ const SendMessage = () => {
         </Alert>
       </Snackbar>
       <div className={styles.selectInputBox}>
-        {corpsValue !== undefined && corpAppValue !== undefined && (
-          <>
-            <Autocomplete
-              openOnFocus
-              disablePortal
-              id="Autocomplete-corpsDataId"
-              value={corpsValue}
-              disableClearable={true}
-              options={corpsList}
-              className={styles.inputWrap}
-              getOptionLabel={(option) => option.corpName}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  className={styles.corpInput}
-                  type="button"
-                  label="选择企业"
-                />
-              )}
-              onChange={(e, value) => {
-                setCorpsValue(value)
-              }}
-            />
-            <Autocomplete
-              openOnFocus
-              disablePortal
-              id="Autocomplete-corpAppListId"
-              value={corpAppValue}
-              options={corpAppList}
-              className={styles.inputWrap}
-              disableClearable
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              onChange={(e, value) => {
-                setCorpAppValue(value)
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  className={styles.corpInput}
-                  type="button"
-                  label="选择应用"
-                />
-              )}
-            />
-          </>
-        )}
-        <Autocomplete
-          openOnFocus
-          disablePortal
-          id="Autocomplete-messageTypeListId"
-          disableClearable={true}
-          options={messageTypeList}
-          className={styles.inputWrap}
-          value={messageTypeValue}
-          getOptionLabel={(option) => option.title}
-          groupBy={(option) => option.groupBy}
-          isOptionEqualToValue={(option, value) => option.title === value.title}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              className={styles.corpInput}
-              type="button"
-              label="消息类型"
-            />
-          )}
-          renderGroup={(params) => {
-            return (
-              <div key={params.key}>
-                <p
-                  className={
-                    params.group === "文件"
-                      ? styles.groupLabel
-                      : styles.noneGroupLabel
-                  }
-                >
-                  {params.group}
-                </p>
-                <span>{params.children}</span>
-              </div>
-            )
-          }}
-          onChange={(e, value) => {
-            setMessageTypeValue(value)
-          }}
+        <SelectContent
+          inputClassName={styles.inputWrap}
+          corpAppValue={corpAppValue}
+          corpsList={corpsList}
+          corpAppList={corpAppList}
+          corpsValue={corpsValue}
+          messageTypeList={messageTypeList}
+          messageTypeValue={messageTypeValue}
+          sendTypeValue={sendTypeValue}
+          sendTypeList={sendTypeList}
+          timeZone={timeZone}
+          timeZoneValue={timeZoneValue}
+          setCorpsValue={setCorpsValue}
+          setCorpAppValue={setCorpAppValue}
+          setMessageTypeValue={setMessageTypeValue}
+          setSendTypeValue={setSendTypeValue}
+          setTimeZoneValue={setTimeZoneValue}
+          setIsShowDialog={setIsShowDialog}
         />
-
-        <FormControl className={styles.inputWrap}>
-          <InputLabel id="demo-simple-select-label">发送类型</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={sendTypeValue}
-            label="发送类型"
-            onChange={(e) => {
-              setSendTypeValue(Number(e.target.value))
-            }}
-          >
-            {sendTypeList.map((item, key) => (
-              <MenuItem key={key} value={item.value}>
-                {item.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl className={styles.inputWrap}>
-          <InputLabel id="demo-simple-select-label">时区</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={timeZoneValue}
-            label="时区"
-            onChange={(e) => {
-              setTimeZoneValue(Number(e.target.value))
-            }}
-          >
-            {timeZone.map((item, key) => (
-              <MenuItem key={key} value={item.value}>
-                {item.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Button
-          sx={{
-            height: "3.5rem",
-            fontSize: "1rem",
-            flexShrink: "0",
-            marginRight: "1.5rem",
-          }}
-          variant="contained"
-          onClick={() => {
-            setIsShowDialog(true)
-          }}
-        >
-          选择发送目标
-        </Button>
         <Button
           sx={{
             height: "3.5rem",
             width: "7rem",
             fontSize: "1rem",
+            marginLeft: "1.5rem",
           }}
           variant="contained"
           onClick={() => handleSubmit(sendTypeValue)}
@@ -270,6 +144,7 @@ const SendMessage = () => {
         listScroll={onScrolling}
         setOuterTagsValue={setTagsValue}
       />
+
       <div className={styles.checkboxAndUploadBox}>
         {(isShowInputOrUpload === MessageWidgetShowStatus.ShowUpload ||
           isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) && (
@@ -372,6 +247,22 @@ const SendMessage = () => {
           dto={dto}
           updateData={updateData}
           getMessageJob={getMessageJob}
+          corpAppValue={corpAppValue}
+          corpsList={corpsList}
+          corpAppList={corpAppList}
+          corpsValue={corpsValue}
+          messageTypeList={messageTypeList}
+          messageTypeValue={messageTypeValue}
+          sendTypeValue={sendTypeValue}
+          sendTypeList={sendTypeList}
+          timeZone={timeZone}
+          timeZoneValue={timeZoneValue}
+          setCorpsValue={setCorpsValue}
+          setCorpAppValue={setCorpAppValue}
+          setMessageTypeValue={setMessageTypeValue}
+          setSendTypeValue={setSendTypeValue}
+          setTimeZoneValue={setTimeZoneValue}
+          setIsShowDialog={setIsShowDialog}
         />
       </ModalBox>
     </div>

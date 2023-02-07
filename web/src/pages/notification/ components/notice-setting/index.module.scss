@@ -8,6 +8,13 @@
   padding-left: 3rem;
   padding-right: 3rem;
 
+  .inputWrap {
+    flex: 1;
+    min-width: 12rem;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+  }
+
   .objectWrap {
     display: flex;
     align-items: flex-start;

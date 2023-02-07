@@ -21,7 +21,27 @@ const asyncTootip = (title: string, styles: string) => {
 
 const SendNotice = React.memo(
   (props: SendNoticeProps) => {
-    const { dto, updateData, getMessageJob } = props
+    const {
+      dto,
+      updateData,
+      getMessageJob,
+      corpAppValue,
+      corpsList,
+      corpAppList,
+      corpsValue,
+      messageTypeList,
+      messageTypeValue,
+      sendTypeValue,
+      sendTypeList,
+      timeZone,
+      timeZoneValue,
+      setCorpsValue,
+      setCorpAppValue,
+      setMessageTypeValue,
+      setSendTypeValue,
+      setTimeZoneValue,
+      setIsShowDialog,
+    } = props
 
     const {
       noticeSettingRef,
@@ -202,6 +222,22 @@ const SendNotice = React.memo(
             {!!updateMessageJobInformation && (
               <NoticeSetting
                 updateMessageJobInformation={updateMessageJobInformation}
+                corpAppValue={corpAppValue}
+                corpsList={corpsList}
+                corpAppList={corpAppList}
+                corpsValue={corpsValue}
+                messageTypeList={messageTypeList}
+                messageTypeValue={messageTypeValue}
+                sendTypeValue={sendTypeValue}
+                sendTypeList={sendTypeList}
+                timeZone={timeZone}
+                timeZoneValue={timeZoneValue}
+                setCorpsValue={setCorpsValue}
+                setCorpAppValue={setCorpAppValue}
+                setMessageTypeValue={setMessageTypeValue}
+                setSendTypeValue={setSendTypeValue}
+                setTimeZoneValue={setTimeZoneValue}
+                setIsShowDialog={setIsShowDialog}
               />
             )}
           </>

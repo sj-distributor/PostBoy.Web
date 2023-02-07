@@ -1,17 +1,17 @@
-import { AppSettings } from "../appsettings";
+import { AppSettings } from "../appsettings"
 
 export async function Get<T>(url: string) {
-  return base<T>(url, "get");
+  return base<T>(url, "get")
 }
 
 export async function Post<T>(url: string, data?: object) {
-  return base<T>(url, "post", data);
+  return base<T>(url, "post", data)
 }
 
 export interface IResponse<T> {
-  code: ResponseCode;
-  msg: string;
-  data: T;
+  code: ResponseCode
+  msg: string
+  data: T
 }
 
 export enum ResponseCode {
@@ -25,29 +25,33 @@ export async function base<T>(
   method: "get" | "post",
   data?: object
 ) {
-  const settings = (window as any).appSettings as AppSettings;
+  const settings = (window as any).appSettings as AppSettings
   return await fetch(`${settings.serverUrl}${url}`, {
     method: method,
     body: data ? JSON.stringify(data) : undefined,
     headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
+      Authorization:
+        "Bearer " +
+        (localStorage.getItem("token")
+          ? (localStorage.getItem("token") as string)
+          : ""),
       "Content-Type": "application/json",
     },
   })
     .then((res) => res.json())
     .then((res: IResponse<T>) => {
       if (res.code === ResponseCode.Ok) {
-        return res.data;
+        return res.data
       } else if (res.code === ResponseCode.Unauthorized) {
-        return null;
+        return null
       } else if (res.code === ResponseCode.InternalServerError) {
-        return null;
+        return null
       } else {
-        console.log("todo");
+        console.log("todo")
       }
     })
     .catch((err) => {
-      console.log("request error:", err);
-      throw new Error(err);
-    });
+      console.log("request error:", err)
+      throw new Error(err)
+    })
 }
