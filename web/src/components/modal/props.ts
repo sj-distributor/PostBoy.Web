@@ -6,4 +6,5 @@ export interface ModalBoxProps {
   children: ReactElement
   footerComponent?: ReactElement
   headComponent?: ReactElement
+  haveCloseIcon?: boolean
 }

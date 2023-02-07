@@ -38,7 +38,6 @@ const SendMessage = () => {
     sendTypeValue,
     cronExp,
     isAdmin,
-    dateValue,
     timeZone,
     timeZoneValue,
     titleParams,
@@ -46,6 +45,7 @@ const SendMessage = () => {
     openError,
     openSuccess,
     departmentKeyValue,
+    promptText,
     setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
@@ -73,7 +73,7 @@ const SendMessage = () => {
   return (
     <div className={styles.sendMsgBox}>
       <Snackbar
-        message="Please choose who to send."
+        message={promptText}
         open={openError}
         anchorOrigin={{
           vertical: "top",
@@ -222,7 +222,7 @@ const SendMessage = () => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            margin: "0 2rem",
+            marginRight: "1.5rem",
           }}
           variant="contained"
           onClick={() => {
@@ -236,7 +236,6 @@ const SendMessage = () => {
             height: "3.5rem",
             width: "7rem",
             fontSize: "1rem",
-            margin: "0 2rem",
           }}
           variant="contained"
           onClick={() => handleSubmit(sendTypeValue)}
@@ -298,19 +297,16 @@ const SendMessage = () => {
 
       <div className={styles.cycleSelectWrap}>
         {sendTypeValue === SendType.SpecifiedDate && (
-          <>
-            <span>发送时间：</span>
-            <input
-              type="datetime-local"
-              id="meeting-time"
-              name="meeting-time"
-              value={dateValue}
-              onChange={(e) =>
-                setDateValue((e.target as HTMLInputElement).value)
-              }
-              className={styles.dateInput}
-            />
-          </>
+          <TextField
+            id="datetime-local"
+            label="发送时间"
+            type="datetime-local"
+            sx={{ width: 250 }}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            onChange={(e) => setDateValue((e.target as HTMLInputElement).value)}
+          />
         )}
         {sendTypeValue === SendType.SendPeriodically && (
           <Scheduler

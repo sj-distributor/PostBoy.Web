@@ -24,18 +24,20 @@ const SendNotice = React.memo(
     const { dto, updateData, getMessageJob } = props
 
     const {
+      noticeSettingRef,
+      sendRecordRef,
+      deleteConfirmRef,
       onSetting,
       onSend,
       onConfirm,
       onSendCancel,
       onNoticeCancel,
-      noticeSettingRef,
-      sendRecordRef,
-      settingId,
       onDeleteMessageJob,
+      onDeleteMessageJobConfirm,
       sendRecordList,
       updateMessageJobInformation,
       alertShow,
+      deleteId,
       loading,
       setLoading,
     } = useAction({ getMessageJob })
@@ -115,7 +117,7 @@ const SendNotice = React.memo(
             </p>
             <p
               className={styles.text}
-              onClick={() => onDeleteMessageJob(params.row.id)}
+              onClick={() => onDeleteMessageJobConfirm(params.row.id)}
             >
               【删除】
             </p>
@@ -176,6 +178,7 @@ const SendNotice = React.memo(
           ref={noticeSettingRef}
           onCancel={onNoticeCancel}
           title={"通知设置"}
+          haveCloseIcon={false}
           footerComponent={
             <div className={styles.boxButtonWrap}>
               <Button
@@ -202,6 +205,35 @@ const SendNotice = React.memo(
               />
             )}
           </>
+        </ModalBox>
+
+        <ModalBox
+          ref={deleteConfirmRef}
+          onCancel={() => deleteConfirmRef.current?.close()}
+          haveCloseIcon={false}
+          title={"确认删除"}
+          footerComponent={
+            <div className={styles.deleteBoxButtonWrap}>
+              <Button
+                variant="contained"
+                className={styles.deleteBoxButton}
+                onClick={() => onDeleteMessageJob(deleteId)}
+              >
+                确认
+              </Button>
+              <Button
+                variant="contained"
+                className={styles.deleteBoxButton}
+                onClick={() => deleteConfirmRef.current?.close()}
+              >
+                取消
+              </Button>
+            </div>
+          }
+        >
+          <div className={styles.deleteTextWrap}>
+            <span>是否确认删除？</span>
+          </div>
         </ModalBox>
 
         <ModalBox

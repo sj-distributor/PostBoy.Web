@@ -7,7 +7,6 @@ import {
   GetDepartmentUsersList,
   GetMessageJob,
   GetTagsList,
-  PostMessageSend,
 } from "../../../../api/enterprise"
 import {
   ICorpAppData,
@@ -30,7 +29,6 @@ import {
   SendTypeCustomListDto,
   TimeType,
   TimeZoneCustomListDto,
-  ITargetDialogValue,
 } from "../../../../dtos/enterprise"
 import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
@@ -125,10 +123,10 @@ const useAction = () => {
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
 
-  const [cronExp, setCronExp] = useState<string>("0 0 * * *") //mark 初始值应该为null
+  const [cronExp, setCronExp] = useState<string>("") //mark 初始值应该为null
   const [cronError, setCronError] = useState<string>("")
   const [isAdmin, setIsAdmin] = useState<boolean>(true)
-  const [dateValue, setDateValue] = useState<string>()
+  const [dateValue, setDateValue] = useState<string>("")
   const [sendTypeValue, setSendTypeValue] = useState<number>(
     sendTypeList[0].value
   )
@@ -136,12 +134,12 @@ const useAction = () => {
   const [fileList, setFileList] = useState<FileDto>()
   const [openError, openErrorAction] = useBoolean(false)
   const [openSuccess, openSuccessAction] = useBoolean(false)
-
   const sendRecordRef = useRef<ModalBoxRef>(null)
+  const [promptText, setPromptText] = useState<string>("")
   setTimeout(() => {
     openErrorAction.setFalse()
     openSuccessAction.setFalse()
-  }, 4000)
+  }, 3000)
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
@@ -223,6 +221,11 @@ const useAction = () => {
     })
   }
 
+  const showErrorPrompt = (text: string) => {
+    setPromptText(text)
+    openErrorAction.setTrue()
+  }
+
   const handleSubmit = async (sendType: number) => {
     let toUsers: string[] = []
     const toParties = departmentKeyValue.data
@@ -237,7 +240,11 @@ const useAction = () => {
     })
 
     if (isEmpty(toUsers)) {
-      openErrorAction.setTrue()
+      showErrorPrompt("Please choose who to send!")
+    } else if (sendType === SendType.SpecifiedDate && !dateValue) {
+      showErrorPrompt("Please select a delivery date!")
+    } else if (sendType === SendType.SendPeriodically && !cronExp) {
+      showErrorPrompt("Please select the sending cycle!")
     } else {
       let workWeChatAppNotification: IWorkWeChatAppNotificationDto = {
         appId: corpAppValue?.appId,
@@ -246,7 +253,7 @@ const useAction = () => {
 
       if (!isEmpty(tagsValue)) {
         workWeChatAppNotification.toTags = tagsValue.map((e) => String(e.tagId))
-      } else if (toParties) {
+      } else if (!isEmpty(toParties)) {
         workWeChatAppNotification.toParties = toParties
       }
 
@@ -352,13 +359,6 @@ const useAction = () => {
     }
   }, [corpAppValue])
 
-  const setDialogValue = { deptAndUserValueList: departmentList, tagsValue }
-
-  const getDialogValue = (dialogData: ITargetDialogValue) => {
-    setDepartmentList(dialogData.deptAndUserValueList)
-    setTagsValue(dialogData.tagsValue)
-  }
-
   useEffect(() => {
     corpAppValue &&
       departmentPage !== 0 &&
@@ -401,6 +401,7 @@ const useAction = () => {
   const sendRecordOpen = () => {
     sendRecordRef?.current?.open()
   }
+
   const sendRecordClose = () => {
     sendRecordRef?.current?.close()
   }
@@ -433,7 +434,6 @@ const useAction = () => {
     sendTypeValue,
     cronExp,
     isAdmin,
-    dateValue,
     timeZone,
     timeZoneValue,
     titleParams,
@@ -441,6 +441,7 @@ const useAction = () => {
     openError,
     openSuccess,
     departmentKeyValue,
+    promptText,
     setDepartmentAndUserList,
     setCorpsValue,
     setCorpAppValue,
@@ -460,7 +461,6 @@ const useAction = () => {
     onUploadFile,
     onScrolling,
     setTagsValue,
-    setDialogValue,
     sendRecordRef,
     sendRecordOpen,
     sendRecordClose,

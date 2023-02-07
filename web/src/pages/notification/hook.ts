@@ -17,7 +17,9 @@ import { HookProps } from "./props"
 export const useAction = ({ getMessageJob }: HookProps) => {
   const noticeSettingRef = useRef<ModalBoxRef>(null)
   const sendRecordRef = useRef<ModalBoxRef>(null)
-  const [settingId, setSettingId] = useState<any>()
+  const deleteConfirmRef = useRef<ModalBoxRef>(null)
+
+  const [deleteId, setDeleteId] = useState<string>("")
   const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([])
   const [clickSendRecordItemUsers, setClickSendRecordItemUsers] =
     useState<string>("")
@@ -81,6 +83,7 @@ export const useAction = ({ getMessageJob }: HookProps) => {
   }
 
   const onDeleteMessageJob = (id: string) => {
+    deleteConfirmRef.current?.close()
     PostMessagejobDelete(id)
       .then((res) => {
         getMessageJob()
@@ -88,6 +91,11 @@ export const useAction = ({ getMessageJob }: HookProps) => {
       .catch((err) => {
         throw Error(err)
       })
+  }
+
+  const onDeleteMessageJobConfirm = (id: string) => {
+    deleteConfirmRef.current?.open()
+    setDeleteId(id)
   }
 
   useEffect(() => {
@@ -101,16 +109,18 @@ export const useAction = ({ getMessageJob }: HookProps) => {
   return {
     noticeSettingRef,
     sendRecordRef,
+    deleteConfirmRef,
     onSetting,
     onSend,
     onConfirm,
     onSendCancel,
     onNoticeCancel,
-    settingId,
     onDeleteMessageJob,
+    onDeleteMessageJobConfirm,
     sendRecordList,
     updateMessageJobInformation,
     alertShow,
+    deleteId,
     loading,
     setLoading,
   }

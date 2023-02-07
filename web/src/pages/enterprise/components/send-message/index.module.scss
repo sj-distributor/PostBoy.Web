@@ -16,8 +16,8 @@
       }
     }
     .inputWrap {
-      width: 13rem;
-      margin-left: 1.5rem;
+      margin-right: 1.5rem;
+      flex: 1;
       text-align: left;
     }
   }
@@ -31,7 +31,7 @@
   }
 
   .textarea {
-    margin: 0 auto;
+    margin-top: 0.7rem;
     width: 100%;
 
     .multilineTextField {

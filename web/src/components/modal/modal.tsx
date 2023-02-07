@@ -21,6 +21,7 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
         children,
         footerComponent,
         headComponent,
+        haveCloseIcon = true,
       }: ModalBoxProps,
       ref
     ) => {
@@ -63,12 +64,14 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
                   <div className={style.boxTitle}>
                     <span className={style.boxTitleText}>{title}</span>
                     <div className={style.cancle}>
-                      <Close
-                        className={style.icon}
-                        onClick={() => {
-                          close()
-                        }}
-                      />
+                      {haveCloseIcon && (
+                        <Close
+                          className={style.icon}
+                          onClick={() => {
+                            close()
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
