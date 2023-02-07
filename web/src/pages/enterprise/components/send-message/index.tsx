@@ -7,7 +7,15 @@ import useAction from "./hook"
 import styles from "./index.module.scss"
 import SendNotice from "../../../notification"
 import Scheduler from "smart-cron"
-import { Alert, Snackbar } from "@mui/material"
+import {
+  Alert,
+  Autocomplete,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+} from "@mui/material"
 import ModalBox from "../../../../components/modal/modal"
 import SelectContent from "../select-content"
 
@@ -85,7 +93,145 @@ const SendMessage = () => {
         </Alert>
       </Snackbar>
       <div className={styles.selectInputBox}>
-        <SelectContent
+        {corpsValue !== undefined && corpAppValue !== undefined && (
+          <>
+            <Autocomplete
+              openOnFocus
+              disablePortal
+              id="Autocomplete-corpsDataId"
+              value={corpsValue}
+              disableClearable={true}
+              options={corpsList}
+              className={styles.inputWrap}
+              getOptionLabel={(option) => option.corpName}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  className={styles.corpInput}
+                  type="button"
+                  label="选择企业"
+                />
+              )}
+              onChange={(e, value) => {
+                setCorpsValue(value)
+              }}
+            />
+            <Autocomplete
+              openOnFocus
+              disablePortal
+              id="Autocomplete-corpAppListId"
+              value={corpAppValue}
+              options={corpAppList}
+              className={styles.inputWrap}
+              disableClearable
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              onChange={(e, value) => {
+                setCorpAppValue(value)
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  className={styles.corpInput}
+                  type="button"
+                  label="选择应用"
+                />
+              )}
+            />
+          </>
+        )}
+        <Autocomplete
+          openOnFocus
+          disablePortal
+          id="Autocomplete-messageTypeListId"
+          disableClearable={true}
+          options={messageTypeList}
+          className={styles.inputWrap}
+          value={messageTypeValue}
+          getOptionLabel={(option) => option.title}
+          groupBy={(option) => option.groupBy}
+          isOptionEqualToValue={(option, value) => option.title === value.title}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              className={styles.corpInput}
+              type="button"
+              label="消息类型"
+            />
+          )}
+          renderGroup={(params) => {
+            return (
+              <div key={params.key}>
+                <p
+                  className={
+                    params.group === "文件"
+                      ? styles.groupLabel
+                      : styles.noneGroupLabel
+                  }
+                >
+                  {params.group}
+                </p>
+                <span>{params.children}</span>
+              </div>
+            )
+          }}
+          onChange={(e, value) => {
+            setMessageTypeValue(value)
+          }}
+        />
+        <FormControl className={styles.inputWrap}>
+          <InputLabel id="demo-simple-select-label">发送类型</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={sendTypeValue}
+            label="发送类型"
+            onChange={(e) => {
+              setSendTypeValue(Number(e.target.value))
+            }}
+          >
+            {sendTypeList.map((item, key) => (
+              <MenuItem key={key} value={item.value}>
+                {item.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl className={styles.inputWrap}>
+          <InputLabel id="demo-simple-select-label">时区</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={timeZoneValue}
+            label="时区"
+            onChange={(e) => {
+              setTimeZoneValue(Number(e.target.value))
+            }}
+          >
+            {timeZone.map((item, key) => (
+              <MenuItem key={key} value={item.value}>
+                {item.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button
+          sx={{
+            height: "3.5rem",
+            fontSize: "1rem",
+            flexShrink: "0",
+            marginRight: "1.5rem",
+          }}
+          variant="contained"
+          onClick={() => {
+            setIsShowDialog(true)
+          }}
+        >
+          选择发送目标
+        </Button>
+        {/* <SelectContent
           inputClassName={styles.inputWrap}
           corpAppValue={corpAppValue}
           corpsList={corpsList}
@@ -103,7 +249,7 @@ const SendMessage = () => {
           setSendTypeValue={setSendTypeValue}
           setTimeZoneValue={setTimeZoneValue}
           setIsShowDialog={setIsShowDialog}
-        />
+        /> */}
         <Button
           sx={{
             height: "3.5rem",
@@ -176,7 +322,7 @@ const SendMessage = () => {
             id="datetime-local"
             label="发送时间"
             type="datetime-local"
-            sx={{ width: 250 }}
+            sx={{ width: 250, marginTop: 2 }}
             InputLabelProps={{
               shrink: true,
             }}
