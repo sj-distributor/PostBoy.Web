@@ -120,6 +120,11 @@ export interface ITagsListResponse extends IResponseMsg {
   taglist: ITagsList[]
 }
 
+export interface ISearchList {
+  key: string
+  data: IDepartmentAndUserListValue[]
+}
+
 export interface ITagsList {
   tagId: number
   tagName: string

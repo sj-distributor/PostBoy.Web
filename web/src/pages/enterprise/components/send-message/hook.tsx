@@ -14,6 +14,7 @@ import {
   IDepartmentData,
   IDepartmentKeyControl,
   IMessageTypeData,
+  ISearchList,
   ISendMsgData,
   ITagsList,
   MessageDataType,
@@ -49,7 +50,7 @@ const useAction = () => {
     IDepartmentKeyControl[]
   >([])
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-    IDepartmentAndUserListValue[]
+    ISearchList[]
   >([])
 
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
@@ -63,6 +64,13 @@ const useAction = () => {
     return result as IDepartmentKeyControl
   }, [departmentAndUserList])
 
+  const searchKeyValue = useMemo(() => {
+    const result = flattenDepartmentList.find(
+      (e) => e.key === corpAppValue?.appId
+    )
+    return result?.data as IDepartmentAndUserListValue[]
+  }, [flattenDepartmentList])
+
   const recursiveDeptList = (
     hasData: IDepartmentAndUserListValue[],
     defaultChild: IDepartmentAndUserListValue,
@@ -75,7 +83,8 @@ const useAction = () => {
       if (e.id === department.parentid) {
         e.children.push(defaultChild)
         return parentRouteId
-      } else if (e.children.length > 0) {
+      }
+      if (e.children.length > 0) {
         const idList: number[] = recursiveDeptList(
           e.children,
           defaultChild,
@@ -159,8 +168,9 @@ const useAction = () => {
           return newValue
         })
         setFlattenDepartmentList((prev) => {
-          return [
-            ...prev,
+          const newValue = clone(prev)
+          let hasData = newValue.find((e) => e.key === AppId)
+          const insertData = [
             {
               id: department.id,
               name: department.name,
@@ -180,6 +190,15 @@ const useAction = () => {
               }))
             )
           ]
+          if (hasData) {
+            hasData.data = [...hasData.data, ...insertData]
+          } else {
+            newValue.push({
+              key: AppId,
+              data: insertData
+            })
+          }
+          return newValue
         })
         index === deptListResponse.length - 1 && setIsTreeViewLoading(false)
       }
@@ -303,7 +322,7 @@ const useAction = () => {
     departmentAndUserList,
     isTreeViewLoading,
     tagsList,
-    flattenDepartmentList,
+    searchKeyValue,
     departmentKeyValue,
     setDepartmentAndUserList,
     setCorpsValue,

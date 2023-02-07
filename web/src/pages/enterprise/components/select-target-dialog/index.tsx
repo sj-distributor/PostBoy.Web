@@ -142,46 +142,48 @@ const SelectTargetDialog = memo(
               </div>
             )}
 
-            <Autocomplete
-              id="sreach-input"
-              disablePortal
-              openOnFocus
-              multiple
-              disableCloseOnSelect
-              size="small"
-              limitTags={3}
-              sx={{
-                margin: "1rem 0 1rem"
-              }}
-              value={departmentSelectedList}
-              options={flattenDepartmentList}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              groupBy={(option) => option.parentid as string}
-              renderInput={(params) => (
-                <TextField {...params} label="部门与用户搜索" />
-              )}
-              onChange={(e, value) => {
-                value && setSearchToDeptValue(value)
-              }}
-              renderGroup={(params) => {
-                const { key, group, children } = params
-                return <div key={key}>{children}</div>
-              }}
-              renderOption={(props, option, state) => {
-                let style = Object.assign(
-                  option.type === DepartmentAndUserType.Department
-                    ? { color: "#666" }
-                    : { paddingLeft: "2rem" },
-                  { fontSize: "0.9rem" }
-                )
-                return (
-                  <li {...props} style={style}>
-                    {option.name}
-                  </li>
-                )
-              }}
-            />
+            {flattenDepartmentList && (
+              <Autocomplete
+                id="sreach-input"
+                disablePortal
+                openOnFocus
+                multiple
+                disableCloseOnSelect
+                size="small"
+                limitTags={3}
+                sx={{
+                  margin: "1rem 0 1rem"
+                }}
+                value={departmentSelectedList}
+                options={flattenDepartmentList}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                groupBy={(option) => option.parentid as string}
+                renderInput={(params) => (
+                  <TextField {...params} label="部门与用户搜索" />
+                )}
+                onChange={(e, value) => {
+                  value && setSearchToDeptValue(value)
+                }}
+                renderGroup={(params) => {
+                  const { key, group, children } = params
+                  return <div key={key}>{children}</div>
+                }}
+                renderOption={(props, option, state) => {
+                  let style = Object.assign(
+                    option.type === DepartmentAndUserType.Department
+                      ? { color: "#666" }
+                      : { paddingLeft: "2rem" },
+                    { fontSize: "0.9rem" }
+                  )
+                  return (
+                    <li {...props} style={style}>
+                      {option.name}
+                    </li>
+                  )
+                }}
+              />
+            )}
 
             <Autocomplete
               id="tags-list"

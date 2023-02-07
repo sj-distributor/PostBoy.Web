@@ -45,7 +45,6 @@ const useAction = (props: {
         recursiveSeachDeptOrUser(e.children, item, callback)
       }
     }
-    return
   }
 
   const handleDeptOrUserClick = (
@@ -117,7 +116,6 @@ const useAction = (props: {
           : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1)
         e.children.length > 0 && recursiveDeptList(e.children, changeList)
       }
-      return
     }
     departmentKeyValue?.data.length > 0 &&
       !isLoading &&
