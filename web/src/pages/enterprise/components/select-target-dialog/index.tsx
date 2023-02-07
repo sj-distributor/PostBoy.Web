@@ -10,7 +10,6 @@ import ListItemButton from "@mui/material/ListItemButton"
 import ListItemText from "@mui/material/ListItemText"
 import ExpandLess from "@mui/icons-material/ExpandLess"
 import ExpandMore from "@mui/icons-material/ExpandMore"
-import CircularProgress from "@mui/material/CircularProgress"
 import Divider from "@mui/material/Divider"
 import Autocomplete from "@mui/material/Autocomplete"
 import Checkbox from "@mui/material/Checkbox"
@@ -38,7 +37,6 @@ const SelectTargetDialog = memo(
       departmentKeyValue,
       setOpenFunction,
       setDeptUserList,
-      listScroll,
       setOuterTagsValue
     } = props
 
@@ -109,7 +107,7 @@ const SelectTargetDialog = memo(
                 {deptUserData.children.length > 0 && (
                   <Collapse
                     in={!!deptUserData.isCollapsed}
-                    timeout="auto"
+                    timeout={0}
                     unmountOnExit
                   >
                     {recursiveRenderDeptList(deptUserData.children, pl + 2)}
@@ -140,16 +138,7 @@ const SelectTargetDialog = memo(
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             {departmentKeyValue?.data && departmentKeyValue.data.length > 0 && (
-              <div
-                style={{ height: "15rem", overflowY: "auto" }}
-                onScroll={(e) => {
-                  debounce(listScroll, 1200)(
-                    (e.target as HTMLDivElement).scrollHeight,
-                    (e.target as HTMLDivElement).scrollTop,
-                    (e.target as HTMLDivElement).clientHeight
-                  )
-                }}
-              >
+              <div style={{ height: "15rem", overflowY: "auto" }}>
                 {recursiveRenderDeptList(departmentKeyValue.data, 0)}
               </div>
             )}

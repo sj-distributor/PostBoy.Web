@@ -66,18 +66,6 @@ const useAction = () => {
     return result as IDepartmentKeyControl
   }, [departmentAndUserList])
 
-  const onScrolling = (
-    scrollHeight: number,
-    scrollTop: number,
-    clientHeight: number
-  ) => {
-    // if (scrollTop + clientHeight >= scrollHeight - 2) {
-    //   setDepartmentPage((prev) =>
-    //     prev + 10 >= departmentList.length ? departmentList.length : prev + 10
-    //   )
-    // }
-  }
-
   const recursiveDeptList = (
     hasData: IDepartmentAndUserListValue[],
     defaultChild: IDepartmentAndUserListValue,
@@ -111,10 +99,6 @@ const useAction = () => {
     AppId: string,
     deptListResponse: IDepartmentData[]
   ) => {
-    const limit =
-      departmentPage + 10 >= deptListResponse.length
-        ? deptListResponse.length
-        : departmentPage + 10
     for (let index = departmentPage; index < deptListResponse.length; index++) {
       const department = deptListResponse[index]
       // referIndexList储存从嵌套数组顶部到当前部门的ID路径
@@ -341,7 +325,6 @@ const useAction = () => {
     handleSubmit,
     setIsShowDialog,
     setIsShowMessageParams,
-    onScrolling,
     setTagsValue
   }
 }

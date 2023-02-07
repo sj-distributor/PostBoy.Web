@@ -108,11 +108,6 @@ export interface ITargetDialogProps {
   setOpenFunction: (open: boolean) => void
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
-  listScroll: (
-    scrollHeight: number,
-    scrollTop: number,
-    clientHeight: number
-  ) => void
 }
 
 export enum MessageWidgetShowStatus {

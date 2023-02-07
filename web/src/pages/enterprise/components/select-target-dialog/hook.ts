@@ -4,7 +4,6 @@ import {
   DepartmentAndUserType,
   ITagsList,
   IDepartmentKeyControl,
-  IDepartmentData,
   ClickType
 } from "../../../../dtos/enterprise"
 

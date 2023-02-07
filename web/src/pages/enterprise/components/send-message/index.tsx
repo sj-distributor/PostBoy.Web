@@ -34,7 +34,6 @@ const SendMessage = () => {
     handleSubmit,
     setIsShowDialog,
     setIsShowMessageParams,
-    onScrolling,
     setTagsValue
   } = useAction()
 
@@ -228,7 +227,6 @@ const SendMessage = () => {
         tagsList={tagsList}
         setOpenFunction={setIsShowDialog}
         setDeptUserList={setDepartmentAndUserList}
-        listScroll={onScrolling}
         setOuterTagsValue={setTagsValue}
       />
     </div>
