@@ -18,8 +18,9 @@ import useAction from "./hook"
 import styles from "./index.module.scss"
 
 import {
+  ClickType,
   DepartmentAndUserType,
-  IDepartmentUsersData,
+  IDepartmentAndUserListValue,
   ITargetDialogProps
 } from "../../../../dtos/enterprise"
 import { memo } from "react"
@@ -57,6 +58,72 @@ const SelectTargetDialog = memo(
       setOuterTagsValue
     })
 
+    const recursiveRenderDeptList = (
+      data: IDepartmentAndUserListValue[],
+      pl: number
+    ) => {
+      const result = (
+        <List dense>
+          {data.map((deptUserData, deptUserIndex) => {
+            const insertData: IDepartmentAndUserListValue = {
+              id: deptUserData.id,
+              name: deptUserData.name,
+              type: deptUserData.type,
+              parentid: String(deptUserData.parentid),
+              selected: deptUserData.selected,
+              children: []
+            }
+            return (
+              <div key={deptUserIndex}>
+                <ListItemButton
+                  sx={{ pl, height: "2.2rem" }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    deptUserData.children.length > 0 &&
+                      handleDeptOrUserClick(
+                        ClickType.Collapse,
+                        Object.assign(insertData, {
+                          isCollapsed: deptUserData.isCollapsed
+                        })
+                      )
+                  }}
+                >
+                  <Checkbox
+                    edge="start"
+                    checked={deptUserData.selected}
+                    tabIndex={-1}
+                    disableRipple
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeptOrUserClick(ClickType.Select, insertData)
+                    }}
+                  />
+                  <ListItemText primary={deptUserData.name} />
+                  {deptUserData.children.length > 0 &&
+                    (!!deptUserData.isCollapsed ? (
+                      <ExpandLess />
+                    ) : (
+                      <ExpandMore />
+                    ))}
+                </ListItemButton>
+                {deptUserData.children.length > 0 && (
+                  <Collapse
+                    in={!!deptUserData.isCollapsed}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    {recursiveRenderDeptList(deptUserData.children, pl + 2)}
+                  </Collapse>
+                )}
+              </div>
+            )
+          })}
+          <Divider />
+        </List>
+      )
+      return result
+    }
+
     return (
       <div>
         <Dialog
@@ -72,9 +139,7 @@ const SelectTargetDialog = memo(
         >
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
-            {departmentKeyValue?.data &&
-            departmentKeyValue.data.length > 0 &&
-            !isLoading ? (
+            {departmentKeyValue?.data && departmentKeyValue.data.length > 0 && (
               <div
                 style={{ height: "15rem", overflowY: "auto" }}
                 onScroll={(e) => {
@@ -85,85 +150,7 @@ const SelectTargetDialog = memo(
                   )
                 }}
               >
-                <List dense>
-                  {departmentKeyValue?.data &&
-                    departmentKeyValue.data.map(
-                      (department, departmentIndex: number) => {
-                        return (
-                          <div key={departmentIndex}>
-                            <ListItemButton
-                              sx={{ height: "2.2rem" }}
-                              onClick={() => {
-                                handleDeptOrUserClick({
-                                  id: department.id,
-                                  name: department.name,
-                                  type: DepartmentAndUserType.Department,
-                                  parentid: department.parentid
-                                })
-                              }}
-                            >
-                              <Checkbox
-                                edge="start"
-                                checked={department.selected}
-                                tabIndex={-1}
-                                disableRipple
-                              />
-                              <ListItemText primary={department.name} />
-                              {!!department.selected ? (
-                                <ExpandLess />
-                              ) : (
-                                <ExpandMore />
-                              )}
-                            </ListItemButton>
-
-                            {department.departmentUserList && (
-                              <Collapse
-                                in={!!department.selected}
-                                timeout="auto"
-                                unmountOnExit
-                              >
-                                <List component="div" disablePadding dense>
-                                  {department.departmentUserList.map(
-                                    (
-                                      user: IDepartmentUsersData,
-                                      userIndex: number
-                                    ) => (
-                                      <ListItemButton
-                                        key={userIndex}
-                                        selected={!!user.selected}
-                                        sx={{ pl: 4, height: "2.2rem" }}
-                                        onClick={(e) => {
-                                          handleDeptOrUserClick({
-                                            id: user.userid,
-                                            name: user.name,
-                                            type: DepartmentAndUserType.User,
-                                            parentid: department.name
-                                          })
-                                        }}
-                                      >
-                                        <Checkbox
-                                          edge="start"
-                                          checked={user.selected}
-                                          tabIndex={-1}
-                                          disableRipple
-                                        />
-                                        <ListItemText primary={user.name} />
-                                      </ListItemButton>
-                                    )
-                                  )}
-                                </List>
-                              </Collapse>
-                            )}
-                          </div>
-                        )
-                      }
-                    )}
-                </List>
-                <Divider />
-              </div>
-            ) : (
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <CircularProgress />
+                {recursiveRenderDeptList(departmentKeyValue.data, 0)}
               </div>
             )}
 
@@ -173,7 +160,8 @@ const SelectTargetDialog = memo(
               openOnFocus
               multiple
               disableCloseOnSelect
-              limitTags={2}
+              size="small"
+              limitTags={3}
               sx={{
                 margin: "1rem 0 1rem"
               }}
@@ -187,6 +175,23 @@ const SelectTargetDialog = memo(
               )}
               onChange={(e, value) => {
                 value && setSearchToDeptValue(value)
+              }}
+              renderGroup={(params) => {
+                const { key, group, children } = params
+                return <div key={key}>{children}</div>
+              }}
+              renderOption={(props, option, state) => {
+                let style = Object.assign(
+                  option.type === DepartmentAndUserType.Department
+                    ? { color: "#666" }
+                    : { paddingLeft: "2rem" },
+                  { fontSize: "0.9rem" }
+                )
+                return (
+                  <li {...props} style={style}>
+                    {option.name}
+                  </li>
+                )
               }}
             />
 

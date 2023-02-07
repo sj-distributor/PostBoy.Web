@@ -32,8 +32,13 @@ export interface IDepartmentUsersListApiData {
 }
 
 export interface IDepartmentKeyControl {
-  data: IDepartmentData[]
+  data: IDepartmentAndUserListValue[]
   key: string
+}
+
+export interface IDeptTreeList {
+  data: IDepartmentData[]
+  children: IDeptTreeList[]
 }
 
 export interface IDepartmentData {
@@ -59,7 +64,10 @@ export interface IDepartmentAndUserListValue {
   id: number | string
   name: string
   type?: DepartmentAndUserType
-  parentid: number | string
+  parentid: string
+  selected: boolean
+  isCollapsed?: boolean
+  children: IDepartmentAndUserListValue[]
 }
 
 export enum DepartmentAndUserType {
@@ -144,4 +152,9 @@ export interface ISendMsgData {
       }
     ]
   }
+}
+
+export enum ClickType {
+  Collapse,
+  Select
 }
