@@ -208,7 +208,6 @@ const useAction = () => {
         return a.id === b.id
       }
     )(recursiveGetSelectedList(departmentKeyValue.data, []))
-    console.log(selectedList)
 
     const data: ISendMsgData = {
       appId: corpAppValue?.appId,
@@ -238,8 +237,8 @@ const useAction = () => {
           fileContent: "",
           fileType: messageTypeValue.type
         })
-    //   // TODO 发送接口
-    //   // const response = await SendMessage(data);
+    // TODO 发送接口
+    // const response = await SendMessage(data);
   }
 
   useEffect(() => {
