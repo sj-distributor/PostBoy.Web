@@ -1,0 +1,25 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 70rem;
+  height: 20rem;
+  margin: 0 auto;
+
+  .inputGroup {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+
+    & > span {
+      line-height: 1.5;
+      width: 5rem;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.editorBox {
+  margin-top: 2rem;
+  width: 100%;
+  height: 10rem;
+}
