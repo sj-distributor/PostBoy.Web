@@ -73,9 +73,6 @@ export const useAction = () => {
 
   const [deleteId, setDeleteId] = useState<string>("")
   const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([])
-  const [clickSendRecordItemUsers, setClickSendRecordItemUsers] =
-    useState<string>("")
-
   const [alertShow, setAlertShow] = useBoolean(false)
   const [loading, setLoading] = useBoolean(false)
 
@@ -103,7 +100,10 @@ export const useAction = () => {
     setAlertShow.setTrue()
   }
 
-  const messageRecordConvertType = (arr: IMessageJobRecord[]) => {
+  const messageRecordConvertType = (
+    arr: IMessageJobRecord[],
+    toUsers: string
+  ) => {
     const sendRecordArray: ISendRecordDto[] = []
     if (arr.length > 0) {
       arr.forEach((item) => {
@@ -113,7 +113,7 @@ export const useAction = () => {
           correlationId: item.correlationId,
           result: item.result,
           state: messageSendResultType[item.result],
-          sendTheObject: clickSendRecordItemUsers,
+          sendTheObject: toUsers,
           errorSendtheobject:
             JSON.parse(item.responseJson).invaliduser !== null
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
@@ -124,12 +124,11 @@ export const useAction = () => {
     return sendRecordArray
   }
 
-  const onSend = (toUsers: string, id: string) => {
+  const onSend = async (toUsers: string, id: string) => {
     sendRecordRef.current?.open()
-    setClickSendRecordItemUsers(toUsers)
-    GetMessageJobRecords(id).then((res) => {
+    await GetMessageJobRecords(id).then((res) => {
       if (!!res) {
-        setSendRecordList(messageRecordConvertType(res))
+        setSendRecordList(messageRecordConvertType(res, toUsers))
       }
     })
   }

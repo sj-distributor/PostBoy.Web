@@ -210,7 +210,7 @@ export const useAction = (props: SelectContentHookProps) => {
           author: "",
           digest: "",
           content: content,
-          fileContent: (base64 as string).split("base64,")[1],
+          fileContent: base64 as string,
           contentSourceUrl: "",
         })
       })
@@ -221,7 +221,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setFile((prev) => ({
         ...prev,
         fileName: file.name,
-        fileContent: (base64 as string).split("base64,")[1],
+        fileContent: base64 as string,
       }))
     }
   }

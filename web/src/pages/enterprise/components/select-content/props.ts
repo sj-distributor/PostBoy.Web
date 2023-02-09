@@ -26,9 +26,11 @@ export interface SelectContentProps {
   setTitle: React.Dispatch<React.SetStateAction<string>>
   content: string
   setContent: React.Dispatch<React.SetStateAction<string>>
+  pictureText: PictureText[]
   setPictureText: React.Dispatch<React.SetStateAction<PictureText[]>>
   oldPictureText: PictureText[]
   oldFile?: FileObject
+  file: FileObject
   setFile: React.Dispatch<React.SetStateAction<FileObject>>
   setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   dateValue: string

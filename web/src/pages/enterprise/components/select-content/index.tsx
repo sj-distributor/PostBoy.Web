@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react"
+import { memo } from "react"
 import {
   Button,
   FormControl,
@@ -17,6 +17,7 @@ import {
   FileObject,
   MessageDataType,
   MessageJobType,
+  PictureText,
 } from "../../../../dtos/enterprise"
 import moment from "moment"
 
@@ -55,6 +56,8 @@ const SelectContent = memo(
       setFile,
       setPictureText,
       oldPictureText,
+      file,
+      pictureText,
     } = props
 
     const {
@@ -80,19 +83,54 @@ const SelectContent = memo(
       content,
     })
 
-    const fileOrImage = (oldFile: FileObject) => {
-      switch (oldFile?.fileType) {
+    const fileOrImage = (file: FileObject, state: string) => {
+      switch (file?.fileType) {
         case MessageDataType.Image: {
-          return <img src={oldFile?.fileUrl} alt={oldFile?.fileName} />
+          return (
+            <div className={styles.picturebackground}>
+              <img
+                className={styles.image}
+                src={state === "new" ? file?.fileContent : file?.fileUrl}
+                alt={file?.fileName}
+              />
+            </div>
+          )
         }
         default: {
           return (
-            <a href={!!oldFile?.fileUrl ? oldFile?.fileUrl : ""}>
-              {oldFile?.fileName}
-            </a>
+            <div className={styles.picturebackground}>
+              <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
+                {file?.fileName}
+              </a>
+            </div>
           )
         }
       }
+    }
+
+    const pictureImage = (pictureText: PictureText[], state: string) => {
+      return (
+        <div className={styles.picturebackground}>
+          {pictureText.map((item, index) => (
+            <img
+              src={state === "new" ? item.fileContent : item?.fileUrl}
+              className={styles.image}
+              alt={item.title}
+              key={index}
+            />
+          ))}
+        </div>
+      )
+    }
+
+    const disolayByType = (
+      state: string,
+      file?: FileObject,
+      pictureText?: PictureText[]
+    ) => {
+      return messageTypeValue.title !== "图文"
+        ? !!file && fileOrImage(file, state)
+        : !!pictureText && pictureImage(pictureText, state)
     }
 
     return (
@@ -301,33 +339,20 @@ const SelectContent = memo(
                 )}
 
                 <div className={styles.information}>
-                  <div className={styles.box}>
-                    上次上传内容:
-                    {messageTypeValue.title !== "图文"
-                      ? !!oldFile && fileOrImage(oldFile)
-                      : !!oldPictureText && (
-                          <div
-                            style={{
-                              flex: 1,
-                              display: "flex",
-                              flexDirection: "row",
-                              flexWrap: "wrap",
-                              backgroundColor: "red",
-                            }}
-                          >
-                            {oldPictureText.map((item, index) => (
-                              <img
-                                src={item?.fileUrl}
-                                style={{ width: "10rem", height: "5rem" }}
-                                alt={item.title}
-                                key={index}
-                              />
-                            ))}
-                          </div>
-                        )}
-                  </div>
+                  {oldFile !== undefined && (
+                    <>
+                      <div className={styles.box}>
+                        上次上传内容:
+                        {disolayByType("old", oldFile, oldPictureText)}
+                      </div>
+                      <div className={styles.separate} />
+                    </>
+                  )}
 
-                  <div className={styles.box}>这次:</div>
+                  <div className={styles.box}>
+                    这次上传内容:
+                    {disolayByType("new", file, pictureText)}
+                  </div>
                 </div>
               </div>
             )}
@@ -372,6 +397,7 @@ const SelectContent = memo(
                     locale={"zh_CN"}
                   />
                 )}
+                <div className={styles.separate} />
                 <TextField
                   label="终止时间"
                   type="datetime-local"
