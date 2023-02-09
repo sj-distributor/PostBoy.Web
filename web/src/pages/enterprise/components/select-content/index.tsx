@@ -68,6 +68,7 @@ const SelectContent = memo(
       setCorpsValue,
       setCorpAppValue,
       setSendObject,
+      setFile,
     })
 
     return (
@@ -264,15 +265,20 @@ const SelectContent = memo(
               >
                 <input
                   type="file"
-                  // onChange={
-                  //   (e) => fileUpload(e)
-
-                  //   // e.target.value = ""
-                  // }
+                  accept="image/*"
+                  multiple
+                  onChange={(e) =>
+                    !!e.target.files && fileUpload(e.target.files)
+                  }
                 />
-                <a href={!!oldFile?.fileUrl ? oldFile?.fileUrl : ""}>
-                  {oldFile.fileName}
-                </a>
+                {!!oldFile && (
+                  <div>
+                    上次上传内容:
+                    <a href={!!oldFile?.fileUrl ? oldFile?.fileUrl : ""}>
+                      {oldFile?.fileName}
+                    </a>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -17,6 +17,7 @@ import {
   ISearchList,
   ITagsList,
 } from "../../../../dtos/enterprise"
+import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
 
 export const useAction = (props: SelectContentHookProps) => {
@@ -26,6 +27,7 @@ export const useAction = (props: SelectContentHookProps) => {
     setCorpsValue,
     setCorpAppValue,
     setSendObject,
+    setFile,
   } = props
 
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
@@ -194,7 +196,15 @@ export const useAction = (props: SelectContentHookProps) => {
     return selectedList
   }
 
-  const fileUpload = () => {}
+  const fileUpload = async (files: FileList) => {
+    const file = files[0]
+    const base64 = await convertBase64(file)
+    setFile((prev) => ({
+      ...prev,
+      fileName: file.name,
+      fileContent: (base64 as string).split("base64,")[1],
+    }))
+  }
 
   useEffect(() => {
     const selectedList = uniqWith(

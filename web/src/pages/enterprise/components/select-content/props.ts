@@ -25,7 +25,7 @@ export interface SelectContentProps {
   setTitle: React.Dispatch<React.SetStateAction<string>>
   content: string
   setContent: React.Dispatch<React.SetStateAction<string>>
-  oldFile: FileObject
+  oldFile?: FileObject
   setFile: React.Dispatch<React.SetStateAction<FileObject>>
   setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   dateValue: string
@@ -52,4 +52,5 @@ export interface SelectContentHookProps {
     React.SetStateAction<ICorpAppData | undefined>
   >
   setSendObject: React.Dispatch<React.SetStateAction<SendObject>>
+  setFile: React.Dispatch<React.SetStateAction<FileObject>>
 }
