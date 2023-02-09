@@ -5,10 +5,19 @@
   height: 20rem;
   margin: 0 auto;
 
+  :global(input[type="button" i]) {
+    text-align: left;
+    cursor: pointer;
+  }
+
   .inputGroup {
     margin-top: 2rem;
     display: flex;
     align-items: center;
+
+    .corpInput {
+      flex: 1;
+    }
 
     & > span {
       line-height: 1.5;
