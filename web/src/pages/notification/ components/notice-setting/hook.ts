@@ -1,301 +1,115 @@
-import { useBoolean } from "ahooks";
-import { useEffect, useRef, useState } from "react";
-import { CycleOptionType, WeekDayType } from "../../props";
+import { useEffect, useState } from "react"
+import {
+  ICorpAppData,
+  ICorpData,
+  IMessageTypeData,
+  ITagsList,
+  MessageDataType,
+  MessageJobType,
+  SendObject,
+} from "../../../../dtos/enterprise"
+import {
+  messageTypeList,
+  timeZone,
+} from "../../../enterprise/components/send-message/hook"
+import { NoticeSettingHookProps } from "./props"
 
-const enterpriseWeChatList = [
-  {
-    id: 1,
-    name: "TRACY",
-  },
-  {
-    id: 2,
-    name: "TED",
-  },
-  {
-    id: 3,
-    name: "BANDI",
-  },
-  {
-    id: 4,
-    name: "MAXON",
-  },
-];
+export const useAction = (props: NoticeSettingHookProps) => {
+  const { updateMessageJobInformation } = props
 
-const top100Films = [
-  { title: "The Shawshank Redemption", year: 1994 },
-  { title: "The Godfather", year: 1972 },
-  { title: "The Godfather: Part II", year: 1974 },
-  { title: "The Dark Knight", year: 2008 },
-  { title: "12 Angry Men", year: 1957 },
-  { title: "Schindler's List", year: 1993 },
-  { title: "Pulp Fiction", year: 1994 },
-  {
-    title: "The Lord of the Rings: The Return of the King",
-    year: 2003,
-  },
-  { title: "The Good, the Bad and the Ugly", year: 1966 },
-  { title: "Fight Club", year: 1999 },
-  {
-    title: "The Lord of the Rings: The Fellowship of the Ring",
-    year: 2001,
-  },
-  {
-    title: "Star Wars: Episode V - The Empire Strikes Back",
-    year: 1980,
-  },
-  { title: "Forrest Gump", year: 1994 },
-  { title: "Inception", year: 2010 },
-  {
-    title: "The Lord of the Rings: The Two Towers",
-    year: 2002,
-  },
-  { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
-  { title: "Goodfellas", year: 1990 },
-  { title: "The Matrix", year: 1999 },
-  { title: "Seven Samurai", year: 1954 },
-  {
-    title: "Star Wars: Episode IV - A New Hope",
-    year: 1977,
-  },
-  { title: "City of God", year: 2002 },
-  { title: "Se7en", year: 1995 },
-  { title: "The Silence of the Lambs", year: 1991 },
-  { title: "It's a Wonderful Life", year: 1946 },
-  { title: "Life Is Beautiful", year: 1997 },
-  { title: "The Usual Suspects", year: 1995 },
-  { title: "Léon: The Professional", year: 1994 },
-  { title: "Spirited Away", year: 2001 },
-  { title: "Saving Private Ryan", year: 1998 },
-  { title: "Once Upon a Time in the West", year: 1968 },
-  { title: "American History X", year: 1998 },
-  { title: "Interstellar", year: 2014 },
-  { title: "Casablanca", year: 1942 },
-  { title: "City Lights", year: 1931 },
-  { title: "Psycho", year: 1960 },
-  { title: "The Green Mile", year: 1999 },
-  { title: "The Intouchables", year: 2011 },
-  { title: "Modern Times", year: 1936 },
-  { title: "Raiders of the Lost Ark", year: 1981 },
-  { title: "Rear Window", year: 1954 },
-  { title: "The Pianist", year: 2002 },
-  { title: "The Departed", year: 2006 },
-  { title: "Terminator 2: Judgment Day", year: 1991 },
-  { title: "Back to the Future", year: 1985 },
-  { title: "Whiplash", year: 2014 },
-  { title: "Gladiator", year: 2000 },
-  { title: "Memento", year: 2000 },
-  { title: "The Prestige", year: 2006 },
-  { title: "The Lion King", year: 1994 },
-  { title: "Apocalypse Now", year: 1979 },
-  { title: "Alien", year: 1979 },
-  { title: "Sunset Boulevard", year: 1950 },
-  {
-    title:
-      "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
-    year: 1964,
-  },
-  { title: "The Great Dictator", year: 1940 },
-  { title: "Cinema Paradiso", year: 1988 },
-  { title: "The Lives of Others", year: 2006 },
-  { title: "Grave of the Fireflies", year: 1988 },
-  { title: "Paths of Glory", year: 1957 },
-  { title: "Django Unchained", year: 2012 },
-  { title: "The Shining", year: 1980 },
-  { title: "WALL·E", year: 2008 },
-  { title: "American Beauty", year: 1999 },
-  { title: "The Dark Knight Rises", year: 2012 },
-  { title: "Princess Mononoke", year: 1997 },
-  { title: "Aliens", year: 1986 },
-  { title: "Oldboy", year: 2003 },
-  { title: "Once Upon a Time in America", year: 1984 },
-  { title: "Witness for the Prosecution", year: 1957 },
-  { title: "Das Boot", year: 1981 },
-  { title: "Citizen Kane", year: 1941 },
-  { title: "North by Northwest", year: 1959 },
-  { title: "Vertigo", year: 1958 },
-  {
-    title: "Star Wars: Episode VI - Return of the Jedi",
-    year: 1983,
-  },
-  { title: "Reservoir Dogs", year: 1992 },
-  { title: "Braveheart", year: 1995 },
-  { title: "M", year: 1931 },
-  { title: "Requiem for a Dream", year: 2000 },
-  { title: "Amélie", year: 2001 },
-  { title: "A Clockwork Orange", year: 1971 },
-  { title: "Like Stars on Earth", year: 2007 },
-  { title: "Taxi Driver", year: 1976 },
-  { title: "Lawrence of Arabia", year: 1962 },
-  { title: "Double Indemnity", year: 1944 },
-  {
-    title: "Eternal Sunshine of the Spotless Mind",
-    year: 2004,
-  },
-  { title: "Amadeus", year: 1984 },
-  { title: "To Kill a Mockingbird", year: 1962 },
-  { title: "Toy Story 3", year: 2010 },
-  { title: "Logan", year: 2017 },
-  { title: "Full Metal Jacket", year: 1987 },
-  { title: "Dangal", year: 2016 },
-  { title: "The Sting", year: 1973 },
-  { title: "2001: A Space Odyssey", year: 1968 },
-  { title: "Singin' in the Rain", year: 1952 },
-  { title: "Toy Story", year: 1995 },
-  { title: "Bicycle Thieves", year: 1948 },
-  { title: "The Kid", year: 1921 },
-  { title: "Inglourious Basterds", year: 2009 },
-  { title: "Snatch", year: 2000 },
-  { title: "3 Idiots", year: 2009 },
-  { title: "Monty Python and the Holy Grail", year: 1975 },
-];
+  const [corpsValue, setCorpsValue] = useState<ICorpData>()
 
-const nameList = ["Ted.F", "Tracy.W", "Bans.C", "Fury.S"];
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
 
-const cycleOptions = [
-  {
-    optionName: "每月",
-    optionValue: CycleOptionType.PerMonth,
-  },
-  {
-    optionName: "每2周",
-    optionValue: CycleOptionType.PerTwoweeks,
-  },
-  {
-    optionName: "每周",
-    optionValue: CycleOptionType.PerWeek,
-  },
-  {
-    optionName: "每日",
-    optionValue: CycleOptionType.PerDay,
-  },
-];
+  const [messageFileType, setMessageFileType] = useState<IMessageTypeData>(
+    messageTypeList[0]
+  )
 
-export const useAction = () => {
-  const [content, setContent] = useState<string>("");
-  const [isShowName, setIsShowName] = useBoolean(false);
-  const [data, setData] = useState<number>(1);
-  const [textFieldData, setTextFieldData] = useState<number>();
-  const [enterpriseWeChatValue, setEnterpriseWeChatValue] = useState<number>();
-  const textInput = useRef<HTMLDivElement>(null);
-  const [click, clickAction] = useBoolean(false);
-  const [selectWeekDay, setSelectWeekDay] = useState({
-    sun: false,
-    mon: false,
-    tue: false,
-    wed: false,
-    thu: false,
-    fri: false,
-    sat: false,
-  });
+  const [type, setType] = useState<MessageJobType>(
+    updateMessageJobInformation.jobType
+  )
 
-  const weekDay = [
-    {
-      name: "日",
-      value: selectWeekDay.sun,
-      type: WeekDayType.Sun,
-    },
-    {
-      name: "一",
-      value: selectWeekDay.sun,
-      type: WeekDayType.Mon,
-    },
-    {
-      name: "二",
-      value: selectWeekDay.mon,
-      type: WeekDayType.Tue,
-    },
-    {
-      name: "三",
-      value: selectWeekDay.wed,
-      type: WeekDayType.Wed,
-    },
-    {
-      name: "四",
-      value: selectWeekDay.thu,
-      type: WeekDayType.Thu,
-    },
-    {
-      name: "五",
-      value: selectWeekDay.fri,
-      type: WeekDayType.Fri,
-    },
-    {
-      name: "六",
-      value: selectWeekDay.sat,
-      type: WeekDayType.Sat,
-    },
-  ];
+  const [timeZoneValue, setTimeZoneValue] = useState<number>(1)
 
-  const onClickName = (name: string) => {
-    setContent(content.concat(name + " "));
-    clickAction.setTrue();
-  };
+  const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
 
-  const onChangeDay = (value: string) => {
-    if (Number(value) >= 1 && Number(value) <= 7) setData(Number(value));
-  };
+  const [cronExp, setCronExp] = useState<string>("0 0 * * *")
 
-  const onChangeWeek = (day: WeekDayType) => {
-    switch (day) {
-      case WeekDayType.Sun:
-        setSelectWeekDay({ ...selectWeekDay, sun: !selectWeekDay.sun });
-        break;
-      case WeekDayType.Mon:
-        setSelectWeekDay({ ...selectWeekDay, mon: !selectWeekDay.mon });
-        break;
-      case WeekDayType.Tue:
-        setSelectWeekDay({ ...selectWeekDay, tue: !selectWeekDay.tue });
-        break;
-      case WeekDayType.Wed:
-        setSelectWeekDay({ ...selectWeekDay, wed: !selectWeekDay.wed });
-        break;
-      case WeekDayType.Thu:
-        setSelectWeekDay({ ...selectWeekDay, thu: !selectWeekDay.thu });
-        break;
-      case WeekDayType.Fri:
-        setSelectWeekDay({ ...selectWeekDay, fri: !selectWeekDay.fri });
-        break;
-      case WeekDayType.Sat:
-        setSelectWeekDay({ ...selectWeekDay, sat: !selectWeekDay.sat });
-        break;
-    }
-  };
+  const [dateValue, setDateValue] = useState<string>("")
+
+  const [endDateValue, setEndDateValue] = useState<string>("")
+
+  // 发送标签
+  const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
+
+  // 发送人员
+  const [sendObject, setSendObject] = useState<SendObject>({
+    toUsers: [],
+    toParties: [],
+  })
 
   useEffect(() => {
-    if (content.charAt(content.length - 1) === "@") {
-      setIsShowName.setTrue();
-      clickAction.setFalse();
-    } else {
-      setIsShowName.setFalse();
-      clickAction.setTrue();
-    }
-  }, [content, setIsShowName, clickAction]);
+    const timeZoneData = timeZone.find(
+      (item) =>
+        item.title ===
+        JSON.parse(updateMessageJobInformation.jobSettingJson).Timezone
+    )
+
+    if (!!timeZoneData) setTimeZoneValue(timeZoneData?.value)
+  }, [updateMessageJobInformation])
 
   useEffect(() => {
-    if (click && isShowName) {
-      textInput.current?.focus();
+    setCorpsValue(updateMessageJobInformation.enterprise)
+    setCorpAppValue(updateMessageJobInformation.app)
+
+    const type = updateMessageJobInformation.workWeChatAppNotification
+    if (!!type.text) {
+      setMessageFileType(messageTypeList[0])
+    } else if (!!type.file) {
+      switch (type.file.fileType) {
+        case MessageDataType.Image: {
+          setMessageFileType(messageTypeList[2])
+          break
+        }
+        case MessageDataType.Voice: {
+          setMessageFileType(messageTypeList[3])
+          break
+        }
+        case MessageDataType.Video: {
+          setMessageFileType(messageTypeList[4])
+          break
+        }
+        case MessageDataType.File: {
+          setMessageFileType(messageTypeList[5])
+          break
+        }
+      }
+    } else if (!!type.mpNews) {
+      setMessageFileType(messageTypeList[1])
     }
-  }, [click, isShowName]);
+  }, [updateMessageJobInformation])
 
   return {
-    isShowName,
-    nameList,
-    onClickName,
-    onChangeDay,
-    data,
-    textFieldData,
-    setTextFieldData,
-    onChangeWeek,
-    setIsShowName,
-    content,
-    setContent,
-    enterpriseWeChatList,
-    enterpriseWeChatValue,
-    setEnterpriseWeChatValue,
-    top100Films,
-    cycleOptions,
-    weekDay,
-    textInput,
-    clickAction,
-  };
-};
+    corpsValue,
+    setCorpsValue,
+    corpAppValue,
+    setCorpAppValue,
+    messageFileType,
+    setMessageFileType,
+    type,
+    setType,
+    timeZoneValue,
+    setTimeZoneValue,
+    isShowDialog,
+    setIsShowDialog,
+    cronExp,
+    setCronExp,
+    dateValue,
+    setDateValue,
+    endDateValue,
+    setEndDateValue,
+    tagsValue,
+    setTagsValue,
+    setSendObject,
+  }
+}

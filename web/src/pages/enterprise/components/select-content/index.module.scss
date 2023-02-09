@@ -1,32 +1,64 @@
-.selectWrap {
+.box {
   display: flex;
-  flex-direction: row;
-  flex: 1;
-  flex-wrap: wrap;
+  flex-direction: column;
 
-  .inputWrap {
-    margin-right: 1.5rem;
+  .selectWrap {
+    display: flex;
+    flex-direction: row;
     flex: 1;
-    text-align: left;
+    flex-wrap: wrap;
 
-    .corpInput {
-      margin-bottom: 1rem;
-      :global(input[type="button" i]) {
-        text-align: left;
-        cursor: pointer;
+    .inputWrap {
+      margin-right: 1.5rem;
+      flex: 1;
+      text-align: left;
+
+      .corpInput {
+        margin-bottom: 1rem;
+        :global(input[type="button" i]) {
+          text-align: left;
+          cursor: pointer;
+        }
       }
+    }
+
+    .groupLabel {
+      margin: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 0.1rem solid #eee;
+    }
+
+    .noneGroupLabel {
+      height: 0;
+      margin: 0;
+      padding: 0;
     }
   }
 
-  .groupLabel {
-    margin: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 0.1rem solid #eee;
-  }
+  .typeShow {
+    display: flex;
+    flex-direction: column;
 
-  .noneGroupLabel {
-    height: 0;
-    margin: 0;
-    padding: 0;
+    .rowBox {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+
+      .titleAndContentinputBox {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0.25rem 0;
+
+        .input {
+          flex: 1;
+          padding: 0.25rem 0;
+        }
+      }
+
+      .uploadBtnBox {
+        padding: 0.5rem 0 0 0;
+      }
+    }
   }
 }

@@ -1,25 +1,75 @@
 import { useBoolean } from "ahooks"
 import { useEffect, useRef, useState } from "react"
 import {
+  GetMessageJob,
   GetMessageJobRecords,
   PostMessageJobDelete,
   PostMessageJobUpdate,
 } from "../../api/enterprise"
 import {
+  IDtoExtend,
   ILastShowTableData,
+  IMessageJob,
   IMessageJobRecord,
   ISendMessageCommand,
   ISendRecordDto,
+  MessageJobDestination,
   MessageJobType,
   messageSendResultType,
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
-import { HookProps } from "./props"
 
-export const useAction = ({ getMessageJob }: HookProps) => {
+// 转换数组类型返回
+const messageJobConvertType = (arr: IMessageJob[]) => {
+  const array: ILastShowTableData[] = []
+  if (arr.length > 0) {
+    arr.forEach((item) =>
+      array.push({
+        id: item.id,
+        jobId: item.jobId,
+        createdDate: item.createdDate,
+        correlationId: item.correlationId,
+        userAccountId: item.userAccountId,
+        jobType: item.jobType,
+        jobSettingJson: item.jobSettingJson,
+        jobCronExpressionDesc: item.jobCronExpressionDesc,
+        destination: item.destination,
+        workWeChatAppNotification: item.workWeChatAppNotification,
+        content: item.workWeChatAppNotification.text?.content,
+        title: item.metadata.filter((item) => item.key === "title")[0]?.value,
+        toUsers: item.workWeChatAppNotification.toUsers.join(";"),
+        enterprise: {
+          corpName: item.metadata.filter(
+            (item) => item.key === "enterpriseName"
+          )[0]?.value,
+          id: item.metadata.filter((item) => item.key === "enterpriseId")[0]
+            ?.value,
+        },
+        app: {
+          name: item.metadata.filter((item) => item.key === "appName")[0]
+            ?.value,
+          id: item.metadata.filter((item) => item.key === "appId")[0]?.value,
+          appId: item.metadata.filter((item) => item.key === "weChatAppId")[0]
+            ?.value,
+        },
+      })
+    )
+  }
+  return array
+}
+
+export const useAction = () => {
   const noticeSettingRef = useRef<ModalBoxRef>(null)
   const sendRecordRef = useRef<ModalBoxRef>(null)
   const deleteConfirmRef = useRef<ModalBoxRef>(null)
+
+  const [dto, setDto] = useState<IDtoExtend>({
+    loading: true,
+    messageJobs: [],
+    rowCount: 0,
+    pageSize: 10,
+    page: 0,
+  })
 
   const [deleteId, setDeleteId] = useState<string>("")
   const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([])
@@ -97,6 +147,37 @@ export const useAction = ({ getMessageJob }: HookProps) => {
       })
   }
 
+  // 获取MessageJob 数组
+  const getMessageJob = () => {
+    updateData("loading", true)
+    GetMessageJob(dto.page + 1, dto.pageSize, MessageJobDestination.WorkWeChat)
+      .then((res) => {
+        if (!!res) {
+          setTimeout(() => {
+            updateData("rowCount", res.count)
+            updateData("messageJobs", messageJobConvertType(res.messageJobs))
+            updateData("loading", false)
+          }, 500)
+        }
+      })
+      .catch((err) => {
+        setTimeout(() => {
+          updateData("rowCount", 0)
+          updateData("messageJobs", [])
+          updateData("loading", false)
+        }, 500)
+      })
+  }
+
+  useEffect(() => {
+    getMessageJob()
+  }, [dto.page, dto.pageSize])
+
+  // 更新MessageJob table参数
+  const updateData = (k: keyof IDtoExtend, v: any) => {
+    setDto((prev) => ({ ...prev, [k]: v }))
+  }
+
   const onUpdateMessageJob = (data: ISendMessageCommand) => {
     PostMessageJobUpdate(data)
       .then(() => {
@@ -111,10 +192,6 @@ export const useAction = ({ getMessageJob }: HookProps) => {
     deleteConfirmRef.current?.open()
     setDeleteId(id)
   }
-
-  //获取企业
-
-  //获取应用
 
   useEffect(() => {
     if (alertShow) {
@@ -141,5 +218,8 @@ export const useAction = ({ getMessageJob }: HookProps) => {
     deleteId,
     loading,
     setLoading,
+    dto,
+    getMessageJob,
+    updateData,
   }
 }

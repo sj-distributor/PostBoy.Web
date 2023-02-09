@@ -132,18 +132,12 @@ export interface ITagsList {
   tagName: string
 }
 
-export enum SendType {
-  InstantSend,
-  SpecifiedDate,
-  SendPeriodically,
-}
-
 export interface IMessageJobDto {
   count: number
   messageJobs: IMessageJob[]
 }
 
-export interface IMessageJob extends IMessageJobSame {
+export interface IMessageJob extends IMessageJobBase {
   metadata: {
     id: string
     createDate: string
@@ -151,19 +145,26 @@ export interface IMessageJob extends IMessageJobSame {
     key: string
     value: string
   }[]
+  emailNotification?: {
+    senderId: string
+    subject: string
+    body: string
+    to: string[]
+    cc: string[]
+  }
 }
 
-export interface IMessageJobSame {
+export interface IMessageJobBase {
   id: string
   jobId: string
   createdDate: string
   correlationId: string
   userAccountId: string
-  commandJson: string
   jobType: MessageJobType
   jobSettingJson: string
-  cronExpressionDescriptor: string
+  jobCronExpressionDesc: string
   destination: MessageJobDestination
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto
 }
 
 export enum MessageJobType {
@@ -207,7 +208,7 @@ export interface ISendMessageCommand {
     subject: string
     body: string
     to: string[]
-    cc: string
+    cc: string[]
   }
   workWeChatAppNotification: IWorkWeChatAppNotificationDto
 }
@@ -219,6 +220,7 @@ export interface IJobSettingDto {
   }
   recurringJob?: {
     cronExpression: string
+    endDate?: string
   }
 }
 
@@ -264,17 +266,17 @@ export interface IDtoExtend {
   messageJobs: ILastShowTableData[]
 }
 
-export interface ILastShowTableData extends IMessageJobSame {
+export interface ILastShowTableData extends IMessageJobBase {
   title: string
-  content: string
+  content?: string
   toUsers: string
   enterprise: {
-    name: string
     id: string
+    corpName: string
   }
   app: {
-    name: string
     id: string
+    name: string
     appId: string
   }
 }
@@ -287,7 +289,7 @@ export interface ISendRecordDto extends IMessageJobRecordSame {
 
 export interface SendTypeCustomListDto {
   title: string
-  value: SendType
+  value: MessageJobType
 }
 
 export interface TimeZoneCustomListDto {
@@ -298,4 +300,9 @@ export interface TimeZoneCustomListDto {
 export enum ClickType {
   Collapse,
   Select,
+}
+
+export interface SendObject {
+  toUsers: string[]
+  toParties: string[]
 }

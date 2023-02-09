@@ -1,7 +1,10 @@
 import Button from "@mui/material/Button"
 import Switch from "@mui/material/Switch"
 import TextField from "@mui/material/TextField"
-import { MessageWidgetShowStatus, SendType } from "../../../../dtos/enterprise"
+import {
+  MessageJobType,
+  MessageWidgetShowStatus,
+} from "../../../../dtos/enterprise"
 import SelectTargetDialog from "../select-target-dialog"
 import useAction from "./hook"
 import styles from "./index.module.scss"
@@ -42,7 +45,6 @@ const SendMessage = () => {
     timeZone,
     timeZoneValue,
     titleParams,
-    dto,
     openError,
     openSuccess,
     departmentKeyValue,
@@ -61,8 +63,6 @@ const SendMessage = () => {
     setDateValue,
     setTimeZoneValue,
     setTitleParams,
-    updateData,
-    getMessageJob,
     onUploadFile,
     setTagsValue,
     sendRecordRef,
@@ -302,7 +302,7 @@ const SendMessage = () => {
       </div>
 
       <div className={styles.cycleSelectWrap}>
-        {sendTypeValue === SendType.SpecifiedDate && (
+        {sendTypeValue === MessageJobType.Delayed && (
           <TextField
             id="datetime-local"
             label="发送时间"
@@ -314,7 +314,7 @@ const SendMessage = () => {
             onChange={(e) => setDateValue((e.target as HTMLInputElement).value)}
           />
         )}
-        {sendTypeValue === SendType.SendPeriodically && (
+        {sendTypeValue === MessageJobType.Recurring && (
           <Scheduler
             cron={cronExp}
             setCron={setCronExp}
@@ -327,8 +327,8 @@ const SendMessage = () => {
 
       {(isShowInputOrUpload === MessageWidgetShowStatus.ShowInput ||
         isShowInputOrUpload === MessageWidgetShowStatus.ShowAll) &&
-        (sendTypeValue === SendType.SpecifiedDate ||
-          sendTypeValue === SendType.SendPeriodically) && (
+        (sendTypeValue === MessageJobType.Delayed ||
+          sendTypeValue === MessageJobType.Recurring) && (
           <TextField
             id="Autocomplete-messageParamsId"
             label="标题"
@@ -368,32 +368,13 @@ const SendMessage = () => {
           />
         </div>
       )}
+
       <ModalBox
         ref={sendRecordRef}
         onCancel={() => sendRecordClose}
         title={"发送记录"}
       >
-        <SendNotice
-          dto={dto}
-          updateData={updateData}
-          getMessageJob={getMessageJob}
-          corpAppValue={corpAppValue}
-          corpsList={corpsList}
-          corpAppList={corpAppList}
-          corpsValue={corpsValue}
-          messageTypeList={messageTypeList}
-          messageTypeValue={messageTypeValue}
-          sendTypeValue={sendTypeValue}
-          sendTypeList={sendTypeList}
-          timeZone={timeZone}
-          timeZoneValue={timeZoneValue}
-          setCorpsValue={setCorpsValue}
-          setCorpAppValue={setCorpAppValue}
-          setMessageTypeValue={setMessageTypeValue}
-          setSendTypeValue={setSendTypeValue}
-          setTimeZoneValue={setTimeZoneValue}
-          setIsShowDialog={setIsShowDialog}
-        />
+        <SendNotice />
       </ModalBox>
 
       <SelectTargetDialog
