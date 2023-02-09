@@ -39,7 +39,11 @@ const NoticeSetting = memo(
       setTitle,
       content,
       setContent,
+      oldFile,
+      setFile,
     } = useAction({ updateMessageJobInformation })
+
+    // console.log(updateMessageJobInformation, "updateMessageJobInformation--")
 
     return (
       <div className={styles.noticeWrap}>
@@ -75,6 +79,9 @@ const NoticeSetting = memo(
             setTitle={setTitle}
             content={content}
             setContent={setContent}
+            oldFile={oldFile}
+            setFile={setFile}
+            // setOleFile={setOleFile}
           />
         </div>
       </div>

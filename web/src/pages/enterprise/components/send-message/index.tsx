@@ -64,7 +64,7 @@ const SendMessage = () => {
         </Alert>
       </Snackbar>
       <div className={styles.selectInputBox}>
-        <SelectContent
+        {/* <SelectContent
           inputClassName={styles.inputWrap}
           sendTypeList={sendTypeList}
           sendTypeValue={sendTypeValue}
@@ -93,7 +93,7 @@ const SendMessage = () => {
           setTitle={setTitle}
           content={content}
           setContent={setContent}
-        />
+        /> */}
       </div>
       <Button
         sx={{

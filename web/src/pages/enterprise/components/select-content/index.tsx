@@ -47,6 +47,8 @@ const SelectContent = memo(
       setTitle,
       content,
       setContent,
+      oldFile,
+      setFile,
     } = props
 
     const {
@@ -59,6 +61,7 @@ const SelectContent = memo(
       setCronError,
       departmentAndUserList,
       setDepartmentAndUserList,
+      fileUpload,
     } = useAction({
       corpsValue,
       corpAppValue,
@@ -234,7 +237,7 @@ const SelectContent = memo(
                   label="标题"
                   variant="outlined"
                   rows={4}
-                  value={title}
+                  defaultValue={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <TextField
@@ -243,7 +246,7 @@ const SelectContent = memo(
                   multiline
                   rows={4}
                   variant="outlined"
-                  value={content}
+                  defaultValue={content}
                   onChange={(e) => setContent(e.target.value)}
                 />
               </div>
@@ -259,7 +262,17 @@ const SelectContent = memo(
                     messageTypeValue.groupBy === "文件" ? "0" : "2rem",
                 }}
               >
-                <Button variant="contained">Upload</Button>
+                <input
+                  type="file"
+                  // onChange={
+                  //   (e) => fileUpload(e)
+
+                  //   // e.target.value = ""
+                  // }
+                />
+                <a href={!!oldFile?.fileUrl ? oldFile?.fileUrl : ""}>
+                  {oldFile.fileName}
+                </a>
               </div>
             )}
           </div>
@@ -269,7 +282,11 @@ const SelectContent = memo(
                 label="发送时间"
                 type="datetime-local"
                 sx={{ width: 250, marginTop: 2 }}
-                defaultValue={moment(dateValue).format("yyyy-MM-DDThh:mm")}
+                defaultValue={
+                  !!dateValue
+                    ? moment(dateValue).format("yyyy-MM-DDThh:mm")
+                    : ""
+                }
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -303,7 +320,11 @@ const SelectContent = memo(
                   label="终止时间"
                   type="datetime-local"
                   sx={{ width: 250, marginTop: 2 }}
-                  defaultValue={moment(endDateValue).format("yyyy-MM-DDThh:mm")}
+                  defaultValue={
+                    !!endDateValue
+                      ? moment(endDateValue).format("yyyy-MM-DDThh:mm")
+                      : ""
+                  }
                   InputLabelProps={{
                     shrink: true,
                   }}

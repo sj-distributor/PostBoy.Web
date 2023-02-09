@@ -94,6 +94,13 @@ export enum MessageDataType {
   Text,
 }
 
+export interface FileObject {
+  fileContent: string
+  fileName: string
+  fileType: MessageDataType
+  fileUrl?: string
+}
+
 export interface ITargetDialogProps {
   open: boolean
   departmentAndUserList: IDepartmentKeyControl[]
@@ -251,6 +258,7 @@ export interface FileDto {
   fileName: string
   fileContent: string
   fileType: MessageDataType
+  fileUrl?: string
 }
 
 export enum TimeType {

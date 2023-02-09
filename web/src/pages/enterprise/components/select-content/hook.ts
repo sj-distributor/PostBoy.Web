@@ -194,6 +194,8 @@ export const useAction = (props: SelectContentHookProps) => {
     return selectedList
   }
 
+  const fileUpload = () => {}
+
   useEffect(() => {
     const selectedList = uniqWith(
       (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
@@ -298,5 +300,6 @@ export const useAction = (props: SelectContentHookProps) => {
     setCronError,
     departmentAndUserList,
     setDepartmentAndUserList,
+    fileUpload,
   }
 }

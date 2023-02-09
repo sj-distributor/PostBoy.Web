@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import {
+  FileObject,
   ICorpAppData,
   ICorpData,
   IMessageTypeData,
@@ -36,9 +37,8 @@ export const useAction = (props: NoticeSettingHookProps) => {
   const [cronExp, setCronExp] = useState<string>(
     JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
       ?.CronExpression !== null
-      ? JSON.parse(
-          updateMessageJobInformation.jobSettingJson
-        ).RecurringJob?.CronExpression.slice(2)
+      ? JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
+          ?.CronExpression
       : "0 0 * * *"
   )
 
@@ -70,6 +70,31 @@ export const useAction = (props: NoticeSettingHookProps) => {
       : ""
   )
 
+  const [oldFile, setOleFile] = useState<FileObject>({
+    fileContent: !!updateMessageJobInformation.workWeChatAppNotification.file
+      ?.fileContent
+      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileContent
+      : "",
+    fileName: !!updateMessageJobInformation.workWeChatAppNotification.file
+      ?.fileName
+      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileName
+      : "",
+    fileType: !!updateMessageJobInformation.workWeChatAppNotification.file
+      ?.fileType
+      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileType
+      : 0,
+    fileUrl: !!updateMessageJobInformation.workWeChatAppNotification.file
+      ?.fileUrl
+      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileUrl
+      : "",
+  })
+
+  const [file, setFile] = useState<FileObject>({
+    fileContent: "",
+    fileName: "",
+    fileType: MessageDataType.Image,
+  })
+
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
 
@@ -78,6 +103,10 @@ export const useAction = (props: NoticeSettingHookProps) => {
     toUsers: [],
     toParties: [],
   })
+
+  useEffect(() => {
+    setFile({ ...file, fileType: messageFileType.type })
+  }, [messageFileType])
 
   useEffect(() => {
     const timeZoneData = timeZone.find(
@@ -146,5 +175,8 @@ export const useAction = (props: NoticeSettingHookProps) => {
     setTitle,
     content,
     setContent,
+    oldFile,
+    file,
+    setFile,
   }
 }

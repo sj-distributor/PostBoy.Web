@@ -1,4 +1,5 @@
 import {
+  FileObject,
   ICorpAppData,
   ICorpData,
   IMessageTypeData,
@@ -24,6 +25,8 @@ export interface SelectContentProps {
   setTitle: React.Dispatch<React.SetStateAction<string>>
   content: string
   setContent: React.Dispatch<React.SetStateAction<string>>
+  oldFile: FileObject
+  setFile: React.Dispatch<React.SetStateAction<FileObject>>
   setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   dateValue: string
   setDateValue: React.Dispatch<React.SetStateAction<string>>
