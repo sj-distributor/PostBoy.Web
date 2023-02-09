@@ -1,4 +1,4 @@
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import {
   Button,
   FormControl,
@@ -13,7 +13,11 @@ import { SelectContentProps } from "./props"
 import { useAction } from "./hook"
 import SelectTargetDialog from "../select-target-dialog"
 import Scheduler from "smart-cron"
-import { MessageDataType, MessageJobType } from "../../../../dtos/enterprise"
+import {
+  FileObject,
+  MessageDataType,
+  MessageJobType,
+} from "../../../../dtos/enterprise"
 import moment from "moment"
 
 const SelectContent = memo(
@@ -49,6 +53,8 @@ const SelectContent = memo(
       setContent,
       oldFile,
       setFile,
+      setPictureText,
+      oldPictureText,
     } = props
 
     const {
@@ -69,7 +75,25 @@ const SelectContent = memo(
       setCorpAppValue,
       setSendObject,
       setFile,
+      setPictureText,
+      title,
+      content,
     })
+
+    const fileOrImage = (oldFile: FileObject) => {
+      switch (oldFile?.fileType) {
+        case MessageDataType.Image: {
+          return <img src={oldFile?.fileUrl} alt={oldFile?.fileName} />
+        }
+        default: {
+          return (
+            <a href={!!oldFile?.fileUrl ? oldFile?.fileUrl : ""}>
+              {oldFile?.fileName}
+            </a>
+          )
+        }
+      }
+    }
 
     return (
       <div className={styles.box}>
@@ -252,33 +276,59 @@ const SelectContent = memo(
                 />
               </div>
             )}
-
+          </div>
+          <div className={styles.rowBox}>
             {(messageTypeValue.groupBy === "文件" ||
               (messageTypeValue.type === MessageDataType.Image &&
                 messageTypeValue.groupBy === "")) && (
-              <div
-                className={styles.uploadBtnBox}
-                style={{
-                  paddingLeft:
-                    messageTypeValue.groupBy === "文件" ? "0" : "2rem",
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) =>
-                    !!e.target.files && fileUpload(e.target.files)
-                  }
-                />
-                {!!oldFile && (
-                  <div>
-                    上次上传内容:
-                    <a href={!!oldFile?.fileUrl ? oldFile?.fileUrl : ""}>
-                      {oldFile?.fileName}
-                    </a>
-                  </div>
+              <div className={styles.uploadBtnBox}>
+                {messageTypeValue.title === "图文" ? (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) =>
+                      !!e.target.files && fileUpload(e.target.files, "图文")
+                    }
+                  />
+                ) : (
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      !!e.target.files && fileUpload(e.target.files, "文件")
+                    }
+                  />
                 )}
+
+                <div className={styles.information}>
+                  <div className={styles.box}>
+                    上次上传内容:
+                    {messageTypeValue.title !== "图文"
+                      ? !!oldFile && fileOrImage(oldFile)
+                      : !!oldPictureText && (
+                          <div
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              flexWrap: "wrap",
+                              backgroundColor: "red",
+                            }}
+                          >
+                            {oldPictureText.map((item, index) => (
+                              <img
+                                src={item?.fileUrl}
+                                style={{ width: "10rem", height: "5rem" }}
+                                alt={item.title}
+                                key={index}
+                              />
+                            ))}
+                          </div>
+                        )}
+                  </div>
+
+                  <div className={styles.box}>这次:</div>
+                </div>
               </div>
             )}
           </div>

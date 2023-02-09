@@ -41,6 +41,8 @@ const NoticeSetting = memo(
       setContent,
       oldFile,
       setFile,
+      setPictureText,
+      oldPictureText,
     } = useAction({ updateMessageJobInformation })
 
     // console.log(updateMessageJobInformation, "updateMessageJobInformation--")
@@ -81,7 +83,8 @@ const NoticeSetting = memo(
             setContent={setContent}
             oldFile={oldFile}
             setFile={setFile}
-            // setOleFile={setOleFile}
+            setPictureText={setPictureText}
+            oldPictureText={oldPictureText}
           />
         </div>
       </div>

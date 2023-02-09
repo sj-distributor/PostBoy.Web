@@ -59,7 +59,18 @@
       .uploadBtnBox {
         padding: 0.5rem 0 0 0;
         display: flex;
+        flex: 1;
         flex-direction: column;
+        background-color: skyblue;
+
+        .information {
+          display: flex;
+          flex-direction: row;
+
+          .box {
+            flex: 1;
+          }
+        }
       }
     }
   }

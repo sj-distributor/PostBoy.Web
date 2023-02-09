@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   FileObject,
   ICorpAppData,
@@ -7,6 +7,7 @@ import {
   ITagsList,
   MessageDataType,
   MessageJobType,
+  PictureText,
   SendObject,
 } from "../../../../dtos/enterprise"
 import {
@@ -70,30 +71,42 @@ export const useAction = (props: NoticeSettingHookProps) => {
       : ""
   )
 
-  const [oldFile, setOleFile] = useState<FileObject>({
-    fileContent: !!updateMessageJobInformation.workWeChatAppNotification.file
-      ?.fileContent
-      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileContent
-      : "",
-    fileName: !!updateMessageJobInformation.workWeChatAppNotification.file
-      ?.fileName
-      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileName
-      : "",
-    fileType: !!updateMessageJobInformation.workWeChatAppNotification.file
-      ?.fileType
-      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileType
-      : 0,
-    fileUrl: !!updateMessageJobInformation.workWeChatAppNotification.file
-      ?.fileUrl
-      ? updateMessageJobInformation.workWeChatAppNotification.file?.fileUrl
-      : "",
-  })
+  const oldFile: FileObject = useMemo(() => {
+    return {
+      fileContent: !!updateMessageJobInformation.workWeChatAppNotification.file
+        ?.fileContent
+        ? updateMessageJobInformation.workWeChatAppNotification.file
+            ?.fileContent
+        : "",
+      fileName: !!updateMessageJobInformation.workWeChatAppNotification.file
+        ?.fileName
+        ? updateMessageJobInformation.workWeChatAppNotification.file?.fileName
+        : "",
+      fileType: !!updateMessageJobInformation.workWeChatAppNotification.file
+        ?.fileType
+        ? updateMessageJobInformation.workWeChatAppNotification.file?.fileType
+        : 0,
+      fileUrl: !!updateMessageJobInformation.workWeChatAppNotification.file
+        ?.fileUrl
+        ? updateMessageJobInformation.workWeChatAppNotification.file?.fileUrl
+        : "",
+    }
+  }, [updateMessageJobInformation.workWeChatAppNotification.file])
 
   const [file, setFile] = useState<FileObject>({
     fileContent: "",
     fileName: "",
     fileType: MessageDataType.Image,
   })
+
+  const [pictureText, setPictureText] = useState<PictureText[]>([])
+
+  const oldPictureText: PictureText[] = useMemo(() => {
+    return !!updateMessageJobInformation.workWeChatAppNotification.mpNews
+      ?.articles
+      ? updateMessageJobInformation.workWeChatAppNotification.mpNews?.articles
+      : []
+  }, [updateMessageJobInformation.workWeChatAppNotification.mpNews])
 
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
@@ -178,5 +191,8 @@ export const useAction = (props: NoticeSettingHookProps) => {
     oldFile,
     file,
     setFile,
+    pictureText,
+    setPictureText,
+    oldPictureText,
   }
 }

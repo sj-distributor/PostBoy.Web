@@ -16,6 +16,7 @@ import {
   IDepartmentKeyControl,
   ISearchList,
   ITagsList,
+  PictureText,
 } from "../../../../dtos/enterprise"
 import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
@@ -28,6 +29,9 @@ export const useAction = (props: SelectContentHookProps) => {
     setCorpAppValue,
     setSendObject,
     setFile,
+    setPictureText,
+    title,
+    content,
   } = props
 
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
@@ -196,14 +200,30 @@ export const useAction = (props: SelectContentHookProps) => {
     return selectedList
   }
 
-  const fileUpload = async (files: FileList) => {
-    const file = files[0]
-    const base64 = await convertBase64(file)
-    setFile((prev) => ({
-      ...prev,
-      fileName: file.name,
-      fileContent: (base64 as string).split("base64,")[1],
-    }))
+  const fileUpload = async (files: FileList, type: string) => {
+    if (type === "图文") {
+      const objectList: PictureText[] = []
+      Array.from(files).forEach(async (item) => {
+        const base64 = await convertBase64(item)
+        objectList.push({
+          title: title,
+          author: "",
+          digest: "",
+          content: content,
+          fileContent: (base64 as string).split("base64,")[1],
+          contentSourceUrl: "",
+        })
+      })
+      setPictureText(objectList)
+    } else {
+      const file = files[0]
+      const base64 = await convertBase64(file)
+      setFile((prev) => ({
+        ...prev,
+        fileName: file.name,
+        fileContent: (base64 as string).split("base64,")[1],
+      }))
+    }
   }
 
   useEffect(() => {

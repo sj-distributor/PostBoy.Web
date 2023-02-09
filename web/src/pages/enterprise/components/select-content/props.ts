@@ -4,6 +4,7 @@ import {
   ICorpData,
   IMessageTypeData,
   ITagsList,
+  PictureText,
   SendObject,
   SendTypeCustomListDto,
   TimeZoneCustomListDto,
@@ -25,6 +26,8 @@ export interface SelectContentProps {
   setTitle: React.Dispatch<React.SetStateAction<string>>
   content: string
   setContent: React.Dispatch<React.SetStateAction<string>>
+  setPictureText: React.Dispatch<React.SetStateAction<PictureText[]>>
+  oldPictureText: PictureText[]
   oldFile?: FileObject
   setFile: React.Dispatch<React.SetStateAction<FileObject>>
   setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
@@ -53,4 +56,7 @@ export interface SelectContentHookProps {
   >
   setSendObject: React.Dispatch<React.SetStateAction<SendObject>>
   setFile: React.Dispatch<React.SetStateAction<FileObject>>
+  setPictureText: React.Dispatch<React.SetStateAction<PictureText[]>>
+  title: string
+  content: string
 }

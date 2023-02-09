@@ -240,14 +240,7 @@ export interface IWorkWeChatAppNotificationDto {
   text?: TextDto
   file?: FileDto
   mpNews?: {
-    articles: {
-      title: string
-      author: string
-      digest: string
-      content: string
-      fileContent: string
-      contentSourceUrl: string
-    }[]
+    articles: PictureText[]
   }
 }
 export interface TextDto {
@@ -313,4 +306,14 @@ export enum ClickType {
 export interface SendObject {
   toUsers: string[]
   toParties: string[]
+}
+
+export interface PictureText {
+  title: string
+  author: string
+  digest: string
+  content: string
+  fileContent: string
+  contentSourceUrl: string
+  fileUrl?: string
 }
