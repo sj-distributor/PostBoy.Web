@@ -43,6 +43,10 @@ const SelectContent = memo(
       setEndDateValue,
       setTagsValue,
       setSendObject,
+      title,
+      setTitle,
+      content,
+      setContent,
     } = props
 
     const {
@@ -60,7 +64,6 @@ const SelectContent = memo(
       corpAppValue,
       setCorpsValue,
       setCorpAppValue,
-      cronExp,
       setSendObject,
     })
 
@@ -231,6 +234,8 @@ const SelectContent = memo(
                   label="标题"
                   variant="outlined"
                   rows={4}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                 />
                 <TextField
                   className={styles.input}
@@ -238,6 +243,8 @@ const SelectContent = memo(
                   multiline
                   rows={4}
                   variant="outlined"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
                 />
               </div>
             )}
@@ -262,7 +269,7 @@ const SelectContent = memo(
                 label="发送时间"
                 type="datetime-local"
                 sx={{ width: 250, marginTop: 2 }}
-                value={dateValue}
+                defaultValue={moment(dateValue).format("yyyy-MM-DDThh:mm")}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -296,7 +303,7 @@ const SelectContent = memo(
                   label="终止时间"
                   type="datetime-local"
                   sx={{ width: 250, marginTop: 2 }}
-                  value={endDateValue}
+                  defaultValue={moment(endDateValue).format("yyyy-MM-DDThh:mm")}
                   InputLabelProps={{
                     shrink: true,
                   }}

@@ -36,6 +36,10 @@ const SendMessage = () => {
     corpsValue,
     corpAppValue,
     sendRecordOpen,
+    title,
+    setTitle,
+    content,
+    setContent,
   } = useAction()
 
   return (
@@ -77,7 +81,7 @@ const SendMessage = () => {
           setCorpAppValue={setCorpAppValue}
           isShowDialog={isShowDialog}
           setIsShowDialog={setIsShowDialog}
-          // cronExp={cronExp}
+          cronExp={cronExp}
           setCronExp={setCronExp}
           dateValue={dateValue}
           setDateValue={setDateValue}
@@ -85,20 +89,24 @@ const SendMessage = () => {
           setEndDateValue={setEndDateValue}
           setTagsValue={setTagsValue}
           setSendObject={setSendObject}
+          title={title}
+          setTitle={setTitle}
+          content={content}
+          setContent={setContent}
         />
       </div>
-      {/* <Button
-          sx={{
-            height: "3.5rem",
-            width: "7rem",
-            fontSize: "1rem",
-            marginLeft: "1.5rem",
-          }}
-          variant="contained"
-          onClick={() => handleSubmit(sendTypeValue)}
-        >
-          发 送
-        </Button>*/}
+      <Button
+        sx={{
+          height: "3.5rem",
+          width: "7rem",
+          fontSize: "1rem",
+          marginLeft: "1.5rem",
+        }}
+        variant="contained"
+        // onClick={() => handleSubmit(sendTypeValue)}
+      >
+        发 送
+      </Button>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <Switch
           sx={{ display: "none" }}

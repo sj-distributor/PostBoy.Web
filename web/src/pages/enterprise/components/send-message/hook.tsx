@@ -82,6 +82,10 @@ const useAction = () => {
   const sendRecordRef = useRef<ModalBoxRef>(null)
   const [promptText, setPromptText] = useState<string>("")
 
+  const [title, setTitle] = useState<string>("")
+
+  const [content, setContent] = useState<string>("")
+
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
 
@@ -161,6 +165,10 @@ const useAction = () => {
     endDateValue,
     setEndDateValue,
     setSendObject,
+    title,
+    setTitle,
+    content,
+    setContent,
   }
 }
 

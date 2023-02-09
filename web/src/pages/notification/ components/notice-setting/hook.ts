@@ -33,11 +33,42 @@ export const useAction = (props: NoticeSettingHookProps) => {
 
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
 
-  const [cronExp, setCronExp] = useState<string>("0 0 * * *")
+  const [cronExp, setCronExp] = useState<string>(
+    JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
+      ?.CronExpression !== null
+      ? JSON.parse(
+          updateMessageJobInformation.jobSettingJson
+        ).RecurringJob?.CronExpression.slice(2)
+      : "0 0 * * *"
+  )
 
-  const [dateValue, setDateValue] = useState<string>("")
+  const [dateValue, setDateValue] = useState<string>(
+    JSON.parse(updateMessageJobInformation.jobSettingJson).DelayedJob
+      ?.EnqueueAt !== null
+      ? JSON.parse(updateMessageJobInformation.jobSettingJson).DelayedJob
+          ?.EnqueueAt
+      : ""
+  )
 
-  const [endDateValue, setEndDateValue] = useState<string>("")
+  const [endDateValue, setEndDateValue] = useState<string>(
+    JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
+      ?.EndDate !== null
+      ? JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
+          ?.EndDate
+      : ""
+  )
+
+  const [title, setTitle] = useState<string>(
+    updateMessageJobInformation.title !== undefined
+      ? updateMessageJobInformation.title
+      : ""
+  )
+
+  const [content, setContent] = useState<string>(
+    updateMessageJobInformation.content !== undefined
+      ? updateMessageJobInformation.content
+      : ""
+  )
 
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
@@ -111,5 +142,9 @@ export const useAction = (props: NoticeSettingHookProps) => {
     tagsValue,
     setTagsValue,
     setSendObject,
+    title,
+    setTitle,
+    content,
+    setContent,
   }
 }

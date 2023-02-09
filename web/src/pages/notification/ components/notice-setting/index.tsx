@@ -35,6 +35,10 @@ const NoticeSetting = memo(
       setEndDateValue,
       setTagsValue,
       setSendObject,
+      title,
+      setTitle,
+      content,
+      setContent,
     } = useAction({ updateMessageJobInformation })
 
     return (
@@ -67,6 +71,10 @@ const NoticeSetting = memo(
             setEndDateValue={setEndDateValue}
             setTagsValue={setTagsValue}
             setSendObject={setSendObject}
+            title={title}
+            setTitle={setTitle}
+            content={content}
+            setContent={setContent}
           />
         </div>
       </div>

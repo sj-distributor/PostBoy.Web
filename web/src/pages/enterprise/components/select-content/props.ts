@@ -20,6 +20,10 @@ export interface SelectContentProps {
   timeZoneValue: number
   isShowDialog: boolean
   cronExp?: string
+  title: string
+  setTitle: React.Dispatch<React.SetStateAction<string>>
+  content: string
+  setContent: React.Dispatch<React.SetStateAction<string>>
   setTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   dateValue: string
   setDateValue: React.Dispatch<React.SetStateAction<string>>
@@ -44,6 +48,5 @@ export interface SelectContentHookProps {
   setCorpAppValue: React.Dispatch<
     React.SetStateAction<ICorpAppData | undefined>
   >
-  cronExp: string | undefined
   setSendObject: React.Dispatch<React.SetStateAction<SendObject>>
 }
