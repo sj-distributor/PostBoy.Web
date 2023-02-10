@@ -96,7 +96,7 @@ export const useAction = (props: NoticeSettingHookProps) => {
   const [file, setFile] = useState<FileObject>({
     fileContent: "",
     fileName: "",
-    fileType: MessageDataType.Image,
+    fileType: messageFileType.type,
   })
 
   const [pictureText, setPictureText] = useState<PictureText[]>([])
@@ -116,10 +116,6 @@ export const useAction = (props: NoticeSettingHookProps) => {
     toUsers: [],
     toParties: [],
   })
-
-  useEffect(() => {
-    setFile({ ...file, fileType: messageFileType.type })
-  }, [messageFileType])
 
   useEffect(() => {
     const timeZoneData = timeZone.find(

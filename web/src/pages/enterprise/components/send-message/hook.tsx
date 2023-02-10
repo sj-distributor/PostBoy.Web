@@ -14,6 +14,8 @@ import {
   TimeZoneCustomListDto,
   MessageJobType,
   SendObject,
+  FileObject,
+  PictureText,
 } from "../../../../dtos/enterprise"
 import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
@@ -85,6 +87,14 @@ const useAction = () => {
   const [title, setTitle] = useState<string>("")
 
   const [content, setContent] = useState<string>("")
+
+  const [file, setFile] = useState<FileObject>({
+    fileContent: "",
+    fileName: "",
+    fileType: MessageDataType.Text,
+  })
+
+  const [pictureText, setPictureText] = useState<PictureText[]>([])
 
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
@@ -169,6 +179,10 @@ const useAction = () => {
     setTitle,
     content,
     setContent,
+    file,
+    setFile,
+    pictureText,
+    setPictureText,
   }
 }
 

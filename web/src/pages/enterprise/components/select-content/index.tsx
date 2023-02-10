@@ -71,6 +71,7 @@ const SelectContent = memo(
       departmentAndUserList,
       setDepartmentAndUserList,
       fileUpload,
+      fileAccept,
     } = useAction({
       corpsValue,
       corpAppValue,
@@ -81,45 +82,50 @@ const SelectContent = memo(
       setPictureText,
       title,
       content,
+      file,
+      messageTypeValue,
     })
 
     const fileOrImage = (file: FileObject, state: string) => {
-      switch (file?.fileType) {
-        case MessageDataType.Image: {
-          return (
-            <div className={styles.picturebackground}>
-              <img
-                className={styles.image}
-                src={state === "new" ? file?.fileContent : file?.fileUrl}
-                alt={file?.fileName}
-              />
-            </div>
-          )
+      if ((!!file.fileContent || !!file.fileUrl) && !!file.fileName)
+        switch (file?.fileType) {
+          case MessageDataType.Image: {
+            return (
+              <div className={styles.picturebackground}>
+                <img
+                  className={styles.image}
+                  src={state === "new" ? file?.fileContent : file?.fileUrl}
+                  alt={file?.fileName}
+                />
+              </div>
+            )
+          }
+          default: {
+            return (
+              <div className={styles.picturebackground}>
+                <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
+                  {file?.fileName}
+                </a>
+              </div>
+            )
+          }
         }
-        default: {
-          return (
-            <div className={styles.picturebackground}>
-              <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
-                {file?.fileName}
-              </a>
-            </div>
-          )
-        }
-      }
     }
 
     const pictureImage = (pictureText: PictureText[], state: string) => {
       return (
-        <div className={styles.picturebackground}>
-          {pictureText.map((item, index) => (
-            <img
-              src={state === "new" ? item.fileContent : item?.fileUrl}
-              className={styles.image}
-              alt={item.title}
-              key={index}
-            />
-          ))}
-        </div>
+        pictureText.length > 0 && (
+          <div className={styles.picturebackground}>
+            {pictureText.map((item, index) => (
+              <img
+                src={state === "new" ? item.fileContent : item?.fileUrl}
+                className={styles.image}
+                alt={item.title}
+                key={index}
+              />
+            ))}
+          </div>
+        )
       )
     }
 
@@ -332,6 +338,7 @@ const SelectContent = memo(
                 ) : (
                   <input
                     type="file"
+                    accept={fileAccept}
                     onChange={(e) =>
                       !!e.target.files && fileUpload(e.target.files, "文件")
                     }
@@ -435,7 +442,13 @@ const SelectContent = memo(
       prevProps.isShowDialog === nextProps.isShowDialog &&
       prevProps.cronExp === nextProps.cronExp &&
       prevProps.dateValue === nextProps.dateValue &&
-      prevProps.endDateValue === nextProps.endDateValue
+      prevProps.endDateValue === nextProps.endDateValue &&
+      prevProps.content === nextProps.content &&
+      prevProps.title === nextProps.title &&
+      prevProps.oldFile === nextProps.oldFile &&
+      prevProps.oldPictureText === nextProps.oldPictureText &&
+      prevProps.file === nextProps.file &&
+      prevProps.pictureText === nextProps.pictureText
     )
   }
 )

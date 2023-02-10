@@ -40,6 +40,10 @@ const SendMessage = () => {
     setTitle,
     content,
     setContent,
+    file,
+    setFile,
+    pictureText,
+    setPictureText,
   } = useAction()
 
   return (
@@ -64,7 +68,7 @@ const SendMessage = () => {
         </Alert>
       </Snackbar>
       <div className={styles.selectInputBox}>
-        {/* <SelectContent
+        <SelectContent
           inputClassName={styles.inputWrap}
           sendTypeList={sendTypeList}
           sendTypeValue={sendTypeValue}
@@ -93,7 +97,11 @@ const SendMessage = () => {
           setTitle={setTitle}
           content={content}
           setContent={setContent}
-        /> */}
+          pictureText={pictureText}
+          setPictureText={setPictureText}
+          file={file}
+          setFile={setFile}
+        />
       </div>
       <Button
         sx={{

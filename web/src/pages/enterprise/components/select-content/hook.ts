@@ -16,6 +16,7 @@ import {
   IDepartmentKeyControl,
   ISearchList,
   ITagsList,
+  MessageDataType,
   PictureText,
 } from "../../../../dtos/enterprise"
 import { convertBase64 } from "../../../../uilts/convert-base64"
@@ -32,6 +33,8 @@ export const useAction = (props: SelectContentHookProps) => {
     setPictureText,
     title,
     content,
+    file,
+    messageTypeValue,
   } = props
 
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
@@ -218,6 +221,7 @@ export const useAction = (props: SelectContentHookProps) => {
     } else {
       const file = files[0]
       const base64 = await convertBase64(file)
+
       setFile((prev) => ({
         ...prev,
         fileName: file.name,
@@ -225,6 +229,31 @@ export const useAction = (props: SelectContentHookProps) => {
       }))
     }
   }
+
+  const fileAccept = useMemo(() => {
+    if (messageTypeValue.groupBy === "文件")
+      switch (messageTypeValue.type) {
+        case MessageDataType.Image: {
+          return "image/jpg,image/png"
+        }
+        case MessageDataType.Voice: {
+          return "audio/amr"
+        }
+        case MessageDataType.Video: {
+          return "vedio/mp4"
+        }
+        default: {
+          return "application/*"
+        }
+      }
+  }, [messageTypeValue])
+
+  useEffect(() => {
+    setFile((prev) => ({
+      ...prev,
+      fileType: messageTypeValue.type,
+    }))
+  }, [messageTypeValue])
 
   useEffect(() => {
     const selectedList = uniqWith(
@@ -254,6 +283,16 @@ export const useAction = (props: SelectContentHookProps) => {
       }
     })
   }, [])
+
+  useEffect(() => {
+    if (file === undefined) {
+      setFile({
+        fileContent: "",
+        fileName: "",
+        fileType: MessageDataType.Image,
+      })
+    }
+  }, [file])
 
   useEffect(() => {
     if (corpsValue === undefined) {
@@ -331,5 +370,6 @@ export const useAction = (props: SelectContentHookProps) => {
     departmentAndUserList,
     setDepartmentAndUserList,
     fileUpload,
+    fileAccept,
   }
 }

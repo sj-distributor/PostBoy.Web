@@ -28,7 +28,7 @@ export interface SelectContentProps {
   setContent: React.Dispatch<React.SetStateAction<string>>
   pictureText: PictureText[]
   setPictureText: React.Dispatch<React.SetStateAction<PictureText[]>>
-  oldPictureText: PictureText[]
+  oldPictureText?: PictureText[]
   oldFile?: FileObject
   file: FileObject
   setFile: React.Dispatch<React.SetStateAction<FileObject>>
@@ -57,8 +57,10 @@ export interface SelectContentHookProps {
     React.SetStateAction<ICorpAppData | undefined>
   >
   setSendObject: React.Dispatch<React.SetStateAction<SendObject>>
+  file: FileObject
   setFile: React.Dispatch<React.SetStateAction<FileObject>>
   setPictureText: React.Dispatch<React.SetStateAction<PictureText[]>>
   title: string
   content: string
+  messageTypeValue: IMessageTypeData
 }

@@ -6,7 +6,7 @@
   width: 10rem;
   height: 6rem;
   object-fit: cover;
-  padding: 0.5rem;
+  padding: 0.25rem;
 }
 
 .box {
@@ -88,6 +88,7 @@
               flex-wrap: wrap;
               border-radius: 0.5rem;
               border: 0.1rem solid rgb(207, 200, 200);
+              padding: 0.25rem;
             }
           }
         }
