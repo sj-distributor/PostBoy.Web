@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 import { GetEmailData } from "../../api/email"
 import * as wangEditor from "@wangeditor/editor"
+import { IEmailResonponse } from "../../dtos/email"
 
 const useAction = () => {
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null) // 存储 editor 实例
-  const [html, setHtml] = useState("<p>hello</p>")
-  const [emailFrom, setEmailFrom] = useState("")
+  const [html, setHtml] = useState("")
+  const [emailFrom, setEmailFrom] = useState<IEmailResonponse>()
+  const [emailList, setEmailList] = useState<IEmailResonponse[]>([])
 
   const toolbarConfig = {
     toolbarKeys: [
@@ -50,7 +52,8 @@ const useAction = () => {
   useEffect(() => {
     GetEmailData().then((data) => {
       // 获取发送信息
-      // setEmailFrom(data.data[0].displayName)
+      data && setEmailList(data)
+      data && setEmailFrom(data[0])
     })
   }, [])
 
@@ -76,6 +79,7 @@ const useAction = () => {
     editor,
     html,
     emailFrom,
+    emailList,
     setEditor,
     setHtml,
     setEmailFrom

@@ -1,11 +1,9 @@
-import Autocomplete from "@mui/material/Autocomplete"
 import TextField from "@mui/material/TextField"
 import useAction from "./hook"
 import styles from "./index.module.scss"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import "@wangeditor/editor/dist/css/style.css"
 import { MenuItem, Select } from "@mui/material"
-import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp"
 
 const SendEmail = () => {
   const {
@@ -15,17 +13,11 @@ const SendEmail = () => {
     editor,
     html,
     emailFrom,
+    emailList,
     setEditor,
     setHtml,
     setEmailFrom
   } = useAction()
-
-  const emailList = [
-    "maxon1@sj.com2222222222222",
-    "maxon2@sj.com",
-    "maxon3@sj.com",
-    "maxon4@sj.com"
-  ]
 
   return (
     <div className={styles.wrap}>
@@ -43,12 +35,14 @@ const SendEmail = () => {
           }}
           sx={inputSx}
           onChange={(event, child) => {
-            setEmailFrom(event.target.value)
+            setEmailFrom(
+              emailList.find((e) => e.displayName === event.target.value)
+            )
           }}
         >
           {emailList.map((item, index) => (
-            <MenuItem value={item} key={index}>
-              {item}
+            <MenuItem value={item.senderId} key={index}>
+              {item.displayName}
             </MenuItem>
           ))}
         </Select>
