@@ -8,7 +8,6 @@ import {
   ITagsList,
   MessageDataType,
   MessageWidgetShowStatus,
-  FileDto,
   SendTypeCustomListDto,
   TimeType,
   TimeZoneCustomListDto,
@@ -78,7 +77,7 @@ const useAction = () => {
     sendTypeList[0].value
   )
   const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
-  const [fileList, setFileList] = useState<FileDto>()
+  const [fileList, setFileList] = useState<FileObject>()
   const [openError, openErrorAction] = useBoolean(false)
   const [openSuccess, openSuccessAction] = useBoolean(false)
   const sendRecordRef = useRef<ModalBoxRef>(null)

@@ -95,7 +95,7 @@ export enum MessageDataType {
 }
 
 export interface FileObject {
-  fileContent: string
+  fileContent?: string
   fileName: string
   fileType: MessageDataType
   fileUrl?: string
@@ -145,13 +145,6 @@ export interface IMessageJobDto {
 }
 
 export interface IMessageJob extends IMessageJobBase {
-  metadata: {
-    id: string
-    createDate: string
-    messageJobId: string
-    key: string
-    value: string
-  }[]
   emailNotification?: {
     senderId: string
     subject: string
@@ -172,6 +165,13 @@ export interface IMessageJobBase {
   jobCronExpressionDesc: string
   destination: MessageJobDestination
   workWeChatAppNotification: IWorkWeChatAppNotificationDto
+  metadata: {
+    id: string
+    createDate: string
+    messageJobId: string
+    key: string
+    value: string
+  }[]
 }
 
 export enum MessageJobType {
@@ -238,20 +238,13 @@ export interface IWorkWeChatAppNotificationDto {
   toUsers: string[]
   toParties?: string[]
   text?: TextDto
-  file?: FileDto
+  file?: FileObject
   mpNews?: {
     articles: PictureText[]
   }
 }
 export interface TextDto {
   content: string
-}
-
-export interface FileDto {
-  fileName: string
-  fileContent: string
-  fileType: MessageDataType
-  fileUrl?: string
 }
 
 export enum TimeType {
@@ -313,7 +306,7 @@ export interface PictureText {
   author: string
   digest: string
   content: string
-  fileContent: string
+  fileContent?: string
   contentSourceUrl: string
   fileUrl?: string
 }

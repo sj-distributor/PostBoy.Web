@@ -35,6 +35,7 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         jobCronExpressionDesc: item.jobCronExpressionDesc,
         destination: item.destination,
         workWeChatAppNotification: item.workWeChatAppNotification,
+        metadata: item.metadata,
         content: item.workWeChatAppNotification.text?.content,
         title: item.metadata.filter((item) => item.key === "title")[0]?.value,
         toUsers: item.workWeChatAppNotification.toUsers.join(";"),

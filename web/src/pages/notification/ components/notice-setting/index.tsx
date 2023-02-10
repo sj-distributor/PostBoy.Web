@@ -47,7 +47,7 @@ const NoticeSetting = memo(
       oldPictureText,
     } = useAction({ updateMessageJobInformation })
 
-    // console.log(updateMessageJobInformation, "updateMessageJobInformation--")
+    console.log(updateMessageJobInformation, "updateMessageJobInformation--")
 
     return (
       <div className={styles.noticeWrap}>
