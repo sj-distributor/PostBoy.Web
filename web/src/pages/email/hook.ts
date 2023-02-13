@@ -80,12 +80,6 @@ const useAction = () => {
     })
   }, [])
 
-  useEffect(() => {
-    console.log(editor?.children) // 获取编辑器内容JSON格式
-    console.log(editor?.getText(), "---", JSON.stringify(editor?.getText())) // 获取编辑器内容TEXT格式
-    console.log(editor?.getHtml()) // 获取编辑器内容HTML格式
-  }, [editor?.children])
-
   // 及时销毁 editor
   useEffect(() => {
     return () => {
