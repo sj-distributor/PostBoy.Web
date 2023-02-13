@@ -1,5 +1,5 @@
 import { clone, flatten, uniqWith } from "ramda"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -124,6 +124,8 @@ export const useAction = (props: SelectContentHookProps) => {
   )
   // 上次上传的File
   const [lastTimeFile, setLastTimeFile] = useState<FileObject>()
+
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // 初始化企业数组
   useEffect(() => {
@@ -441,11 +443,17 @@ export const useAction = (props: SelectContentHookProps) => {
   }
 
   // 文件上传
-  const fileUpload = async (files: FileList, type: string) => {
+  const fileUpload = async (
+    files: FileList,
+    type: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (type === "图文") {
       const array = Array.from(files)
       const isExceedSize = judgingFileSize("图文", array)
       if (isExceedSize) {
+        e.target.value = ""
+        console.log(0)
       } else {
         if (array.length > 0) {
           const objectList: PictureText[] = []
@@ -469,6 +477,8 @@ export const useAction = (props: SelectContentHookProps) => {
           messageTypeValue.type
         )
         if (isExceedSize) {
+          e.target.value = ""
+          console.log(0)
         } else {
           const file = files[0]
           const base64 = await convertBase64(file)
@@ -517,23 +527,33 @@ export const useAction = (props: SelectContentHookProps) => {
       messageTypeValue.groupBy === "文件" &&
       messageTypeValue.type !== MessageDataFileType.Text
     ) {
-      setFile((prev) => ({
-        ...prev,
+      setFile({
+        fileName: "",
+        fileUrl: "",
         fileType: messageTypeValue.type,
-      }))
+      })
     }
+    if (inputRef.current) inputRef.current.value = ""
   }, [messageTypeValue])
 
   // 图文上传时 标题内容自动更新
   useEffect(() => {
     if (messageTypeValue.groupBy === "" && messageTypeValue.title === "图文") {
       if (pictureText.length > 0) {
-        const arr = pictureText.map((item) => {
+        const newArr = pictureText.map((item) => {
           item.content = content
           item.title = title
           return item
         })
-        setPictureText(arr)
+        setPictureText(newArr)
+      }
+      if (lastTimePictureText.length > 0) {
+        const lastArr = lastTimePictureText.map((item) => {
+          item.content = content
+          item.title = title
+          return item
+        })
+        setLastTimePictureText(lastArr)
       }
     }
   }, [content, title])
@@ -571,7 +591,8 @@ export const useAction = (props: SelectContentHookProps) => {
         break
       }
     }
-  }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue])
+  }, [timeZoneValue, cronExp, dateValue, endDateValue])
+  // sendTypeValue,
 
   //判断jobSetting是否正确
   useEffect(() => {
@@ -601,7 +622,8 @@ export const useAction = (props: SelectContentHookProps) => {
         }
       }
     }
-  }, [jobSetting, sendTypeValue])
+  }, [jobSetting])
+  // sendTypeValue
 
   // sendData
   useEffect(() => {
@@ -639,21 +661,16 @@ export const useAction = (props: SelectContentHookProps) => {
         break
       }
     }
-  }, [
-    messageTypeValue.title,
-    content,
-    pictureText,
-    file,
-    isNewOrUpdate,
-    lastTimePictureText,
-    lastTimeFile,
-  ])
+  }, [content, pictureText, file, lastTimePictureText, lastTimeFile])
+  // messageTypeValue.title,isNewOrUpdate,
 
   // 判断sendData是否正确
   useEffect(() => {
     switch (messageTypeValue.title) {
       case "文本": {
-        setIsSendData(sendData !== undefined)
+        setIsSendData(
+          sendData !== undefined && sendData.text?.content !== undefined
+        )
         break
       }
       case "图文": {
@@ -674,12 +691,13 @@ export const useAction = (props: SelectContentHookProps) => {
         break
       }
     }
-  }, [sendData, messageTypeValue.title])
+  }, [sendData])
+  // , messageTypeValue.title
 
   // sendParameter
   useEffect(() => {
     setSendParameter({
-      appId: !!corpAppValue?.id ? corpAppValue?.id : "",
+      appId: !!corpAppValue?.appId ? corpAppValue?.appId : "",
       toTags: tagsNameList,
       toUsers: sendObject.toUsers,
       toParties: sendObject.toParties,
@@ -815,7 +833,7 @@ export const useAction = (props: SelectContentHookProps) => {
   // 返回最终的数据给外层
   useEffect(() => {
     if (isJobSetting && isSendParameter && isSendData && !!title) {
-      if (jobSetting !== undefined && sendParameter !== undefined)
+      if (jobSetting !== undefined && sendParameter !== undefined) {
         if (isNewOrUpdate === "new") {
           getSendData !== undefined &&
             getSendData({
@@ -891,7 +909,8 @@ export const useAction = (props: SelectContentHookProps) => {
               },
             })
         }
-      setWhetherToCallAPI(true)
+        setWhetherToCallAPI(true)
+      }
     } else {
       setWhetherToCallAPI(false)
     }
@@ -950,5 +969,6 @@ export const useAction = (props: SelectContentHookProps) => {
     lastTimeTagsList,
     lastTimePictureText,
     lastTimeFile,
+    inputRef,
   }
 }

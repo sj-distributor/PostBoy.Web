@@ -77,6 +77,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     lastTimeTagsList,
     lastTimePictureText,
     lastTimeFile,
+    inputRef,
   } = useAction({
     getSendData,
     isNewOrUpdate,
@@ -133,7 +134,11 @@ const SelectContent = memo((props: SelectContentProps) => {
     file?: FileObject,
     pictureText?: PictureText[]
   ) => {
-    return messageTypeValue.title !== "图文"
+    return state === "old"
+      ? file !== undefined
+        ? !!file && fileOrImage(file, state)
+        : !!pictureText && pictureImage(pictureText, state)
+      : messageTypeValue.title !== "图文"
       ? !!file && fileOrImage(file, state)
       : !!pictureText && pictureImage(pictureText, state)
   }
@@ -307,7 +312,6 @@ const SelectContent = memo((props: SelectContentProps) => {
               rows={4}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              // onBlur={(e) => setTitle(e.target.value)}
             />
             {(messageTypeValue.type === MessageDataFileType.Text ||
               (messageTypeValue.type === MessageDataFileType.Image &&
@@ -331,38 +335,36 @@ const SelectContent = memo((props: SelectContentProps) => {
             <div className={styles.uploadBtnBox}>
               {messageTypeValue.title === "图文" ? (
                 <input
+                  ref={inputRef}
                   type="file"
                   accept="image/*"
                   multiple
                   onChange={(e) =>
-                    !!e.target.files && fileUpload(e.target.files, "图文")
+                    !!e.target.files && fileUpload(e.target.files, "图文", e)
                   }
                 />
               ) : (
                 <input
+                  ref={inputRef}
                   type="file"
                   accept={fileAccept}
                   onChange={(e) =>
-                    !!e.target.files && fileUpload(e.target.files, "文件")
+                    !!e.target.files && fileUpload(e.target.files, "文件", e)
                   }
                 />
               )}
 
               <div className={styles.information}>
-                {lastTimeFile !== undefined &&
-                  lastTimePictureText !== undefined && (
-                    <>
-                      <div className={styles.box}>
-                        上次上传内容:
-                        {displayByType(
-                          "old",
-                          lastTimeFile,
-                          lastTimePictureText
-                        )}
-                      </div>
-                      <div className={styles.separate} />
-                    </>
-                  )}
+                {(lastTimeFile !== undefined ||
+                  lastTimePictureText !== undefined) && (
+                  <>
+                    <div className={styles.box}>
+                      上次上传内容:
+                      {displayByType("old", lastTimeFile, lastTimePictureText)}
+                    </div>
+                    <div className={styles.separate} />
+                  </>
+                )}
                 <div className={styles.box}>
                   这次上传内容:
                   {displayByType("new", file, pictureText)}

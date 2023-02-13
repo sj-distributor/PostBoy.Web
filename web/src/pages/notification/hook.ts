@@ -1,4 +1,5 @@
 import { useBoolean } from "ahooks"
+import { clone } from "ramda"
 import { useEffect, useRef, useState } from "react"
 import {
   GetMessageJob,
@@ -19,6 +20,7 @@ import {
   messageSendResultType,
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
+import { convertType } from "../../uilts/convert-type"
 
 // 转换数组类型返回
 const messageJobConvertType = (arr: IMessageJob[]) => {
@@ -148,16 +150,22 @@ export const useAction = () => {
   }
 
   const onUpdateMessageJob = (data: IUpdateMessageCommand) => {
-    console.log(data, "data--")
-    // PostMessageJobUpdate(data)
-    //   .then(() => {
-    //     noticeSettingRef.current?.close()
-    //     getMessageJob()
-    //   })
-    //   .catch((err) => {
-    //     console.log("失败")
-    //     throw Error(err)
-    //   })
+    const cloneData = clone(data)
+    cloneData.workWeChatAppNotification = convertType(
+      cloneData.workWeChatAppNotification
+    )
+
+    PostMessageJobUpdate(cloneData)
+      .then(() => {
+        noticeSettingRef.current?.close()
+        setTimeout(() => {
+          getMessageJob()
+        }, 500)
+      })
+      .catch((err) => {
+        console.log("失败")
+        throw Error(err)
+      })
   }
 
   // 获取MessageJob 数组
