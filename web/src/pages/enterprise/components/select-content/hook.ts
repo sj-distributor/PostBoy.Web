@@ -891,9 +891,9 @@ export const useAction = (props: SelectContentHookProps) => {
               },
             })
         }
-      setWhetherToCallAPI.setTrue()
+      setWhetherToCallAPI(true)
     } else {
-      setWhetherToCallAPI.setFalse()
+      setWhetherToCallAPI(false)
     }
   }, [
     title,

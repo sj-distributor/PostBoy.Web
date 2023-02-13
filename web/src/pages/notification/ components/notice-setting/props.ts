@@ -10,5 +10,5 @@ export interface NoticeSettingProps {
 }
 
 export interface NoticeSettingHookProps {
-  updateMessageJobInformation: ILastShowTableData
+  onUpdateMessageJob: (data: IUpdateMessageCommand) => void
 }

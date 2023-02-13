@@ -9,8 +9,13 @@ const NoticeSetting = memo((props: NoticeSettingProps) => {
   const { updateMessageJobInformation, onNoticeCancel, onUpdateMessageJob } =
     props
 
-  const { setUpdateData, setWhetherToCallAPI, promptText, openError } =
-    useAction()
+  const {
+    setUpdateData,
+    setWhetherToCallAPI,
+    promptText,
+    openError,
+    clickUpdate,
+  } = useAction({ onUpdateMessageJob })
 
   return (
     <div className={styles.noticeWrap}>
@@ -34,7 +39,7 @@ const NoticeSetting = memo((props: NoticeSettingProps) => {
         <Button
           variant="contained"
           className={styles.boxButton}
-          // onClick={() => onUpdateMessageJob(data)}
+          onClick={() => clickUpdate()}
         >
           提交
         </Button>

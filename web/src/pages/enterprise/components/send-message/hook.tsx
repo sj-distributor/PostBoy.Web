@@ -14,7 +14,7 @@ const useAction = () => {
 
   const sendRecordRef = useRef<ModalBoxRef>(null)
 
-  const [whetherToCallAPI, setWhetherToCallAPI] = useBoolean(false)
+  const [whetherToCallAPI, setWhetherToCallAPI] = useState<boolean>(false)
 
   const clickSendRecord = (operation: string) => {
     operation === "open"

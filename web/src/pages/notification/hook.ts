@@ -11,7 +11,6 @@ import {
   ILastShowTableData,
   IMessageJob,
   IMessageJobRecord,
-  ISendMessageCommand,
   ISendRecordDto,
   IUpdateMessageCommand,
   MessageJobDestination,
@@ -152,8 +151,8 @@ export const useAction = () => {
     console.log(data, "data--")
     // PostMessageJobUpdate(data)
     //   .then(() => {
-    //     console.log("成功")
-    //     // ref.current.close()
+    //     noticeSettingRef.current?.close()
+    //     getMessageJob()
     //   })
     //   .catch((err) => {
     //     console.log("失败")

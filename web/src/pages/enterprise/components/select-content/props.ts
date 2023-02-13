@@ -1,4 +1,3 @@
-import { Actions } from "ahooks/lib/useBoolean"
 import {
   ILastShowTableData,
   ISendMessageCommand,
@@ -14,7 +13,7 @@ export interface SelectContentProps {
   >
   updateMessageJobInformation?: ILastShowTableData
   isNewOrUpdate: string
-  setWhetherToCallAPI: Actions
+  setWhetherToCallAPI: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface SelectContentHookProps {
@@ -26,5 +25,5 @@ export interface SelectContentHookProps {
   >
   updateMessageJobInformation?: ILastShowTableData
   isNewOrUpdate: string
-  setWhetherToCallAPI: Actions
+  setWhetherToCallAPI: React.Dispatch<React.SetStateAction<boolean>>
 }
