@@ -1,9 +1,12 @@
-import TextField from "@mui/material/TextField"
 import useAction from "./hook"
 import styles from "./index.module.scss"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import "@wangeditor/editor/dist/css/style.css"
-import { MenuItem, Select } from "@mui/material"
+import TextField from "@mui/material/TextField"
+import MenuItem from "@mui/material/MenuItem"
+import Select from "@mui/material/Select"
+import Button from "@mui/material/Button"
+import SendIcon from "@mui/icons-material/Send"
 
 const SendEmail = () => {
   const {
@@ -14,9 +17,12 @@ const SendEmail = () => {
     html,
     emailFrom,
     emailList,
+    emailTo,
+    setEmailTo,
     setEditor,
     setHtml,
-    setEmailFrom
+    setEmailFrom,
+    validateEmail
   } = useAction()
 
   return (
@@ -28,16 +34,17 @@ const SendEmail = () => {
           id="demo-simple-select"
           label="Age"
           variant="standard"
-          value={emailFrom}
+          value={emailFrom.senderId}
           className={styles.selectInput}
           inputProps={{
             type: "button"
           }}
           sx={inputSx}
           onChange={(event, child) => {
-            setEmailFrom(
-              emailList.find((e) => e.displayName === event.target.value)
+            const selected = emailList.find(
+              (e) => e.displayName === event.target.value
             )
+            selected && setEmailFrom(selected)
           }}
         >
           {emailList.map((item, index) => (
@@ -46,14 +53,27 @@ const SendEmail = () => {
             </MenuItem>
           ))}
         </Select>
+        <Button
+          sx={{ marginLeft: "2rem" }}
+          variant="contained"
+          endIcon={<SendIcon />}
+        >
+          Send
+        </Button>
       </div>
       <div className={styles.inputGroup}>
         <span>到:</span>
         <TextField
-          className={styles.corpInput}
-          sx={inputSx}
           type="text"
           variant="standard"
+          helperText={!validateEmail(emailTo) ? "Incorrect entry." : ""}
+          className={styles.corpInput}
+          sx={inputSx}
+          value={emailTo}
+          error={!validateEmail(emailTo)}
+          onChange={(e) => {
+            setEmailTo(e.target.value)
+          }}
         />
       </div>
       <div className={styles.inputGroup}>

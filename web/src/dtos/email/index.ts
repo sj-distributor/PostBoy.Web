@@ -1,4 +1,4 @@
 export interface IEmailResonponse {
-  senderId: "string"
-  displayName: "string"
+  senderId: string
+  displayName: string
 }
