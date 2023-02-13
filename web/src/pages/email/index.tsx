@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField"
 import MenuItem from "@mui/material/MenuItem"
 import Select from "@mui/material/Select"
 import Button from "@mui/material/Button"
+import InputAdornment from "@mui/material/InputAdornment"
 import SendIcon from "@mui/icons-material/Send"
 
 const SendEmail = () => {
@@ -18,6 +19,10 @@ const SendEmail = () => {
     emailFrom,
     emailList,
     emailTo,
+    isShowCopyto,
+    emailCopyTo,
+    setEmailCopyTo,
+    setIsShowCopyto,
     setEmailTo,
     setEditor,
     setHtml,
@@ -74,8 +79,34 @@ const SendEmail = () => {
           onChange={(e) => {
             setEmailTo(e.target.value)
           }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button onClick={() => setIsShowCopyto((prev) => !prev)}>
+                  抄送
+                </Button>
+              </InputAdornment>
+            )
+          }}
         />
       </div>
+      {isShowCopyto && (
+        <div className={styles.inputGroup}>
+          <span>抄送:</span>
+          <TextField
+            type="text"
+            variant="standard"
+            helperText={!validateEmail(emailCopyTo) ? "Incorrect entry." : ""}
+            className={styles.corpInput}
+            sx={inputSx}
+            value={emailCopyTo}
+            error={!validateEmail(emailCopyTo)}
+            onChange={(e) => {
+              setEmailCopyTo(e.target.value)
+            }}
+          />
+        </div>
+      )}
       <div className={styles.inputGroup}>
         <span>主题:</span>
         <TextField

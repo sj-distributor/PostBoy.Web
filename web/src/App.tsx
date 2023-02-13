@@ -33,18 +33,18 @@ const App = () => {
     })
   }
 
-  return isLoaded ? (
-    <div className="App">
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route element={<Main />}>
-          <Route path="" element={<Navigate to={"/home"} />} />
-          {getSubRoute(routerArray)}
-        </Route>
-      </Routes>
-    </div>
-  ) : (
-    <></>
+  return (
+    isLoaded && (
+      <div className="App">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route element={<Main />}>
+            <Route path="" element={<Navigate to={"/home"} />} />
+            {getSubRoute(routerArray)}
+          </Route>
+        </Routes>
+      </div>
+    )
   )
 }
 

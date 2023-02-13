@@ -15,6 +15,8 @@ const useAction = () => {
     useState<IEmailResonponse>(defaultEmailValue)
   const [emailList, setEmailList] = useState<IEmailResonponse[]>([])
   const [emailTo, setEmailTo] = useState("")
+  const [emailCopyTo, setEmailCopyTo] = useState("")
+  const [isShowCopyto, setIsShowCopyto] = useState(false)
 
   const validateEmail = (email: string) => {
     const re =
@@ -48,8 +50,7 @@ const useAction = () => {
       "|",
       "redo",
       "undo",
-      "uploadAttachment",
-      "menu1"
+      "uploadAttachment"
     ]
   }
 
@@ -105,6 +106,10 @@ const useAction = () => {
     emailFrom,
     emailList,
     emailTo,
+    isShowCopyto,
+    emailCopyTo,
+    setEmailCopyTo,
+    setIsShowCopyto,
     setEmailTo,
     validateEmail,
     setEditor,
