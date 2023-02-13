@@ -88,7 +88,6 @@ const useAction = () => {
 
   // 及时销毁 editor
   useEffect(() => {
-    console.log(editor?.getAllMenuKeys())
     return () => {
       if (editor == null) return
 
