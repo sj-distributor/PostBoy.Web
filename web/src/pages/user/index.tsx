@@ -8,7 +8,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import useAuth from "../../auth"
 import useAction from "./hook"
 import { Button } from "@mui/material"
-import RegisterModal from "./component/register-modal"
+import RegistrationPopup from "./component/registration-popup"
 
 const User = () => {
   const { username } = useAuth()
@@ -17,7 +17,7 @@ const User = () => {
   return (
     <div className={styles.user}>
       {/* 注册用户弹窗 */}
-      {isShowRegister && <RegisterModal />}
+      {isShowRegister && <RegistrationPopup />}
       <div>
         <Button
           variant="outlined"
