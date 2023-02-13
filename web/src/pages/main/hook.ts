@@ -4,14 +4,14 @@ import { useLocation } from "react-router-dom"
 import { GetAuthUser } from "../../api/user-management"
 import { RouteState } from "../../dtos/route-index"
 import { RouteItem } from "../../dtos/route-type"
-import { IUserDataDto } from "../../dtos/user-management"
+import { IUserDto } from "../../dtos/user-management"
 import { routerArray } from "../../router/elementRoute"
 
 const useMainAction = () => {
   const mainLocation = useLocation()
   const [clickMainIndex, setMainClickIndex] = useState<number>()
   const [haveAdministrator, haveAdministratorAction] = useBoolean(false)
-  const [userData, setUserData] = useState<IUserDataDto>()
+  const [userData, setUserData] = useState<IUserDto>()
 
   useEffect(() => {
     const getMainClickIndex = () => {
@@ -36,18 +36,14 @@ const useMainAction = () => {
 
   useEffect(() => {
     GetAuthUser().then((res) => {
-      setUserData(res?.data)
-      console.log("data", res)
+      if (!!res) {
+        setUserData(res)
+      }
+      if (res?.roles?.find((x) => x.name === "Administrator")) {
+        haveAdministratorAction.setTrue()
+      }
     })
   }, [])
-
-  useEffect(() => {
-    // 检验userList是否有Administrator这个角色
-    if (!!userData?.roles.find((x) => x.name === "Administrator")) {
-      // haveAdministratorAction.setTrue()
-    }
-    haveAdministratorAction.setTrue()
-  }, [userData])
 
   return {
     mainLocation,

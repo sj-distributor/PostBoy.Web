@@ -1,10 +1,4 @@
 export interface IUserDto {
-  msg: string
-  code: number
-  data: IUserDataDto
-}
-
-export interface IUserDataDto {
   id: string
   createdDate: string
   modifiedDate: string
