@@ -11,6 +11,7 @@ import {
   IMessageJobDto,
   ISendMessageCommand,
   MessageJobDestination,
+  IUpdateMessageCommand,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -70,6 +71,6 @@ export const PostMessageJobDelete = async (data: { MessageJobId: string }) => {
   return await Post(`/api/Message/job/delete`, data)
 }
 
-export const PostMessageJobUpdate = async (data: ISendMessageCommand) => {
+export const PostMessageJobUpdate = async (data: IUpdateMessageCommand) => {
   return await Post(`/api/Message/job/update`, data)
 }

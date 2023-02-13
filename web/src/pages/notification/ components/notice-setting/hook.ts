@@ -1,194 +1,37 @@
-import { useEffect, useMemo, useState } from "react"
-import {
-  FileObject,
-  ICorpAppData,
-  ICorpData,
-  IMessageTypeData,
-  ITagsList,
-  MessageDataType,
-  MessageJobType,
-  PictureText,
-  SendObject,
-} from "../../../../dtos/enterprise"
-import {
-  messageTypeList,
-  timeZone,
-} from "../../../enterprise/components/send-message/hook"
+import { useBoolean } from "ahooks"
+import { useEffect, useState } from "react"
+import { IUpdateMessageCommand } from "../../../../dtos/enterprise"
 import { NoticeSettingHookProps } from "./props"
 
-export const useAction = (props: NoticeSettingHookProps) => {
-  const { updateMessageJobInformation } = props
+// props: NoticeSettingHookProps
 
-  const [corpsValue, setCorpsValue] = useState<ICorpData>()
+export const useAction = () => {
+  const [updateData, setUpdateData] = useState<IUpdateMessageCommand>()
 
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
+  const [promptText, setPromptText] = useState<string>("")
 
-  const [messageFileType, setMessageFileType] = useState<IMessageTypeData>(
-    messageTypeList[0]
-  )
+  const [openError, openErrorAction] = useBoolean(false)
 
-  const [type, setType] = useState<MessageJobType>(
-    updateMessageJobInformation.jobType
-  )
+  const [whetherToCallAPI, setWhetherToCallAPI] = useBoolean(false)
 
-  const [timeZoneValue, setTimeZoneValue] = useState<number>(1)
-
-  const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
-
-  const [cronExp, setCronExp] = useState<string>(
-    JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
-      ?.CronExpression !== null
-      ? JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
-          ?.CronExpression
-      : "0 0 * * *"
-  )
-
-  const [dateValue, setDateValue] = useState<string>(
-    JSON.parse(updateMessageJobInformation.jobSettingJson).DelayedJob
-      ?.EnqueueAt !== null
-      ? JSON.parse(updateMessageJobInformation.jobSettingJson).DelayedJob
-          ?.EnqueueAt
-      : ""
-  )
-
-  const [endDateValue, setEndDateValue] = useState<string>(
-    JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
-      ?.EndDate !== null
-      ? JSON.parse(updateMessageJobInformation.jobSettingJson).RecurringJob
-          ?.EndDate
-      : ""
-  )
-
-  const [title, setTitle] = useState<string>(
-    updateMessageJobInformation.title !== undefined
-      ? updateMessageJobInformation.title
-      : ""
-  )
-
-  const [content, setContent] = useState<string>(
-    updateMessageJobInformation.content !== undefined
-      ? updateMessageJobInformation.content
-      : ""
-  )
-
-  const oldFile: FileObject = useMemo(() => {
-    return {
-      fileContent: !!updateMessageJobInformation.workWeChatAppNotification.file
-        ?.fileContent
-        ? updateMessageJobInformation.workWeChatAppNotification.file
-            ?.fileContent
-        : "",
-      fileName: !!updateMessageJobInformation.workWeChatAppNotification.file
-        ?.fileName
-        ? updateMessageJobInformation.workWeChatAppNotification.file?.fileName
-        : "",
-      fileType: !!updateMessageJobInformation.workWeChatAppNotification.file
-        ?.fileType
-        ? updateMessageJobInformation.workWeChatAppNotification.file?.fileType
-        : 0,
-      fileUrl: !!updateMessageJobInformation.workWeChatAppNotification.file
-        ?.fileUrl
-        ? updateMessageJobInformation.workWeChatAppNotification.file?.fileUrl
-        : "",
-    }
-  }, [updateMessageJobInformation.workWeChatAppNotification.file])
-
-  const [file, setFile] = useState<FileObject>({
-    fileContent: "",
-    fileName: "",
-    fileType: messageFileType.type,
-  })
-
-  const [pictureText, setPictureText] = useState<PictureText[]>([])
-
-  const oldPictureText: PictureText[] = useMemo(() => {
-    return !!updateMessageJobInformation.workWeChatAppNotification.mpNews
-      ?.articles
-      ? updateMessageJobInformation.workWeChatAppNotification.mpNews?.articles
-      : []
-  }, [updateMessageJobInformation.workWeChatAppNotification.mpNews])
-
-  // 发送标签
-  const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
-
-  // 发送人员
-  const [sendObject, setSendObject] = useState<SendObject>({
-    toUsers: [],
-    toParties: [],
-  })
-
-  useEffect(() => {
-    const timeZoneData = timeZone.find(
-      (item) =>
-        item.title ===
-        JSON.parse(updateMessageJobInformation.jobSettingJson).Timezone
-    )
-
-    if (!!timeZoneData) setTimeZoneValue(timeZoneData?.value)
-  }, [updateMessageJobInformation])
-
-  useEffect(() => {
-    setCorpsValue(updateMessageJobInformation.enterprise)
-    setCorpAppValue(updateMessageJobInformation.app)
-
-    const type = updateMessageJobInformation.workWeChatAppNotification
-    if (!!type.text) {
-      setMessageFileType(messageTypeList[0])
-    } else if (!!type.file) {
-      switch (type.file.fileType) {
-        case MessageDataType.Image: {
-          setMessageFileType(messageTypeList[2])
-          break
-        }
-        case MessageDataType.Voice: {
-          setMessageFileType(messageTypeList[3])
-          break
-        }
-        case MessageDataType.Video: {
-          setMessageFileType(messageTypeList[4])
-          break
-        }
-        case MessageDataType.File: {
-          setMessageFileType(messageTypeList[5])
-          break
-        }
-      }
-    } else if (!!type.mpNews) {
-      setMessageFileType(messageTypeList[1])
-    }
-  }, [updateMessageJobInformation])
-
-  return {
-    corpsValue,
-    setCorpsValue,
-    corpAppValue,
-    setCorpAppValue,
-    messageFileType,
-    setMessageFileType,
-    type,
-    setType,
-    timeZoneValue,
-    setTimeZoneValue,
-    isShowDialog,
-    setIsShowDialog,
-    cronExp,
-    setCronExp,
-    dateValue,
-    setDateValue,
-    endDateValue,
-    setEndDateValue,
-    tagsValue,
-    setTagsValue,
-    setSendObject,
-    title,
-    setTitle,
-    content,
-    setContent,
-    oldFile,
-    file,
-    setFile,
-    pictureText,
-    setPictureText,
-    oldPictureText,
+  // 弹出警告
+  const showErrorPrompt = (text: string) => {
+    setPromptText(text)
+    openErrorAction.setTrue()
   }
+
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse()
+      }, 3000)
+    }
+  }, [openError])
+
+  useEffect(() => {
+    if (updateData !== undefined) console.log(updateData, "updateData--")
+  }, [updateData])
+
+  return { setUpdateData, setWhetherToCallAPI, promptText, openError }
 }

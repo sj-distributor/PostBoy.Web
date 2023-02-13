@@ -7,7 +7,6 @@ import ModalBox from "../../components/modal/modal"
 import NoticeSetting from "./ components/notice-setting"
 import SendRecord from "./ components/send-record"
 import React from "react"
-import { SendNoticeProps } from "./props"
 import LoadingButton from "@mui/lab/LoadingButton"
 import RestartAltIcon from "@mui/icons-material/RestartAlt"
 
@@ -19,7 +18,7 @@ const asyncTootip = (title: string, styles: string) => {
   )
 }
 
-const SendNotice = React.memo((props: SendNoticeProps) => {
+const SendNotice = React.memo(() => {
   const {
     noticeSettingRef,
     sendRecordRef,
@@ -40,6 +39,7 @@ const SendNotice = React.memo((props: SendNoticeProps) => {
     dto,
     getMessageJob,
     updateData,
+    onUpdateMessageJob,
   } = useAction()
 
   const handleClick = async () => {
@@ -109,7 +109,16 @@ const SendNotice = React.memo((props: SendNoticeProps) => {
           </p>
           <p
             className={styles.text}
-            onClick={() => onSend(params.row.toUsers, params.row.correlationId)}
+            onClick={() =>
+              onSend(
+                [
+                  ...params.row.workWeChatAppNotification.toParties,
+                  ...params.row.workWeChatAppNotification.toTags,
+                  ...params.row.workWeChatAppNotification.toUsers,
+                ].join(";"),
+                params.row.correlationId
+              )
+            }
           >
             【发送记录】
           </p>
@@ -177,29 +186,13 @@ const SendNotice = React.memo((props: SendNoticeProps) => {
         onCancel={onNoticeCancel}
         title={"通知设置"}
         haveCloseIcon={false}
-        footerComponent={
-          <div className={styles.boxButtonWrap}>
-            <Button
-              variant="contained"
-              className={styles.boxButton}
-              onClick={() => onConfirm()}
-            >
-              提交
-            </Button>
-            <Button
-              variant="contained"
-              className={styles.boxButton}
-              onClick={onNoticeCancel}
-            >
-              取消
-            </Button>
-          </div>
-        }
       >
         <>
           {!!updateMessageJobInformation && (
             <NoticeSetting
               updateMessageJobInformation={updateMessageJobInformation}
+              onNoticeCancel={onNoticeCancel}
+              onUpdateMessageJob={onUpdateMessageJob}
             />
           )}
         </>

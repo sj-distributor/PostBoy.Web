@@ -12,6 +12,7 @@
 .box {
   display: flex;
   flex-direction: column;
+  flex: 1;
 
   .selectWrap {
     display: flex;
@@ -20,9 +21,9 @@
     flex-wrap: wrap;
 
     .inputWrap {
-      margin-right: 1.5rem;
       flex: 1;
-      text-align: left;
+      min-width: 12rem;
+      margin-right: 1rem;
 
       .corpInput {
         margin-bottom: 1rem;
@@ -79,7 +80,7 @@
 
           .box {
             flex: 1;
-            margin-top: 0.25rem;
+            margin: 0.25rem 0;
 
             .picturebackground {
               flex: 1;

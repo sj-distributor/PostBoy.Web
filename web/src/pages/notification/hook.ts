@@ -13,8 +13,10 @@ import {
   IMessageJobRecord,
   ISendMessageCommand,
   ISendRecordDto,
+  IUpdateMessageCommand,
   MessageJobDestination,
-  MessageJobType,
+  MessageJobSendType,
+  // MessageJobType,
   messageSendResultType,
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
@@ -38,7 +40,6 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         metadata: item.metadata,
         content: item.workWeChatAppNotification.text?.content,
         title: item.metadata.filter((item) => item.key === "title")[0]?.value,
-        toUsers: item.workWeChatAppNotification.toUsers.join(";"),
         enterprise: {
           corpName: item.metadata.filter(
             (item) => item.key === "enterpriseName"
@@ -93,7 +94,7 @@ export const useAction = () => {
   }
 
   const onSetting = (item: ILastShowTableData) => {
-    if (item.jobType !== MessageJobType.Fire) {
+    if (item.jobType !== MessageJobSendType.Fire) {
       setUpdateMessageJobInformation(item)
       noticeSettingRef.current?.open()
       return
@@ -103,7 +104,7 @@ export const useAction = () => {
 
   const messageRecordConvertType = (
     arr: IMessageJobRecord[],
-    toUsers: string
+    toObject: string
   ) => {
     const sendRecordArray: ISendRecordDto[] = []
     if (arr.length > 0) {
@@ -114,7 +115,7 @@ export const useAction = () => {
           correlationId: item.correlationId,
           result: item.result,
           state: messageSendResultType[item.result],
-          sendTheObject: toUsers,
+          sendTheObject: toObject,
           errorSendtheobject:
             JSON.parse(item.responseJson).invaliduser !== null
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
@@ -125,11 +126,11 @@ export const useAction = () => {
     return sendRecordArray
   }
 
-  const onSend = async (toUsers: string, id: string) => {
+  const onSend = async (toObject: string, id: string) => {
     sendRecordRef.current?.open()
     await GetMessageJobRecords(id).then((res) => {
       if (!!res) {
-        setSendRecordList(messageRecordConvertType(res, toUsers))
+        setSendRecordList(messageRecordConvertType(res, toObject))
       }
     })
   }
@@ -145,6 +146,19 @@ export const useAction = () => {
       .catch((err) => {
         throw Error(err)
       })
+  }
+
+  const onUpdateMessageJob = (data: IUpdateMessageCommand) => {
+    console.log(data, "data--")
+    // PostMessageJobUpdate(data)
+    //   .then(() => {
+    //     console.log("成功")
+    //     // ref.current.close()
+    //   })
+    //   .catch((err) => {
+    //     console.log("失败")
+    //     throw Error(err)
+    //   })
   }
 
   // 获取MessageJob 数组
@@ -176,16 +190,6 @@ export const useAction = () => {
   // 更新MessageJob table参数
   const updateData = (k: keyof IDtoExtend, v: any) => {
     setDto((prev) => ({ ...prev, [k]: v }))
-  }
-
-  const onUpdateMessageJob = (data: ISendMessageCommand) => {
-    PostMessageJobUpdate(data)
-      .then(() => {
-        // ref.current.close()
-      })
-      .catch((err) => {
-        throw Error(err)
-      })
   }
 
   const onDeleteMessageJobConfirm = (id: string) => {
@@ -221,5 +225,6 @@ export const useAction = () => {
     dto,
     getMessageJob,
     updateData,
+    onUpdateMessageJob,
   }
 }

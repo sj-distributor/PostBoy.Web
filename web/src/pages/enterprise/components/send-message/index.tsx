@@ -1,49 +1,21 @@
 import TextField from "@mui/material/TextField"
-import useAction, { messageTypeList, sendTypeList, timeZone } from "./hook"
+import useAction from "./hook"
 import styles from "./index.module.scss"
 import SendNotice from "../../../notification"
-import { Alert, Button, Snackbar, Switch } from "@mui/material"
+import { Button, Switch, Snackbar } from "@mui/material"
 import ModalBox from "../../../../components/modal/modal"
 import SelectContent from "../select-content"
 
 const SendMessage = () => {
   const {
-    messageTypeValue,
-    isShowDialog,
+    setSendData,
+    clickSendRecord,
     isShowMessageParams,
     setIsShowMessageParams,
-    sendTypeValue,
-    cronExp,
-    timeZoneValue,
-    openError,
-    openSuccess,
-    promptText,
-    setCorpsValue,
-    setCorpAppValue,
-    setMessageTypeValue,
-    setIsShowDialog,
-    setSendTypeValue,
-    setCronExp,
-    setDateValue,
-    setTimeZoneValue,
-    setTagsValue,
     sendRecordRef,
-    sendRecordClose,
-    dateValue,
-    endDateValue,
-    setEndDateValue,
-    setSendObject,
-    corpsValue,
-    corpAppValue,
-    sendRecordOpen,
-    title,
-    setTitle,
-    content,
-    setContent,
-    file,
-    setFile,
-    pictureText,
-    setPictureText,
+    setWhetherToCallAPI,
+    promptText,
+    openError,
   } = useAction()
 
   return (
@@ -56,51 +28,11 @@ const SendMessage = () => {
           horizontal: "center",
         }}
       />
-      <Snackbar
-        open={openSuccess}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          send success!
-        </Alert>
-      </Snackbar>
       <div className={styles.selectInputBox}>
         <SelectContent
-          inputClassName={styles.inputWrap}
-          sendTypeList={sendTypeList}
-          sendTypeValue={sendTypeValue}
-          setSendTypeValue={setSendTypeValue}
-          timeZone={timeZone}
-          timeZoneValue={timeZoneValue}
-          setTimeZoneValue={setTimeZoneValue}
-          messageTypeList={messageTypeList}
-          messageTypeValue={messageTypeValue}
-          setMessageTypeValue={setMessageTypeValue}
-          corpsValue={corpsValue}
-          setCorpsValue={setCorpsValue}
-          corpAppValue={corpAppValue}
-          setCorpAppValue={setCorpAppValue}
-          isShowDialog={isShowDialog}
-          setIsShowDialog={setIsShowDialog}
-          cronExp={cronExp}
-          setCronExp={setCronExp}
-          dateValue={dateValue}
-          setDateValue={setDateValue}
-          endDateValue={endDateValue}
-          setEndDateValue={setEndDateValue}
-          setTagsValue={setTagsValue}
-          setSendObject={setSendObject}
-          title={title}
-          setTitle={setTitle}
-          content={content}
-          setContent={setContent}
-          pictureText={pictureText}
-          setPictureText={setPictureText}
-          file={file}
-          setFile={setFile}
+          getSendData={setSendData}
+          isNewOrUpdate={"new"}
+          setWhetherToCallAPI={setWhetherToCallAPI}
         />
       </div>
       <Button
@@ -111,7 +43,6 @@ const SendMessage = () => {
           marginLeft: "1.5rem",
         }}
         variant="contained"
-        // onClick={() => handleSubmit(sendTypeValue)}
       >
         发 送
       </Button>
@@ -123,7 +54,10 @@ const SendMessage = () => {
             setIsShowMessageParams((e.target as HTMLInputElement).checked)
           }}
         />
-        <Button style={{ display: "flex" }} onClick={() => sendRecordOpen()}>
+        <Button
+          style={{ display: "flex" }}
+          onClick={() => clickSendRecord("open")}
+        >
           发送记录
         </Button>
       </div>
@@ -142,7 +76,7 @@ const SendMessage = () => {
 
       <ModalBox
         ref={sendRecordRef}
-        onCancel={() => sendRecordClose}
+        onCancel={() => clickSendRecord("close")}
         title={"发送记录"}
       >
         <SendNotice />

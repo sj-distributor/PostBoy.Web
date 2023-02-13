@@ -22,8 +22,9 @@ import {
   IDepartmentUsersData,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
+  ITagsList,
 } from "../../../../dtos/enterprise"
-import { memo } from "react"
+import { memo, useEffect } from "react"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -38,6 +39,8 @@ const SelectTargetDialog = memo(
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
+      lastTagsValue,
+      isLoadStop,
     } = props
 
     const {
@@ -55,6 +58,20 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
     })
+
+    useEffect(() => {
+      if (!!tagsList && !!lastTagsValue && lastTagsValue?.length > 0) {
+        const selectTagsList: ITagsList[] = []
+        lastTagsValue.forEach((item) => {
+          const findItem = tagsList.find((i) => i.tagId === Number(item))
+          if (!!findItem) {
+            selectTagsList.push(findItem)
+          }
+        })
+
+        setTagsValue(selectTagsList)
+      }
+    }, [tagsList, lastTagsValue])
 
     const recursiveRenderDeptList = (
       data: IDepartmentAndUserListValue[],
@@ -82,7 +99,8 @@ const SelectTargetDialog = memo(
                         ClickType.Collapse,
                         Object.assign(insertData, {
                           isCollapsed: deptUserData.isCollapsed,
-                        })
+                        }),
+                        true
                       )
                   }}
                 >
@@ -93,7 +111,11 @@ const SelectTargetDialog = memo(
                     disableRipple
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeptOrUserClick(ClickType.Select, insertData)
+                      handleDeptOrUserClick(
+                        ClickType.Select,
+                        insertData,
+                        isLoadStop
+                      )
                     }}
                   />
                   <ListItemText primary={deptUserData.name} />

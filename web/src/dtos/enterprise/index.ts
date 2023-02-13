@@ -83,10 +83,10 @@ export interface IDepartmentUsersResonse extends IResponseMsg {
 export interface IMessageTypeData {
   title: string
   groupBy: string
-  type: MessageDataType
+  type: MessageDataFileType
 }
 
-export enum MessageDataType {
+export enum MessageDataFileType {
   Image,
   Voice,
   Video,
@@ -97,7 +97,7 @@ export enum MessageDataType {
 export interface FileObject {
   fileContent?: string
   fileName: string
-  fileType: MessageDataType
+  fileType: MessageDataFileType
   fileUrl?: string
 }
 
@@ -109,6 +109,8 @@ export interface ITargetDialogProps {
   AppId: string
   isLoading: boolean
   tagsList: ITagsList[]
+  lastTagsValue?: string[] | undefined
+  isLoadStop: boolean
   setOpenFunction: (open: boolean) => void
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
@@ -160,7 +162,7 @@ export interface IMessageJobBase {
   createdDate: string
   correlationId: string
   userAccountId: string
-  jobType: MessageJobType
+  jobType: MessageJobSendType
   jobSettingJson: string
   jobCronExpressionDesc: string
   destination: MessageJobDestination
@@ -174,7 +176,7 @@ export interface IMessageJobBase {
   }[]
 }
 
-export enum MessageJobType {
+export enum MessageJobSendType {
   Fire,
   Delayed,
   Recurring,
@@ -208,7 +210,21 @@ export const messageSendResultType = {
 
 export interface ISendMessageCommand {
   correlationId: string
-  jobSetting?: IJobSettingDto
+  jobSetting: IJobSettingDto
+  metadata: { key: string; value: string }[]
+  emailNotification?: {
+    senderId: string
+    subject: string
+    body: string
+    to: string[]
+    cc: string[]
+  }
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+}
+
+export interface IUpdateMessageCommand {
+  messageJobId: string
+  jobSetting: IJobSettingDto
   metadata: { key: string; value: string }[]
   emailNotification?: {
     senderId: string
@@ -221,9 +237,9 @@ export interface ISendMessageCommand {
 }
 
 export interface IJobSettingDto {
-  timezone?: string
+  timezone: string
   delayedJob?: {
-    enqueueAt: Date
+    enqueueAt: string
   }
   recurringJob?: {
     cronExpression: string
@@ -231,18 +247,26 @@ export interface IJobSettingDto {
   }
 }
 
-export interface IWorkWeChatAppNotificationDto {
-  appId?: string
+export interface IWorkWeChatAppNotificationDto
+  extends SendParameter,
+    SendData {}
+
+export interface SendParameter {
+  appId: string
   chatId?: string
   toTags?: string[]
-  toUsers: string[]
+  toUsers?: string[]
   toParties?: string[]
+}
+
+export interface SendData {
   text?: TextDto
   file?: FileObject
   mpNews?: {
     articles: PictureText[]
   }
 }
+
 export interface TextDto {
   content: string
 }
@@ -263,7 +287,6 @@ export interface IDtoExtend {
 export interface ILastShowTableData extends IMessageJobBase {
   title: string
   content?: string
-  toUsers: string
   enterprise: {
     id: string
     corpName: string
@@ -283,7 +306,7 @@ export interface ISendRecordDto extends IMessageJobRecordSame {
 
 export interface SendTypeCustomListDto {
   title: string
-  value: MessageJobType
+  value: MessageJobSendType
 }
 
 export interface TimeZoneCustomListDto {
@@ -303,10 +326,8 @@ export interface SendObject {
 
 export interface PictureText {
   title: string
-  author: string
-  digest: string
   content: string
   fileContent?: string
-  contentSourceUrl: string
+  contentSourceUrl?: string
   fileUrl?: string
 }

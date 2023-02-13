@@ -1,7 +1,12 @@
-import { ILastShowTableData } from "../../../../dtos/enterprise"
+import {
+  ILastShowTableData,
+  IUpdateMessageCommand,
+} from "../../../../dtos/enterprise"
 
 export interface NoticeSettingProps {
   updateMessageJobInformation: ILastShowTableData
+  onNoticeCancel: () => void
+  onUpdateMessageJob: (data: IUpdateMessageCommand) => void
 }
 
 export interface NoticeSettingHookProps {
