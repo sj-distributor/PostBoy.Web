@@ -453,7 +453,6 @@ export const useAction = (props: SelectContentHookProps) => {
       const isExceedSize = judgingFileSize("图文", array)
       if (isExceedSize) {
         e.target.value = ""
-        console.log(0)
       } else {
         if (array.length > 0) {
           const objectList: PictureText[] = []
@@ -478,7 +477,6 @@ export const useAction = (props: SelectContentHookProps) => {
         )
         if (isExceedSize) {
           e.target.value = ""
-          console.log(0)
         } else {
           const file = files[0]
           const base64 = await convertBase64(file)
@@ -591,8 +589,7 @@ export const useAction = (props: SelectContentHookProps) => {
         break
       }
     }
-  }, [timeZoneValue, cronExp, dateValue, endDateValue])
-  // sendTypeValue,
+  }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue])
 
   //判断jobSetting是否正确
   useEffect(() => {
@@ -622,8 +619,7 @@ export const useAction = (props: SelectContentHookProps) => {
         }
       }
     }
-  }, [jobSetting])
-  // sendTypeValue
+  }, [jobSetting, sendTypeValue])
 
   // sendData
   useEffect(() => {
@@ -661,16 +657,21 @@ export const useAction = (props: SelectContentHookProps) => {
         break
       }
     }
-  }, [content, pictureText, file, lastTimePictureText, lastTimeFile])
-  // messageTypeValue.title,isNewOrUpdate,
+  }, [
+    content,
+    pictureText,
+    file,
+    lastTimePictureText,
+    lastTimeFile,
+    messageTypeValue.title,
+    isNewOrUpdate,
+  ])
 
   // 判断sendData是否正确
   useEffect(() => {
     switch (messageTypeValue.title) {
       case "文本": {
-        setIsSendData(
-          sendData !== undefined && sendData.text?.content !== undefined
-        )
+        setIsSendData(sendData !== undefined && !!sendData.text?.content)
         break
       }
       case "图文": {
@@ -691,13 +692,12 @@ export const useAction = (props: SelectContentHookProps) => {
         break
       }
     }
-  }, [sendData])
-  // , messageTypeValue.title
+  }, [sendData, messageTypeValue.title])
 
   // sendParameter
   useEffect(() => {
     setSendParameter({
-      appId: !!corpAppValue?.appId ? corpAppValue?.appId : "",
+      appId: !!corpAppValue?.id ? corpAppValue?.id : "",
       toTags: tagsNameList,
       toUsers: sendObject.toUsers,
       toParties: sendObject.toParties,
@@ -834,81 +834,131 @@ export const useAction = (props: SelectContentHookProps) => {
   useEffect(() => {
     if (isJobSetting && isSendParameter && isSendData && !!title) {
       if (jobSetting !== undefined && sendParameter !== undefined) {
-        if (isNewOrUpdate === "new") {
-          getSendData !== undefined &&
+        const metadata = [
+          {
+            key: "title",
+            value: title,
+          },
+          {
+            key: "enterpriseName",
+            value: `${corpsValue?.corpName}`,
+          },
+          {
+            key: "enterpriseId",
+            value: `${corpsValue?.id}`,
+          },
+          {
+            key: "appName",
+            value: `${corpAppValue?.name}`,
+          },
+          {
+            key: "weChatAppId",
+            value: `${corpAppValue?.appId}`,
+          },
+          {
+            key: "appId",
+            value: `${corpAppValue?.id}`,
+          },
+        ]
+
+        isNewOrUpdate === "new"
+          ? getSendData !== undefined &&
             getSendData({
               correlationId: uuidv4(),
               jobSetting: jobSetting,
-              metadata: [
-                {
-                  key: "title",
-                  value: title,
-                },
-                {
-                  key: "enterpriseName",
-                  value: `${corpsValue?.corpName}`,
-                },
-                {
-                  key: "enterpriseId",
-                  value: `${corpsValue?.id}`,
-                },
-                {
-                  key: "appName",
-                  value: `${corpAppValue?.name}`,
-                },
-                {
-                  key: "weChatAppId",
-                  value: `${corpAppValue?.appId}`,
-                },
-                {
-                  key: "appId",
-                  value: `${corpAppValue?.id}`,
-                },
-              ],
+              metadata: metadata,
               workWeChatAppNotification: {
                 ...sendParameter,
                 ...sendData,
               },
             })
-        } else {
-          getUpdateData !== undefined &&
+          : getUpdateData !== undefined &&
             getUpdateData({
               messageJobId: !!updateMessageJobInformation?.id
                 ? updateMessageJobInformation?.id
                 : "",
               jobSetting: jobSetting,
-              metadata: [
-                {
-                  key: "title",
-                  value: title,
-                },
-                {
-                  key: "enterpriseName",
-                  value: `${corpsValue?.corpName}`,
-                },
-                {
-                  key: "enterpriseId",
-                  value: `${corpsValue?.id}`,
-                },
-                {
-                  key: "appName",
-                  value: `${corpAppValue?.name}`,
-                },
-                {
-                  key: "weChatAppId",
-                  value: `${corpAppValue?.appId}`,
-                },
-                {
-                  key: "appId",
-                  value: `${corpAppValue?.id}`,
-                },
-              ],
+              metadata: metadata,
               workWeChatAppNotification: {
                 ...sendParameter,
                 ...sendData,
               },
             })
-        }
+        // if (isNewOrUpdate === "new") {
+        //   getSendData !== undefined &&
+        //     getSendData({
+        //       correlationId: uuidv4(),
+        //       jobSetting: jobSetting,
+        //       metadata: [
+        //         {
+        //           key: "title",
+        //           value: title,
+        //         },
+        //         {
+        //           key: "enterpriseName",
+        //           value: `${corpsValue?.corpName}`,
+        //         },
+        //         {
+        //           key: "enterpriseId",
+        //           value: `${corpsValue?.id}`,
+        //         },
+        //         {
+        //           key: "appName",
+        //           value: `${corpAppValue?.name}`,
+        //         },
+        //         {
+        //           key: "weChatAppId",
+        //           value: `${corpAppValue?.appId}`,
+        //         },
+        //         {
+        //           key: "appId",
+        //           value: `${corpAppValue?.id}`,
+        //         },
+        //       ],
+        //       workWeChatAppNotification: {
+        //         ...sendParameter,
+        //         ...sendData,
+        //       },
+        //     })
+        // } else {
+        //   getUpdateData !== undefined &&
+        //     getUpdateData({
+        //       messageJobId: !!updateMessageJobInformation?.id
+        //         ? updateMessageJobInformation?.id
+        //         : "",
+        //       jobSetting: jobSetting,
+        //       metadata: [
+        //         {
+        //           key: "title",
+        //           value: title,
+        //         },
+        //         {
+        //           key: "enterpriseName",
+        //           value: `${corpsValue?.corpName}`,
+        //         },
+        //         {
+        //           key: "enterpriseId",
+        //           value: `${corpsValue?.id}`,
+        //         },
+        //         {
+        //           key: "appName",
+        //           value: `${corpAppValue?.name}`,
+        //         },
+        //         {
+        //           key: "weChatAppId",
+        //           value: `${corpAppValue?.appId}`,
+        //         },
+        //         {
+        //           key: "appId",
+        //           value: `${corpAppValue?.id}`,
+        //         },
+        //       ],
+        //       workWeChatAppNotification: {
+        //         ...sendParameter,
+        //         ...sendData,
+        //       },
+        //     })
+        // }
         setWhetherToCallAPI(true)
       }
     } else {
