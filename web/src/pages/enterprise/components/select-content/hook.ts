@@ -38,6 +38,7 @@ export const useAction = (props: SelectContentHookProps) => {
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
+    clearData,
   } = props
 
   // 拿到的企业对象
@@ -48,7 +49,7 @@ export const useAction = (props: SelectContentHookProps) => {
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
-  // 发送的Tags数组
+  // 获取的Tags数组
   const [tagsList, setTagsList] = useState<ITagsList[]>([])
   // 消息类型选择
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
@@ -847,19 +848,31 @@ export const useAction = (props: SelectContentHookProps) => {
     isNewOrUpdate,
   ])
 
-  // 消息类型更换时替换文件的字段
   useEffect(() => {
-    if (
-      messageTypeValue.groupBy === "文件" &&
-      messageTypeValue.type !== MessageDataFileType.Text
-    ) {
+    if (clearData && isNewOrUpdate === "new") {
+      setTitle("")
+      setContent("")
+      setCorpsValue(corpsList[0])
+      setCorpAppValue(corpAppList[0])
+      setTagsValue([])
+      setMessageTypeValue(messageTypeList[0])
+      setSendTypeValue(MessageJobSendType.Fire)
+      setTimeZoneValue(timeZone[0].value)
+      setSendObject({
+        toUsers: [],
+        toParties: [],
+      })
+      setPictureText([])
       setFile({
+        fileContent: "",
         fileName: "",
-        fileUrl: "",
         fileType: messageTypeValue.type,
       })
+      setDateValue("")
+      setEndDateValue("")
+      setCronExp("0 0 * * *")
     }
-  }, [messageTypeValue])
+  }, [clearData, isNewOrUpdate])
 
   return {
     corpsValue,

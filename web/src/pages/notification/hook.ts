@@ -1,5 +1,4 @@
 import { useBoolean } from "ahooks"
-import { Actions } from "ahooks/lib/useBoolean"
 import { clone } from "ramda"
 import { useEffect, useRef, useState } from "react"
 import {
@@ -15,6 +14,7 @@ import {
   IMessageJobRecord,
   ISendRecordDto,
   IUpdateMessageCommand,
+  IWorkWeChatAppNotificationDto,
   MessageJobDestination,
   messageJobSendType,
   MessageJobSendType,
@@ -23,6 +23,18 @@ import {
 import { ModalBoxRef } from "../../dtos/modal"
 import { convertType } from "../../uilts/convert-type"
 import { parameterJudgment } from "../../uilts/parameter-judgment"
+
+const judgeContent = (
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+) => {
+  if (workWeChatAppNotification.text !== null) {
+    return workWeChatAppNotification.text?.content
+  } else if (workWeChatAppNotification.mpNews !== null) {
+    return workWeChatAppNotification.mpNews?.articles[0].content
+  } else {
+    return "文件"
+  }
+}
 
 // 转换数组类型返回
 const messageJobConvertType = (arr: IMessageJob[]) => {
@@ -42,7 +54,7 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         destination: item.destination,
         workWeChatAppNotification: item.workWeChatAppNotification,
         metadata: item.metadata,
-        content: item.workWeChatAppNotification.text?.content,
+        content: judgeContent(item.workWeChatAppNotification),
         title: item.metadata.filter((item) => item.key === "title")[0]?.value,
         enterprise: {
           corpName: item.metadata.filter(

@@ -22,6 +22,7 @@ const useAction = () => {
   const [loading, loadingAction] = useBoolean(false)
   const [success, successAction] = useBoolean(false)
   const [failSend, failSendAction] = useBoolean(false)
+  const [clearData, setClearData] = useBoolean(false)
 
   const clickSendRecord = (operation: string) => {
     operation === "open"
@@ -30,7 +31,6 @@ const useAction = () => {
   }
 
   const handleSubmit = async () => {
-    console.log("res", sendData)
     if (!loading) {
       successAction.setFalse()
       loadingAction.setTrue()
@@ -47,6 +47,9 @@ const useAction = () => {
             .then((res) => {
               successAction.setTrue()
               loadingAction.setFalse()
+              setTimeout(() => {
+                setClearData.setTrue()
+              }, 2000)
             })
             .catch((error) => {
               loadingAction.setFalse()
@@ -91,6 +94,14 @@ const useAction = () => {
     }
   }, [openError, failSend, success])
 
+  useEffect(() => {
+    if (clearData) {
+      setTimeout(() => {
+        setClearData.setFalse()
+      }, 1500)
+    }
+  }, [clearData])
+
   return {
     setSendData,
     promptText,
@@ -107,6 +118,7 @@ const useAction = () => {
     failSend,
     successAction,
     failSendAction,
+    clearData,
   }
 }
 

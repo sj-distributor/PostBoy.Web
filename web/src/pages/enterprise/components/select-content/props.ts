@@ -14,6 +14,7 @@ export interface SelectContentProps {
   updateMessageJobInformation?: ILastShowTableData
   isNewOrUpdate: string
   showErrorPrompt: (text: string) => void
+  clearData?: boolean
 }
 
 export interface SelectContentHookProps {
@@ -26,4 +27,5 @@ export interface SelectContentHookProps {
   updateMessageJobInformation?: ILastShowTableData
   isNewOrUpdate: string
   showErrorPrompt: (text: string) => void
+  clearData?: boolean
 }

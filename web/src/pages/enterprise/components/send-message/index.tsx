@@ -32,6 +32,7 @@ const SendMessage = () => {
     failSend,
     successAction,
     failSendAction,
+    clearData,
   } = useAction()
 
   return (
@@ -71,6 +72,7 @@ const SendMessage = () => {
           getSendData={setSendData}
           isNewOrUpdate={"new"}
           showErrorPrompt={showErrorPrompt}
+          clearData={clearData}
         />
       </div>
       <div
@@ -78,7 +80,6 @@ const SendMessage = () => {
           display: "flex",
           justifyContent: "space-between",
           alignContent: "center",
-          marginTop: "0.5rem",
           padding: "0rem 8rem",
         }}
       >

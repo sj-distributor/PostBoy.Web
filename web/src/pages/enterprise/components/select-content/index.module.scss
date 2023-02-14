@@ -30,9 +30,9 @@
       flex: 1;
       min-width: 12rem;
       margin-right: 1rem;
+      margin-bottom: 1rem;
 
       .corpInput {
-        margin-bottom: 1rem;
         :global(input[type="button" i]) {
           text-align: left;
           cursor: pointer;
@@ -66,37 +66,36 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 0.5rem 0;
 
         .input {
           flex: 1;
+          margin-bottom: 1rem;
         }
       }
 
       .uploadBtnBox {
-        padding: 0.5rem 0 0 0;
+        margin-bottom: 1rem;
         display: flex;
         flex: 1;
         flex-direction: column;
+      }
 
-        .information {
-          display: flex;
-          flex-direction: row;
-          margin: 0.5rem 0;
+      .information {
+        display: flex;
+        flex-direction: row;
 
-          .box {
+        .sendBox {
+          flex: 1;
+
+          .picturebackground {
             flex: 1;
-            margin-top: 0.25rem;
-
-            .picturebackground {
-              flex: 1;
-              display: flex;
-              flex-direction: row;
-              flex-wrap: wrap;
-              border-radius: 0.5rem;
-              border: 0.1rem solid rgb(207, 200, 200);
-              padding: 0.25rem;
-            }
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            border-radius: 0.5rem;
+            border: 0.1rem solid rgb(207, 200, 200);
+            padding: 0.25rem;
+            margin-bottom: 1rem;
           }
         }
       }

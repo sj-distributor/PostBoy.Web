@@ -34,6 +34,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
+    clearData,
   } = props
 
   const {
@@ -85,6 +86,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
+    clearData,
   })
 
   const fileOrImage = (file: FileObject, state: string) => {
@@ -92,14 +94,35 @@ const SelectContent = memo((props: SelectContentProps) => {
       switch (file?.fileType) {
         case MessageDataFileType.Image: {
           return (
-            <div className={styles.picturebackground}>
-              <div style={{ position: "relative" }}>
-                <img
-                  className={styles.image}
-                  src={state === "new" ? file?.fileContent : file?.fileUrl}
-                  alt={file?.fileName}
-                />
+            <div>
+              {state === "new" ? "这次上传内容:" : "上次上传内容:"}
+              <div className={styles.picturebackground}>
+                <div style={{ position: "relative" }}>
+                  <img
+                    className={styles.image}
+                    src={state === "new" ? file?.fileContent : file?.fileUrl}
+                    alt={file?.fileName}
+                  />
 
+                  {state === "new" && (
+                    <HighlightOffIcon
+                      className={styles.deleteIcon}
+                      onClick={() => fileDelete("file")}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        }
+        default: {
+          return (
+            <div>
+              {state === "new" ? "这次上传内容:" : "上次上传内容:"}
+              <div className={styles.picturebackground}>
+                <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
+                  {file?.fileName}
+                </a>
                 {state === "new" && (
                   <HighlightOffIcon
                     className={styles.deleteIcon}
@@ -110,43 +133,31 @@ const SelectContent = memo((props: SelectContentProps) => {
             </div>
           )
         }
-        default: {
-          return (
-            <div className={styles.picturebackground}>
-              <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
-                {file?.fileName}
-              </a>
-              {state === "new" && (
-                <HighlightOffIcon
-                  className={styles.deleteIcon}
-                  onClick={() => fileDelete("file")}
-                />
-              )}
-            </div>
-          )
-        }
       }
   }
 
   const pictureImage = (pictureText: PictureText[], state: string) => {
     return (
       pictureText.length > 0 && (
-        <div className={styles.picturebackground}>
-          {pictureText.map((item, index) => (
-            <div style={{ position: "relative" }} key={index}>
-              <img
-                src={state === "new" ? item.fileContent : item?.fileUrl}
-                className={styles.image}
-                alt={item.title}
-              />
-              {state === "new" && (
-                <HighlightOffIcon
-                  className={styles.deleteIcon}
-                  onClick={() => fileDelete("picture", index)}
+        <div>
+          {state === "new" ? "这次上传内容:" : "上次上传内容:"}
+          <div className={styles.picturebackground}>
+            {pictureText.map((item, index) => (
+              <div style={{ position: "relative" }} key={index}>
+                <img
+                  src={state === "new" ? item.fileContent : item?.fileUrl}
+                  className={styles.image}
+                  alt={item.title}
                 />
-              )}
-            </div>
-          ))}
+                {state === "new" && (
+                  <HighlightOffIcon
+                    className={styles.deleteIcon}
+                    onClick={() => fileDelete("picture", index)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )
     )
@@ -281,7 +292,6 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            // margin: "0 1rem",
           }}
           variant="contained"
           onClick={() => {
@@ -322,10 +332,6 @@ const SelectContent = memo((props: SelectContentProps) => {
                 messageTypeValue.groupBy === "")) && (
               <TextField
                 className={styles.input}
-                style={{
-                  marginBottom: "0.7rem",
-                  marginTop: "1.5rem",
-                }}
                 label="内容"
                 multiline
                 rows={6}
@@ -340,48 +346,47 @@ const SelectContent = memo((props: SelectContentProps) => {
           {(messageTypeValue.groupBy === "文件" ||
             (messageTypeValue.type === MessageDataFileType.Image &&
               messageTypeValue.groupBy === "")) && (
-            <div className={styles.uploadBtnBox}>
-              <Button
-                variant="outlined"
-                color="inherit"
-                component="label"
-                sx={{
-                  height: "2rem",
-                  width: "6rem",
-                  fontSize: "0.9rem",
-                }}
-              >
-                上传文件
-                {messageTypeValue.title === "图文" ? (
-                  <input
-                    ref={inputRef}
-                    hidden
-                    type="file"
-                    accept="image/jpg,image/png"
-                    multiple
-                    onChange={(e) =>
-                      !!e.target.files && fileUpload(e.target.files, "图文", e)
-                    }
-                  />
-                ) : (
-                  <input
-                    ref={inputRef}
-                    hidden
-                    type="file"
-                    accept={fileAccept}
-                    onChange={(e) =>
-                      !!e.target.files && fileUpload(e.target.files, "文件", e)
-                    }
-                  />
-                )}
-              </Button>
-
+            <div style={{ flex: 1 }}>
+              <div className={styles.uploadBtnBox}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  sx={{
+                    width: "6rem",
+                  }}
+                >
+                  上传文件
+                  {messageTypeValue.title === "图文" ? (
+                    <input
+                      ref={inputRef}
+                      hidden
+                      type="file"
+                      accept="image/jpg,image/png"
+                      multiple
+                      onChange={(e) =>
+                        !!e.target.files &&
+                        fileUpload(e.target.files, "图文", e)
+                      }
+                    />
+                  ) : (
+                    <input
+                      ref={inputRef}
+                      hidden
+                      type="file"
+                      accept={fileAccept}
+                      onChange={(e) =>
+                        !!e.target.files &&
+                        fileUpload(e.target.files, "文件", e)
+                      }
+                    />
+                  )}
+                </Button>
+              </div>
               <div className={styles.information}>
                 {lastTimeFile !== undefined &&
                   lastTimePictureText !== undefined && (
                     <>
-                      <div className={styles.box}>
-                        上次上传内容:
+                      <div className={styles.sendBox}>
                         {displayByType(
                           "old",
                           lastTimeFile,
@@ -391,15 +396,43 @@ const SelectContent = memo((props: SelectContentProps) => {
                       <div className={styles.separate} />
                     </>
                   )}
-                <div className={styles.box}>
-                  这次上传内容:
+                <div className={styles.sendBox}>
                   {displayByType("new", file, pictureText)}
                 </div>
               </div>
             </div>
           )}
         </div>
-        <div className={styles.rowBox}>
+        <div>
+          {(sendTypeValue === MessageJobSendType.Delayed ||
+            sendTypeValue === MessageJobSendType.Recurring) && (
+            <div>
+              <FormControl
+                style={{
+                  width: 252,
+                  marginTop: "1rem",
+                }}
+              >
+                <InputLabel id="demo-simple-select-label">时区</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={timeZoneValue}
+                  label="时区"
+                  onChange={(e) => {
+                    switchTimeZone(Number(e.target.value))
+                  }}
+                >
+                  {timeZone.map((item, key) => (
+                    <MenuItem key={key} value={item.value}>
+                      {item.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          )}
+
           {sendTypeValue === MessageJobSendType.Delayed && (
             <TextField
               label="发送时间"
@@ -421,11 +454,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                     "Please select a time later than the current time"
                   )
                 } else {
-                  setDateValue(
-                    moment((e.target as HTMLInputElement).value)
-                      .toDate()
-                      .toISOString()
-                  )
+                  setDateValue((e.target as HTMLInputElement).value)
                 }
               }}
             />
@@ -451,31 +480,6 @@ const SelectContent = memo((props: SelectContentProps) => {
                   isAdmin={true}
                   locale={"zh_CN"}
                 />
-
-                <FormControl
-                  style={{
-                    width: 252,
-                    marginTop: "1rem",
-                    marginLeft: "2rem",
-                  }}
-                >
-                  <InputLabel id="demo-simple-select-label">时区</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={timeZoneValue}
-                    label="时区"
-                    onChange={(e) => {
-                      switchTimeZone(Number(e.target.value))
-                    }}
-                  >
-                    {timeZone.map((item, key) => (
-                      <MenuItem key={key} value={item.value}>
-                        {item.title}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
               </div>
               <TextField
                 label="终止时间"
@@ -490,11 +494,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                   shrink: true,
                 }}
                 onChange={(e) => {
-                  setEndDateValue(
-                    moment((e.target as HTMLInputElement).value)
-                      .toDate()
-                      .toISOString()
-                  )
+                  setEndDateValue((e.target as HTMLInputElement).value)
                 }}
               />
             </div>
