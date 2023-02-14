@@ -2,9 +2,10 @@ import TextField from "@mui/material/TextField"
 import useAction from "./hook"
 import styles from "./index.module.scss"
 import SendNotice from "../../../notification"
-import { Button, Switch, Snackbar } from "@mui/material"
+import { Button, Switch, Snackbar, Box, CircularProgress } from "@mui/material"
 import ModalBox from "../../../../components/modal/modal"
 import SelectContent from "../select-content"
+import { green } from "@mui/material/colors"
 
 const SendMessage = () => {
   const {
@@ -16,6 +17,10 @@ const SendMessage = () => {
     setWhetherToCallAPI,
     promptText,
     openError,
+    handleSubmit,
+    buttonSx,
+    loading,
+    showErrorPrompt,
   } = useAction()
 
   return (
@@ -33,33 +38,60 @@ const SendMessage = () => {
           getSendData={setSendData}
           isNewOrUpdate={"new"}
           setWhetherToCallAPI={setWhetherToCallAPI}
+          showErrorPrompt={showErrorPrompt}
         />
       </div>
-      <Button
-        sx={{
-          height: "3.5rem",
-          width: "7rem",
-          fontSize: "1rem",
-          marginLeft: "1.5rem",
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignContent: "center",
+          marginTop: "0.5rem",
         }}
-        variant="contained"
       >
-        发 送
-      </Button>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Switch
-          sx={{ display: "none" }}
-          value={isShowMessageParams}
-          onChange={(e) => {
-            setIsShowMessageParams((e.target as HTMLInputElement).checked)
-          }}
-        />
-        <Button
-          style={{ display: "flex" }}
-          onClick={() => clickSendRecord("open")}
-        >
-          发送记录
-        </Button>
+        <Box sx={{ position: "relative" }}>
+          <Button
+            variant="contained"
+            style={{
+              height: "3.5rem",
+              width: "7rem",
+              fontSize: "1rem",
+            }}
+            sx={buttonSx}
+            disabled={loading}
+            onClick={handleSubmit}
+          >
+            发 送
+          </Button>
+          {loading && (
+            <CircularProgress
+              size={24}
+              sx={{
+                color: green[500],
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                marginTop: "-0.8rem",
+                marginLeft: "-0.8rem",
+              }}
+            />
+          )}
+        </Box>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Switch
+            sx={{ display: "none" }}
+            value={isShowMessageParams}
+            onChange={(e) => {
+              setIsShowMessageParams((e.target as HTMLInputElement).checked)
+            }}
+          />
+          <Button
+            style={{ display: "flex" }}
+            onClick={() => clickSendRecord("open")}
+          >
+            发送记录
+          </Button>
+        </div>
       </div>
 
       {isShowMessageParams && (
@@ -79,7 +111,7 @@ const SendMessage = () => {
         onCancel={() => clickSendRecord("close")}
         title={"发送记录"}
       >
-        <SendNotice />
+        <SendNotice showErrorPrompt={showErrorPrompt} />
       </ModalBox>
     </div>
   )

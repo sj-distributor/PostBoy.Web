@@ -34,6 +34,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     getUpdateData,
     updateMessageJobInformation,
     setWhetherToCallAPI,
+    showErrorPrompt,
   } = props
 
   const {
@@ -84,6 +85,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     getUpdateData,
     updateMessageJobInformation,
     setWhetherToCallAPI,
+    showErrorPrompt,
   })
 
   const fileOrImage = (file: FileObject, state: string) => {
@@ -333,38 +335,54 @@ const SelectContent = memo((props: SelectContentProps) => {
             (messageTypeValue.type === MessageDataFileType.Image &&
               messageTypeValue.groupBy === "")) && (
             <div className={styles.uploadBtnBox}>
-              {messageTypeValue.title === "图文" ? (
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) =>
-                    !!e.target.files && fileUpload(e.target.files, "图文", e)
-                  }
-                />
-              ) : (
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept={fileAccept}
-                  onChange={(e) =>
-                    !!e.target.files && fileUpload(e.target.files, "文件", e)
-                  }
-                />
-              )}
+              <Button
+                variant="outlined"
+                color="inherit"
+                component="label"
+                sx={{
+                  height: "2rem",
+                  width: "6rem",
+                  fontSize: "0.9rem",
+                }}
+              >
+                上传文件
+                {messageTypeValue.title === "图文" ? (
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/jpg,image/png"
+                    multiple
+                    onChange={(e) =>
+                      !!e.target.files && fileUpload(e.target.files, "图文", e)
+                    }
+                  />
+                ) : (
+                  <input
+                    hidden
+                    type="file"
+                    accept={fileAccept}
+                    onChange={(e) =>
+                      !!e.target.files && fileUpload(e.target.files, "文件", e)
+                    }
+                  />
+                )}
+              </Button>
 
               <div className={styles.information}>
-                {(lastTimeFile !== undefined ||
-                  lastTimePictureText !== undefined) && (
-                  <>
-                    <div className={styles.box}>
-                      上次上传内容:
-                      {displayByType("old", lastTimeFile, lastTimePictureText)}
-                    </div>
-                    <div className={styles.separate} />
-                  </>
-                )}
+                {lastTimeFile !== undefined &&
+                  lastTimePictureText !== undefined && (
+                    <>
+                      <div className={styles.box}>
+                        上次上传内容:
+                        {displayByType(
+                          "old",
+                          lastTimeFile,
+                          lastTimePictureText
+                        )}
+                      </div>
+                      <div className={styles.separate} />
+                    </>
+                  )}
                 <div className={styles.box}>
                   这次上传内容:
                   {displayByType("new", file, pictureText)}
@@ -391,11 +409,15 @@ const SelectContent = memo((props: SelectContentProps) => {
                 ).valueOf()
                 const nowTime = moment(new Date()).valueOf()
                 if (time <= nowTime) {
-                  // showErrorPrompt(
-                  //   "Please select a time later than the current time"
-                  // )
+                  showErrorPrompt(
+                    "Please select a time later than the current time"
+                  )
                 } else {
-                  setDateValue((e.target as HTMLInputElement).value)
+                  setDateValue(
+                    moment((e.target as HTMLInputElement).value)
+                      .toDate()
+                      .toISOString()
+                  )
                 }
               }}
             />
@@ -424,7 +446,11 @@ const SelectContent = memo((props: SelectContentProps) => {
                   shrink: true,
                 }}
                 onChange={(e) => {
-                  setEndDateValue((e.target as HTMLInputElement).value)
+                  setEndDateValue(
+                    moment((e.target as HTMLInputElement).value)
+                      .toDate()
+                      .toISOString()
+                  )
                 }}
               />
             </div>

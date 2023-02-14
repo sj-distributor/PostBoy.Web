@@ -1,7 +1,11 @@
+import { green } from "@mui/material/colors"
 import { useBoolean } from "ahooks"
+import { clone } from "ramda"
 import { useEffect, useRef, useState } from "react"
+import { PostMessageSend } from "../../../../api/enterprise"
 import { ISendMessageCommand } from "../../../../dtos/enterprise"
 import { ModalBoxRef } from "../../../../dtos/modal"
+import { convertType } from "../../../../uilts/convert-type"
 
 const useAction = () => {
   const [sendData, setSendData] = useState<ISendMessageCommand>()
@@ -16,10 +20,57 @@ const useAction = () => {
 
   const [whetherToCallAPI, setWhetherToCallAPI] = useState<boolean>(false)
 
+  const [loading, loadingAction] = useBoolean(false)
+  const [success, successAction] = useBoolean(false)
+  const timer = useRef<number>()
+
   const clickSendRecord = (operation: string) => {
     operation === "open"
       ? sendRecordRef.current?.open()
       : sendRecordRef.current?.close()
+  }
+
+  const handleSubmit = async () => {
+    if (!loading) {
+      successAction.setFalse()
+      loadingAction.setTrue()
+
+      if (whetherToCallAPI) {
+        const cloneData = clone(sendData)
+        if (!!cloneData) {
+          cloneData.workWeChatAppNotification = convertType(
+            cloneData.workWeChatAppNotification
+          )
+          console.log("111", cloneData)
+          // 接口调用
+          PostMessageSend(cloneData)
+            .then((res) => {
+              successAction.setTrue()
+              loadingAction.setFalse()
+              timer.current = window.setTimeout(() => {
+                successAction.setFalse()
+              }, 2000)
+            })
+            .catch((error) => {
+              successAction.setFalse()
+              loadingAction.setFalse()
+            })
+        }
+      } else {
+        showErrorPrompt(
+          "The message job has information that is not filled in!"
+        )
+      }
+    }
+  }
+
+  const buttonSx = {
+    ...(success && {
+      bgcolor: green[500],
+      "&:hover": {
+        bgcolor: green[700],
+      },
+    }),
   }
 
   // 弹出警告
@@ -37,10 +88,6 @@ const useAction = () => {
     }
   }, [openError])
 
-  useEffect(() => {
-    if (sendData !== undefined) console.log(sendData, "sendData--")
-  }, [sendData])
-
   return {
     setSendData,
     promptText,
@@ -50,6 +97,10 @@ const useAction = () => {
     setIsShowMessageParams,
     sendRecordRef,
     setWhetherToCallAPI,
+    handleSubmit,
+    buttonSx,
+    loading,
+    showErrorPrompt,
   }
 }
 

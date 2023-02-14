@@ -1,4 +1,4 @@
-import { clone, flatten, uniqWith } from "ramda"
+import { clone, flatten, isEmpty, uniqWith } from "ramda"
 import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
@@ -19,6 +19,7 @@ import {
   IMessageTypeData,
   ISearchList,
   ITagsList,
+  ITagsListResponse,
   MessageDataFileType,
   MessageJobSendType,
   PictureText,
@@ -39,6 +40,7 @@ export const useAction = (props: SelectContentHookProps) => {
     getUpdateData,
     updateMessageJobInformation,
     setWhetherToCallAPI,
+    showErrorPrompt,
   } = props
 
   // 拿到的企业对象
@@ -129,7 +131,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 初始化企业数组
   useEffect(() => {
-    GetCorpsList().then((data) => {
+    GetCorpsList().then((data: ICorpData[] | null | undefined) => {
       if (data) {
         const array: { id: string; corpName: string }[] = []
         data.forEach((item) =>
@@ -150,27 +152,31 @@ export const useAction = (props: SelectContentHookProps) => {
   // 初始化App数组
   useEffect(() => {
     !!corpsValue &&
-      GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
-        if (corpAppResult) {
-          const array: { id: string; name: string; appId: string }[] = []
-          corpAppResult.forEach((item) =>
-            array.push({
-              id: item.id,
-              name: item.name,
-              appId: item.appId,
-            })
-          )
-          setCorpAppList(array)
+      GetCorpAppList({ CorpId: corpsValue.id }).then(
+        (corpAppResult: ICorpAppData[] | null | undefined) => {
+          if (corpAppResult) {
+            const array: { id: string; name: string; appId: string }[] = []
+            corpAppResult.forEach((item) =>
+              array.push({
+                id: item.id,
+                name: item.name,
+                appId: item.appId,
+              })
+            )
+            setCorpAppList(array)
+          }
         }
-      })
+      )
   }, [corpsValue?.id])
 
   // 获取Tags数组
   useEffect(() => {
     corpAppValue?.appId !== undefined &&
-      GetTagsList({ AppId: corpAppValue.appId }).then((tagsData) => {
-        tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
-      })
+      GetTagsList({ AppId: corpAppValue.appId }).then(
+        (tagsData: ITagsListResponse | null | undefined) => {
+          tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
+        }
+      )
   }, [corpAppValue?.appId])
 
   // 默认选择第一个App对象
@@ -453,6 +459,7 @@ export const useAction = (props: SelectContentHookProps) => {
       const isExceedSize = judgingFileSize("图文", array)
       if (isExceedSize) {
         e.target.value = ""
+        showErrorPrompt("The file size is too large！")
       } else {
         if (array.length > 0) {
           const objectList: PictureText[] = []
@@ -462,7 +469,6 @@ export const useAction = (props: SelectContentHookProps) => {
               title: title,
               content: content,
               fileContent: base64 as string,
-              contentSourceUrl: "",
             })
           }
           setPictureText(objectList)
@@ -477,6 +483,7 @@ export const useAction = (props: SelectContentHookProps) => {
         )
         if (isExceedSize) {
           e.target.value = ""
+          showErrorPrompt("The file size is too large！")
         } else {
           const file = files[0]
           const base64 = await convertBase64(file)
@@ -696,12 +703,17 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // sendParameter
   useEffect(() => {
-    setSendParameter({
-      appId: !!corpAppValue?.id ? corpAppValue?.id : "",
-      toTags: tagsNameList,
-      toUsers: sendObject.toUsers,
-      toParties: sendObject.toParties,
-    })
+    const a: SendParameter = {
+      appId: !!corpAppValue?.appId ? corpAppValue?.appId : "",
+    }
+    if (!isEmpty(tagsNameList)) {
+      a.toTags = tagsNameList
+    } else if (!isEmpty(sendObject.toUsers)) {
+      a.toUsers = sendObject.toUsers
+    } else if (!isEmpty(sendObject.toParties)) {
+      a.toParties = sendObject.toParties
+    }
+    setSendParameter(a)
   }, [corpAppValue?.id, tagsNameList, sendObject])
 
   // 判断sendParameter是否正确
@@ -864,6 +876,10 @@ export const useAction = (props: SelectContentHookProps) => {
             value: `${corpAppValue?.id}`,
           },
         ]
+        const workWeChatAppNotification = {
+          ...sendParameter,
+          ...sendData,
+        }
 
         isNewOrUpdate === "new"
           ? getSendData !== undefined &&
@@ -871,10 +887,7 @@ export const useAction = (props: SelectContentHookProps) => {
               correlationId: uuidv4(),
               jobSetting: jobSetting,
               metadata: metadata,
-              workWeChatAppNotification: {
-                ...sendParameter,
-                ...sendData,
-              },
+              workWeChatAppNotification: workWeChatAppNotification,
             })
           : getUpdateData !== undefined &&
             getUpdateData({
@@ -883,86 +896,9 @@ export const useAction = (props: SelectContentHookProps) => {
                 : "",
               jobSetting: jobSetting,
               metadata: metadata,
-              workWeChatAppNotification: {
-                ...sendParameter,
-                ...sendData,
-              },
+              workWeChatAppNotification: workWeChatAppNotification,
             })
-        // if (isNewOrUpdate === "new") {
-        //   getSendData !== undefined &&
-        //     getSendData({
-        //       correlationId: uuidv4(),
-        //       jobSetting: jobSetting,
-        //       metadata: [
-        //         {
-        //           key: "title",
-        //           value: title,
-        //         },
-        //         {
-        //           key: "enterpriseName",
-        //           value: `${corpsValue?.corpName}`,
-        //         },
-        //         {
-        //           key: "enterpriseId",
-        //           value: `${corpsValue?.id}`,
-        //         },
-        //         {
-        //           key: "appName",
-        //           value: `${corpAppValue?.name}`,
-        //         },
-        //         {
-        //           key: "weChatAppId",
-        //           value: `${corpAppValue?.appId}`,
-        //         },
-        //         {
-        //           key: "appId",
-        //           value: `${corpAppValue?.id}`,
-        //         },
-        //       ],
-        //       workWeChatAppNotification: {
-        //         ...sendParameter,
-        //         ...sendData,
-        //       },
-        //     })
-        // } else {
-        //   getUpdateData !== undefined &&
-        //     getUpdateData({
-        //       messageJobId: !!updateMessageJobInformation?.id
-        //         ? updateMessageJobInformation?.id
-        //         : "",
-        //       jobSetting: jobSetting,
-        //       metadata: [
-        //         {
-        //           key: "title",
-        //           value: title,
-        //         },
-        //         {
-        //           key: "enterpriseName",
-        //           value: `${corpsValue?.corpName}`,
-        //         },
-        //         {
-        //           key: "enterpriseId",
-        //           value: `${corpsValue?.id}`,
-        //         },
-        //         {
-        //           key: "appName",
-        //           value: `${corpAppValue?.name}`,
-        //         },
-        //         {
-        //           key: "weChatAppId",
-        //           value: `${corpAppValue?.appId}`,
-        //         },
-        //         {
-        //           key: "appId",
-        //           value: `${corpAppValue?.id}`,
-        //         },
-        //       ],
-        //       workWeChatAppNotification: {
-        //         ...sendParameter,
-        //         ...sendData,
-        //       },
-        //     })
-        // }
+
         setWhetherToCallAPI(true)
       }
     } else {
@@ -980,6 +916,20 @@ export const useAction = (props: SelectContentHookProps) => {
     corpAppValue,
     isNewOrUpdate,
   ])
+
+  // 消息类型更换时替换文件的字段
+  useEffect(() => {
+    if (
+      messageTypeValue.groupBy === "文件" &&
+      messageTypeValue.type !== MessageDataFileType.Text
+    ) {
+      setFile({
+        fileName: "",
+        fileUrl: "",
+        fileType: messageTypeValue.type,
+      })
+    }
+  }, [messageTypeValue])
 
   return {
     corpsValue,

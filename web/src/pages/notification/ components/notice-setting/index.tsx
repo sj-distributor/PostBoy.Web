@@ -6,8 +6,12 @@ import { Button, Snackbar } from "@mui/material"
 import SelectContent from "../../../enterprise/components/select-content"
 
 const NoticeSetting = memo((props: NoticeSettingProps) => {
-  const { updateMessageJobInformation, onNoticeCancel, onUpdateMessageJob } =
-    props
+  const {
+    updateMessageJobInformation,
+    onNoticeCancel,
+    onUpdateMessageJob,
+    showErrorPrompt,
+  } = props
 
   const {
     setUpdateData,
@@ -33,6 +37,7 @@ const NoticeSetting = memo((props: NoticeSettingProps) => {
           isNewOrUpdate={"update"}
           updateMessageJobInformation={updateMessageJobInformation}
           setWhetherToCallAPI={setWhetherToCallAPI}
+          showErrorPrompt={showErrorPrompt}
         />
       </div>
       <div className={styles.boxButtonWrap}>
