@@ -6,7 +6,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Snackbar,
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
@@ -348,6 +347,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                 上传文件
                 {messageTypeValue.title === "图文" ? (
                   <input
+                    ref={inputRef}
                     hidden
                     type="file"
                     accept="image/jpg,image/png"
@@ -358,6 +358,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                   />
                 ) : (
                   <input
+                    ref={inputRef}
                     hidden
                     type="file"
                     accept={fileAccept}

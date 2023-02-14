@@ -31,7 +31,6 @@ import { messageTypeList, timeZone } from "../../../../dtos/send-message-job"
 import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
 import { v4 as uuidv4 } from "uuid"
-import { useBoolean } from "ahooks"
 
 export const useAction = (props: SelectContentHookProps) => {
   const {
@@ -758,7 +757,7 @@ export const useAction = (props: SelectContentHookProps) => {
       ) {
         if (workWeChatAppNotification.mpNews?.articles.length > 0) {
           const arr: PictureText[] = []
-          workWeChatAppNotification.mpNews?.articles.map((item) =>
+          workWeChatAppNotification.mpNews?.articles.map((item: PictureText) =>
             arr.push({
               title: item.title,
               content: item.content,
