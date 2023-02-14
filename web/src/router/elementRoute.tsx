@@ -1,8 +1,9 @@
-import Home from "../pages/home";
-import Enterprise from "../pages/enterprise";
-import { RouteItem } from "../dtos/route-type";
-import "../fonts/iconfont/iconfont.css";
-import User from "../pages/user";
+import Home from "../pages/home"
+import Enterprise from "../pages/enterprise"
+import SendEmail from "../pages/email"
+import { RouteItem } from "../dtos/route-type"
+import "../fonts/iconfont/iconfont.css"
+import User from "../pages/user"
 
 export const routerArray: RouteItem[] = [
   {
@@ -14,14 +15,19 @@ export const routerArray: RouteItem[] = [
       {
         path: "/home/enterprise",
         title: "企业微信",
-        elementChild: <Enterprise />,
+        elementChild: <Enterprise />
       },
-    ],
+      {
+        path: "/home/email",
+        title: "邮件发送",
+        elementChild: <SendEmail />
+      }
+    ]
   },
   {
     path: "/user",
     head: "用户管理",
     icons: "iconfont iconic_account_circle_24px",
-    element: <User />,
-  },
-];
+    element: <User />
+  }
+]
