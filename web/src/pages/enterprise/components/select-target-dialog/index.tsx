@@ -25,6 +25,7 @@ import {
   ITagsList,
 } from "../../../../dtos/enterprise"
 import { memo, useEffect } from "react"
+import { CircularProgress } from "@mui/material"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -160,8 +161,26 @@ const SelectTargetDialog = memo(
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             {departmentKeyValue?.data && departmentKeyValue.data.length > 0 && (
-              <div style={{ height: "15rem", overflowY: "auto" }}>
-                {recursiveRenderDeptList(departmentKeyValue.data, 0)}
+              <div
+                style={{
+                  height: "15rem",
+                  overflowY: "auto",
+                  position: "relative",
+                }}
+              >
+                {isLoadStop ? (
+                  recursiveRenderDeptList(departmentKeyValue.data, 0)
+                ) : (
+                  <CircularProgress
+                    style={{
+                      position: "absolute",
+                      width: "2rem",
+                      height: "2rem",
+                      left: "13rem",
+                      top: "5.5rem",
+                    }}
+                  />
+                )}
               </div>
             )}
 

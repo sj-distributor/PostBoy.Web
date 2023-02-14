@@ -180,8 +180,8 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个App对象
   useEffect(() => {
-    setCorpAppValue(corpAppList[0])
-  }, [corpAppList])
+    isNewOrUpdate === "new" && setCorpAppValue(corpAppList[0])
+  }, [corpAppList, isNewOrUpdate])
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
