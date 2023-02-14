@@ -1,4 +1,5 @@
 import { useBoolean } from "ahooks"
+import { Actions } from "ahooks/lib/useBoolean"
 import { clone } from "ramda"
 import { useEffect, useRef, useState } from "react"
 import {
@@ -21,6 +22,7 @@ import {
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
 import { convertType } from "../../uilts/convert-type"
+import { parameterJudgment } from "../../uilts/parameter-judgment"
 
 // 转换数组类型返回
 const messageJobConvertType = (arr: IMessageJob[]) => {
@@ -80,6 +82,12 @@ export const useAction = () => {
   const [alertShow, setAlertShow] = useBoolean(false)
   const [loading, setLoading] = useBoolean(false)
 
+  const [promptText, setPromptText] = useState<string>("")
+
+  const [openError, openErrorAction] = useBoolean(false)
+
+  const [failSend, failSendAction] = useBoolean(false)
+
   const [updateMessageJobInformation, setUpdateMessageJobInformation] =
     useState<ILastShowTableData>()
 
@@ -98,6 +106,12 @@ export const useAction = () => {
       return
     }
     setAlertShow.setTrue()
+  }
+
+  // 弹出警告
+  const showErrorPrompt = (text: string) => {
+    setPromptText(text)
+    openErrorAction.setTrue()
   }
 
   const messageRecordConvertType = (
@@ -151,18 +165,19 @@ export const useAction = () => {
     cloneData.workWeChatAppNotification = convertType(
       cloneData.workWeChatAppNotification
     )
-
-    PostMessageJobUpdate(cloneData)
-      .then(() => {
-        noticeSettingRef.current?.close()
-        setTimeout(() => {
-          getMessageJob()
-        }, 500)
-      })
-      .catch((err) => {
-        console.log("失败")
-        throw Error(err)
-      })
+    if (parameterJudgment(cloneData, showErrorPrompt)) {
+      PostMessageJobUpdate(cloneData)
+        .then(() => {
+          noticeSettingRef.current?.close()
+          setTimeout(() => {
+            getMessageJob()
+          }, 500)
+        })
+        .catch((err) => {
+          failSendAction.setTrue()
+          throw Error(err)
+        })
+    }
   }
 
   // 获取MessageJob 数组
@@ -209,6 +224,15 @@ export const useAction = () => {
     }
   }, [alertShow])
 
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse()
+      }, 3000)
+    }
+  }, [openError])
+
   return {
     noticeSettingRef,
     sendRecordRef,
@@ -229,5 +253,8 @@ export const useAction = () => {
     getMessageJob,
     updateData,
     onUpdateMessageJob,
+    failSend,
+    promptText,
+    openError,
   }
 }

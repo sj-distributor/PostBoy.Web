@@ -6,6 +6,7 @@ import { PostMessageSend } from "../../../../api/enterprise"
 import { ISendMessageCommand } from "../../../../dtos/enterprise"
 import { ModalBoxRef } from "../../../../dtos/modal"
 import { convertType } from "../../../../uilts/convert-type"
+import { parameterJudgment } from "../../../../uilts/parameter-judgment"
 
 const useAction = () => {
   const [sendData, setSendData] = useState<ISendMessageCommand>()
@@ -18,11 +19,9 @@ const useAction = () => {
 
   const sendRecordRef = useRef<ModalBoxRef>(null)
 
-  const [whetherToCallAPI, setWhetherToCallAPI] = useState<boolean>(false)
-
   const [loading, loadingAction] = useBoolean(false)
   const [success, successAction] = useBoolean(false)
-  const timer = useRef<number>()
+  const [failSend, failSendAction] = useBoolean(false)
 
   const clickSendRecord = (operation: string) => {
     operation === "open"
@@ -31,36 +30,30 @@ const useAction = () => {
   }
 
   const handleSubmit = async () => {
+    console.log("res", sendData)
     if (!loading) {
       successAction.setFalse()
       loadingAction.setTrue()
-
-      if (whetherToCallAPI) {
-        const cloneData = clone(sendData)
+      const cloneData = clone(sendData)
+      if (!!cloneData) {
+        cloneData.workWeChatAppNotification = convertType(
+          cloneData.workWeChatAppNotification
+        )
+      }
+      if (parameterJudgment(cloneData, showErrorPrompt)) {
         if (!!cloneData) {
-          cloneData.workWeChatAppNotification = convertType(
-            cloneData.workWeChatAppNotification
-          )
-
           // 接口调用
           PostMessageSend(cloneData)
             .then((res) => {
               successAction.setTrue()
               loadingAction.setFalse()
-              timer.current = window.setTimeout(() => {
-                successAction.setFalse()
-              }, 2000)
             })
             .catch((error) => {
-              successAction.setFalse()
               loadingAction.setFalse()
+              failSendAction.setTrue()
             })
         }
       } else {
-        showErrorPrompt(
-          "The message job has information that is not filled in!"
-        )
-        successAction.setFalse()
         loadingAction.setFalse()
       }
     }
@@ -87,8 +80,16 @@ const useAction = () => {
       setTimeout(() => {
         openErrorAction.setFalse()
       }, 3000)
+    } else if (failSend) {
+      setTimeout(() => {
+        failSendAction.setFalse()
+      }, 3000)
+    } else if (success) {
+      setTimeout(() => {
+        successAction.setFalse()
+      }, 3000)
     }
-  }, [openError])
+  }, [openError, failSend, success])
 
   return {
     setSendData,
@@ -98,11 +99,14 @@ const useAction = () => {
     isShowMessageParams,
     setIsShowMessageParams,
     sendRecordRef,
-    setWhetherToCallAPI,
     handleSubmit,
     buttonSx,
     loading,
     showErrorPrompt,
+    success,
+    failSend,
+    successAction,
+    failSendAction,
   }
 }
 

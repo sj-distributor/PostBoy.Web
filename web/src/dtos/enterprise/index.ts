@@ -209,7 +209,7 @@ export const messageSendResultType = {
 }
 
 export interface ISendMessageCommand {
-  correlationId: string
+  correlationId?: string
   jobSetting: IJobSettingDto
   metadata: { key: string; value: string }[]
   emailNotification?: {

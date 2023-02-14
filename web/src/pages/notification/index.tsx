@@ -1,4 +1,4 @@
-import { Alert, Button, Tooltip } from "@mui/material"
+import { Alert, AlertTitle, Button, Snackbar, Tooltip } from "@mui/material"
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid"
 import styles from "./index.module.scss"
 import moment from "moment"
@@ -9,6 +9,7 @@ import SendRecord from "./ components/send-record"
 import React from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
 import RestartAltIcon from "@mui/icons-material/RestartAlt"
+import { Actions } from "ahooks/lib/useBoolean"
 
 const asyncTootip = (title: string, styles: string) => {
   return (
@@ -19,8 +20,12 @@ const asyncTootip = (title: string, styles: string) => {
 }
 
 const SendNotice = React.memo(
-  (props: { showErrorPrompt: (text: string) => void }) => {
-    const { showErrorPrompt } = props
+  (props: {
+    showErrorPrompt: (text: string) => void
+    successAction: Actions
+    failSendAction: Actions
+  }) => {
+    const { showErrorPrompt, successAction, failSendAction } = props
     const {
       noticeSettingRef,
       sendRecordRef,
@@ -41,6 +46,9 @@ const SendNotice = React.memo(
       getMessageJob,
       updateData,
       onUpdateMessageJob,
+      failSend,
+      promptText,
+      openError,
     } = useAction()
 
     const handleClick = async () => {
@@ -146,6 +154,25 @@ const SendNotice = React.memo(
 
     return (
       <div className={styles.tableWrap}>
+        <Snackbar
+          message={promptText}
+          open={openError}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        />
+        <Snackbar
+          open={failSend}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert severity="error">
+            <AlertTitle>Failed to send</AlertTitle>
+          </Alert>
+        </Snackbar>
         {alertShow && (
           <Alert severity="error" className={styles.alert}>
             即时发送类型不能设置!

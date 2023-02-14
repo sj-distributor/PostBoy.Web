@@ -13,7 +13,6 @@ export interface SelectContentProps {
   >
   updateMessageJobInformation?: ILastShowTableData
   isNewOrUpdate: string
-  setWhetherToCallAPI: React.Dispatch<React.SetStateAction<boolean>>
   showErrorPrompt: (text: string) => void
 }
 
@@ -26,6 +25,5 @@ export interface SelectContentHookProps {
   >
   updateMessageJobInformation?: ILastShowTableData
   isNewOrUpdate: string
-  setWhetherToCallAPI: React.Dispatch<React.SetStateAction<boolean>>
   showErrorPrompt: (text: string) => void
 }

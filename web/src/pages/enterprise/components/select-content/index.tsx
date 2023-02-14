@@ -33,7 +33,6 @@ const SelectContent = memo((props: SelectContentProps) => {
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
-    setWhetherToCallAPI,
     showErrorPrompt,
   } = props
 
@@ -85,7 +84,6 @@ const SelectContent = memo((props: SelectContentProps) => {
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
-    setWhetherToCallAPI,
     showErrorPrompt,
   })
 
@@ -278,30 +276,12 @@ const SelectContent = memo((props: SelectContentProps) => {
           </Select>
         </FormControl>
 
-        <FormControl className={styles.inputWrap}>
-          <InputLabel id="demo-simple-select-label">时区</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={timeZoneValue}
-            label="时区"
-            onChange={(e) => {
-              switchTimeZone(Number(e.target.value))
-            }}
-          >
-            {timeZone.map((item, key) => (
-              <MenuItem key={key} value={item.value}>
-                {item.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
         <Button
           sx={{
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
+            // margin: "0 1rem",
           }}
           variant="contained"
           onClick={() => {
@@ -342,9 +322,13 @@ const SelectContent = memo((props: SelectContentProps) => {
                 messageTypeValue.groupBy === "")) && (
               <TextField
                 className={styles.input}
+                style={{
+                  marginBottom: "0.7rem",
+                  marginTop: "1.5rem",
+                }}
                 label="内容"
                 multiline
-                rows={4}
+                rows={6}
                 variant="outlined"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -447,20 +431,56 @@ const SelectContent = memo((props: SelectContentProps) => {
             />
           )}
           {sendTypeValue === MessageJobSendType.Recurring && (
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              <Scheduler
-                cron={cronExp}
-                setCron={setCronExp}
-                setCronError={setCronError}
-                isAdmin={true}
-                locale={"zh_CN"}
-              />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "100%",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                }}
+              >
+                <Scheduler
+                  cron={cronExp}
+                  setCron={setCronExp}
+                  setCronError={setCronError}
+                  isAdmin={true}
+                  locale={"zh_CN"}
+                />
 
-              <div className={styles.separate} />
+                <FormControl
+                  style={{
+                    width: 252,
+                    marginTop: "1rem",
+                    marginLeft: "2rem",
+                  }}
+                >
+                  <InputLabel id="demo-simple-select-label">时区</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={timeZoneValue}
+                    label="时区"
+                    onChange={(e) => {
+                      switchTimeZone(Number(e.target.value))
+                    }}
+                  >
+                    {timeZone.map((item, key) => (
+                      <MenuItem key={key} value={item.value}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
               <TextField
                 label="终止时间"
                 type="datetime-local"
-                sx={{ width: 250, marginTop: 2 }}
+                sx={{ width: 252, marginTop: 2 }}
                 defaultValue={
                   !!endDateValue
                     ? moment(endDateValue).format("yyyy-MM-DDThh:mm")

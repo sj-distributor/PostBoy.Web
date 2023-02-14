@@ -2,7 +2,7 @@ import styles from "./index.module.scss"
 import { useAction } from "./hook"
 import { memo } from "react"
 import { NoticeSettingProps } from "./props"
-import { Button, Snackbar } from "@mui/material"
+import { Alert, AlertTitle, Button, Snackbar } from "@mui/material"
 import SelectContent from "../../../enterprise/components/select-content"
 
 const NoticeSetting = memo((props: NoticeSettingProps) => {
@@ -13,30 +13,15 @@ const NoticeSetting = memo((props: NoticeSettingProps) => {
     showErrorPrompt,
   } = props
 
-  const {
-    setUpdateData,
-    setWhetherToCallAPI,
-    promptText,
-    openError,
-    clickUpdate,
-  } = useAction({ onUpdateMessageJob })
+  const { setUpdateData, clickUpdate } = useAction({ onUpdateMessageJob })
 
   return (
     <div className={styles.noticeWrap}>
-      <Snackbar
-        message={promptText}
-        open={openError}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      />
       <div>
         <SelectContent
           getUpdateData={setUpdateData}
           isNewOrUpdate={"update"}
           updateMessageJobInformation={updateMessageJobInformation}
-          setWhetherToCallAPI={setWhetherToCallAPI}
           showErrorPrompt={showErrorPrompt}
         />
       </div>

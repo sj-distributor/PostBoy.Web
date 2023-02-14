@@ -2,7 +2,15 @@ import TextField from "@mui/material/TextField"
 import useAction from "./hook"
 import styles from "./index.module.scss"
 import SendNotice from "../../../notification"
-import { Button, Switch, Snackbar, Box, CircularProgress } from "@mui/material"
+import {
+  Button,
+  Switch,
+  Snackbar,
+  Box,
+  CircularProgress,
+  Alert,
+  AlertTitle,
+} from "@mui/material"
 import ModalBox from "../../../../components/modal/modal"
 import SelectContent from "../select-content"
 import { green } from "@mui/material/colors"
@@ -14,13 +22,16 @@ const SendMessage = () => {
     isShowMessageParams,
     setIsShowMessageParams,
     sendRecordRef,
-    setWhetherToCallAPI,
     promptText,
     openError,
     handleSubmit,
     buttonSx,
     loading,
     showErrorPrompt,
+    success,
+    failSend,
+    successAction,
+    failSendAction,
   } = useAction()
 
   return (
@@ -33,11 +44,32 @@ const SendMessage = () => {
           horizontal: "center",
         }}
       />
+      <Snackbar
+        open={success}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert severity="success">
+          <AlertTitle>Sent successfully</AlertTitle>
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={failSend}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert severity="error">
+          <AlertTitle>Failed to send</AlertTitle>
+        </Alert>
+      </Snackbar>
       <div className={styles.selectInputBox}>
         <SelectContent
           getSendData={setSendData}
           isNewOrUpdate={"new"}
-          setWhetherToCallAPI={setWhetherToCallAPI}
           showErrorPrompt={showErrorPrompt}
         />
       </div>
@@ -47,6 +79,7 @@ const SendMessage = () => {
           justifyContent: "space-between",
           alignContent: "center",
           marginTop: "0.5rem",
+          padding: "0rem 8rem",
         }}
       >
         <Box sx={{ position: "relative" }}>
@@ -111,7 +144,11 @@ const SendMessage = () => {
         onCancel={() => clickSendRecord("close")}
         title={"发送记录"}
       >
-        <SendNotice showErrorPrompt={showErrorPrompt} />
+        <SendNotice
+          showErrorPrompt={showErrorPrompt}
+          successAction={successAction}
+          failSendAction={failSendAction}
+        />
       </ModalBox>
     </div>
   )

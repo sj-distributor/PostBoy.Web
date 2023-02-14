@@ -30,7 +30,6 @@ import {
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job"
 import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
-import { v4 as uuidv4 } from "uuid"
 
 export const useAction = (props: SelectContentHookProps) => {
   const {
@@ -38,7 +37,6 @@ export const useAction = (props: SelectContentHookProps) => {
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
-    setWhetherToCallAPI,
     showErrorPrompt,
   } = props
 
@@ -105,16 +103,10 @@ export const useAction = (props: SelectContentHookProps) => {
   const [isLoadStop, setIsLoadStop] = useState<boolean>(false)
   //  jobSetting
   const [jobSetting, setJobSetting] = useState<IJobSettingDto>()
-  //  is JobSetting true
-  const [isJobSetting, setIsJobSetting] = useState<boolean>(false)
   // workWeChatAppNotification SendParameter
   const [sendParameter, setSendParameter] = useState<SendParameter>()
-  //
-  const [isSendParameter, setIsSendParameter] = useState<boolean>(false)
   // workWeChatAppNotification SendParameter
   const [sendData, setSendData] = useState<SendData>()
-  //
-  const [isSendData, setIsSendData] = useState<boolean>(false)
   // 判断是否拿到上次用户部门数据
   const [isGetLastTimeData, setIsGetLastTimeData] = useState<boolean>(false)
   // 上次上传的tagsList
@@ -616,36 +608,6 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue])
 
-  //判断jobSetting是否正确
-  useEffect(() => {
-    if (jobSetting !== undefined) {
-      switch (sendTypeValue) {
-        case MessageJobSendType.Fire: {
-          setIsJobSetting(jobSetting !== undefined && !!jobSetting.timezone)
-          break
-        }
-        case MessageJobSendType.Delayed: {
-          setIsJobSetting(
-            jobSetting !== undefined &&
-              !!jobSetting.timezone &&
-              jobSetting.delayedJob !== undefined &&
-              !!jobSetting.delayedJob.enqueueAt
-          )
-          break
-        }
-        default: {
-          setIsJobSetting(
-            jobSetting !== undefined &&
-              !!jobSetting.timezone &&
-              jobSetting.recurringJob !== undefined &&
-              !!jobSetting.recurringJob.cronExpression
-          )
-          break
-        }
-      }
-    }
-  }, [jobSetting, sendTypeValue])
-
   // sendData
   useEffect(() => {
     switch (messageTypeValue.title) {
@@ -692,33 +654,6 @@ export const useAction = (props: SelectContentHookProps) => {
     isNewOrUpdate,
   ])
 
-  // 判断sendData是否正确
-  useEffect(() => {
-    switch (messageTypeValue.title) {
-      case "文本": {
-        setIsSendData(sendData !== undefined && !!sendData.text?.content)
-        break
-      }
-      case "图文": {
-        setIsSendData(
-          sendData !== undefined &&
-            sendData.mpNews !== undefined &&
-            sendData.mpNews.articles.length > 0
-        )
-        break
-      }
-      default: {
-        setIsSendData(
-          sendData !== undefined &&
-            sendData.file !== undefined &&
-            sendData.file.fileName.length > 0 &&
-            sendData.file.fileType !== MessageDataFileType.Text
-        )
-        break
-      }
-    }
-  }, [sendData, messageTypeValue.title])
-
   // sendParameter
   useEffect(() => {
     const a: SendParameter = {
@@ -733,20 +668,6 @@ export const useAction = (props: SelectContentHookProps) => {
     }
     setSendParameter(a)
   }, [corpAppValue?.id, tagsNameList, sendObject])
-
-  // 判断sendParameter是否正确
-  useEffect(() => {
-    setIsSendParameter(
-      sendParameter !== undefined &&
-        !!sendParameter.appId &&
-        ((sendParameter.toTags !== undefined &&
-          sendParameter.toTags.length > 0) ||
-          (sendParameter.toUsers !== undefined &&
-            sendParameter.toUsers.length > 0) ||
-          (sendParameter.toParties !== undefined &&
-            sendParameter.toParties.length > 0))
-    )
-  }, [sendParameter])
 
   useEffect(() => {
     if (updateMessageJobInformation !== undefined) {
@@ -867,67 +788,57 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 返回最终的数据给外层
   useEffect(() => {
-    if (isJobSetting && isSendParameter && isSendData && !!title) {
-      if (jobSetting !== undefined && sendParameter !== undefined) {
-        const metadata = [
-          {
-            key: "title",
-            value: title,
-          },
-          {
-            key: "enterpriseName",
-            value: `${corpsValue?.corpName}`,
-          },
-          {
-            key: "enterpriseId",
-            value: `${corpsValue?.id}`,
-          },
-          {
-            key: "appName",
-            value: `${corpAppValue?.name}`,
-          },
-          {
-            key: "weChatAppId",
-            value: `${corpAppValue?.appId}`,
-          },
-          {
-            key: "appId",
-            value: `${corpAppValue?.id}`,
-          },
-        ]
-        const workWeChatAppNotification = {
-          ...sendParameter,
-          ...sendData,
-        }
-
-        isNewOrUpdate === "new"
-          ? getSendData !== undefined &&
-            getSendData({
-              correlationId: uuidv4(),
-              jobSetting: jobSetting,
-              metadata: metadata,
-              workWeChatAppNotification: workWeChatAppNotification,
-            })
-          : getUpdateData !== undefined &&
-            getUpdateData({
-              messageJobId: !!updateMessageJobInformation?.id
-                ? updateMessageJobInformation?.id
-                : "",
-              jobSetting: jobSetting,
-              metadata: metadata,
-              workWeChatAppNotification: workWeChatAppNotification,
-            })
-
-        setWhetherToCallAPI(true)
+    if (jobSetting !== undefined && sendParameter !== undefined) {
+      const metadata = [
+        {
+          key: "title",
+          value: title,
+        },
+        {
+          key: "enterpriseName",
+          value: `${corpsValue?.corpName}`,
+        },
+        {
+          key: "enterpriseId",
+          value: `${corpsValue?.id}`,
+        },
+        {
+          key: "appName",
+          value: `${corpAppValue?.name}`,
+        },
+        {
+          key: "weChatAppId",
+          value: `${corpAppValue?.appId}`,
+        },
+        {
+          key: "appId",
+          value: `${corpAppValue?.id}`,
+        },
+      ]
+      const workWeChatAppNotification = {
+        ...sendParameter,
+        ...sendData,
       }
-    } else {
-      setWhetherToCallAPI(false)
+
+      isNewOrUpdate === "new"
+        ? getSendData !== undefined &&
+          getSendData({
+            jobSetting: jobSetting,
+            metadata: metadata,
+            workWeChatAppNotification: workWeChatAppNotification,
+          })
+        : getUpdateData !== undefined &&
+          getUpdateData({
+            messageJobId: !!updateMessageJobInformation?.id
+              ? updateMessageJobInformation?.id
+              : "",
+            jobSetting: jobSetting,
+            metadata: metadata,
+            workWeChatAppNotification: workWeChatAppNotification,
+          })
     }
   }, [
     title,
-    isJobSetting,
-    isSendParameter,
-    isSendData,
     jobSetting,
     sendParameter,
     sendData,
