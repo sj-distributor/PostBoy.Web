@@ -471,7 +471,7 @@ export const useAction = (props: SelectContentHookProps) => {
     } else {
       if (Array.from(files).length > 0) {
         const isExceedSize = judgingFileSize(
-          "图文",
+          "文件",
           Array.from(files),
           messageTypeValue.type
         )
