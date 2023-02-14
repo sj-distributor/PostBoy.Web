@@ -12,13 +12,10 @@
   .boxButtonWrap {
     display: flex;
     justify-content: flex-end;
-    padding-bottom: 0.5rem;
-    padding-top: 0.5rem;
-    // margin-right: 1rem;
+    padding: 0.5rem 0;
 
     .boxButton {
-      line-height: 0.9rem;
-      margin: 0rem 2rem;
+      margin: 0rem 0 0 2rem;
     }
   }
 }

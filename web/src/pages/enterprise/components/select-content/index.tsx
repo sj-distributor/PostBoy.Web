@@ -403,7 +403,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             </div>
           )}
         </div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           {(sendTypeValue === MessageJobSendType.Delayed ||
             sendTypeValue === MessageJobSendType.Recurring) && (
             <div>

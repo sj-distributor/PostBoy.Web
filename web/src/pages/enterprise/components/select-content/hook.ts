@@ -497,7 +497,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 文件删除
   const fileDelete = (name: string, index?: number) => {
-    if (name === "文件") {
+    if (name === "file") {
       setFile({
         fileName: "",
         fileContent: "",
