@@ -4,14 +4,14 @@ import { useLocation } from "react-router-dom"
 import { GetAuthUser } from "../../api/user-management"
 import { RouteState } from "../../dtos/route-index"
 import { RouteItem } from "../../dtos/route-type"
-import { IUserDto } from "../../dtos/user-management"
+import { IUserResponse } from "../../dtos/user-management"
 import { routerArray } from "../../router/elementRoute"
 
 const useMainAction = () => {
   const mainLocation = useLocation()
   const [clickMainIndex, setMainClickIndex] = useState<number>()
   const [haveAdministrator, haveAdministratorAction] = useBoolean(false)
-  const [userData, setUserData] = useState<IUserDto>()
+  const [userData, setUserData] = useState<IUserResponse>()
 
   useEffect(() => {
     const getMainClickIndex = () => {

@@ -7,7 +7,7 @@ import {
   IDepartmentResponse,
   IDepartmentUsersResonse,
   ITagsListResponse,
-  ISendMsgData
+  ISendMsgData,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
