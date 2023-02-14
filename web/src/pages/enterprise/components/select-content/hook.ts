@@ -724,7 +724,11 @@ export const useAction = (props: SelectContentHookProps) => {
       setCorpAppValue(updateMessageJobInformation.app)
       setSendTypeValue(updateMessageJobInformation.jobType)
 
-      setTitle(updateMessageJobInformation.title)
+      setTitle(
+        updateMessageJobInformation.title !== undefined
+          ? updateMessageJobInformation.title
+          : ""
+      )
 
       const workWeChatAppNotification =
         updateMessageJobInformation.workWeChatAppNotification
