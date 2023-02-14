@@ -454,7 +454,11 @@ export const useAction = (props: SelectContentHookProps) => {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (type === "图文") {
-      const array = Array.from(files)
+      const array =
+        Array.from(files).length > 8
+          ? Array.from(files).slice(-8)
+          : Array.from(files)
+
       const isExceedSize = judgingFileSize("图文", array)
       if (isExceedSize) {
         e.target.value = ""
