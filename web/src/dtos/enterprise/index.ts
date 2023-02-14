@@ -287,6 +287,7 @@ export interface IDtoExtend {
 export interface ILastShowTableData extends IMessageJobBase {
   title: string
   content?: string
+  sendType: string
   enterprise: {
     id: string
     corpName: string
@@ -328,6 +329,13 @@ export interface PictureText {
   title: string
   content: string
   fileContent?: string
+  fileName: string
   contentSourceUrl?: string
   fileUrl?: string
+}
+
+export const messageJobSendType = {
+  [MessageJobSendType.Fire]: "即时发送",
+  [MessageJobSendType.Delayed]: "定时发送",
+  [MessageJobSendType.Recurring]: "周期发送",
 }

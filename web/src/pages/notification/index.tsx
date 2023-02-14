@@ -96,6 +96,16 @@ const SendNotice = React.memo(
           moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
       },
       {
+        field: "sendType",
+        headerName: "发送类型",
+        width: 200,
+        headerAlign: "center",
+        disableColumnMenu: true,
+        sortable: false,
+        align: "center",
+        headerClassName: styles.tableBoxHeader,
+      },
+      {
         field: "operate",
         headerName: "操作",
         flex: 1,
@@ -138,14 +148,14 @@ const SendNotice = React.memo(
       <div className={styles.tableWrap}>
         {alertShow && (
           <Alert severity="error" className={styles.alert}>
-            该MessageJob暂时设置不了!
+            即时发送类型不能设置!
           </Alert>
         )}
         <div
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            paddingTop: "0.5rem",
+            paddingTop: "1rem",
           }}
         >
           <LoadingButton
@@ -173,7 +183,7 @@ const SendNotice = React.memo(
               paginationMode="server"
               rowHeight={56}
               page={dto.page}
-              style={{ height: 675, width: "100%" }}
+              style={{ height: 675, width: "95%" }}
               rowCount={dto.rowCount}
               onPageChange={(value) => updateData("page", value)}
               onPageSizeChange={(value) => updateData("pageSize", value)}

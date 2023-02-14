@@ -25,6 +25,7 @@ import {
   MessageJobSendType,
   PictureText,
 } from "../../../../dtos/enterprise"
+import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 
 const SelectContent = memo((props: SelectContentProps) => {
   const {
@@ -78,6 +79,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     lastTimePictureText,
     lastTimeFile,
     inputRef,
+    fileDelete,
   } = useAction({
     getSendData,
     isNewOrUpdate,
@@ -93,11 +95,20 @@ const SelectContent = memo((props: SelectContentProps) => {
         case MessageDataFileType.Image: {
           return (
             <div className={styles.picturebackground}>
-              <img
-                className={styles.image}
-                src={state === "new" ? file?.fileContent : file?.fileUrl}
-                alt={file?.fileName}
-              />
+              <div style={{ position: "relative" }}>
+                <img
+                  className={styles.image}
+                  src={state === "new" ? file?.fileContent : file?.fileUrl}
+                  alt={file?.fileName}
+                />
+
+                {state === "new" && (
+                  <HighlightOffIcon
+                    className={styles.deleteIcon}
+                    onClick={() => fileDelete("file")}
+                  />
+                )}
+              </div>
             </div>
           )
         }
@@ -107,6 +118,12 @@ const SelectContent = memo((props: SelectContentProps) => {
               <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
                 {file?.fileName}
               </a>
+              {state === "new" && (
+                <HighlightOffIcon
+                  className={styles.deleteIcon}
+                  onClick={() => fileDelete("file")}
+                />
+              )}
             </div>
           )
         }
@@ -118,12 +135,19 @@ const SelectContent = memo((props: SelectContentProps) => {
       pictureText.length > 0 && (
         <div className={styles.picturebackground}>
           {pictureText.map((item, index) => (
-            <img
-              src={state === "new" ? item.fileContent : item?.fileUrl}
-              className={styles.image}
-              alt={item.title}
-              key={index}
-            />
+            <div style={{ position: "relative" }} key={index}>
+              <img
+                src={state === "new" ? item.fileContent : item?.fileUrl}
+                className={styles.image}
+                alt={item.title}
+              />
+              {state === "new" && (
+                <HighlightOffIcon
+                  className={styles.deleteIcon}
+                  onClick={() => fileDelete("picture", index)}
+                />
+              )}
+            </div>
           ))}
         </div>
       )
@@ -278,7 +302,6 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            // margin: "0 1rem",
           }}
           variant="contained"
           onClick={() => {

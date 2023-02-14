@@ -472,6 +472,7 @@ export const useAction = (props: SelectContentHookProps) => {
               title: title,
               content: content,
               fileContent: base64 as string,
+              fileName: array[key].name,
             })
           }
           setPictureText(objectList)
@@ -498,6 +499,20 @@ export const useAction = (props: SelectContentHookProps) => {
           }))
         }
       }
+    }
+  }
+
+  // 文件删除
+  const fileDelete = (name: string, index?: number) => {
+    if (name === "文件") {
+      setFile({
+        fileName: "",
+        fileContent: "",
+        fileType: 0,
+      })
+    } else {
+      const arr = pictureText.filter((x, i) => i !== index)
+      setPictureText(arr)
     }
   }
 
@@ -766,6 +781,7 @@ export const useAction = (props: SelectContentHookProps) => {
               title: item.title,
               content: item.content,
               fileUrl: item.fileUrl,
+              fileName: item.fileName,
             })
           )
           setLastTimePictureText(arr)
@@ -977,5 +993,6 @@ export const useAction = (props: SelectContentHookProps) => {
     lastTimePictureText,
     lastTimeFile,
     inputRef,
+    fileDelete,
   }
 }

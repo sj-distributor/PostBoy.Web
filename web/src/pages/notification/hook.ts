@@ -15,6 +15,7 @@ import {
   ISendRecordDto,
   IUpdateMessageCommand,
   MessageJobDestination,
+  messageJobSendType,
   MessageJobSendType,
   messageSendResultType,
 } from "../../dtos/enterprise"
@@ -33,6 +34,7 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         correlationId: item.correlationId,
         userAccountId: item.userAccountId,
         jobType: item.jobType,
+        sendType: messageJobSendType[item.jobType],
         jobSettingJson: item.jobSettingJson,
         jobCronExpressionDesc: item.jobCronExpressionDesc,
         destination: item.destination,

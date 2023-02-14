@@ -9,6 +9,12 @@
   padding: 0.25rem;
 }
 
+.deleteIcon {
+  position: absolute;
+  right: -0.25rem;
+  top: -0.25rem;
+}
+
 .box {
   display: flex;
   flex-direction: column;

@@ -192,7 +192,7 @@ const SelectTargetDialog = memo(
                 multiple
                 disableCloseOnSelect
                 size="small"
-                limitTags={3}
+                // limitTags={3}
                 sx={{
                   margin: "1rem 0 1rem",
                 }}
@@ -235,6 +235,7 @@ const SelectTargetDialog = memo(
               disableCloseOnSelect
               disableClearable
               limitTags={2}
+              size="small"
               value={tagsValue}
               options={tagsList}
               getOptionLabel={(option) => option.tagName}

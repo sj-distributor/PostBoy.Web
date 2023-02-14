@@ -1,8 +1,8 @@
 .tableWrap {
-  width: 90rem;
-  height: 46rem;
+  width: 105rem;
   display: flex;
   flex-direction: column;
+  padding: 0 1rem 1rem;
 
   .alert {
     position: absolute;
@@ -21,9 +21,9 @@
     justify-content: center;
 
     .tableBox {
-      padding: 1rem 0rem;
+      padding: 1rem 0 0 0;
       width: 100%;
-      height: 20rem;
+      display: flex;
 
       .createNoticeWrap {
         display: flex;
@@ -64,6 +64,7 @@
       }
     }
   }
+
   .boxButtonWrap {
     display: flex;
     justify-content: flex-end;
