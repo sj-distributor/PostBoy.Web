@@ -404,7 +404,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             <TextField
               label="发送时间"
               type="datetime-local"
-              sx={{ width: 250, marginTop: 2 }}
+              sx={{ width: 250, marginTop: 2, marginBottom: "0.7rem" }}
               defaultValue={
                 !!dateValue ? moment(dateValue).format("yyyy-MM-DDThh:mm") : ""
               }
@@ -480,7 +480,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               <TextField
                 label="终止时间"
                 type="datetime-local"
-                sx={{ width: 252, marginTop: 2 }}
+                sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
                 defaultValue={
                   !!endDateValue
                     ? moment(endDateValue).format("yyyy-MM-DDThh:mm")
