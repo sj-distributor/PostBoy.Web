@@ -16,7 +16,6 @@ import {
   IUpdateMessageCommand,
   MessageJobDestination,
   MessageJobSendType,
-  // MessageJobType,
   messageSendResultType,
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
@@ -88,10 +87,6 @@ export const useAction = () => {
 
   const onSendCancel = () => {
     sendRecordRef.current?.close()
-  }
-
-  const onConfirm = () => {
-    noticeSettingRef.current?.close()
   }
 
   const onSetting = (item: ILastShowTableData) => {
@@ -218,7 +213,6 @@ export const useAction = () => {
     deleteConfirmRef,
     onSetting,
     onSend,
-    onConfirm,
     onSendCancel,
     onNoticeCancel,
     onDeleteMessageJob,

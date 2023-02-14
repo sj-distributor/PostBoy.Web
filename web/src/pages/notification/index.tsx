@@ -27,7 +27,6 @@ const SendNotice = React.memo(
       deleteConfirmRef,
       onSetting,
       onSend,
-      onConfirm,
       onSendCancel,
       onNoticeCancel,
       onDeleteMessageJob,
@@ -94,7 +93,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         renderCell: (params: GridCellParams) =>
-          moment(params.row.createdDate).format("YYYY/MM/DD mm:ss"),
+          moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
       },
       {
         field: "operate",

@@ -41,7 +41,7 @@ const useAction = () => {
           cloneData.workWeChatAppNotification = convertType(
             cloneData.workWeChatAppNotification
           )
-          console.log("111", cloneData)
+
           // 接口调用
           PostMessageSend(cloneData)
             .then((res) => {
@@ -60,6 +60,8 @@ const useAction = () => {
         showErrorPrompt(
           "The message job has information that is not filled in!"
         )
+        successAction.setFalse()
+        loadingAction.setFalse()
       }
     }
   }

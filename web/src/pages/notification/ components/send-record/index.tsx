@@ -35,7 +35,7 @@ const SendRecord = memo(
         sortable: false,
         width: 150,
         renderCell: (params: GridCellParams) =>
-          moment(params.row.createdDate).format("YYYY/MM/DD mm:ss"),
+          moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
       },
       {
         field: "sendTheObject",
