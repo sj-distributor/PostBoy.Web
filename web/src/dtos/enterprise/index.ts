@@ -162,6 +162,7 @@ export interface IMessageJobBase {
   createdDate: string
   correlationId: string
   userAccountId: string
+  isDelete: boolean
   jobType: MessageJobSendType
   jobSettingJson: string
   jobCronExpressionDesc: string

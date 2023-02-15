@@ -47,6 +47,7 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         createdDate: item.createdDate,
         correlationId: item.correlationId,
         userAccountId: item.userAccountId,
+        isDelete: item.isDelete,
         jobType: item.jobType,
         sendType: messageJobSendType[item.jobType],
         jobSettingJson: item.jobSettingJson,
