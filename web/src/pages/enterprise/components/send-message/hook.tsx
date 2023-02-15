@@ -40,9 +40,9 @@ const useAction = () => {
           cloneData.workWeChatAppNotification
         )
       }
+      // 判断传入的信息是否填写正确
       if (parameterJudgment(cloneData, showErrorPrompt)) {
         if (!!cloneData) {
-          // 接口调用
           PostMessageSend(cloneData)
             .then((res) => {
               successAction.setTrue()
@@ -116,8 +116,6 @@ const useAction = () => {
     showErrorPrompt,
     success,
     failSend,
-    successAction,
-    failSendAction,
     clearData,
   }
 }

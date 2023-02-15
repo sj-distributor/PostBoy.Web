@@ -35,6 +35,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
+    isFromNoticeSetting = false,
   } = props
 
   const {
@@ -190,6 +191,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               disableClearable={true}
               options={corpsList}
               className={styles.inputWrap}
+              style={{ marginRight: "2rem" }}
               getOptionLabel={(option) => option.corpName}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
@@ -211,6 +213,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               value={corpAppValue}
               options={corpAppList}
               className={styles.inputWrap}
+              style={{ marginRight: "2rem" }}
               disableClearable
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -236,6 +239,7 @@ const SelectContent = memo((props: SelectContentProps) => {
           disableClearable={true}
           options={messageTypeList}
           className={styles.inputWrap}
+          style={{ marginRight: isFromNoticeSetting ? "0rem" : "2rem" }}
           value={messageTypeValue}
           getOptionLabel={(option) => option.title}
           groupBy={(option) => option.groupBy}
@@ -268,7 +272,10 @@ const SelectContent = memo((props: SelectContentProps) => {
             setMessageTypeValue(value)
           }}
         />
-        <FormControl className={styles.inputWrap}>
+        <FormControl
+          className={styles.inputWrap}
+          style={{ marginRight: "2rem" }}
+        >
           <InputLabel id="demo-simple-select-label">发送类型</InputLabel>
           <Select
             labelId="demo-simple-select-label"

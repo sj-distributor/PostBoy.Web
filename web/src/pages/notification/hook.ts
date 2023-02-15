@@ -268,5 +268,6 @@ export const useAction = () => {
     failSend,
     promptText,
     openError,
+    showErrorPrompt,
   }
 }

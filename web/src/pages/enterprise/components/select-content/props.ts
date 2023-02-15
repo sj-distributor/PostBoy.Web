@@ -15,6 +15,7 @@ export interface SelectContentProps {
   isNewOrUpdate: string
   showErrorPrompt: (text: string) => void
   clearData?: boolean
+  isFromNoticeSetting?: boolean
 }
 
 export interface SelectContentHookProps {

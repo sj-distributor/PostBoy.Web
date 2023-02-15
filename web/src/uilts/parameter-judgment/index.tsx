@@ -8,7 +8,6 @@ export const parameterJudgment = (
   data: ISendMessageCommand | IUpdateMessageCommand | undefined,
   showErrorPrompt: (text: string) => void
 ) => {
-  console.log("11", data)
   if (!!data) {
     if (
       data.jobSetting !== undefined &&
@@ -35,6 +34,8 @@ export const parameterJudgment = (
       data.workWeChatAppNotification.file === undefined
     ) {
       showErrorPrompt("Please fill in the sending information!")
+    } else if (!data.metadata.find((x) => x.key === "title")?.value) {
+      showErrorPrompt("Please fill in the title!")
     } else if (
       data.workWeChatAppNotification.text !== undefined &&
       !data.workWeChatAppNotification.text.content
@@ -53,8 +54,6 @@ export const parameterJudgment = (
       data.workWeChatAppNotification.file.fileType !== MessageDataFileType.Text
     ) {
       showErrorPrompt("Please upload the files to be sent!")
-    } else if (!data.metadata.find((x) => x.key === "title")?.value) {
-      showErrorPrompt("Please fill in the title!")
     } else {
       return true
     }

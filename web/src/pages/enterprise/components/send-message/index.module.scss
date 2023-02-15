@@ -1,7 +1,7 @@
 .sendMsgBox {
   display: flex;
   flex-direction: column;
-  padding: 1rem 3rem 1rem 5rem;
+  padding: 1rem 10rem;
   display: flex;
 
   .selectInputBox {
@@ -9,6 +9,7 @@
     flex-wrap: wrap;
     flex: 1;
     padding: 0rem 8rem;
+    // padding-right: 12rem;
 
     .corpInput {
       margin-bottom: 1rem;
@@ -16,12 +17,6 @@
         text-align: left;
         cursor: pointer;
       }
-    }
-
-    .inputWrap {
-      margin-right: 1.5rem;
-      flex: 1;
-      text-align: left;
     }
   }
 

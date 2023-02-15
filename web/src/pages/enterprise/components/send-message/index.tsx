@@ -30,8 +30,6 @@ const SendMessage = () => {
     showErrorPrompt,
     success,
     failSend,
-    successAction,
-    failSendAction,
     clearData,
   } = useAction()
 
@@ -145,11 +143,7 @@ const SendMessage = () => {
         onCancel={() => clickSendRecord("close")}
         title={"发送记录"}
       >
-        <SendNotice
-          showErrorPrompt={showErrorPrompt}
-          successAction={successAction}
-          failSendAction={failSendAction}
-        />
+        <SendNotice />
       </ModalBox>
     </div>
   )

@@ -2,7 +2,7 @@ import styles from "./index.module.scss"
 import { useAction } from "./hook"
 import { memo } from "react"
 import { NoticeSettingProps } from "./props"
-import { Alert, AlertTitle, Button, Snackbar } from "@mui/material"
+import { Button } from "@mui/material"
 import SelectContent from "../../../enterprise/components/select-content"
 
 const NoticeSetting = memo((props: NoticeSettingProps) => {
@@ -23,6 +23,7 @@ const NoticeSetting = memo((props: NoticeSettingProps) => {
           isNewOrUpdate={"update"}
           updateMessageJobInformation={updateMessageJobInformation}
           showErrorPrompt={showErrorPrompt}
+          isFromNoticeSetting={true}
         />
       </div>
       <div className={styles.boxButtonWrap}>
