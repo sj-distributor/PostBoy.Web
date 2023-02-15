@@ -1,13 +1,13 @@
-import { Route, Routes, Navigate } from "react-router-dom";
-import { routerArray } from "./router/elementRoute";
-import Login from "./pages/login";
-import Main from "./pages/main";
-import useAction from "./AppHook";
-import { RouteItem } from "./dtos/route-type";
-import IsAuthUser from "./pages/auth";
+import { Route, Routes, Navigate } from "react-router-dom"
+import { routerArray } from "./router/elementRoute"
+import Login from "./pages/login"
+import Main from "./pages/main"
+import useAction from "./AppHook"
+import { RouteItem } from "./dtos/route-type"
+import IsAuthUser from "./pages/auth"
 
 const App = () => {
-  const { isLoaded } = useAction();
+  const { isLoaded } = useAction()
 
   const getSubRoute = (list: RouteItem[]) => {
     return list.map((item, index) => {
@@ -26,26 +26,28 @@ const App = () => {
                 path={childrenItem.path}
                 element={childrenItem.elementChild}
               />
-            );
+            )
           })}
         </Route>
-      );
-    });
-  };
+      )
+    })
+  }
 
-  return isLoaded ? (
-    <div className="App">
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route element={<Main />}>
-          <Route path="" element={<Navigate to={"/home"} />} />
-          {getSubRoute(routerArray)}
-        </Route>
-      </Routes>
-    </div>
-  ) : (
-    <></>
-  );
-};
+  return (
+    <>
+      {isLoaded && (
+        <div className="App">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<Main />}>
+              <Route path="" element={<Navigate to={"/home"} />} />
+              {getSubRoute(routerArray)}
+            </Route>
+          </Routes>
+        </div>
+      )}
+    </>
+  )
+}
 
-export default App;
+export default App
