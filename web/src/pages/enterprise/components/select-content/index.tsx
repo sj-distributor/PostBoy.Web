@@ -191,7 +191,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               disableClearable={true}
               options={corpsList}
               className={styles.inputWrap}
-              style={{ marginRight: "2rem" }}
+              style={{ marginRight: "1.6rem" }}
               getOptionLabel={(option) => option.corpName}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
@@ -213,7 +213,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               value={corpAppValue}
               options={corpAppList}
               className={styles.inputWrap}
-              style={{ marginRight: "2rem" }}
+              style={{ marginRight: "1.6rem" }}
               disableClearable
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -239,7 +239,7 @@ const SelectContent = memo((props: SelectContentProps) => {
           disableClearable={true}
           options={messageTypeList}
           className={styles.inputWrap}
-          style={{ marginRight: isFromNoticeSetting ? "0rem" : "2rem" }}
+          style={{ marginRight: isFromNoticeSetting ? "0rem" : "1.6rem" }}
           value={messageTypeValue}
           getOptionLabel={(option) => option.title}
           groupBy={(option) => option.groupBy}
@@ -274,7 +274,7 @@ const SelectContent = memo((props: SelectContentProps) => {
         />
         <FormControl
           className={styles.inputWrap}
-          style={{ marginRight: "2rem" }}
+          style={{ marginRight: "1.6rem" }}
         >
           <InputLabel id="demo-simple-select-label">发送类型</InputLabel>
           <Select
@@ -417,7 +417,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               <FormControl
                 style={{
                   width: 252,
-                  marginTop: "1rem",
+                  marginTop: "0.6rem",
                 }}
               >
                 <InputLabel id="demo-simple-select-label">时区</InputLabel>
@@ -444,7 +444,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             <TextField
               label="发送时间"
               type="datetime-local"
-              sx={{ width: 250, marginTop: 2, marginBottom: "0.7rem" }}
+              sx={{ width: 250, marginTop: 3.3, marginBottom: "0.7rem" }}
               defaultValue={
                 !!dateValue ? moment(dateValue).format("yyyy-MM-DDThh:mm") : ""
               }
