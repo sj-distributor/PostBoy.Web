@@ -63,6 +63,8 @@ const SendNotice = React.memo(() => {
       sortable: false,
       align: "center",
       headerClassName: styles.tableBoxHeader,
+      cellClassName: (params: GridCellParams) =>
+        params.row.isDelete && styles.isDeleteColor,
     },
     {
       field: "content",
@@ -73,6 +75,8 @@ const SendNotice = React.memo(() => {
       sortable: false,
       align: "center",
       headerClassName: styles.tableBoxHeader,
+      cellClassName: (params: GridCellParams) =>
+        params.row.isDelete && styles.isDeleteColor,
       renderCell: (params: GridCellParams) =>
         asyncTootip(params.row.content, styles.tooltip),
     },
@@ -84,6 +88,8 @@ const SendNotice = React.memo(() => {
       disableColumnMenu: true,
       sortable: false,
       headerClassName: styles.tableBoxHeader,
+      cellClassName: (params: GridCellParams) =>
+        params.row.isDelete && styles.isDeleteColor,
     },
     {
       field: "createdDate",
@@ -94,6 +100,8 @@ const SendNotice = React.memo(() => {
       sortable: false,
       align: "center",
       headerClassName: styles.tableBoxHeader,
+      cellClassName: (params: GridCellParams) =>
+        params.row.isDelete && styles.isDeleteColor,
       renderCell: (params: GridCellParams) =>
         moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
     },
@@ -106,6 +114,8 @@ const SendNotice = React.memo(() => {
       sortable: false,
       align: "center",
       headerClassName: styles.tableBoxHeader,
+      cellClassName: (params: GridCellParams) =>
+        params.row.isDelete && styles.isDeleteColor,
     },
     {
       field: "operate",
@@ -115,6 +125,8 @@ const SendNotice = React.memo(() => {
       disableColumnMenu: true,
       sortable: false,
       headerClassName: styles.tableBoxHeader,
+      cellClassName: (params: GridCellParams) =>
+        params.row.isDelete && styles.isDeleteColor,
       renderCell: (params: GridCellParams) => (
         <div className={styles.operate}>
           <p className={styles.text} onClick={() => onSetting(params.row)}>
