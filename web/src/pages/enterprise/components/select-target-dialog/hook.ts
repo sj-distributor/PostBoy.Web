@@ -4,7 +4,7 @@ import {
   DepartmentAndUserType,
   ITagsList,
   IDepartmentKeyControl,
-  ClickType
+  ClickType,
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -23,7 +23,7 @@ const useAction = (props: {
     open,
     isLoading,
     setDeptUserList,
-    setOuterTagsValue
+    setOuterTagsValue,
   } = props
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
     IDepartmentAndUserListValue[]
@@ -49,23 +49,27 @@ const useAction = (props: {
 
   const handleDeptOrUserClick = (
     type: ClickType,
-    clickedItem: IDepartmentAndUserListValue
+    clickedItem: IDepartmentAndUserListValue,
+    isLoadStop?: boolean
   ) => {
-    setDeptUserList((prev) => {
-      const newValue = prev.filter((e) => !!e)
-      const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
-      activeData &&
-        recursiveSeachDeptOrUser(activeData.data, clickedItem, (e, item) => {
-          if (e.id === item.id) {
-            if (type === ClickType.Collapse) {
-              e.isCollapsed = !e.isCollapsed
-            } else {
-              e.selected = !e.selected
+    isLoadStop &&
+      setDeptUserList((prev) => {
+        const newValue = prev.filter((e) => !!e)
+        const activeData = newValue.find(
+          (e) => e.key === departmentKeyValue.key
+        )
+        activeData &&
+          recursiveSeachDeptOrUser(activeData.data, clickedItem, (e, item) => {
+            if (e.id === item.id) {
+              if (type === ClickType.Collapse) {
+                e.isCollapsed = !e.isCollapsed
+              } else {
+                e.selected = !e.selected
+              }
             }
-          }
-        })
-      return newValue
-    })
+          })
+        return newValue
+      })
   }
 
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -111,7 +115,7 @@ const useAction = (props: {
               type: DepartmentAndUserType.User,
               parentid: String(e.parentid),
               selected: e.selected,
-              children: []
+              children: [],
             })
           : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1)
         e.children.length > 0 && recursiveDeptList(e.children, changeList)
@@ -140,7 +144,7 @@ const useAction = (props: {
     tagsValue,
     setTagsValue,
     handleDeptOrUserClick,
-    setSearchToDeptValue
+    setSearchToDeptValue,
   }
 }
 export default useAction

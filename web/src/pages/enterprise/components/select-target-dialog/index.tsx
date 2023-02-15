@@ -19,10 +19,12 @@ import styles from "./index.module.scss"
 import {
   ClickType,
   DepartmentAndUserType,
+  ITargetDialogProps,
   IDepartmentAndUserListValue,
-  ITargetDialogProps
+  ITagsList,
 } from "../../../../dtos/enterprise"
-import { memo } from "react"
+import { memo, useEffect } from "react"
+import { CircularProgress } from "@mui/material"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -36,7 +38,9 @@ const SelectTargetDialog = memo(
       departmentKeyValue,
       setOpenFunction,
       setDeptUserList,
-      setOuterTagsValue
+      setOuterTagsValue,
+      lastTagsValue,
+      isLoadStop,
     } = props
 
     const {
@@ -44,7 +48,7 @@ const SelectTargetDialog = memo(
       tagsValue,
       handleDeptOrUserClick,
       setSearchToDeptValue,
-      setTagsValue
+      setTagsValue,
     } = useAction({
       open,
       AppId,
@@ -52,8 +56,22 @@ const SelectTargetDialog = memo(
       departmentAndUserList,
       isLoading,
       setDeptUserList,
-      setOuterTagsValue
+      setOuterTagsValue,
     })
+
+    useEffect(() => {
+      if (!!tagsList && !!lastTagsValue && lastTagsValue?.length > 0) {
+        const selectTagsList: ITagsList[] = []
+        lastTagsValue.forEach((item) => {
+          const findItem = tagsList.find((i) => i.tagId === Number(item))
+          if (!!findItem) {
+            selectTagsList.push(findItem)
+          }
+        })
+
+        setTagsValue(selectTagsList)
+      }
+    }, [tagsList, lastTagsValue])
 
     const recursiveRenderDeptList = (
       data: IDepartmentAndUserListValue[],
@@ -68,7 +86,7 @@ const SelectTargetDialog = memo(
               type: deptUserData.type,
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
-              children: []
+              children: [],
             }
             return (
               <div key={deptUserIndex}>
@@ -80,8 +98,9 @@ const SelectTargetDialog = memo(
                       handleDeptOrUserClick(
                         ClickType.Collapse,
                         Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed
-                        })
+                          isCollapsed: deptUserData.isCollapsed,
+                        }),
+                        true
                       )
                   }}
                 >
@@ -92,7 +111,11 @@ const SelectTargetDialog = memo(
                     disableRipple
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeptOrUserClick(ClickType.Select, insertData)
+                      handleDeptOrUserClick(
+                        ClickType.Select,
+                        insertData,
+                        isLoadStop
+                      )
                     }}
                   />
                   <ListItemText primary={deptUserData.name} />
@@ -127,8 +150,8 @@ const SelectTargetDialog = memo(
           open={open}
           PaperProps={{
             sx: {
-              overflowY: "unset"
-            }
+              overflowY: "unset",
+            },
           }}
           onClose={() => {
             setOpenFunction(false)
@@ -137,8 +160,26 @@ const SelectTargetDialog = memo(
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             {departmentKeyValue?.data && departmentKeyValue.data.length > 0 && (
-              <div style={{ height: "15rem", overflowY: "auto" }}>
-                {recursiveRenderDeptList(departmentKeyValue.data, 0)}
+              <div
+                style={{
+                  height: "15rem",
+                  overflowY: "auto",
+                  position: "relative",
+                }}
+              >
+                {isLoadStop ? (
+                  recursiveRenderDeptList(departmentKeyValue.data, 0)
+                ) : (
+                  <CircularProgress
+                    style={{
+                      position: "absolute",
+                      width: "2rem",
+                      height: "2rem",
+                      left: "13rem",
+                      top: "5.5rem",
+                    }}
+                  />
+                )}
               </div>
             )}
 
@@ -150,9 +191,8 @@ const SelectTargetDialog = memo(
                 multiple
                 disableCloseOnSelect
                 size="small"
-                limitTags={3}
                 sx={{
-                  margin: "1rem 0 1rem"
+                  margin: "1rem 0 1rem",
                 }}
                 value={departmentSelectedList}
                 options={flattenDepartmentList}
@@ -193,6 +233,7 @@ const SelectTargetDialog = memo(
               disableCloseOnSelect
               disableClearable
               limitTags={2}
+              size="small"
               value={tagsValue}
               options={tagsList}
               getOptionLabel={(option) => option.tagName}

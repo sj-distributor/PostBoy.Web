@@ -7,7 +7,11 @@ import {
   IDepartmentResponse,
   IDepartmentUsersResonse,
   ITagsListResponse,
-  ISendMsgData
+  IMessageJobRecord,
+  IMessageJobDto,
+  ISendMessageCommand,
+  MessageJobDestination,
+  IUpdateMessageCommand,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -43,6 +47,30 @@ export const GetTagsList = async (params: { AppId: string }) => {
   )
 }
 
-export const SendMessage = async (data: ISendMsgData) => {
-  return await Post("/api/Message/send", data)
+export const GetMessageJob = async (
+  pageIndex: number,
+  pageSize: number,
+  destination: MessageJobDestination
+) => {
+  return await Get<IMessageJobDto>(
+    `/api/Message/jobs?PageIndex=${pageIndex}&PageSize=${pageSize}&Destination=${destination}`
+  )
+}
+
+export const GetMessageJobRecords = async (correlationId: string) => {
+  return await Get<IMessageJobRecord[]>(
+    `/api/Message/job/records?CorrelationId=${correlationId}`
+  )
+}
+
+export const PostMessageSend = async (data: ISendMessageCommand) => {
+  return await Post(`/api/Message/send`, data)
+}
+
+export const PostMessageJobDelete = async (data: { MessageJobId: string }) => {
+  return await Post(`/api/Message/job/delete`, data)
+}
+
+export const PostMessageJobUpdate = async (data: IUpdateMessageCommand) => {
+  return await Post(`/api/Message/job/update`, data)
 }

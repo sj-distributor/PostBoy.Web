@@ -1,338 +1,122 @@
-import { useEffect, useMemo, useState } from "react"
-import {
-  GetCorpAppList,
-  GetCorpsList,
-  GetDepartmentList,
-  GetDepartmentUsersList,
-  GetTagsList
-} from "../../../../api/enterprise"
-import {
-  DepartmentAndUserType,
-  ICorpAppData,
-  ICorpData,
-  IDepartmentAndUserListValue,
-  IDepartmentData,
-  IDepartmentKeyControl,
-  IMessageTypeData,
-  ISearchList,
-  ISendMsgData,
-  ITagsList,
-  MessageDataType,
-  MessageWidgetShowStatus
-} from "../../../../dtos/enterprise"
-import { clone, flatten, uniqWith } from "ramda"
+import { green } from "@mui/material/colors"
+import { useBoolean } from "ahooks"
+import { clone } from "ramda"
+import { useEffect, useRef, useState } from "react"
+import { PostMessageSend } from "../../../../api/enterprise"
+import { ISendMessageCommand } from "../../../../dtos/enterprise"
+import { ModalBoxRef } from "../../../../dtos/modal"
+import { convertType } from "../../../../uilts/convert-type"
+import { parameterJudgment } from "../../../../uilts/parameter-judgment"
 
 const useAction = () => {
-  const messageTypeList: IMessageTypeData[] = [
-    { title: "文本", groupBy: "", type: MessageDataType.Text },
-    { title: "图文", groupBy: "", type: MessageDataType.Image },
-    { title: "图片", groupBy: "文件", type: MessageDataType.Image },
-    { title: "语音", groupBy: "文件", type: MessageDataType.Voice },
-    { title: "视频", groupBy: "文件", type: MessageDataType.Video },
-    { title: "文件", groupBy: "文件", type: MessageDataType.File }
-  ]
-  const [messageParams, setMessageParams] = useState<string>("")
+  const [sendData, setSendData] = useState<ISendMessageCommand>()
 
-  const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
-    messageTypeList[0]
-  )
+  const [promptText, setPromptText] = useState<string>("")
 
-  const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
-  const [isShowInputOrUpload, setIsShowInputOrUpload] =
-    useState<MessageWidgetShowStatus>(MessageWidgetShowStatus.ShowAll)
+  const [openError, openErrorAction] = useBoolean(false)
+
   const [isShowMessageParams, setIsShowMessageParams] = useState<boolean>(false)
 
-  const [corpsList, setCorpsList] = useState<ICorpData[]>([])
-  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
-  const [corpsValue, setCorpsValue] = useState<ICorpData>()
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
-  const [departmentAndUserList, setDepartmentAndUserList] = useState<
-    IDepartmentKeyControl[]
-  >([])
-  const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-    ISearchList[]
-  >([])
+  const sendRecordRef = useRef<ModalBoxRef>(null)
 
-  const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
-  const [tagsList, setTagsList] = useState<ITagsList[]>([])
-  const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
+  const [loading, loadingAction] = useBoolean(false)
+  const [success, successAction] = useBoolean(false)
+  const [failSend, failSendAction] = useBoolean(false)
+  const [clearData, setClearData] = useBoolean(false)
 
-  const departmentKeyValue = useMemo(() => {
-    const result = departmentAndUserList.find(
-      (e) => e.key === corpAppValue?.appId
-    )
-    return result as IDepartmentKeyControl
-  }, [departmentAndUserList])
-
-  const searchKeyValue = useMemo(() => {
-    const result = flattenDepartmentList.find(
-      (e) => e.key === corpAppValue?.appId
-    )
-    return result?.data as IDepartmentAndUserListValue[]
-  }, [flattenDepartmentList])
-
-  const recursiveDeptList = (
-    hasData: IDepartmentAndUserListValue[],
-    defaultChild: IDepartmentAndUserListValue,
-    department: IDepartmentData,
-    parentRouteId: number[]
-  ) => {
-    for (const key in hasData) {
-      const e = hasData[key]
-      parentRouteId.push(Number(e.id))
-      if (e.id === department.parentid) {
-        e.children.push(defaultChild)
-        return parentRouteId
-      }
-      if (e.children.length > 0) {
-        const idList: number[] = recursiveDeptList(
-          e.children,
-          defaultChild,
-          department,
-          [...parentRouteId]
-        )
-        if (idList.length !== parentRouteId.length) return idList
-        parentRouteId.pop()
-      } else {
-        parentRouteId.pop()
-      }
-    }
-    return parentRouteId
-  }
-
-  const loadDeptUsers = async (
-    departmentPage: number,
-    AppId: string,
-    deptListResponse: IDepartmentData[]
-  ) => {
-    for (let index = departmentPage; index < deptListResponse.length; index++) {
-      const department = deptListResponse[index]
-      // referIndexList储存从嵌套数组顶部到当前部门的ID路径
-      let referIndexList: number[] = []
-      const defaultChild = {
-        id: department.id,
-        name: department.name,
-        type: DepartmentAndUserType.Department,
-        parentid: String(department.parentid),
-        selected: false,
-        children: []
-      }
-      setDepartmentAndUserList((prev) => {
-        const newValue = clone(prev)
-        const hasData = newValue.find((e) => e.key === AppId)
-        if (hasData && hasData.data.length > 0) {
-          // 实现查找parentid等于当前部门id后插入chilrden
-          const idList = recursiveDeptList(
-            hasData.data,
-            defaultChild,
-            department,
-            []
-          )
-          referIndexList = referIndexList.concat(idList, [department.id])
-        } else {
-          referIndexList = referIndexList.concat(department.id)
-          newValue.push({ key: AppId, data: [defaultChild] })
-        }
-        return newValue
-      })
-
-      const userList = await GetDepartmentUsersList({
-        AppId,
-        DepartmentId: department.id
-      })
-      if (!!userList && userList.errcode === 0) {
-        setDepartmentAndUserList((prev) => {
-          const newValue = clone(prev)
-          const hasData = newValue.find((e) => e.key === AppId)
-          if (hasData) {
-            let result: IDepartmentAndUserListValue | undefined
-            referIndexList.forEach((number, index) => {
-              if (index !== 0) {
-                result = result?.children.find((item) => number === item.id)
-              } else {
-                result = hasData.data.find(
-                  (item) => referIndexList[0] === item.id
-                )
-              }
-            })
-            if (result)
-              result.children = userList.userlist.map((e) => ({
-                id: e.userid,
-                name: e.name,
-                type: DepartmentAndUserType.User,
-                parentid: String(department.id),
-                selected: false,
-                children: []
-              }))
-          }
-          return newValue
-        })
-        setFlattenDepartmentList((prev) => {
-          const newValue = clone(prev)
-          let hasData = newValue.find((e) => e.key === AppId)
-          const insertData = [
-            {
-              id: department.id,
-              name: department.name,
-              parentid: department.name,
-              type: DepartmentAndUserType.Department,
-              selected: false,
-              children: []
-            },
-            ...flatten(
-              userList.userlist.map((item) => ({
-                id: item.userid,
-                name: item.name,
-                parentid: department.name,
-                type: DepartmentAndUserType.User,
-                selected: false,
-                children: []
-              }))
-            )
-          ]
-          if (hasData) {
-            hasData.data = [...hasData.data, ...insertData]
-          } else {
-            newValue.push({
-              key: AppId,
-              data: insertData
-            })
-          }
-          return newValue
-        })
-        index === deptListResponse.length - 1 && setIsTreeViewLoading(false)
-      }
-    }
-  }
-
-  const recursiveGetSelectedList = (
-    hasData: IDepartmentAndUserListValue[],
-    selectedList: IDepartmentAndUserListValue[]
-  ) => {
-    for (const key in hasData) {
-      const e = hasData[key]
-      if (e.selected) {
-        selectedList.push(e)
-      }
-      if (e.children.length > 0) {
-        selectedList = recursiveGetSelectedList(e.children, [...selectedList])
-      }
-    }
-    return selectedList
+  const clickSendRecord = (operation: string) => {
+    operation === "open"
+      ? sendRecordRef.current?.open()
+      : sendRecordRef.current?.close()
   }
 
   const handleSubmit = async () => {
-    const selectedList = uniqWith(
-      (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
-        return a.id === b.id
+    if (!loading) {
+      successAction.setFalse()
+      loadingAction.setTrue()
+      const cloneData = clone(sendData)
+      if (!!cloneData) {
+        cloneData.workWeChatAppNotification = convertType(
+          cloneData.workWeChatAppNotification
+        )
       }
-    )(recursiveGetSelectedList(departmentKeyValue.data, []))
-
-    const data: ISendMsgData = {
-      appId: corpAppValue?.appId,
-      toTags: tagsValue.map((e) => String(e.tagId)),
-      toUsers: selectedList
-        .filter((e) => e.type === DepartmentAndUserType.User)
-        .map((e) => String(e.id)),
-      toParties: selectedList
-        .filter((e) => e.type === DepartmentAndUserType.Department)
-        .map((e) => String(e.id))
+      // 判断传入的信息是否填写正确
+      if (parameterJudgment(cloneData, showErrorPrompt)) {
+        if (!!cloneData) {
+          PostMessageSend(cloneData)
+            .then((res) => {
+              successAction.setTrue()
+              loadingAction.setFalse()
+              setTimeout(() => {
+                setClearData.setTrue()
+              }, 2000)
+            })
+            .catch((error) => {
+              loadingAction.setFalse()
+              failSendAction.setTrue()
+            })
+        }
+      } else {
+        loadingAction.setFalse()
+      }
     }
-    messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
-      ? (data.mpNews = {
-          articles: [
-            {
-              content: "",
-              fileContent: ""
-            }
-          ]
-        })
-      : messageTypeValue.type === MessageDataType.Text
-      ? (data.text = {
-          content: ""
-        })
-      : (data.file = {
-          fileName: "",
-          fileContent: "",
-          fileType: messageTypeValue.type
-        })
-    // TODO 发送接口
-    // const response = await SendMessage(data);
   }
 
-  useEffect(() => {
-    GetCorpsList().then((data) => {
-      if (data) {
-        setCorpsList(data)
-        setCorpsValue(data[0])
-      }
-    })
-  }, [])
+  const buttonSx = {
+    ...(success && {
+      bgcolor: green[500],
+      "&:hover": {
+        bgcolor: green[700],
+      },
+    }),
+  }
 
-  useEffect(() => {
-    corpsValue &&
-      GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
-        if (corpAppResult) {
-          setCorpAppList(corpAppResult)
-          setCorpAppValue(corpAppResult[0])
-          GetTagsList({ AppId: corpAppResult[0].appId }).then((tagsData) => {
-            tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
-          })
-        }
-      })
-  }, [corpsValue?.id])
+  // 弹出警告
+  const showErrorPrompt = (text: string) => {
+    setPromptText(text)
+    openErrorAction.setTrue()
+  }
 
+  // 延迟关闭警告提示
   useEffect(() => {
-    setDepartmentAndUserList([])
-    setFlattenDepartmentList([])
-    const loadDepartment = async (AppId: string) => {
-      const deptListResponse = await GetDepartmentList({ AppId })
-      if (!!deptListResponse && deptListResponse.errcode === 0) {
-        loadDeptUsers(0, AppId, deptListResponse.department)
-      }
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse()
+      }, 3000)
+    } else if (failSend) {
+      setTimeout(() => {
+        failSendAction.setFalse()
+      }, 3000)
+    } else if (success) {
+      setTimeout(() => {
+        successAction.setFalse()
+      }, 3000)
     }
-    if (!!corpAppValue) {
-      setIsTreeViewLoading(true)
-      loadDepartment(corpAppValue.appId)
-    }
-  }, [corpAppValue?.appId])
+  }, [openError, failSend, success])
 
   useEffect(() => {
-    messageTypeValue.type === MessageDataType.Image && !messageTypeValue.groupBy
-      ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowAll)
-      : messageTypeValue.type === MessageDataType.Text
-      ? setIsShowInputOrUpload(MessageWidgetShowStatus.ShowInput)
-      : (() => {
-          setIsShowInputOrUpload(MessageWidgetShowStatus.ShowUpload)
-          setMessageParams("")
-        })()
-  }, [messageTypeValue])
+    if (clearData) {
+      setTimeout(() => {
+        setClearData.setFalse()
+      }, 1500)
+    }
+  }, [clearData])
 
   return {
-    corpsList,
-    corpAppList,
-    corpsValue,
-    corpAppValue,
-    messageTypeList,
-    messageParams,
-    messageTypeValue,
-    isShowDialog,
-    isShowInputOrUpload,
+    setSendData,
+    promptText,
+    openError,
+    clickSendRecord,
     isShowMessageParams,
-    departmentAndUserList,
-    isTreeViewLoading,
-    tagsList,
-    searchKeyValue,
-    departmentKeyValue,
-    setDepartmentAndUserList,
-    setCorpsValue,
-    setCorpAppValue,
-    setMessageParams,
-    setMessageTypeValue,
-    handleSubmit,
-    setIsShowDialog,
     setIsShowMessageParams,
-    setTagsValue
+    sendRecordRef,
+    handleSubmit,
+    buttonSx,
+    loading,
+    showErrorPrompt,
+    success,
+    failSend,
+    clearData,
   }
 }
 

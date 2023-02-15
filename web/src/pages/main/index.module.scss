@@ -5,56 +5,58 @@ $aClickColor: #30cea3;
 .main {
   display: flex;
   flex-direction: row;
+  background-color: #f2f3f4;
+  height: 100vh;
 
   a {
     text-decoration: none;
   }
-}
 
-.sideBar {
-  background: $navBackgroundColor;
-  width: 15rem;
-  height: 100%;
-  text-align: center;
-  flex-shrink: 0;
+  .sideBar {
+    background: $navBackgroundColor;
+    width: 15rem;
+    text-align: center;
 
-  .navBar {
-    margin-top: 8rem;
-  }
+    .navBar {
+      margin-top: 8rem;
 
-  .item {
-    font-size: 1rem;
-    margin: 2rem 0;
+      .item {
+        font-size: 1rem;
+        margin: 2rem 0;
 
-    span {
-      font-size: 1rem;
-      margin-right: 0.3rem;
+        .itemNone {
+          color: $aColor;
+          text-decoration: none;
+        }
+
+        .itemClick {
+          color: $aClickColor;
+          text-decoration: none;
+        }
+
+        span {
+          font-size: 1rem;
+          margin-right: 0.3rem;
+        }
+      }
     }
   }
 
-  .itemNone {
-    color: $aColor;
-  }
-
-  .itemClick {
-    color: $aClickColor;
-  }
-}
-
-.content {
-  flex: 1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #f2f3f4;
-
-  .contextUpper {
-    display: flex;
-    justify-content: end;
-    padding: 0.5rem 2rem;
-  }
-
-  .contextLower {
+  .content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: calc(100vw - 15rem);
+    height: 100vh;
+
+    .contextUpper {
+      display: flex;
+      justify-content: end;
+      padding: 0.5rem 2rem;
+    }
+
+    .contextLower {
+      flex: 1;
+    }
   }
 }

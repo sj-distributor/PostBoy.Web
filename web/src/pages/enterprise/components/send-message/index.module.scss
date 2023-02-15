@@ -1,15 +1,18 @@
 .sendMsgBox {
-  width: 80rem;
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
+  padding: 0 10rem;
+  padding-bottom: 1.5rem;
+  display: flex;
 
   .selectInputBox {
-    width: 80rem;
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    flex: 1;
+    padding: 0rem 8rem;
 
     .corpInput {
+      margin-bottom: 1rem;
       :global(input[type="button" i]) {
         text-align: left;
         cursor: pointer;
@@ -18,22 +21,29 @@
   }
 
   .checkboxAndUploadBox {
-    margin: 1.5rem 0 0;
-    padding: 0 2rem;
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
-    height: 3.5rem;
     width: 100%;
     box-sizing: border-box;
   }
 
   .textarea {
-    margin: 1.5rem auto 0;
-    width: 76rem;
+    margin-top: 0.7rem;
+    width: 100%;
 
     .multilineTextField {
       width: 100%;
     }
+  }
+
+  .dateInput {
+    width: 12rem;
+    height: 2rem;
+  }
+
+  .cycleSelectWrap {
+    width: 100%;
   }
 
   .groupLabel {
