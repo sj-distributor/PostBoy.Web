@@ -299,6 +299,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
+            marginTop: "0.8rem",
           }}
           variant="contained"
           onClick={() => {
@@ -417,7 +418,7 @@ const SelectContent = memo((props: SelectContentProps) => {
               <FormControl
                 style={{
                   width: 252,
-                  marginTop: "0.6rem",
+                  margin: "0.8rem 0",
                 }}
               >
                 <InputLabel id="demo-simple-select-label">时区</InputLabel>
@@ -444,7 +445,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             <TextField
               label="发送时间"
               type="datetime-local"
-              sx={{ width: 250, marginTop: 3.3, marginBottom: "0.7rem" }}
+              sx={{ width: 250, margin: "0.8rem 0" }}
               defaultValue={
                 !!dateValue ? moment(dateValue).format("yyyy-MM-DDThh:mm") : ""
               }

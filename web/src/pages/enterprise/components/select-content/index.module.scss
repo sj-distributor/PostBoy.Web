@@ -29,7 +29,7 @@
     .inputWrap {
       flex: 1;
       min-width: 12rem;
-      margin-bottom: 1rem;
+      margin: 0.8rem 0;
 
       .corpInput {
         :global(input[type="button" i]) {
@@ -68,13 +68,13 @@
 
         .input {
           flex: 1;
-          margin-bottom: 1rem;
-          margin-top: 0.6rem;
+          margin: 0.8rem 0;
         }
       }
 
       .uploadBtnBox {
-        margin-bottom: 1rem;
+        margin-top: 0.8rem;
+        margin-bottom: 0.7rem;
         display: flex;
         flex: 1;
         flex-direction: column;
