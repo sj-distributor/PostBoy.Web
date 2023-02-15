@@ -1,0 +1,25 @@
+.noticeWrap {
+  width: 45rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  padding-top: 2rem;
+  padding-bottom: 0.8rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  overflow-y: auto;
+
+  .boxButtonWrap {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0;
+
+    .boxButton {
+      margin: 0rem 0 0 2rem;
+    }
+  }
+}
+
+.noticeWrap::-webkit-scrollbar {
+  display: none;
+}

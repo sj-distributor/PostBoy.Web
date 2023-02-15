@@ -2,19 +2,16 @@ export interface IResponseMsg {
   errcode: number
   errmsg: string
 }
+
 export interface ICorpData {
-  corpId: string
   corpName: string
   id: string
 }
 
 export interface ICorpAppData {
-  agentId: number
   appId: string
   id: string
   name: string
-  secret: string
-  workWeChatCorpId: string
 }
 
 export interface ICorpAppListApiData {
@@ -72,7 +69,7 @@ export interface IDepartmentAndUserListValue {
 
 export enum DepartmentAndUserType {
   Department,
-  User
+  User,
 }
 
 export interface IDepartmentResponse extends IResponseMsg {
@@ -86,15 +83,22 @@ export interface IDepartmentUsersResonse extends IResponseMsg {
 export interface IMessageTypeData {
   title: string
   groupBy: string
-  type: MessageDataType
+  type: MessageDataFileType
 }
 
-export enum MessageDataType {
+export enum MessageDataFileType {
   Image,
   Voice,
   Video,
   File,
-  Text
+  Text,
+}
+
+export interface FileObject {
+  fileContent?: string
+  fileName: string
+  fileType: MessageDataFileType
+  fileUrl?: string
 }
 
 export interface ITargetDialogProps {
@@ -105,15 +109,22 @@ export interface ITargetDialogProps {
   AppId: string
   isLoading: boolean
   tagsList: ITagsList[]
+  lastTagsValue?: string[] | undefined
+  isLoadStop: boolean
   setOpenFunction: (open: boolean) => void
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
 }
 
+export interface ITargetDialogValue {
+  deptAndUserValueList: IDepartmentData[]
+  tagsValue: ITagsList[]
+}
+
 export enum MessageWidgetShowStatus {
   ShowInput,
   ShowUpload,
-  ShowAll
+  ShowAll,
 }
 
 export interface ITagsListResponse extends IResponseMsg {
@@ -130,31 +141,202 @@ export interface ITagsList {
   tagName: string
 }
 
-export interface ISendMsgData {
-  appId?: string
+export interface IMessageJobDto {
+  count: number
+  messageJobs: IMessageJob[]
+}
+
+export interface IMessageJob extends IMessageJobBase {
+  emailNotification?: {
+    senderId: string
+    subject: string
+    body: string
+    to: string[]
+    cc: string[]
+  }
+}
+
+export interface IMessageJobBase {
+  id: string
+  jobId: string
+  createdDate: string
+  correlationId: string
+  userAccountId: string
+  isDelete: boolean
+  jobType: MessageJobSendType
+  jobSettingJson: string
+  jobCronExpressionDesc: string
+  destination: MessageJobDestination
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+  metadata: {
+    id: string
+    createDate: string
+    messageJobId: string
+    key: string
+    value: string
+  }[]
+}
+
+export enum MessageJobSendType {
+  Fire,
+  Delayed,
+  Recurring,
+}
+
+export enum MessageJobDestination {
+  Email,
+  WorkWeChat,
+}
+
+export interface IMessageJobRecord extends IMessageJobRecordSame {
+  responseJson: string
+}
+
+export interface IMessageJobRecordSame {
+  id: string
+  createdDate: string
+  correlationId: string
+  result: MessageSendResult
+}
+
+export enum MessageSendResult {
+  Ok,
+  Failed,
+}
+
+export const messageSendResultType = {
+  [MessageSendResult.Ok]: "已发送",
+  [MessageSendResult.Failed]: "异常",
+}
+
+export interface ISendMessageCommand {
+  correlationId?: string
+  jobSetting: IJobSettingDto
+  metadata: { key: string; value: string }[]
+  emailNotification?: {
+    senderId: string
+    subject: string
+    body: string
+    to: string[]
+    cc: string[]
+  }
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+}
+
+export interface IUpdateMessageCommand {
+  messageJobId: string
+  jobSetting: IJobSettingDto
+  metadata: { key: string; value: string }[]
+  emailNotification?: {
+    senderId: string
+    subject: string
+    body: string
+    to: string[]
+    cc: string[]
+  }
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+}
+
+export interface IJobSettingDto {
+  timezone: string
+  delayedJob?: {
+    enqueueAt: string
+  }
+  recurringJob?: {
+    cronExpression: string
+    endDate?: string
+  }
+}
+
+export interface IWorkWeChatAppNotificationDto
+  extends SendParameter,
+    SendData {}
+
+export interface SendParameter {
+  appId: string
   chatId?: string
   toTags?: string[]
   toUsers?: string[]
   toParties?: string[]
-  text?: {
-    content: string
-  }
-  file?: {
-    fileName: string
-    fileContent: string
-    fileType: MessageDataType
-  }
+}
+
+export interface SendData {
+  text?: TextDto
+  file?: FileObject
   mpNews?: {
-    articles: [
-      {
-        content: string
-        fileContent: string
-      }
-    ]
+    articles: PictureText[]
   }
+}
+
+export interface TextDto {
+  content: string
+}
+
+export enum TimeType {
+  UTC,
+  America,
+}
+
+export interface IDtoExtend {
+  loading: boolean
+  rowCount: number
+  pageSize: number
+  page: number
+  messageJobs: ILastShowTableData[]
+}
+
+export interface ILastShowTableData extends IMessageJobBase {
+  title: string
+  content?: string
+  sendType: string
+  enterprise: {
+    id: string
+    corpName: string
+  }
+  app: {
+    id: string
+    name: string
+    appId: string
+  }
+}
+
+export interface ISendRecordDto extends IMessageJobRecordSame {
+  sendTheObject: string
+  errorSendtheobject: string
+  state: string
+}
+
+export interface SendTypeCustomListDto {
+  title: string
+  value: MessageJobSendType
+}
+
+export interface TimeZoneCustomListDto {
+  title: string
+  value: TimeType
 }
 
 export enum ClickType {
   Collapse,
-  Select
+  Select,
+}
+
+export interface SendObject {
+  toUsers: string[]
+  toParties: string[]
+}
+
+export interface PictureText {
+  title: string
+  content: string
+  fileContent?: string
+  fileName: string
+  contentSourceUrl?: string
+  fileUrl?: string
+}
+
+export const messageJobSendType = {
+  [MessageJobSendType.Fire]: "即时发送",
+  [MessageJobSendType.Delayed]: "定时发送",
+  [MessageJobSendType.Recurring]: "周期发送",
 }

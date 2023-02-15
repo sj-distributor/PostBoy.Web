@@ -1,0 +1,104 @@
+.separate {
+  padding: 0 0.35rem;
+}
+
+.image {
+  width: 10rem;
+  height: 6rem;
+  object-fit: cover;
+  padding: 0.25rem;
+}
+
+.deleteIcon {
+  position: absolute;
+  right: -0.25rem;
+  top: -0.25rem;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  .selectWrap {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    flex-wrap: wrap;
+
+    .inputWrap {
+      flex: 1;
+      min-width: 12rem;
+      margin: 0.8rem 0;
+
+      .corpInput {
+        :global(input[type="button" i]) {
+          text-align: left;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .groupLabel {
+      margin: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 0.1rem solid #eee;
+    }
+
+    .noneGroupLabel {
+      height: 0;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .typeShow {
+    display: flex;
+    flex-direction: column;
+
+    .rowBox {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+
+      .titleAndContentinputBox {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .input {
+          flex: 1;
+          margin: 0.8rem 0;
+        }
+      }
+
+      .uploadBtnBox {
+        margin-top: 0.8rem;
+        margin-bottom: 0.7rem;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+
+      .information {
+        display: flex;
+        flex-direction: row;
+
+        .sendBox {
+          flex: 1;
+
+          .picturebackground {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            border-radius: 0.5rem;
+            border: 0.1rem solid rgb(207, 200, 200);
+            padding: 0.25rem;
+            margin-bottom: 1rem;
+          }
+        }
+      }
+    }
+  }
+}
