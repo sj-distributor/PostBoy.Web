@@ -85,6 +85,7 @@ const SendNotice = React.memo(() => {
       headerName: "周期",
       width: 320,
       headerAlign: "center",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       headerClassName: styles.tableBoxHeader,
