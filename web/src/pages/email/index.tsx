@@ -7,7 +7,12 @@ import MenuItem from "@mui/material/MenuItem"
 import Select from "@mui/material/Select"
 import Button from "@mui/material/Button"
 import InputAdornment from "@mui/material/InputAdornment"
+import Chip from "@mui/material/Chip"
 import SendIcon from "@mui/icons-material/Send"
+import ModalBox from "../../components/modal/modal"
+import SendNotice from "../notification"
+import ClearIcon from "@mui/icons-material/Clear"
+import { MessageJobDestination } from "../../dtos/enterprise"
 
 const SendEmail = () => {
   const {
@@ -18,16 +23,27 @@ const SendEmail = () => {
     html,
     emailFrom,
     emailList,
-    emailTo,
     isShowCopyto,
-    emailCopyTo,
-    setEmailCopyTo,
+    sendRecordRef,
+    emailToString,
+    emailToArr,
+    emailCopyToArr,
+    emailCopyToString,
+    emailSubject,
+    setEmailSubject,
+    setEmailCopyToArr,
+    setEmailToArr,
+    setEmailToString,
+    setEmailCopyToString,
     setIsShowCopyto,
-    setEmailTo,
     setEditor,
     setHtml,
     setEmailFrom,
-    validateEmail
+    validateEmail,
+    clickSendRecord,
+    handleClickSend,
+    handleKeyDown,
+    handleChange
   } = useAction()
 
   return (
@@ -62,8 +78,18 @@ const SendEmail = () => {
           sx={{ marginLeft: "2rem" }}
           variant="contained"
           endIcon={<SendIcon />}
+          onClick={handleClickSend}
         >
           Send
+        </Button>
+        <Button
+          sx={{
+            marginLeft: "2rem"
+          }}
+          variant="contained"
+          onClick={() => clickSendRecord("open")}
+        >
+          发送记录
         </Button>
       </div>
       <div className={styles.inputGroup}>
@@ -71,15 +97,32 @@ const SendEmail = () => {
         <TextField
           type="text"
           variant="standard"
-          helperText={!validateEmail(emailTo) ? "Incorrect entry." : ""}
+          value={emailToString}
           className={styles.corpInput}
           sx={inputSx}
-          value={emailTo}
-          error={!validateEmail(emailTo)}
-          onChange={(e) => {
-            setEmailTo(e.target.value)
-          }}
+          onKeyDown={(e) => handleKeyDown(e, setEmailToArr, setEmailToString)}
+          onChange={(e) => handleChange(e, setEmailToArr, setEmailToString)}
           InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                {emailToArr.map((item, index) => (
+                  <Chip
+                    size="small"
+                    sx={{ marginLeft: "0.5rem" }}
+                    label={item}
+                    key={index}
+                    onDelete={() => {
+                      setEmailToArr((prev) => {
+                        const newValue = prev.filter((x) => x)
+                        newValue.splice(index, 1)
+                        return newValue
+                      })
+                    }}
+                    deleteIcon={<ClearIcon />}
+                  />
+                ))}
+              </InputAdornment>
+            ),
             endAdornment: (
               <InputAdornment position="end">
                 <Button onClick={() => setIsShowCopyto((prev) => !prev)}>
@@ -96,13 +139,36 @@ const SendEmail = () => {
           <TextField
             type="text"
             variant="standard"
-            helperText={!validateEmail(emailCopyTo) ? "Incorrect entry." : ""}
+            value={emailCopyToString}
             className={styles.corpInput}
             sx={inputSx}
-            value={emailCopyTo}
-            error={!validateEmail(emailCopyTo)}
-            onChange={(e) => {
-              setEmailCopyTo(e.target.value)
+            onKeyDown={(e) =>
+              handleKeyDown(e, setEmailCopyToArr, setEmailCopyToString)
+            }
+            onChange={(e) =>
+              handleChange(e, setEmailCopyToArr, setEmailCopyToString)
+            }
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  {emailCopyToArr.map((item, index) => (
+                    <Chip
+                      size="small"
+                      sx={{ marginLeft: "0.5rem" }}
+                      label={item}
+                      key={index}
+                      onDelete={() => {
+                        setEmailCopyToArr((prev) => {
+                          const newValue = prev.filter((x) => x)
+                          newValue.splice(index, 1)
+                          return newValue
+                        })
+                      }}
+                      deleteIcon={<ClearIcon />}
+                    />
+                  ))}
+                </InputAdornment>
+              )
             }}
           />
         </div>
@@ -112,8 +178,12 @@ const SendEmail = () => {
         <TextField
           type="text"
           variant="standard"
+          value={emailSubject}
           className={styles.corpInput}
           sx={inputSx}
+          onChange={(e) => {
+            setEmailSubject(e.target.value)
+          }}
         />
       </div>
       <div className={styles.editorBox}>
@@ -132,6 +202,14 @@ const SendEmail = () => {
           style={{ height: "25rem" }}
         />
       </div>
+
+      <ModalBox
+        ref={sendRecordRef}
+        onCancel={() => clickSendRecord("close")}
+        title={"发送记录"}
+      >
+        <SendNotice recordType={MessageJobDestination.Email} />
+      </ModalBox>
     </div>
   )
 }

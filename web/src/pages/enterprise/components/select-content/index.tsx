@@ -5,27 +5,27 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField,
+  TextField
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
 import { SelectContentProps } from "./props"
 import { useAction } from "./hook"
 import SelectTargetDialog from "../select-target-dialog"
-import Scheduler from "smart-cron"
-import moment from "moment"
 import {
   messageTypeList,
   sendTypeList,
-  timeZone,
+  timeZone
 } from "../../../../dtos/send-message-job"
 import {
   FileObject,
   MessageDataFileType,
   MessageJobSendType,
-  PictureText,
+  PictureText
 } from "../../../../dtos/enterprise"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
+import TimeSelector from "../time-selector"
+import DateSelector from "../date-selector"
 
 const SelectContent = memo((props: SelectContentProps) => {
   const {
@@ -35,7 +35,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
-    isFromNoticeSetting = false,
+    isFromNoticeSetting = false
   } = props
 
   const {
@@ -80,14 +80,14 @@ const SelectContent = memo((props: SelectContentProps) => {
     lastTimePictureText,
     lastTimeFile,
     inputRef,
-    fileDelete,
+    fileDelete
   } = useAction({
     getSendData,
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
-    clearData,
+    clearData
   })
 
   const fileOrImage = (file: FileObject, state: string) => {
@@ -299,7 +299,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            marginTop: "0.8rem",
+            marginTop: "0.8rem"
           }}
           variant="contained"
           onClick={() => {
@@ -360,7 +360,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                   variant="outlined"
                   component="label"
                   sx={{
-                    width: "6rem",
+                    width: "6rem"
                   }}
                 >
                   上传文件
@@ -411,103 +411,48 @@ const SelectContent = memo((props: SelectContentProps) => {
             </div>
           )}
         </div>
-        <div style={{ marginBottom: "1rem" }}>
-          {(sendTypeValue === MessageJobSendType.Delayed ||
-            sendTypeValue === MessageJobSendType.Recurring) && (
-            <div>
-              <FormControl
-                style={{
-                  width: 252,
-                  margin: "0.8rem 0",
-                }}
-              >
-                <InputLabel id="demo-simple-select-label">时区</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={timeZoneValue}
-                  label="时区"
-                  onChange={(e) => {
-                    switchTimeZone(Number(e.target.value))
-                  }}
-                >
-                  {timeZone.map((item, key) => (
-                    <MenuItem key={key} value={item.value}>
-                      {item.title}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-          )}
-
-          {sendTypeValue === MessageJobSendType.Delayed && (
-            <TextField
-              label="发送时间"
-              type="datetime-local"
-              sx={{ width: 250, margin: "0.8rem 0" }}
-              defaultValue={
-                !!dateValue ? moment(dateValue).format("yyyy-MM-DDThh:mm") : ""
-              }
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onChange={(e) => {
-                const time = moment(
-                  (e.target as HTMLInputElement).value
-                ).valueOf()
-                const nowTime = moment(new Date()).valueOf()
-                if (time <= nowTime) {
-                  showErrorPrompt(
-                    "Please select a time later than the current time"
-                  )
-                } else {
-                  setDateValue((e.target as HTMLInputElement).value)
-                }
-              }}
-            />
-          )}
-          {sendTypeValue === MessageJobSendType.Recurring && (
-            <div
+        {(sendTypeValue === MessageJobSendType.Delayed ||
+          sendTypeValue === MessageJobSendType.Recurring) && (
+          <div>
+            <FormControl
               style={{
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
+                width: 252,
+                margin: "0.8rem 0"
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
+              <InputLabel id="demo-simple-select-label">时区</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={timeZoneValue}
+                label="时区"
+                onChange={(e) => {
+                  switchTimeZone(Number(e.target.value))
                 }}
               >
-                <Scheduler
-                  cron={cronExp}
-                  setCron={setCronExp}
-                  setCronError={setCronError}
-                  isAdmin={true}
-                  locale={"zh_CN"}
-                />
-              </div>
-              <TextField
-                label="终止时间"
-                type="datetime-local"
-                sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
-                defaultValue={
-                  !!endDateValue
-                    ? moment(endDateValue).format("yyyy-MM-DDThh:mm")
-                    : ""
-                }
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onChange={(e) => {
-                  setEndDateValue((e.target as HTMLInputElement).value)
-                }}
-              />
-            </div>
-          )}
-        </div>
+                {timeZone.map((item, key) => (
+                  <MenuItem key={key} value={item.value}>
+                    {item.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+        )}
+        <DateSelector
+          sendTypeValue={sendTypeValue}
+          dateValue={dateValue}
+          setDateValue={setDateValue}
+          showErrorPrompt={showErrorPrompt}
+        />
+        <TimeSelector
+          sendTypeValue={sendTypeValue}
+          cronExp={cronExp}
+          setCronExp={setCronExp}
+          setCronError={setCronError}
+          endDateValue={endDateValue}
+          setEndDateValue={setEndDateValue}
+        />
       </div>
     </div>
   )

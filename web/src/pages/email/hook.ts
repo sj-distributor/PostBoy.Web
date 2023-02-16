@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { GetEmailData } from "../../api/email"
 import * as wangEditor from "@wangeditor/editor"
-import { IEmailResonponse } from "../../dtos/email"
+import { IEmailInput, IEmailResonponse } from "../../dtos/email"
 import { annexEditorConfig } from "../../uilts/wangEditor"
+import { ModalBoxRef } from "../../dtos/modal"
+import { PostMessageSend } from "../../api/enterprise"
 
 const useAction = () => {
   const defaultEmailValue = {
@@ -14,14 +16,24 @@ const useAction = () => {
   const [emailFrom, setEmailFrom] =
     useState<IEmailResonponse>(defaultEmailValue)
   const [emailList, setEmailList] = useState<IEmailResonponse[]>([])
-  const [emailTo, setEmailTo] = useState("")
-  const [emailCopyTo, setEmailCopyTo] = useState("")
+  const [emailToString, setEmailToString] = useState("")
+  const [emailToArr, setEmailToArr] = useState<string[]>([])
+  const [emailCopyToString, setEmailCopyToString] = useState("")
+  const [emailCopyToArr, setEmailCopyToArr] = useState<string[]>([])
+  const [emailSubject, setEmailSubject] = useState("")
   const [isShowCopyto, setIsShowCopyto] = useState(false)
+  const sendRecordRef = useRef<ModalBoxRef>(null)
 
   const validateEmail = (email: string) => {
     const re =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(String(email).toLowerCase())
+  }
+
+  const clickSendRecord = (operation: string) => {
+    operation === "open"
+      ? sendRecordRef.current?.open()
+      : sendRecordRef.current?.close()
   }
 
   const toolbarConfig: Partial<wangEditor.IToolbarConfig> = {
@@ -54,6 +66,21 @@ const useAction = () => {
     ]
   }
 
+  const handleClickSend = () => {
+    const emailNotification = {
+      senderId: emailFrom.senderId,
+      subject: emailSubject,
+      body: editor ? editor.getText() : "",
+      to: emailToArr,
+      cc: emailCopyToArr
+    }
+    PostMessageSend({
+      emailNotification
+    }).then((data) => {
+      console.log(data)
+    })
+  }
+
   const editorConfig = {
     placeholder: "请输入内容...",
     autoFocus: false,
@@ -70,6 +97,39 @@ const useAction = () => {
 
   const inputSx = { marginLeft: "1rem", flex: 1 }
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    setArr: React.Dispatch<React.SetStateAction<string[]>>,
+    setString: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const value = (e.target as HTMLInputElement).value
+    !!value.slice(0, -1) && (value.includes(";") || value.includes("；"))
+      ? (() => {
+          setArr((prev) => [...prev, value.slice(0, -1)])
+          setString("")
+        })()
+      : setString(value)
+  }
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    setArr: React.Dispatch<React.SetStateAction<string[]>>,
+    setString: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const value = (e.target as HTMLInputElement).value
+    e.code === "Backspace" &&
+      value === "" &&
+      setArr((prev) => {
+        const newValue = prev.filter((x) => x)
+        newValue.splice(newValue.length - 1, 1)
+        return newValue
+      })
+    if (!!value && (e.code === "Enter" || e.code === "NumpadEnter")) {
+      setArr((prev) => [...prev, value])
+      setString("")
+    }
+  }
+
   useEffect(() => {
     GetEmailData().then((data) => {
       // 获取发送信息
@@ -79,6 +139,10 @@ const useAction = () => {
       }
     })
   }, [])
+
+  useEffect(() => {
+    // console.log(JSON.stringify(emailToString))
+  }, [emailToString])
 
   // 及时销毁 editor
   useEffect(() => {
@@ -98,16 +162,27 @@ const useAction = () => {
     html,
     emailFrom,
     emailList,
-    emailTo,
     isShowCopyto,
-    emailCopyTo,
-    setEmailCopyTo,
+    sendRecordRef,
+    emailToString,
+    emailToArr,
+    emailCopyToArr,
+    emailCopyToString,
+    emailSubject,
+    setEmailSubject,
+    setEmailCopyToArr,
+    setEmailToArr,
+    setEmailToString,
+    setEmailCopyToString,
     setIsShowCopyto,
-    setEmailTo,
     validateEmail,
     setEditor,
     setHtml,
-    setEmailFrom
+    setEmailFrom,
+    clickSendRecord,
+    handleClickSend,
+    handleKeyDown,
+    handleChange
   }
 }
 export default useAction
