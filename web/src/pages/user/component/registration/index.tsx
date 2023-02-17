@@ -1,15 +1,16 @@
 import styles from "./index.module.scss"
 import { Button, TextField } from "@mui/material"
 import useAction from "./hook"
-import { ModalBoxRef } from "../../../../dtos/modal"
+import { IUserResponse } from "../../../../dtos/user-management"
 
 const RegistrationPopup = (props: {
   onRegisterCancel: () => void
-  GetAllUsers: () => void
+  GetAllUsers: () => Promise<IUserResponse[] | null | undefined>
+  setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>
 }) => {
-  const { onRegisterCancel, GetAllUsers } = props
+  const { onRegisterCancel, GetAllUsers, setUsersList } = props
   const { username, setUsername, password, setPassword, registerSubmit } =
-    useAction({ onRegisterCancel, GetAllUsers })
+    useAction({ onRegisterCancel, GetAllUsers, setUsersList })
 
   return (
     <div className={styles.pageWrap}>

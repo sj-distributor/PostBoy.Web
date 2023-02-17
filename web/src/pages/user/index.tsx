@@ -1,59 +1,31 @@
 import styles from "./index.module.scss"
-
 import Accordion from "@mui/material/Accordion"
 import AccordionSummary from "@mui/material/AccordionSummary"
 import AccordionDetails from "@mui/material/AccordionDetails"
 import Typography from "@mui/material/Typography"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import useAuth from "../../auth"
 import useAction from "./hook"
 import { Button } from "@mui/material"
-import { useBoolean } from "ahooks"
 import { GetUserApikeys } from "../../api/user-management"
-import { useRef, useState } from "react"
-import { IUserApikeysResponse } from "../../dtos/user-management"
 import ModalBox from "../../components/modal/modal"
-import { ModalBoxRef } from "../../dtos/modal"
 import AddApiKeyPopup from "./component/add-aipkey"
 import RegistrationPopup from "./component/registration"
+
 const User = () => {
-  // const { username } = useAuth()
-  const { usersList, GetAllUsers } = useAction()
-  const [openApikey, openApikeyAction] = useBoolean(false)
-  const [userApikeyList, setUserApikey] = useState<IUserApikeysResponse[][]>([])
-  const [openApikeyUserId, setOpenApikeyUserId] = useState<string[]>([])
-  const registerRef = useRef<ModalBoxRef>(null)
-  const addApikeyRef = useRef<ModalBoxRef>(null)
-  const [userAccountId, setUserAccountId] = useState<string>("")
-
-  const onRegisterCancel = () => {
-    registerRef.current?.close()
-  }
-
-  const onAddApikeyCancel = () => {
-    addApikeyRef.current?.close()
-  }
-
-  const onListClick = async (userId: string) => {
-    // 判断是否存过id,如果存储过不再重复调api
-    if (!openApikeyUserId.find((x) => x === userId)) {
-      const clickApiKeyUserId: string[] = openApikeyUserId
-      clickApiKeyUserId.push(userId)
-      setOpenApikeyUserId(clickApiKeyUserId)
-      await GetUserApikeys(userId).then((res) => {
-        if (!!res) {
-          const apikeyList = userApikeyList
-          apikeyList.push(res)
-          setUserApikey(apikeyList)
-        }
-      })
-    }
-
-    console.log("userID", openApikeyUserId)
-    console.log("list", userApikeyList)
-
-    openApikeyAction.toggle()
-  }
+  const {
+    usersList,
+    setUsersList,
+    GetAllUsers,
+    registerRef,
+    onRegisterCancel,
+    addApikeyRef,
+    onAddApikeyCancel,
+    userAccountId,
+    userApikeyList,
+    setUserApikey,
+    onListClick,
+    setUserAccountId,
+  } = useAction()
 
   return (
     <div className={styles.user}>
@@ -62,6 +34,7 @@ const User = () => {
         <RegistrationPopup
           onRegisterCancel={onRegisterCancel}
           GetAllUsers={GetAllUsers}
+          setUsersList={setUsersList}
         />
       </ModalBox>
       {/* 添加apikey弹窗 */}
@@ -69,20 +42,20 @@ const User = () => {
         <AddApiKeyPopup
           userAccountId={userAccountId}
           onAddApikeyCancel={onAddApikeyCancel}
-          GetAllUsers={GetAllUsers}
+          GetUserApikeys={GetUserApikeys}
+          userApikeyList={userApikeyList}
+          setUserApikey={setUserApikey}
         />
       </ModalBox>
       <div>
-        <Accordion className={styles.accordion}>
+        <Accordion className={styles.accordion} expanded={true}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
             className={styles.accordionSummary}
           >
             <Typography className={styles.listText}>用户名</Typography>
             <Button
-              variant="outlined"
+              variant="contained"
               className={styles.registerButton}
               onClick={registerRef.current?.open}
             >
@@ -98,18 +71,18 @@ const User = () => {
             >
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
                 className={styles.accordionSummary}
                 onClick={() => onListClick(item.id)}
+                id="AccordionSummary"
               >
                 <Typography>{item.userName}</Typography>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   className={styles.addButton}
-                  onClick={() => {
+                  onClick={(event) => {
                     addApikeyRef.current?.open()
                     setUserAccountId(item.id)
+                    event.stopPropagation()
                   }}
                 >
                   添加apikey

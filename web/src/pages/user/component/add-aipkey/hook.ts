@@ -1,30 +1,52 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { PostUserApikeysAdd } from "../../../../api/user-management"
+import { IUserApikeysResponse } from "../../../../dtos/user-management"
 
 const useAction = (props: {
   userAccountId: string
   onAddApikeyCancel: () => void
-  GetAllUsers: () => void
+  GetUserApikeys: (
+    userId: string
+  ) => Promise<IUserApikeysResponse[] | null | undefined>
+  userApikeyList: IUserApikeysResponse[][]
+  setUserApikey: React.Dispatch<React.SetStateAction<IUserApikeysResponse[][]>>
 }) => {
-  const { userAccountId, onAddApikeyCancel, GetAllUsers } = props
+  const {
+    userAccountId,
+    onAddApikeyCancel,
+    GetUserApikeys,
+    userApikeyList,
+    setUserApikey,
+  } = props
   const [apiKey, setAipKey] = useState<string>("")
   const [description, setDescription] = useState<string>("")
 
-  const registerSubmit = () => {
-    // PostUserApikeysAdd({
-    //   apiKey: apiKey,
-    //   description: description,
-    //   userAccountId: userAccountId,
-    // }).then(() => {
-    //   onAddApikeyCancel()
-    //   GetAllUsers()
-    // })
-    onAddApikeyCancel()
-    GetAllUsers()
+  const addApiKeySubmit = () => {
+    PostUserApikeysAdd({
+      apiKey: apiKey,
+      description: description,
+      userAccountId: userAccountId,
+    }).then(() => {
+      onAddApikeyCancel()
+      GetUserApikeys(userAccountId).then((res) => {
+        console.log("Res", res, userApikeyList)
+        if (!!res) {
+          const newList = userApikeyList.map((items) => {
+            if (items[0].userAccountId === userAccountId) {
+              items = res
+            }
+            return items
+          })
+          setUserApikey(newList)
+        }
+      })
+    })
+
     setAipKey("")
     setDescription("")
   }
-  return { apiKey, setAipKey, description, setDescription, registerSubmit }
+
+  return { apiKey, setAipKey, description, setDescription, addApiKeySubmit }
 }
 
 export default useAction

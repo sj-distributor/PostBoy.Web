@@ -1,15 +1,32 @@
 import styles from "./index.module.scss"
 import { Button, TextField } from "@mui/material"
 import useAction from "./hook"
+import { IUserApikeysResponse } from "../../../../dtos/user-management"
 
 const AddApiKeyPopup = (props: {
   userAccountId: string
   onAddApikeyCancel: () => void
-  GetAllUsers: () => void
+  GetUserApikeys: (
+    userId: string
+  ) => Promise<IUserApikeysResponse[] | null | undefined>
+  userApikeyList: IUserApikeysResponse[][]
+  setUserApikey: React.Dispatch<React.SetStateAction<IUserApikeysResponse[][]>>
 }) => {
-  const { userAccountId, onAddApikeyCancel, GetAllUsers } = props
-  const { apiKey, setAipKey, description, setDescription, registerSubmit } =
-    useAction({ userAccountId, onAddApikeyCancel, GetAllUsers })
+  const {
+    userAccountId,
+    onAddApikeyCancel,
+    GetUserApikeys,
+    userApikeyList,
+    setUserApikey,
+  } = props
+  const { apiKey, setAipKey, description, setDescription, addApiKeySubmit } =
+    useAction({
+      userAccountId,
+      onAddApikeyCancel,
+      GetUserApikeys,
+      userApikeyList,
+      setUserApikey,
+    })
 
   return (
     <div className={styles.pageWrap}>
@@ -37,7 +54,7 @@ const AddApiKeyPopup = (props: {
           fullWidth
           variant="contained"
           className={styles.signInButton}
-          onClick={registerSubmit}
+          onClick={addApiKeySubmit}
           disabled={!apiKey}
         >
           Submit
