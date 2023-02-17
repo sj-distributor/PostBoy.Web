@@ -18,8 +18,10 @@ export const GetAllUsers = async () => {
   return await Get<IUserResponse[]>("/auth/allUsers")
 }
 
-export const GetUserApikeys = async () => {
-  return await Get<IUserApikeysResponse[]>("/auth/user/apikeys")
+export const GetUserApikeys = async (userId: string) => {
+  return await Get<IUserApikeysResponse[]>(
+    `/auth/user/apikeys?UserId=${userId}`
+  )
 }
 
 export const PostUserApikeysAdd = async (data: IUserApikeyAddData) => {

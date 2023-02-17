@@ -1,21 +1,21 @@
 import { useBoolean } from "ahooks"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { GetAllUsers } from "../../api/user-management"
+import { IUserResponse } from "../../dtos/user-management"
 
 const useAction = () => {
-  const [isShowRegister, isShowRegisterAction] = useBoolean(false)
-
-  const onRegister = () => {
-    isShowRegisterAction.toggle()
-  }
+  const [usersList, setUsersList] = useState<IUserResponse[]>()
 
   useEffect(() => {
     GetAllUsers().then((res) => {
-      console.log("res", res)
+      if (!!res) {
+        setUsersList(res)
+        console.log("userList", res)
+      }
     })
   }, [])
 
-  return { onRegister, isShowRegister }
+  return { usersList }
 }
 
 export default useAction
