@@ -2,29 +2,35 @@ import styles from "./index.module.scss"
 import { Button, TextField } from "@mui/material"
 import useAction from "./hook"
 
-const AddApiKeyPopup = (props: { userAccountId: string }) => {
-  const { userAccountId } = props
-  const { aipKey, setAipKey, description, setDescription, registerSubmit } =
-    useAction({ userAccountId })
+const AddApiKeyPopup = (props: {
+  userAccountId: string
+  onAddApikeyCancel: () => void
+  GetAllUsers: () => void
+}) => {
+  const { userAccountId, onAddApikeyCancel, GetAllUsers } = props
+  const { apiKey, setAipKey, description, setDescription, registerSubmit } =
+    useAction({ userAccountId, onAddApikeyCancel, GetAllUsers })
 
   return (
     <div className={styles.pageWrap}>
-      <div className={styles.loginBox}>
-        <div className={styles.signInTitleBox}>
-          <div className={styles.title}>Register</div>
+      <div className={styles.addBox}>
+        <div className={styles.addTitleBox}>
+          <div className={styles.title}>Add ApiKey</div>
         </div>
         <TextField
           fullWidth
           label="apiKey"
-          className={styles.signInUsername}
-          value={aipKey}
+          className={styles.apiKey}
+          value={apiKey}
           onChange={(e) => setAipKey(e.target.value)}
         />
         <TextField
           fullWidth
           label="description"
-          className={styles.signInPassword}
+          className={styles.description}
           value={description}
+          multiline
+          rows={5}
           onChange={(e) => setDescription(e.target.value)}
         />
         <Button
@@ -32,7 +38,7 @@ const AddApiKeyPopup = (props: { userAccountId: string }) => {
           variant="contained"
           className={styles.signInButton}
           onClick={registerSubmit}
-          disabled={!aipKey || !description}
+          disabled={!apiKey}
         >
           Submit
         </Button>

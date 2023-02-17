@@ -15,7 +15,7 @@ const useAction = () => {
     })
   }, [])
 
-  return { usersList }
+  return { usersList, GetAllUsers }
 }
 
 export default useAction

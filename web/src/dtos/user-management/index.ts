@@ -22,7 +22,7 @@ export interface IUserApikeysResponse {
 }
 
 export interface IUserApikeyAddData {
-  aipKey: string
+  apiKey: string
   description: string
   userAccountId: string
 }

@@ -1,12 +1,21 @@
 import { useState } from "react"
 import { PostAuthRegister } from "../../../../api/user-management"
 
-const useAction = () => {
+const useAction = (props: {
+  onRegisterCancel: () => void
+  GetAllUsers: () => void
+}) => {
+  const { onRegisterCancel, GetAllUsers } = props
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
 
   const registerSubmit = () => {
-    PostAuthRegister({ userName: username, password: password })
+    // PostAuthRegister({ userName: username, password: password }).then(() => {
+    //   onRegisterCancel()
+    //   GetAllUsers()
+    // })
+    onRegisterCancel()
+    GetAllUsers()
     setPassword("")
     setUsername("")
   }

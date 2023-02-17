@@ -1,10 +1,15 @@
 import styles from "./index.module.scss"
 import { Button, TextField } from "@mui/material"
 import useAction from "./hook"
+import { ModalBoxRef } from "../../../../dtos/modal"
 
-const RegistrationPopup = () => {
+const RegistrationPopup = (props: {
+  onRegisterCancel: () => void
+  GetAllUsers: () => void
+}) => {
+  const { onRegisterCancel, GetAllUsers } = props
   const { username, setUsername, password, setPassword, registerSubmit } =
-    useAction()
+    useAction({ onRegisterCancel, GetAllUsers })
 
   return (
     <div className={styles.pageWrap}>

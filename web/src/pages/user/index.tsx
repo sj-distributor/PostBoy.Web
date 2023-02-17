@@ -18,7 +18,7 @@ import AddApiKeyPopup from "./component/add-aipkey"
 import RegistrationPopup from "./component/registration"
 const User = () => {
   // const { username } = useAuth()
-  const { usersList } = useAction()
+  const { usersList, GetAllUsers } = useAction()
   const [openApikey, openApikeyAction] = useBoolean(false)
   const [userApikeyList, setUserApikey] = useState<IUserApikeysResponse[][]>([])
   const [openApikeyUserId, setOpenApikeyUserId] = useState<string[]>([])
@@ -59,11 +59,18 @@ const User = () => {
     <div className={styles.user}>
       {/* 注册用户弹窗 */}
       <ModalBox ref={registerRef} onCancel={onRegisterCancel}>
-        <RegistrationPopup />
+        <RegistrationPopup
+          onRegisterCancel={onRegisterCancel}
+          GetAllUsers={GetAllUsers}
+        />
       </ModalBox>
       {/* 添加apikey弹窗 */}
       <ModalBox ref={addApikeyRef} onCancel={onAddApikeyCancel}>
-        <AddApiKeyPopup userAccountId={userAccountId} />
+        <AddApiKeyPopup
+          userAccountId={userAccountId}
+          onAddApikeyCancel={onAddApikeyCancel}
+          GetAllUsers={GetAllUsers}
+        />
       </ModalBox>
       <div>
         <Accordion className={styles.accordion}>
@@ -102,7 +109,7 @@ const User = () => {
                   className={styles.addButton}
                   onClick={() => {
                     addApikeyRef.current?.open()
-                    setUserAccountId(item.id) //mark
+                    setUserAccountId(item.id)
                   }}
                 >
                   添加apikey
