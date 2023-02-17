@@ -12,7 +12,25 @@ import SendIcon from "@mui/icons-material/Send"
 import ModalBox from "../../components/modal/modal"
 import SendNotice from "../notification"
 import ClearIcon from "@mui/icons-material/Clear"
-import { MessageJobDestination } from "../../dtos/enterprise"
+import {
+  MessageJobDestination,
+  MessageJobSendType
+} from "../../dtos/enterprise"
+import DateSelector from "../enterprise/components/date-selector"
+import TimeSelector from "../enterprise/components/time-selector"
+import { sendTypeList, timeZone } from "../../dtos/send-message-job"
+import {
+  Box,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  Snackbar
+} from "@mui/material"
+import { green } from "@mui/material/colors"
 
 const SendEmail = () => {
   const {
@@ -30,6 +48,24 @@ const SendEmail = () => {
     emailCopyToArr,
     emailCopyToString,
     emailSubject,
+    sendTypeValue,
+    dateValue,
+    endDateValue,
+    cronExp,
+    timeZoneValue,
+    open,
+    promptText,
+    openError,
+    sendLoading,
+    setOpen,
+    handleClose,
+    setTimeZoneValue,
+    setCronError,
+    setDateValue,
+    setCronExp,
+    showErrorPrompt,
+    setEndDateValue,
+    setSendTypeValue,
     setEmailSubject,
     setEmailCopyToArr,
     setEmailToArr,
@@ -48,12 +84,17 @@ const SendEmail = () => {
 
   return (
     <div className={styles.wrap}>
+      <Snackbar
+        message={promptText}
+        open={openError}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center"
+        }}
+      />
       <div className={styles.inputGroup}>
         <span id="select-label">从: </span>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          label="Age"
           variant="standard"
           value={emailFrom.senderId}
           className={styles.selectInput}
@@ -74,14 +115,30 @@ const SendEmail = () => {
             </MenuItem>
           ))}
         </Select>
-        <Button
-          sx={{ marginLeft: "2rem" }}
-          variant="contained"
-          endIcon={<SendIcon />}
-          onClick={handleClickSend}
-        >
-          Send
-        </Button>
+        <Box sx={{ position: "relative" }}>
+          <Button
+            variant="contained"
+            sx={{ marginLeft: "2rem" }}
+            endIcon={<SendIcon />}
+            disabled={sendLoading}
+            onClick={handleClickSend}
+          >
+            Send
+          </Button>
+          {sendLoading && (
+            <CircularProgress
+              size={24}
+              sx={{
+                color: green[500],
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                marginTop: "-0.8rem",
+                marginLeft: "-0.8rem"
+              }}
+            />
+          )}
+        </Box>
         <Button
           sx={{
             marginLeft: "2rem"
@@ -90,6 +147,15 @@ const SendEmail = () => {
           onClick={() => clickSendRecord("open")}
         >
           发送记录
+        </Button>
+        <Button
+          sx={{
+            marginLeft: "2rem"
+          }}
+          variant="contained"
+          onClick={() => setOpen(true)}
+        >
+          设置发送类型
         </Button>
       </div>
       <div className={styles.inputGroup}>
@@ -202,6 +268,83 @@ const SendEmail = () => {
           style={{ height: "25rem" }}
         />
       </div>
+
+      <Dialog
+        open={open}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">设置发送类型</DialogTitle>
+        <DialogContent sx={{ minWidth: "30rem" }}>
+          <FormControl fullWidth sx={{ m: "1rem 0 1rem 0" }}>
+            <InputLabel id="demo-simple-select-autowidth-label">
+              发送类型
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-autowidth-label"
+              id="demo-simple-select"
+              value={sendTypeValue}
+              label="发送类型"
+              onChange={(e) => {
+                setSendTypeValue(Number(e.target.value))
+              }}
+            >
+              {sendTypeList.map((item, key) => (
+                <MenuItem key={key} value={item.value}>
+                  {item.title}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <div className={styles.dateSelector}>
+            {(sendTypeValue === MessageJobSendType.Delayed ||
+              sendTypeValue === MessageJobSendType.Recurring) && (
+              <FormControl
+                style={{
+                  width: 252,
+                  margin: "0.8rem 0"
+                }}
+              >
+                <InputLabel id="demo-simple-select-label">时区</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={timeZoneValue}
+                  label="时区"
+                  onChange={(e) => {
+                    setTimeZoneValue(Number(e.target.value))
+                  }}
+                >
+                  {timeZone.map((item, key) => (
+                    <MenuItem key={key} value={item.value}>
+                      {item.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+            <div style={{ marginLeft: "1rem" }}>
+              <DateSelector
+                sendTypeValue={sendTypeValue}
+                dateValue={dateValue}
+                setDateValue={setDateValue}
+                showErrorPrompt={showErrorPrompt}
+              />
+            </div>
+            <TimeSelector
+              sendTypeValue={sendTypeValue}
+              cronExp={cronExp}
+              setCronExp={setCronExp}
+              setCronError={setCronError}
+              endDateValue={endDateValue}
+              setEndDateValue={setEndDateValue}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>确定</Button>
+        </DialogActions>
+      </Dialog>
 
       <ModalBox
         ref={sendRecordRef}

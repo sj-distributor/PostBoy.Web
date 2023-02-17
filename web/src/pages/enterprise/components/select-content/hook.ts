@@ -785,7 +785,6 @@ export const useAction = (props: SelectContentHookProps) => {
 
       setIsGetLastTimeData(true)
     }
-    console.log(updateMessageJobInformation)
   }, [updateMessageJobInformation])
 
   // 返回最终的数据给外层
