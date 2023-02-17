@@ -166,6 +166,8 @@ const SendEmail = () => {
           value={emailToString}
           className={styles.corpInput}
           sx={inputSx}
+          helperText={!validateEmail(emailToString) ? "Incorrect entry." : ""}
+          error={!validateEmail(emailToString)}
           onKeyDown={(e) => handleKeyDown(e, setEmailToArr, setEmailToString)}
           onChange={(e) => handleChange(e, setEmailToArr, setEmailToString)}
           InputProps={{
@@ -174,7 +176,12 @@ const SendEmail = () => {
                 {emailToArr.map((item, index) => (
                   <Chip
                     size="small"
-                    sx={{ marginLeft: "0.5rem" }}
+                    sx={{
+                      marginLeft: "0.5rem",
+                      border: !validateEmail(item)
+                        ? "0.0625rem solid #d32f2f"
+                        : ""
+                    }}
                     label={item}
                     key={index}
                     onDelete={() => {
@@ -208,6 +215,10 @@ const SendEmail = () => {
             value={emailCopyToString}
             className={styles.corpInput}
             sx={inputSx}
+            helperText={
+              !validateEmail(emailCopyToString) ? "Incorrect entry." : ""
+            }
+            error={!validateEmail(emailCopyToString)}
             onKeyDown={(e) =>
               handleKeyDown(e, setEmailCopyToArr, setEmailCopyToString)
             }
@@ -220,7 +231,12 @@ const SendEmail = () => {
                   {emailCopyToArr.map((item, index) => (
                     <Chip
                       size="small"
-                      sx={{ marginLeft: "0.5rem" }}
+                      sx={{
+                        marginLeft: "0.5rem",
+                        border: !validateEmail(item)
+                          ? "0.0625rem solid #d32f2f"
+                          : ""
+                      }}
                       label={item}
                       key={index}
                       onDelete={() => {
