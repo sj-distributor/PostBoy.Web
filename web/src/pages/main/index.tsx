@@ -1,32 +1,36 @@
-import styles from "./index.module.scss";
-import { Link, Outlet } from "react-router-dom";
-import { routerArray } from "../../router/elementRoute";
-import useMainAction from "./hook";
-import UserInformation from "./components/user-information";
+import styles from "./index.module.scss"
+import { Link, Outlet } from "react-router-dom"
+import { routerArray } from "../../router/elementRoute"
+import useMainAction from "./hook"
+import UserInformation from "./components/user-information"
 
 const Main = () => {
-  const { clickMainIndex, setMainClickIndex } = useMainAction();
+  const { clickMainIndex, setMainClickIndex, haveAdministrator } =
+    useMainAction()
 
   const routerTabBar = () => {
     return routerArray.map((item, index) => {
       return (
         <div key={index} className={styles.item}>
-          <Link
-            to={item.path}
-            onClick={() => {
-              setMainClickIndex(index);
-            }}
-            className={
-              clickMainIndex === index ? styles.itemClick : styles.itemNone
-            }
-          >
-            <span className={item.icons} />
-            {item.head}
-          </Link>
+          {((haveAdministrator && item.head === "用户管理") ||
+            item.head !== "用户管理") && (
+            <Link
+              to={item.path}
+              onClick={() => {
+                setMainClickIndex(index)
+              }}
+              className={
+                clickMainIndex === index ? styles.itemClick : styles.itemNone
+              }
+            >
+              <span className={item.icons} />
+              {item.head}
+            </Link>
+          )}
         </div>
-      );
-    });
-  };
+      )
+    })
+  }
 
   return (
     <div className={styles.main}>
@@ -42,7 +46,7 @@ const Main = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Main;
+export default Main
