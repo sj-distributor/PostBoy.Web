@@ -212,6 +212,7 @@ const SelectTargetDialog = memo(
                       : { paddingLeft: "2rem" },
                     { fontSize: "0.9rem" }
                   )
+                  !option.canSelect && (props.onClick = () => {})
                   return (
                     <li {...props} style={style}>
                       {option.name}
