@@ -21,7 +21,7 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  ITagsList,
+  ITagsList
 } from "../../../../dtos/enterprise"
 import { memo, useEffect } from "react"
 import { CircularProgress } from "@mui/material"
@@ -40,7 +40,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       lastTagsValue,
-      isLoadStop,
+      isLoadStop
     } = props
 
     const {
@@ -48,7 +48,7 @@ const SelectTargetDialog = memo(
       tagsValue,
       handleDeptOrUserClick,
       setSearchToDeptValue,
-      setTagsValue,
+      setTagsValue
     } = useAction({
       open,
       AppId,
@@ -56,7 +56,7 @@ const SelectTargetDialog = memo(
       departmentAndUserList,
       isLoading,
       setDeptUserList,
-      setOuterTagsValue,
+      setOuterTagsValue
     })
 
     useEffect(() => {
@@ -78,18 +78,19 @@ const SelectTargetDialog = memo(
       pl: number
     ) => {
       const result = (
-        <List dense>
-          {data.map((deptUserData, deptUserIndex) => {
+        <List key={AppId} dense>
+          {data.map((deptUserData) => {
             const insertData: IDepartmentAndUserListValue = {
               id: deptUserData.id,
               name: deptUserData.name,
               type: deptUserData.type,
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
-              children: [],
+              canSelect: deptUserData.selected,
+              children: []
             }
             return (
-              <div key={deptUserIndex}>
+              <div key={deptUserData.id}>
                 <ListItemButton
                   sx={{ pl, height: "2.2rem" }}
                   onClick={(e) => {
@@ -98,26 +99,23 @@ const SelectTargetDialog = memo(
                       handleDeptOrUserClick(
                         ClickType.Collapse,
                         Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed,
-                        }),
-                        true
+                          isCollapsed: deptUserData.isCollapsed
+                        })
                       )
                   }}
                 >
-                  <Checkbox
-                    edge="start"
-                    checked={deptUserData.selected}
-                    tabIndex={-1}
-                    disableRipple
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDeptOrUserClick(
-                        ClickType.Select,
-                        insertData,
-                        isLoadStop
-                      )
-                    }}
-                  />
+                  {deptUserData.canSelect && (
+                    <Checkbox
+                      edge="start"
+                      checked={deptUserData.selected}
+                      tabIndex={-1}
+                      disableRipple
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeptOrUserClick(ClickType.Select, insertData)
+                      }}
+                    />
+                  )}
                   <ListItemText primary={deptUserData.name} />
                   {deptUserData.children.length > 0 &&
                     (!!deptUserData.isCollapsed ? (
@@ -150,8 +148,8 @@ const SelectTargetDialog = memo(
           open={open}
           PaperProps={{
             sx: {
-              overflowY: "unset",
-            },
+              overflowY: "unset"
+            }
           }}
           onClose={() => {
             setOpenFunction(false)
@@ -159,29 +157,27 @@ const SelectTargetDialog = memo(
         >
           <DialogTitle>选择发送目标</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
-            {departmentKeyValue?.data && departmentKeyValue.data.length > 0 && (
-              <div
-                style={{
-                  height: "15rem",
-                  overflowY: "auto",
-                  position: "relative",
-                }}
-              >
-                {isLoadStop ? (
-                  recursiveRenderDeptList(departmentKeyValue.data, 0)
-                ) : (
-                  <CircularProgress
-                    style={{
-                      position: "absolute",
-                      width: "2rem",
-                      height: "2rem",
-                      left: "13rem",
-                      top: "5.5rem",
-                    }}
-                  />
-                )}
-              </div>
-            )}
+            <div
+              style={{
+                height: "15rem",
+                overflowY: "auto",
+                position: "relative"
+              }}
+            >
+              {departmentKeyValue?.data.length > 0 ? (
+                recursiveRenderDeptList(departmentKeyValue.data, 0)
+              ) : (
+                <CircularProgress
+                  style={{
+                    position: "absolute",
+                    width: "2rem",
+                    height: "2rem",
+                    left: "13rem",
+                    top: "5.5rem"
+                  }}
+                />
+              )}
+            </div>
 
             {flattenDepartmentList && (
               <Autocomplete
@@ -192,7 +188,7 @@ const SelectTargetDialog = memo(
                 disableCloseOnSelect
                 size="small"
                 sx={{
-                  margin: "1rem 0 1rem",
+                  margin: "1rem 0 1rem"
                 }}
                 value={departmentSelectedList}
                 options={flattenDepartmentList}
@@ -277,7 +273,9 @@ const SelectTargetDialog = memo(
   (prevProps, nextProps) => {
     return (
       prevProps.open === nextProps.open &&
-      prevProps.departmentAndUserList === nextProps.departmentAndUserList
+      prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
+      prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
+      prevProps.AppId === nextProps.AppId
     )
   }
 )

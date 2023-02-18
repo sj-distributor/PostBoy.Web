@@ -58,10 +58,6 @@ const useAction = () => {
   const [open, setOpen] = useState(false)
   const [sendLoading, setSendLoading] = useState(false)
 
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   // 弹出警告
   const showErrorPrompt = (text: string) => {
     setPromptText(text)
@@ -102,13 +98,9 @@ const useAction = () => {
       "delIndent",
       "indent",
       "|",
-      "uploadImage",
       "insertLink",
-      "insertTable",
-      "|",
       "redo",
-      "undo",
-      "uploadAttachment"
+      "undo"
     ]
   }
   // 点击发送
@@ -124,27 +116,29 @@ const useAction = () => {
       }
     }
     setSendLoading(true)
-    PostMessageSend(data).then((data) => {
-      setPromptText("发送成功")
-      openErrorAction.setTrue()
-      setSendLoading(false)
-      // 清空数据
-      setJobSetting({
-        timezone: timeZone[timeZoneValue].title
+    checkObject() &&
+      PostMessageSend(data).then((data) => {
+        setPromptText("发送成功")
+        openErrorAction.setTrue()
+        setSendLoading(false)
+        // 清空数据
+        setJobSetting({
+          timezone: timeZone[timeZoneValue].title
+        })
+        editor && editor.setHtml("<p></p>")
+        setEmailCopyToArr([])
+        setEmailToArr([])
+        setEmailToString("")
+        setEmailCopyToString("")
+        setEmailSubject("")
+        setSendTypeValue(MessageJobSendType.Fire)
+        setTimeZoneValue(timeZone[0].value)
+        setCronError("")
+        setCronExp("0 0 * * *")
+        setEndDateValue("")
+        setDateValue("")
       })
-      editor && editor.setHtml("<p></p>")
-      setEmailCopyToArr([])
-      setEmailToArr([])
-      setEmailToString("")
-      setEmailCopyToString("")
-      setEmailSubject("")
-      setSendTypeValue(MessageJobSendType.Fire)
-      setTimeZoneValue(timeZone[0].value)
-      setCronError("")
-      setCronExp("0 0 * * *")
-      setEndDateValue("")
-      setDateValue("")
-    })
+    setSendLoading(false)
   }
 
   const editorConfig = {
@@ -198,6 +192,62 @@ const useAction = () => {
     }
   }
 
+  const handleBlur = (
+    e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement, Element>,
+    setArr: React.Dispatch<React.SetStateAction<string[]>>,
+    setString: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const value = (e.target as HTMLInputElement).value
+    if (!!value) {
+      setArr((prev) => [...prev, value])
+      setString("")
+    }
+  }
+
+  const validateAttrFunc = (string: string) => {
+    return string
+      ? {
+          helperText: !validateEmail(string) ? "Incorrect entry." : "",
+          error: !validateEmail(string)
+        }
+      : {
+          helperText: "",
+          error: false
+        }
+  }
+
+  const checkObject = () => {
+    if (
+      !emailToString &&
+      (emailToArr.length <= 0 || emailToArr.some((x) => !validateEmail(x)))
+    ) {
+      setPromptText("please enter a valid email address for send to")
+      openErrorAction.setTrue()
+      return false
+    } else if (
+      emailToString &&
+      emailToArr.length <= 0 &&
+      validateEmail(emailToString)
+    ) {
+      setPromptText("please enter a valid email address for send to")
+      openErrorAction.setTrue()
+      return false
+    } else if (!emailSubject) {
+      setPromptText("please enter a valid email subject")
+      openErrorAction.setTrue()
+      return false
+    } else if (!emailFrom.displayName) {
+      setPromptText("please select a email from")
+      openErrorAction.setTrue()
+      return false
+    } else if (editor?.getText() === "") {
+      setPromptText("please enter email content")
+      openErrorAction.setTrue()
+      return false
+    }
+    return true
+  }
+
   // 延迟关闭警告提示
   useEffect(() => {
     if (openError) {
@@ -221,7 +271,6 @@ const useAction = () => {
   useEffect(() => {
     return () => {
       if (editor == null) return
-
       editor.destroy()
       setEditor(null)
     }
@@ -262,7 +311,6 @@ const useAction = () => {
     }
   }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue])
 
-
   return {
     toolbarConfig,
     editorConfig,
@@ -287,9 +335,9 @@ const useAction = () => {
     promptText,
     openError,
     sendLoading,
+    validateAttrFunc,
     setPromptText,
     setOpen,
-    handleClose,
     setTimeZoneValue,
     setCronError,
     setCronExp,
@@ -310,7 +358,8 @@ const useAction = () => {
     clickSendRecord,
     handleClickSend,
     handleKeyDown,
-    handleChange
+    handleChange,
+    handleBlur
   }
 }
 export default useAction

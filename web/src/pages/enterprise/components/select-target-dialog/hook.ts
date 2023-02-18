@@ -1,10 +1,11 @@
+import { argv } from "process"
 import { useEffect, useState } from "react"
 import {
   IDepartmentAndUserListValue,
   DepartmentAndUserType,
   ITagsList,
   IDepartmentKeyControl,
-  ClickType,
+  ClickType
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -23,7 +24,7 @@ const useAction = (props: {
     open,
     isLoading,
     setDeptUserList,
-    setOuterTagsValue,
+    setOuterTagsValue
   } = props
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
     IDepartmentAndUserListValue[]
@@ -41,35 +42,27 @@ const useAction = (props: {
     for (const key in hasData) {
       const e = hasData[key]
       callback(e, item)
-      if (e.children.length > 0) {
+      e.children.length > 0 &&
         recursiveSeachDeptOrUser(e.children, item, callback)
-      }
     }
   }
 
   const handleDeptOrUserClick = (
     type: ClickType,
-    clickedItem: IDepartmentAndUserListValue,
-    isLoadStop?: boolean
+    clickedItem: IDepartmentAndUserListValue
   ) => {
-    isLoadStop &&
-      setDeptUserList((prev) => {
-        const newValue = prev.filter((e) => !!e)
-        const activeData = newValue.find(
-          (e) => e.key === departmentKeyValue.key
-        )
-        activeData &&
-          recursiveSeachDeptOrUser(activeData.data, clickedItem, (e, item) => {
-            if (e.id === item.id) {
-              if (type === ClickType.Collapse) {
-                e.isCollapsed = !e.isCollapsed
-              } else {
-                e.selected = !e.selected
-              }
-            }
-          })
-        return newValue
-      })
+    setDeptUserList((prev) => {
+      const newValue = prev.filter((e) => !!e)
+      const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
+      activeData &&
+        recursiveSeachDeptOrUser(activeData.data, clickedItem, (e, item) => {
+          e.id === item.id &&
+            (type === ClickType.Collapse
+              ? (e.isCollapsed = !e.isCollapsed)
+              : (e.selected = !e.selected))
+        })
+      return newValue
+    })
   }
 
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -90,9 +83,7 @@ const useAction = (props: {
           : recursiveSeachDeptOrUser(
               activeData.data,
               activeData.data[0],
-              (user) => {
-                user.selected = false
-              }
+              (user) => (user.selected = false)
             )
       }
       return newValue
@@ -115,7 +106,7 @@ const useAction = (props: {
               type: DepartmentAndUserType.User,
               parentid: String(e.parentid),
               selected: e.selected,
-              children: [],
+              children: []
             })
           : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1)
         e.children.length > 0 && recursiveDeptList(e.children, changeList)
@@ -144,7 +135,7 @@ const useAction = (props: {
     tagsValue,
     setTagsValue,
     handleDeptOrUserClick,
-    setSearchToDeptValue,
+    setSearchToDeptValue
   }
 }
 export default useAction

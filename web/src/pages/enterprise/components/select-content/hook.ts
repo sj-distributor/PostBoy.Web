@@ -3,8 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
-  GetDepartmentList,
-  GetDepartmentUsersList,
+  GetDeptsAndUserList,
   GetTagsList
 } from "../../../../api/enterprise"
 import {
@@ -15,6 +14,7 @@ import {
   IDepartmentAndUserListValue,
   IDepartmentData,
   IDepartmentKeyControl,
+  IDeptAndUserList,
   IJobSettingDto,
   IMessageTypeData,
   ISearchList,
@@ -136,9 +136,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个企业对象
   useEffect(() => {
-    if (corpsValue === undefined) {
-      setCorpsValue(corpsList[0])
-    }
+    corpsValue === undefined && setCorpsValue(corpsList[0])
   }, [corpsList])
 
   // 初始化App数组
@@ -181,14 +179,14 @@ export const useAction = (props: SelectContentHookProps) => {
       (e) => e.key === corpAppValue?.appId
     )
     return result as IDepartmentKeyControl
-  }, [departmentAndUserList])
+  }, [departmentAndUserList, corpAppValue?.appId])
 
   const searchKeyValue = useMemo(() => {
     const result = flattenDepartmentList.find(
       (e) => e.key === corpAppValue?.appId
     )
     return result?.data as IDepartmentAndUserListValue[]
-  }, [flattenDepartmentList])
+  }, [flattenDepartmentList, corpAppValue?.appId])
 
   const recursiveDeptList = (
     hasData: IDepartmentAndUserListValue[],
@@ -220,109 +218,83 @@ export const useAction = (props: SelectContentHookProps) => {
   }
 
   const loadDeptUsers = async (
-    departmentPage: number,
     AppId: string,
-    deptListResponse: IDepartmentData[]
+    deptListResponse: IDeptAndUserList[]
   ) => {
-    for (let index = departmentPage; index < deptListResponse.length; index++) {
-      const department = deptListResponse[index]
-      // referIndexList储存从嵌套数组顶部到当前部门的ID路径
-      let referIndexList: number[] = []
-      const defaultChild = {
+    const copyDeptListResponse = deptListResponse.sort(
+      (a, b) => a.department.id - b.department.id
+    )
+    for (let index = 0; index < copyDeptListResponse.length; index++) {
+      // 当前的部门
+      const department = copyDeptListResponse[index].department
+      // 当前的用户列表
+      const users = copyDeptListResponse[index].users
+
+      // 需要插入的数据
+      const defaultChild: IDepartmentAndUserListValue = {
         id: department.id,
         name: department.name,
         type: DepartmentAndUserType.Department,
         parentid: String(department.parentid),
         selected: false,
-        children: []
+        // 能否选择,并显隐checkbox
+        canSelect: true,
+        children: users.map((item) => ({
+          id: item.userid,
+          name: item.userid,
+          type: DepartmentAndUserType.User,
+          parentid: item.department,
+          selected: false,
+          isCollapsed: false,
+          canSelect: true,
+          children: []
+        }))
       }
+
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev)
         const hasData = newValue.find((e) => e.key === AppId)
-        if (hasData && hasData.data.length > 0) {
-          // 实现查找parentid等于当前部门id后插入chilrden
-          const idList = recursiveDeptList(
-            hasData.data,
-            defaultChild,
-            department,
-            []
-          )
-          referIndexList = referIndexList.concat(idList, [department.id])
-        } else {
-          referIndexList = referIndexList.concat(department.id)
-          newValue.push({ key: AppId, data: [defaultChild] })
-        }
+        // 是否现有key的数据
+        hasData && hasData.data.length > 0
+          ? recursiveDeptList(hasData.data, defaultChild, department, [])
+          : newValue.push({ key: AppId, data: [defaultChild] })
         return newValue
       })
 
-      const userList = await GetDepartmentUsersList({
-        AppId,
-        DepartmentId: department.id
-      })
-      if (!!userList && userList.errcode === 0) {
-        setDepartmentAndUserList((prev) => {
-          const newValue = clone(prev)
-          const hasData = newValue.find((e) => e.key === AppId)
-          if (hasData) {
-            let result: IDepartmentAndUserListValue | undefined
-            referIndexList.forEach((number, index) => {
-              if (index !== 0) {
-                result = result?.children.find((item) => number === item.id)
-              } else {
-                result = hasData.data.find(
-                  (item) => referIndexList[0] === item.id
-                )
-              }
-            })
-            if (result)
-              result.children = userList.userlist.map((e) => ({
-                id: e.userid,
-                name: e.name,
-                type: DepartmentAndUserType.User,
-                parentid: String(department.id),
-                selected: false,
-                children: []
-              }))
-          }
-          return newValue
-        })
-        setFlattenDepartmentList((prev) => {
-          const newValue = clone(prev)
-          let hasData = newValue.find((e) => e.key === AppId)
-          const insertData = [
-            {
-              id: department.id,
-              name: department.name,
+      setFlattenDepartmentList((prev) => {
+        const newValue = clone(prev)
+        let hasData = newValue.find((e) => e.key === AppId)
+        const insertData = [
+          {
+            id: department.id,
+            name: department.name,
+            parentid: department.name,
+            type: DepartmentAndUserType.Department,
+            selected: false,
+            children: []
+          },
+          ...flatten(
+            users.map((item) => ({
+              id: item.userid,
+              name: item.userid,
               parentid: department.name,
-              type: DepartmentAndUserType.Department,
+              type: DepartmentAndUserType.User,
               selected: false,
               children: []
-            },
-            ...flatten(
-              userList.userlist.map((item) => ({
-                id: item.userid,
-                name: item.name,
-                parentid: department.name,
-                type: DepartmentAndUserType.User,
-                selected: false,
-                children: []
-              }))
-            )
-          ]
-          if (hasData) {
-            hasData.data = [...hasData.data, ...insertData]
-          } else {
-            newValue.push({
+            }))
+          )
+        ]
+        hasData
+          ? (hasData.data = [...hasData.data, ...insertData])
+          : newValue.push({
               key: AppId,
               data: insertData
             })
-          }
-          return newValue
-        })
-        index === deptListResponse.length - 1 && setIsTreeViewLoading(false)
-      }
+        return newValue
+      })
 
-      if (index === deptListResponse.length - 1) {
+      if (index === copyDeptListResponse.length - 1) {
+        setIsTreeViewLoading(false)
         setIsLoadStop(true)
       }
     }
@@ -334,12 +306,9 @@ export const useAction = (props: SelectContentHookProps) => {
   ) => {
     for (const key in hasData) {
       const e = hasData[key]
-      if (e.selected) {
-        selectedList.push(e)
-      }
-      if (e.children.length > 0) {
-        selectedList = recursiveGetSelectedList(e.children, [...selectedList])
-      }
+      e.selected && selectedList.push(e)
+      e.children.length > 0 &&
+        (selectedList = recursiveGetSelectedList(e.children, [...selectedList]))
     }
     return selectedList
   }
@@ -351,9 +320,8 @@ export const useAction = (props: SelectContentHookProps) => {
     for (const key in sourceData) {
       const e = sourceData[key]
       if (selectedList.some((item) => item === e.id)) e.selected = true
-      if (e.children.length > 0) {
+      e.children.length > 0 &&
         recursiveDeptOrUserToSelectedList(e.children, [...selectedList])
-      }
     }
     return sourceData
   }
@@ -399,16 +367,30 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [departmentAndUserList])
 
   useEffect(() => {
-    setDepartmentAndUserList([])
-    setFlattenDepartmentList([])
-    setIsLoadStop(false)
     const loadDepartment = async (AppId: string) => {
-      const deptListResponse = await GetDepartmentList({ AppId })
-      if (!!deptListResponse && deptListResponse.errcode === 0) {
-        loadDeptUsers(0, AppId, deptListResponse.department)
-      }
+      const deptListResponse = await GetDeptsAndUserList(AppId)
+      !!deptListResponse &&
+        loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
     }
-    if (!!corpAppValue) {
+    if (
+      !!corpAppValue &&
+      !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
+    ) {
+      // 设置相对应key的数据为空
+      setDepartmentAndUserList((prev) => {
+        const newValue = clone(prev)
+        const hasData = newValue.find((e) => e.key === corpAppValue.appId)
+        hasData && (hasData.data = [])
+        return newValue
+      })
+      setFlattenDepartmentList((prev) => {
+        const newValue = clone(prev)
+        const hasData = newValue.find((e) => e.key === corpAppValue.appId)
+        hasData && (hasData.data = [])
+        return newValue
+      })
+      // 开始load数据
+      setIsLoadStop(false)
       setIsTreeViewLoading(true)
       loadDepartment(corpAppValue.appId)
     }
