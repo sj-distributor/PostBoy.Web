@@ -238,7 +238,7 @@ export const useAction = (props: SelectContentHookProps) => {
         parentid: String(department.parentid),
         selected: false,
         // 能否选择,并显隐checkbox
-        canSelect: false,
+        canSelect: true,
         children: users.map((item) => ({
           id: item.userid,
           name: item.userid,
