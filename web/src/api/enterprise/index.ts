@@ -14,6 +14,7 @@ import {
   IUpdateMessageCommand,
   IWorkCorpAppGroup,
   IWorkGroupCreate,
+  IGetDeptAndUsersResponse,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -84,5 +85,11 @@ export const PostWeChatWorkGroupCreate = async (data: IWorkGroupCreate) => {
 export const GetWeChatWorkCorpAppGroups = async (corpApplicationId: string) => {
   return await Get<IWorkCorpAppGroup[]>(
     `/api/WeChat/work/corp/app/groups?corpApplicationId=${corpApplicationId}`
+  )
+}
+
+export const GetDeptsAndUserList = async (AppId: string) => {
+  return await Get<IGetDeptAndUsersResponse>(
+    "/api/WeChat/work/depts/users?AppId=" + AppId
   )
 }

@@ -57,8 +57,8 @@ const SendEmail = () => {
     promptText,
     openError,
     sendLoading,
+    validateAttrFunc,
     setOpen,
-    handleClose,
     setTimeZoneValue,
     setCronError,
     setDateValue,
@@ -79,7 +79,8 @@ const SendEmail = () => {
     clickSendRecord,
     handleClickSend,
     handleKeyDown,
-    handleChange
+    handleChange,
+    handleBlur
   } = useAction()
 
   return (
@@ -161,14 +162,14 @@ const SendEmail = () => {
       <div className={styles.inputGroup}>
         <span>到:</span>
         <TextField
+          {...validateAttrFunc(emailToString)}
           type="text"
           variant="standard"
           value={emailToString}
           className={styles.corpInput}
           sx={inputSx}
-          helperText={!validateEmail(emailToString) ? "Incorrect entry." : ""}
-          error={!validateEmail(emailToString)}
           onKeyDown={(e) => handleKeyDown(e, setEmailToArr, setEmailToString)}
+          onBlur={(e) => handleBlur(e, setEmailToArr, setEmailToString)}
           onChange={(e) => handleChange(e, setEmailToArr, setEmailToString)}
           InputProps={{
             startAdornment: (
@@ -210,6 +211,7 @@ const SendEmail = () => {
         <div className={styles.inputGroup}>
           <span>抄送:</span>
           <TextField
+            {...validateAttrFunc(emailCopyToString)}
             type="text"
             variant="standard"
             value={emailCopyToString}
@@ -221,6 +223,9 @@ const SendEmail = () => {
             error={!validateEmail(emailCopyToString)}
             onKeyDown={(e) =>
               handleKeyDown(e, setEmailCopyToArr, setEmailCopyToString)
+            }
+            onBlur={(e) =>
+              handleBlur(e, setEmailCopyToArr, setEmailCopyToString)
             }
             onChange={(e) =>
               handleChange(e, setEmailCopyToArr, setEmailCopyToString)
@@ -287,6 +292,11 @@ const SendEmail = () => {
 
       <Dialog
         open={open}
+        PaperProps={{
+          sx: {
+            maxWidth: "none"
+          }
+        }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -358,7 +368,7 @@ const SendEmail = () => {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>确定</Button>
+          <Button onClick={() => setOpen(false)}>确定</Button>
         </DialogActions>
       </Dialog>
 

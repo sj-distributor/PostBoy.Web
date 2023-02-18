@@ -133,9 +133,13 @@ const SendNotice = React.memo(
           params.row.isDelete && styles.deletedColor,
         renderCell: (params: GridCellParams) => (
           <div className={styles.operate}>
-            <p className={styles.text} onClick={() => onSetting(params.row)}>
-              【设置】
-            </p>
+            {recordType ? (
+              <p className={styles.text} onClick={() => onSetting(params.row)}>
+                【设置】
+              </p>
+            ) : (
+              <></>
+            )}
             <p
               className={styles.text}
               onClick={() =>
