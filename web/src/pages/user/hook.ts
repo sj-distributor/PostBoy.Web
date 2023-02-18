@@ -1,6 +1,7 @@
 import { useBoolean } from "ahooks"
 import { useEffect, useRef, useState } from "react"
 import { GetAllUsers, GetUserApikeys } from "../../api/user-management"
+import useAuth from "../../auth"
 import { ModalBoxRef } from "../../dtos/modal"
 import { IUserApikeysResponse, IUserResponse } from "../../dtos/user-management"
 
@@ -12,6 +13,7 @@ const useAction = () => {
   const registerRef = useRef<ModalBoxRef>(null)
   const addApikeyRef = useRef<ModalBoxRef>(null)
   const [userAccountId, setUserAccountId] = useState<string>("")
+  const { username } = useAuth()
 
   const onRegisterCancel = () => {
     registerRef.current?.close()
@@ -59,6 +61,7 @@ const useAction = () => {
     setUserApikey,
     onListClick,
     setUserAccountId,
+    username,
   }
 }
 

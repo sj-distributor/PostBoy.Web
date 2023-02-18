@@ -25,6 +25,7 @@ const User = () => {
     setUserApikey,
     onListClick,
     setUserAccountId,
+    username,
   } = useAction()
 
   return (
@@ -53,7 +54,9 @@ const User = () => {
             expandIcon={<ExpandMoreIcon />}
             className={styles.accordionSummary}
           >
-            <Typography className={styles.listText}>用户名</Typography>
+            <Typography
+              className={styles.listText}
+            >{`用户名：${username}`}</Typography>
             <Button
               variant="contained"
               className={styles.registerButton}
