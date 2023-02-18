@@ -340,3 +340,17 @@ export const messageJobSendType = {
   [MessageJobSendType.Delayed]: "定时发送",
   [MessageJobSendType.Recurring]: "周期发送",
 }
+
+export interface IWorkGroupCreate {
+  appId: string
+  name: string
+  owner: string
+  chatId: string
+  userList: string[]
+}
+
+export interface IWorkCorpAppGroup {
+  workWeChatCorpApplicationId: string
+  chatId: string
+  chatName: string
+}
