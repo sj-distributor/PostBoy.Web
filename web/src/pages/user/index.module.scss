@@ -1,4 +1,12 @@
 .user {
+  padding: 1.5rem 0;
+  background-color: #f2f3f4;
+  overflow-y: scroll;
+  height: calc(100vh - 7rem);
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   .accordion {
     background-color: #f2f3f4;
     box-shadow: none;
