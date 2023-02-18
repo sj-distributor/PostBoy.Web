@@ -19,7 +19,9 @@ const useAction = () => {
   const navigateTo = () => {
     if (authStatus || localStorage.getItem("token")) {
       location.state?.from?.pathname
-        ? navigate(location.state.from.pathname, { replace: true })
+        ? location.state?.from?.pathname === "/user"
+          ? navigate("/home")
+          : navigate(location.state.from.pathname, { replace: true })
         : navigate("/home")
     }
   }
