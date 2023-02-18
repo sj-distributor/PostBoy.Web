@@ -61,9 +61,10 @@ export interface IDepartmentAndUserListValue {
   id: number | string
   name: string
   type?: DepartmentAndUserType
-  parentid: string
+  parentid: string | number[]
   selected: boolean
   isCollapsed?: boolean
+  canSelect?: boolean
   children: IDepartmentAndUserListValue[]
 }
 
@@ -347,4 +348,13 @@ export const messageJobSendType = {
   [MessageJobSendType.Fire]: "即时发送",
   [MessageJobSendType.Delayed]: "定时发送",
   [MessageJobSendType.Recurring]: "周期发送"
+}
+
+export interface IGetDeptAndUsersResponse {
+  workWeChatUnits: IDeptAndUserList[]
+}
+
+export interface IDeptAndUserList {
+  department: IDepartmentData
+  users: IDepartmentUsersData[]
 }

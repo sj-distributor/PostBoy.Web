@@ -12,6 +12,7 @@ import {
   ISendMessageCommand,
   MessageJobDestination,
   IUpdateMessageCommand,
+  IGetDeptAndUsersResponse
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -73,4 +74,10 @@ export const PostMessageJobDelete = async (data: { MessageJobId: string }) => {
 
 export const PostMessageJobUpdate = async (data: IUpdateMessageCommand) => {
   return await Post(`/api/Message/job/update`, data)
+}
+
+export const GetDeptsAndUserList = async (AppId: string) => {
+  return await Get<IGetDeptAndUsersResponse>(
+    "/api/WeChat/work/depts/users?AppId=" + AppId
+  )
 }
