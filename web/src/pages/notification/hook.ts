@@ -5,7 +5,7 @@ import {
   GetMessageJob,
   GetMessageJobRecords,
   PostMessageJobDelete,
-  PostMessageJobUpdate,
+  PostMessageJobUpdate
 } from "../../api/enterprise"
 import {
   IDtoExtend,
@@ -18,7 +18,7 @@ import {
   MessageJobDestination,
   messageJobSendType,
   MessageJobSendType,
-  messageSendResultType,
+  messageSendResultType
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
 import { convertType } from "../../uilts/convert-type"
@@ -37,11 +37,15 @@ const judgeContent = (
 }
 
 // 转换数组类型返回
-const messageJobConvertType = (arr: IMessageJob[]) => {
+const messageJobConvertType = (
+  arr: IMessageJob[],
+  recordType: MessageJobDestination
+) => {
+  const isRecordTypeWechat = recordType === MessageJobDestination.WorkWeChat
   const array: ILastShowTableData[] = []
   if (arr.length > 0) {
-    arr.forEach((item) =>
-      array.push({
+    arr.forEach((item) => {
+      const data = {
         id: item.id,
         jobId: item.jobId,
         createdDate: item.createdDate,
@@ -55,29 +59,39 @@ const messageJobConvertType = (arr: IMessageJob[]) => {
         destination: item.destination,
         workWeChatAppNotification: item.workWeChatAppNotification,
         metadata: item.metadata,
-        content: judgeContent(item.workWeChatAppNotification),
-        title: item.metadata.filter((item) => item.key === "title")[0]?.value,
+        content: isRecordTypeWechat
+          ? judgeContent(item.workWeChatAppNotification)
+          : item.emailNotification?.body,
+        emailNotification: item?.emailNotification,
+        title: isRecordTypeWechat
+          ? item.metadata.filter((item) => item.key === "title")[0]?.value
+          : item.emailNotification
+          ? item.emailNotification.subject
+          : "",
         enterprise: {
           corpName: item.metadata.filter(
             (item) => item.key === "enterpriseName"
           )[0]?.value,
           id: item.metadata.filter((item) => item.key === "enterpriseId")[0]
-            ?.value,
+            ?.value
         },
         app: {
           name: item.metadata.filter((item) => item.key === "appName")[0]
             ?.value,
           id: item.metadata.filter((item) => item.key === "appId")[0]?.value,
           appId: item.metadata.filter((item) => item.key === "weChatAppId")[0]
-            ?.value,
-        },
-      })
-    )
+            ?.value
+        }
+      }
+      isRecordTypeWechat
+        ? array.push(data)
+        : item.emailNotification && array.push(data)
+    })
   }
   return array
 }
 
-export const useAction = () => {
+export const useAction = (recordType: MessageJobDestination) => {
   const noticeSettingRef = useRef<ModalBoxRef>(null)
   const sendRecordRef = useRef<ModalBoxRef>(null)
   const deleteConfirmRef = useRef<ModalBoxRef>(null)
@@ -87,7 +101,7 @@ export const useAction = () => {
     messageJobs: [],
     rowCount: 0,
     pageSize: 10,
-    page: 0,
+    page: 0
   })
 
   const [deleteId, setDeleteId] = useState<string>("")
@@ -132,22 +146,31 @@ export const useAction = () => {
     toObject: string
   ) => {
     const sendRecordArray: ISendRecordDto[] = []
-    if (arr.length > 0) {
+    arr.length > 0 &&
       arr.forEach((item) => {
+        const sendToEmailNotification = dto.messageJobs.find((cellItem) => {
+          return cellItem.correlationId === item.correlationId
+        })?.emailNotification
+        const sendTo = sendToEmailNotification
+          ? sendToEmailNotification?.to?.join(";") +
+            (!!sendToEmailNotification?.cc?.join(";")
+              ? ", " + sendToEmailNotification?.cc?.join(";")
+              : "")
+          : ""
         sendRecordArray.push({
           id: item.id,
           createdDate: item.createdDate,
           correlationId: item.correlationId,
           result: item.result,
           state: messageSendResultType[item.result],
-          sendTheObject: toObject,
+          sendTheObject:
+            recordType === MessageJobDestination.WorkWeChat ? toObject : sendTo,
           errorSendtheobject:
             JSON.parse(item.responseJson).invaliduser !== null
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
-              : "",
+              : ""
         })
       })
-    }
     return sendRecordArray
   }
 
@@ -163,7 +186,7 @@ export const useAction = () => {
   const onDeleteMessageJob = (id: string) => {
     deleteConfirmRef.current?.close()
     PostMessageJobDelete({
-      MessageJobId: id,
+      MessageJobId: id
     })
       .then((res) => {
         getMessageJob()
@@ -196,12 +219,15 @@ export const useAction = () => {
   // 获取MessageJob 数组
   const getMessageJob = () => {
     updateData("loading", true)
-    GetMessageJob(dto.page + 1, dto.pageSize, MessageJobDestination.WorkWeChat)
+    GetMessageJob(dto.page + 1, dto.pageSize, recordType)
       .then((res) => {
         if (!!res) {
           setTimeout(() => {
             updateData("rowCount", res.count)
-            updateData("messageJobs", messageJobConvertType(res.messageJobs))
+            updateData(
+              "messageJobs",
+              messageJobConvertType(res.messageJobs, recordType)
+            )
             updateData("loading", false)
           }, 500)
         }
@@ -269,6 +295,6 @@ export const useAction = () => {
     failSend,
     promptText,
     openError,
-    showErrorPrompt,
+    showErrorPrompt
   }
 }

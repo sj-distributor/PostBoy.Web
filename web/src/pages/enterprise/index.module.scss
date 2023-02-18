@@ -1,19 +1,8 @@
 .enterpriseBox {
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  overflow: scroll;
-  flex: 1;
-  height: calc(100vh - 9.4rem);
-
   .switchSend {
     display: flex;
     margin-left: 4.5rem;
     width: 5.5rem;
     color: black;
   }
-}
-
-.enterpriseBox::-webkit-scrollbar {
-  display: none;
 }
