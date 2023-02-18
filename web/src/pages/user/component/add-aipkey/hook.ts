@@ -1,23 +1,18 @@
-import { useEffect, useState } from "react"
-import { PostUserApikeysAdd } from "../../../../api/user-management"
+import { useState } from "react"
+import {
+  GetUserApikeys,
+  PostUserApikeysAdd,
+} from "../../../../api/user-management"
 import { IUserApikeysResponse } from "../../../../dtos/user-management"
 
 const useAction = (props: {
   userAccountId: string
   onAddApikeyCancel: () => void
-  GetUserApikeys: (
-    userId: string
-  ) => Promise<IUserApikeysResponse[] | null | undefined>
   userApikeyList: IUserApikeysResponse[][]
   setUserApikey: React.Dispatch<React.SetStateAction<IUserApikeysResponse[][]>>
 }) => {
-  const {
-    userAccountId,
-    onAddApikeyCancel,
-    GetUserApikeys,
-    userApikeyList,
-    setUserApikey,
-  } = props
+  const { userAccountId, onAddApikeyCancel, userApikeyList, setUserApikey } =
+    props
   const [apiKey, setAipKey] = useState<string>("")
   const [description, setDescription] = useState<string>("")
 

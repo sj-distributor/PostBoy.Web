@@ -1,13 +1,12 @@
 import { useState } from "react"
-import { PostAuthRegister } from "../../../../api/user-management"
+import { GetAllUsers, PostAuthRegister } from "../../../../api/user-management"
 import { IUserResponse } from "../../../../dtos/user-management"
 
 const useAction = (props: {
   onRegisterCancel: () => void
-  GetAllUsers: () => Promise<IUserResponse[] | null | undefined>
   setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>
 }) => {
-  const { onRegisterCancel, GetAllUsers, setUsersList } = props
+  const { onRegisterCancel, setUsersList } = props
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
 

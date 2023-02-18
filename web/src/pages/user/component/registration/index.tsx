@@ -5,12 +5,11 @@ import { IUserResponse } from "../../../../dtos/user-management"
 
 const RegistrationPopup = (props: {
   onRegisterCancel: () => void
-  GetAllUsers: () => Promise<IUserResponse[] | null | undefined>
   setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>
 }) => {
-  const { onRegisterCancel, GetAllUsers, setUsersList } = props
+  const { onRegisterCancel, setUsersList } = props
   const { username, setUsername, password, setPassword, registerSubmit } =
-    useAction({ onRegisterCancel, GetAllUsers, setUsersList })
+    useAction({ onRegisterCancel, setUsersList })
 
   return (
     <div className={styles.pageWrap}>

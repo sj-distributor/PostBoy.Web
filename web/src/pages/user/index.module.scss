@@ -13,12 +13,6 @@
         margin-left: 1.5rem;
         font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
       }
-
-      .registerButton {
-        height: 2rem;
-        margin-left: 1.5rem;
-      }
-
       .listText {
         display: flex;
         align-items: center;
@@ -37,5 +31,11 @@
     box-shadow: none;
     border-width: none;
     border: #f2f3f4;
+  }
+
+  .registerButton {
+    height: 2rem;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
   }
 }
