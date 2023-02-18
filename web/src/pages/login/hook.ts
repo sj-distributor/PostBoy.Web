@@ -12,14 +12,16 @@ const useAction = () => {
   const { authStatus, signIn } = useAuth()
 
   const handleLoginButton = async () => {
-    const data = await AuthAccont({ username, password })
+    const data = await AuthAccont({ userName: username, password })
     !!data ? signIn(data, navigateTo) : setOpenSnackBar(true)
   }
 
   const navigateTo = () => {
     if (authStatus || localStorage.getItem("token")) {
       location.state?.from?.pathname
-        ? navigate(location.state.from.pathname, { replace: true })
+        ? location.state?.from?.pathname === "/user"
+          ? navigate("/home")
+          : navigate(location.state.from.pathname, { replace: true })
         : navigate("/home")
     }
   }
@@ -35,7 +37,7 @@ const useAction = () => {
     setOpenSnackBar,
     setUsername,
     setPassword,
-    handleLoginButton
+    handleLoginButton,
   }
 }
 
