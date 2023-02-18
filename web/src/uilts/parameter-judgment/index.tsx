@@ -1,7 +1,7 @@
 import {
   ISendMessageCommand,
   IUpdateMessageCommand,
-  MessageDataFileType,
+  MessageDataFileType
 } from "../../dtos/enterprise"
 
 export const parameterJudgment = (
@@ -23,22 +23,22 @@ export const parameterJudgment = (
     ) {
       showErrorPrompt("Please select the sending period!")
     } else if (
-      data.workWeChatAppNotification.toTags === undefined &&
-      data.workWeChatAppNotification.toUsers === undefined &&
-      data.workWeChatAppNotification.toParties === undefined
+      data.workWeChatAppNotification?.toTags === undefined &&
+      data.workWeChatAppNotification?.toUsers === undefined &&
+      data.workWeChatAppNotification?.toParties === undefined
     ) {
       showErrorPrompt("Please select an object to send!")
     } else if (
-      data.workWeChatAppNotification.text === undefined &&
-      data.workWeChatAppNotification.mpNews === undefined &&
-      data.workWeChatAppNotification.file === undefined
+      data.workWeChatAppNotification?.text === undefined &&
+      data.workWeChatAppNotification?.mpNews === undefined &&
+      data.workWeChatAppNotification?.file === undefined
     ) {
       showErrorPrompt("Please fill in the sending information!")
-    } else if (!data.metadata.find((x) => x.key === "title")?.value) {
+    } else if (!data.metadata?.find((x) => x.key === "title")?.value) {
       showErrorPrompt("Please fill in the title!")
     } else if (
-      data.workWeChatAppNotification.text !== undefined &&
-      !data.workWeChatAppNotification.text.content
+      data.workWeChatAppNotification?.text !== undefined &&
+      !data.workWeChatAppNotification?.text.content
     ) {
       showErrorPrompt("Please fill in the sending text!")
     } else if (

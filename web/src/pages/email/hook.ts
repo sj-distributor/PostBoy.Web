@@ -1,27 +1,85 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { GetEmailData } from "../../api/email"
 import * as wangEditor from "@wangeditor/editor"
-import { IEmailResonponse } from "../../dtos/email"
+import { IEmailInput, IEmailResonponse } from "../../dtos/email"
 import { annexEditorConfig } from "../../uilts/wangEditor"
+import { ModalBoxRef } from "../../dtos/modal"
+import { PostMessageSend } from "../../api/enterprise"
+import { IJobSettingDto, MessageJobSendType } from "../../dtos/enterprise"
+import { useBoolean } from "ahooks"
+import { timeZone } from "../../dtos/send-message-job"
 
 const useAction = () => {
   const defaultEmailValue = {
     displayName: "",
     senderId: ""
   }
+  // 富文本框实例
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null) // 存储 editor 实例
+  // 富文本框html
   const [html, setHtml] = useState("")
+  // 邮件的从
   const [emailFrom, setEmailFrom] =
     useState<IEmailResonponse>(defaultEmailValue)
+  // 邮件从的用户列表
   const [emailList, setEmailList] = useState<IEmailResonponse[]>([])
-  const [emailTo, setEmailTo] = useState("")
-  const [emailCopyTo, setEmailCopyTo] = useState("")
+  // 发送邮件地址input值
+  const [emailToString, setEmailToString] = useState("")
+  // 发送邮件地址 确认列表
+  const [emailToArr, setEmailToArr] = useState<string[]>([])
+  // 抄送邮箱地址的input值
+  const [emailCopyToString, setEmailCopyToString] = useState("")
+  // 抄送邮箱地址的 确定列表
+  const [emailCopyToArr, setEmailCopyToArr] = useState<string[]>([])
+  // 邮箱主题
+  const [emailSubject, setEmailSubject] = useState("")
+  // 是否显示抄送
   const [isShowCopyto, setIsShowCopyto] = useState(false)
+  // 发送记录的ref
+  const sendRecordRef = useRef<ModalBoxRef>(null)
+  // 周期发送的设置value
+  const [jobSetting, setJobSetting] = useState<IJobSettingDto>()
+  // 提示语
+  const [promptText, setPromptText] = useState("")
+  // 提示显隐
+  const [openError, openErrorAction] = useBoolean(false)
+  // 循环周期
+  const [cronExp, setCronExp] = useState<string>("0 0 * * *")
+  // 发送类型选择
+  const [sendTypeValue, setSendTypeValue] = useState<MessageJobSendType>(
+    MessageJobSendType.Fire
+  )
+  // 发送时间
+  const [dateValue, setDateValue] = useState<string>("")
+  // 终止时间
+  const [endDateValue, setEndDateValue] = useState<string>("")
+  // 时区选择
+  const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
+  const [open, setOpen] = useState(false)
+  const [sendLoading, setSendLoading] = useState(false)
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  // 弹出警告
+  const showErrorPrompt = (text: string) => {
+    setPromptText(text)
+    openErrorAction.setTrue()
+  }
+  // 输出周期报错
+  const [cronError, setCronError] = useState<string>("")
 
   const validateEmail = (email: string) => {
     const re =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(String(email).toLowerCase())
+  }
+
+  const clickSendRecord = (operation: string) => {
+    operation === "open"
+      ? sendRecordRef.current?.open()
+      : sendRecordRef.current?.close()
   }
 
   const toolbarConfig: Partial<wangEditor.IToolbarConfig> = {
@@ -53,6 +111,41 @@ const useAction = () => {
       "uploadAttachment"
     ]
   }
+  // 点击发送
+  const handleClickSend = () => {
+    const data = {
+      jobSetting,
+      emailNotification: {
+        senderId: emailFrom.senderId,
+        subject: emailSubject,
+        body: editor ? editor.getText() : "",
+        to: emailToArr,
+        cc: emailCopyToArr
+      }
+    }
+    setSendLoading(true)
+    PostMessageSend(data).then((data) => {
+      setPromptText("发送成功")
+      openErrorAction.setTrue()
+      setSendLoading(false)
+      // 清空数据
+      setJobSetting({
+        timezone: timeZone[timeZoneValue].title
+      })
+      editor && editor.setHtml("<p></p>")
+      setEmailCopyToArr([])
+      setEmailToArr([])
+      setEmailToString("")
+      setEmailCopyToString("")
+      setEmailSubject("")
+      setSendTypeValue(MessageJobSendType.Fire)
+      setTimeZoneValue(timeZone[0].value)
+      setCronError("")
+      setCronExp("0 0 * * *")
+      setEndDateValue("")
+      setDateValue("")
+    })
+  }
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -69,6 +162,50 @@ const useAction = () => {
   }
 
   const inputSx = { marginLeft: "1rem", flex: 1 }
+
+  // 发送邮箱和抄送邮箱 input changing的时候通用自定义修改
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    setArr: React.Dispatch<React.SetStateAction<string[]>>,
+    setString: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const value = (e.target as HTMLInputElement).value
+    !!value.slice(0, -1) && (value.includes(";") || value.includes("；"))
+      ? (() => {
+          setArr((prev) => [...prev, value.slice(0, -1)])
+          setString("")
+        })()
+      : setString(value)
+  }
+
+  // 发送邮箱和抄送邮箱 input keydown的时候通用自定义修改
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    setArr: React.Dispatch<React.SetStateAction<string[]>>,
+    setString: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const value = (e.target as HTMLInputElement).value
+    e.code === "Backspace" &&
+      value === "" &&
+      setArr((prev) => {
+        const newValue = prev.filter((x) => x)
+        newValue.splice(newValue.length - 1, 1)
+        return newValue
+      })
+    if (!!value && (e.code === "Enter" || e.code === "NumpadEnter")) {
+      setArr((prev) => [...prev, value])
+      setString("")
+    }
+  }
+
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse()
+      }, 3000)
+    }
+  }, [openError])
 
   useEffect(() => {
     GetEmailData().then((data) => {
@@ -90,6 +227,42 @@ const useAction = () => {
     }
   }, [editor])
 
+  // jobSetting参数
+  useEffect(() => {
+    switch (sendTypeValue) {
+      case MessageJobSendType.Fire: {
+        setJobSetting({
+          timezone: timeZone[timeZoneValue].title
+        })
+        break
+      }
+      case MessageJobSendType.Delayed: {
+        setJobSetting({
+          timezone: timeZone[timeZoneValue].title,
+          delayedJob: {
+            enqueueAt: dateValue
+          }
+        })
+        break
+      }
+      default: {
+        setJobSetting({
+          timezone: timeZone[timeZoneValue].title,
+          recurringJob: !!endDateValue
+            ? {
+                cronExpression: cronExp,
+                endDate: endDateValue
+              }
+            : {
+                cronExpression: cronExp
+              }
+        })
+        break
+      }
+    }
+  }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue])
+
+
   return {
     toolbarConfig,
     editorConfig,
@@ -98,16 +271,46 @@ const useAction = () => {
     html,
     emailFrom,
     emailList,
-    emailTo,
     isShowCopyto,
-    emailCopyTo,
-    setEmailCopyTo,
+    sendRecordRef,
+    emailToString,
+    emailToArr,
+    emailCopyToArr,
+    emailCopyToString,
+    emailSubject,
+    sendTypeValue,
+    dateValue,
+    endDateValue,
+    cronExp,
+    timeZoneValue,
+    open,
+    promptText,
+    openError,
+    sendLoading,
+    setPromptText,
+    setOpen,
+    handleClose,
+    setTimeZoneValue,
+    setCronError,
+    setCronExp,
+    setEndDateValue,
+    setDateValue,
+    showErrorPrompt,
+    setSendTypeValue,
+    setEmailSubject,
+    setEmailCopyToArr,
+    setEmailToArr,
+    setEmailToString,
+    setEmailCopyToString,
     setIsShowCopyto,
-    setEmailTo,
     validateEmail,
     setEditor,
     setHtml,
-    setEmailFrom
+    setEmailFrom,
+    clickSendRecord,
+    handleClickSend,
+    handleKeyDown,
+    handleChange
   }
 }
 export default useAction

@@ -35,7 +35,7 @@ const useAction = () => {
       successAction.setFalse()
       loadingAction.setTrue()
       const cloneData = clone(sendData)
-      if (!!cloneData) {
+      if (!!cloneData && cloneData.workWeChatAppNotification) {
         cloneData.workWeChatAppNotification = convertType(
           cloneData.workWeChatAppNotification
         )
@@ -66,9 +66,9 @@ const useAction = () => {
     ...(success && {
       bgcolor: green[500],
       "&:hover": {
-        bgcolor: green[700],
-      },
-    }),
+        bgcolor: green[700]
+      }
+    })
   }
 
   // 弹出警告
@@ -116,7 +116,7 @@ const useAction = () => {
     showErrorPrompt,
     success,
     failSend,
-    clearData,
+    clearData
   }
 }
 
