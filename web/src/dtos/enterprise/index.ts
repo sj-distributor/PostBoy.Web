@@ -111,7 +111,7 @@ export interface ITargetDialogProps {
   isLoading: boolean
   tagsList: ITagsList[]
   lastTagsValue?: string[] | undefined
-  isLoadStop: boolean
+  clickName: string
   setOpenFunction: (open: boolean) => void
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>

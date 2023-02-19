@@ -21,7 +21,7 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  ITagsList
+  ITagsList,
 } from "../../../../dtos/enterprise"
 import { memo, useEffect } from "react"
 import { CircularProgress } from "@mui/material"
@@ -40,7 +40,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       lastTagsValue,
-      isLoadStop
+      clickName,
     } = props
 
     const {
@@ -48,7 +48,7 @@ const SelectTargetDialog = memo(
       tagsValue,
       handleDeptOrUserClick,
       setSearchToDeptValue,
-      setTagsValue
+      setTagsValue,
     } = useAction({
       open,
       AppId,
@@ -56,7 +56,7 @@ const SelectTargetDialog = memo(
       departmentAndUserList,
       isLoading,
       setDeptUserList,
-      setOuterTagsValue
+      setOuterTagsValue,
     })
 
     useEffect(() => {
@@ -87,7 +87,7 @@ const SelectTargetDialog = memo(
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
               canSelect: deptUserData.selected,
-              children: []
+              children: [],
             }
             return (
               <div key={deptUserData.id}>
@@ -99,7 +99,7 @@ const SelectTargetDialog = memo(
                       handleDeptOrUserClick(
                         ClickType.Collapse,
                         Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed
+                          isCollapsed: deptUserData.isCollapsed,
                         })
                       )
                   }}
@@ -148,20 +148,20 @@ const SelectTargetDialog = memo(
           open={open}
           PaperProps={{
             sx: {
-              overflowY: "unset"
-            }
+              overflowY: "unset",
+            },
           }}
-          onClose={() => {
-            setOpenFunction(false)
-          }}
+          // onClose={() => {
+          //   setOpenFunction(false)
+          // }}
         >
-          <DialogTitle>选择发送目标</DialogTitle>
+          <DialogTitle>{clickName}</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             <div
               style={{
                 height: "15rem",
                 overflowY: "auto",
-                position: "relative"
+                position: "relative",
               }}
             >
               {departmentKeyValue?.data.length > 0 ? (
@@ -173,7 +173,7 @@ const SelectTargetDialog = memo(
                     width: "2rem",
                     height: "2rem",
                     left: "13rem",
-                    top: "5.5rem"
+                    top: "5.5rem",
                   }}
                 />
               )}
@@ -188,7 +188,7 @@ const SelectTargetDialog = memo(
                 disableCloseOnSelect
                 size="small"
                 sx={{
-                  margin: "1rem 0 1rem"
+                  margin: "1rem 0 1rem",
                 }}
                 value={departmentSelectedList}
                 options={flattenDepartmentList}
@@ -196,7 +196,14 @@ const SelectTargetDialog = memo(
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 groupBy={(option) => option.parentid as string}
                 renderInput={(params) => (
-                  <TextField {...params} label="部门与用户搜索" />
+                  <TextField
+                    {...params}
+                    label={
+                      clickName === "选择发送目标"
+                        ? "部门与用户搜索"
+                        : "用户搜索"
+                    }
+                  />
                 )}
                 onChange={(e, value) => {
                   value && setSearchToDeptValue(value)
@@ -222,34 +229,98 @@ const SelectTargetDialog = memo(
               />
             )}
 
-            <Autocomplete
-              id="tags-list"
-              disablePortal
-              openOnFocus
-              multiple
-              disableCloseOnSelect
-              disableClearable
-              limitTags={2}
-              size="small"
-              value={tagsValue}
-              options={tagsList}
-              getOptionLabel={(option) => option.tagName}
-              isOptionEqualToValue={(option, value) =>
-                option.tagId === value.tagId
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  className={styles.InputButton}
-                  margin="dense"
-                  type="button"
-                  label="标签列表"
+            {clickName === "选择发送目标" ? (
+              <>
+                <Autocomplete
+                  id="group-list"
+                  disablePortal
+                  openOnFocus
+                  multiple
+                  disableCloseOnSelect
+                  disableClearable
+                  limitTags={2}
+                  size="small"
+                  value={tagsValue}
+                  options={tagsList}
+                  getOptionLabel={(option) => option.tagName}
+                  isOptionEqualToValue={(option, value) =>
+                    option.tagId === value.tagId
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.InputButton}
+                      margin="dense"
+                      type="button"
+                      label="群组列表"
+                    />
+                  )}
+                  onChange={(e, value) => {
+                    setTagsValue(value)
+                  }}
                 />
-              )}
-              onChange={(e, value) => {
-                setTagsValue(value)
-              }}
-            />
+                <Autocomplete
+                  id="tags-list"
+                  disablePortal
+                  openOnFocus
+                  multiple
+                  disableCloseOnSelect
+                  disableClearable
+                  limitTags={2}
+                  size="small"
+                  value={tagsValue}
+                  options={tagsList}
+                  getOptionLabel={(option) => option.tagName}
+                  isOptionEqualToValue={(option, value) =>
+                    option.tagId === value.tagId
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.InputButton}
+                      margin="dense"
+                      type="button"
+                      label="标签列表"
+                    />
+                  )}
+                  onChange={(e, value) => {
+                    setTagsValue(value)
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <TextField size="small" fullWidth label={"群名"} />
+                <Autocomplete
+                  id="group-list"
+                  disablePortal
+                  openOnFocus
+                  multiple
+                  disableCloseOnSelect
+                  disableClearable
+                  limitTags={2}
+                  size="small"
+                  value={tagsValue}
+                  options={tagsList}
+                  getOptionLabel={(option) => option.tagName}
+                  isOptionEqualToValue={(option, value) =>
+                    option.tagId === value.tagId
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.InputButton}
+                      margin="dense"
+                      type="button"
+                      label="群主选择"
+                    />
+                  )}
+                  onChange={(e, value) => {
+                    setTagsValue(value)
+                  }}
+                />
+              </>
+            )}
           </DialogContent>
           <DialogActions>
             <Button
@@ -264,7 +335,7 @@ const SelectTargetDialog = memo(
                 setOpenFunction(false)
               }}
             >
-              确定
+              {clickName === "选择发送目标" ? "确定" : "创建"}
             </Button>
           </DialogActions>
         </Dialog>
