@@ -232,6 +232,18 @@ const useAction = () => {
       setPromptText("please enter a valid email address for send to")
       openErrorAction.setTrue()
       return false
+    } else if (emailCopyToArr.some((x) => !validateEmail(x))) {
+      setPromptText("please enter a valid email address for send copy")
+      openErrorAction.setTrue()
+      return false
+    } else if (
+      emailCopyToString &&
+      emailCopyToArr.length <= 0 &&
+      validateEmail(emailCopyToString)
+    ) {
+      setPromptText("please enter a valid email address for send copy")
+      openErrorAction.setTrue()
+      return false
     } else if (!emailSubject) {
       setPromptText("please enter a valid email subject")
       openErrorAction.setTrue()

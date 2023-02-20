@@ -217,10 +217,6 @@ const SendEmail = () => {
             value={emailCopyToString}
             className={styles.corpInput}
             sx={inputSx}
-            helperText={
-              !validateEmail(emailCopyToString) ? "Incorrect entry." : ""
-            }
-            error={!validateEmail(emailCopyToString)}
             onKeyDown={(e) =>
               handleKeyDown(e, setEmailCopyToArr, setEmailCopyToString)
             }

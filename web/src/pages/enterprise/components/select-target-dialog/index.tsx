@@ -21,7 +21,7 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  ITagsList,
+  ITagsList
 } from "../../../../dtos/enterprise"
 import { memo, useEffect } from "react"
 import { CircularProgress } from "@mui/material"
@@ -40,7 +40,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       lastTagsValue,
-      clickName,
+      clickName
     } = props
 
     const {
@@ -48,7 +48,7 @@ const SelectTargetDialog = memo(
       tagsValue,
       handleDeptOrUserClick,
       setSearchToDeptValue,
-      setTagsValue,
+      setTagsValue
     } = useAction({
       open,
       AppId,
@@ -56,7 +56,7 @@ const SelectTargetDialog = memo(
       departmentAndUserList,
       isLoading,
       setDeptUserList,
-      setOuterTagsValue,
+      setOuterTagsValue
     })
 
     useEffect(() => {
@@ -87,7 +87,7 @@ const SelectTargetDialog = memo(
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
               canSelect: deptUserData.selected,
-              children: [],
+              children: []
             }
             return (
               <div key={deptUserData.id}>
@@ -99,7 +99,7 @@ const SelectTargetDialog = memo(
                       handleDeptOrUserClick(
                         ClickType.Collapse,
                         Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed,
+                          isCollapsed: deptUserData.isCollapsed
                         })
                       )
                   }}
@@ -148,12 +148,9 @@ const SelectTargetDialog = memo(
           open={open}
           PaperProps={{
             sx: {
-              overflowY: "unset",
-            },
+              overflowY: "unset"
+            }
           }}
-          // onClose={() => {
-          //   setOpenFunction(false)
-          // }}
         >
           <DialogTitle>{clickName}</DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
@@ -161,7 +158,7 @@ const SelectTargetDialog = memo(
               style={{
                 height: "15rem",
                 overflowY: "auto",
-                position: "relative",
+                position: "relative"
               }}
             >
               {departmentKeyValue?.data.length > 0 ? (
@@ -173,7 +170,7 @@ const SelectTargetDialog = memo(
                     width: "2rem",
                     height: "2rem",
                     left: "13rem",
-                    top: "5.5rem",
+                    top: "5.5rem"
                   }}
                 />
               )}
@@ -187,9 +184,6 @@ const SelectTargetDialog = memo(
                 multiple
                 disableCloseOnSelect
                 size="small"
-                sx={{
-                  margin: "1rem 0 1rem",
-                }}
                 value={departmentSelectedList}
                 options={flattenDepartmentList}
                 getOptionLabel={(option) => option.name}
@@ -240,6 +234,9 @@ const SelectTargetDialog = memo(
                   disableClearable
                   limitTags={2}
                   size="small"
+                  sx={{
+                    margin: "1rem 0 calc(1rem - 4px)"
+                  }}
                   value={tagsValue}
                   options={tagsList}
                   getOptionLabel={(option) => option.tagName}
