@@ -5,7 +5,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField
+  TextField,
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
@@ -15,13 +15,13 @@ import SelectTargetDialog from "../select-target-dialog"
 import {
   messageTypeList,
   sendTypeList,
-  timeZone
+  timeZone,
 } from "../../../../dtos/send-message-job"
 import {
   FileObject,
   MessageDataFileType,
   MessageJobSendType,
-  PictureText
+  PictureText,
 } from "../../../../dtos/enterprise"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import TimeSelector from "../time-selector"
@@ -35,7 +35,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
-    isFromNoticeSetting = false
+    isFromNoticeSetting = false,
   } = props
 
   const {
@@ -80,14 +80,15 @@ const SelectContent = memo((props: SelectContentProps) => {
     lastTimePictureText,
     lastTimeFile,
     inputRef,
-    fileDelete
+    fileDelete,
+    fileMark,
   } = useAction({
     getSendData,
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
-    clearData
+    clearData,
   })
 
   const fileOrImage = (file: FileObject, state: string) => {
@@ -299,7 +300,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            marginTop: "0.8rem"
+            marginTop: "0.8rem",
           }}
           variant="contained"
           onClick={() => {
@@ -360,7 +361,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                   variant="outlined"
                   component="label"
                   sx={{
-                    width: "6rem"
+                    width: "6rem",
                   }}
                 >
                   上传文件
@@ -389,6 +390,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                     />
                   )}
                 </Button>
+                {!!fileMark && <div className={styles.mark}>{fileMark}</div>}
               </div>
               <div className={styles.information}>
                 {lastTimeFile !== undefined &&
@@ -417,7 +419,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             <FormControl
               style={{
                 width: 252,
-                margin: "0.8rem 0"
+                margin: "0.8rem 0",
               }}
             >
               <InputLabel id="demo-simple-select-label">时区</InputLabel>

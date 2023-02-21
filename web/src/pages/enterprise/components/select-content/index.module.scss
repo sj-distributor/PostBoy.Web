@@ -9,7 +9,14 @@
   padding: 0.25rem;
 }
 
+.mark {
+  color: red;
+  margin-top: 0.75rem;
+  font-family: "STKaiti";
+}
+
 .deleteIcon {
+  cursor: pointer;
   position: absolute;
   right: -0.25rem;
   top: -0.25rem;
