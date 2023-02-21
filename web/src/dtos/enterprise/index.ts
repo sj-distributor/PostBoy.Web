@@ -60,17 +60,16 @@ export interface IDepartmentUsersData {
 export interface IDepartmentAndUserListValue {
   id: number | string
   name: string
-  type?: DepartmentAndUserType
+  type: DepartmentAndUserType
   parentid: string | number[]
   selected: boolean
   isCollapsed?: boolean
-  canSelect?: boolean
   children: IDepartmentAndUserListValue[]
 }
 
 export enum DepartmentAndUserType {
   Department,
-  User,
+  User
 }
 
 export interface IDepartmentResponse extends IResponseMsg {
@@ -79,6 +78,10 @@ export interface IDepartmentResponse extends IResponseMsg {
 
 export interface IDepartmentUsersResonse extends IResponseMsg {
   userlist: IDepartmentUsersData[]
+}
+
+export interface ICreateGroupResonse extends IResponseMsg {
+  chatid: string
 }
 
 export interface IMessageTypeData {
@@ -92,7 +95,7 @@ export enum MessageDataFileType {
   Voice,
   Video,
   File,
-  Text,
+  Text
 }
 
 export interface FileObject {
@@ -112,9 +115,20 @@ export interface ITargetDialogProps {
   tagsList: ITagsList[]
   lastTagsValue?: string[] | undefined
   clickName: string
+  groupArr: IWorkCorpAppGroup[]
+  canSelect: DeptUserCanSelectStatus
+  groupDeptUserSelectedList?: IDepartmentAndUserListValue[]
+  setChatId?: React.Dispatch<React.SetStateAction<string>>
   setOpenFunction: (open: boolean) => void
+  setGroupArr: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
+}
+
+export enum DeptUserCanSelectStatus {
+  Department,
+  User,
+  Both
 }
 
 export interface ITargetDialogValue {
@@ -125,7 +139,7 @@ export interface ITargetDialogValue {
 export enum MessageWidgetShowStatus {
   ShowInput,
   ShowUpload,
-  ShowAll,
+  ShowAll
 }
 
 export interface ITagsListResponse extends IResponseMsg {
@@ -181,12 +195,12 @@ export interface IMessageJobBase {
 export enum MessageJobSendType {
   Fire,
   Delayed,
-  Recurring,
+  Recurring
 }
 
 export enum MessageJobDestination {
   Email,
-  WorkWeChat,
+  WorkWeChat
 }
 
 export interface IMessageJobRecord extends IMessageJobRecordSame {
@@ -202,12 +216,12 @@ export interface IMessageJobRecordSame {
 
 export enum MessageSendResult {
   Ok,
-  Failed,
+  Failed
 }
 
 export const messageSendResultType = {
   [MessageSendResult.Ok]: "已发送",
-  [MessageSendResult.Failed]: "异常",
+  [MessageSendResult.Failed]: "异常"
 }
 
 export interface ISendMessageCommand {
@@ -275,7 +289,7 @@ export interface TextDto {
 
 export enum TimeType {
   UTC,
-  America,
+  America
 }
 
 export interface IDtoExtend {
@@ -327,7 +341,7 @@ export interface TimeZoneCustomListDto {
 
 export enum ClickType {
   Collapse,
-  Select,
+  Select
 }
 
 export interface SendObject {
@@ -347,19 +361,18 @@ export interface PictureText {
 export const messageJobSendType = {
   [MessageJobSendType.Fire]: "即时发送",
   [MessageJobSendType.Delayed]: "定时发送",
-  [MessageJobSendType.Recurring]: "周期发送",
+  [MessageJobSendType.Recurring]: "周期发送"
 }
 
 export interface IWorkGroupCreate {
   appId: string
   name: string
   owner: string
-  chatId: string
+  chatId?: string
   userList: string[]
 }
 
 export interface IWorkCorpAppGroup {
-  workWeChatCorpApplicationId: string
   chatId: string
   chatName: string
 }

@@ -21,10 +21,11 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  ITagsList
+  DeptUserCanSelectStatus
 } from "../../../../dtos/enterprise"
-import { memo, useEffect } from "react"
-import { CircularProgress } from "@mui/material"
+import { memo } from "react"
+import { CircularProgress, Snackbar } from "@mui/material"
+import { LoadingButton } from "@mui/lab"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -36,6 +37,10 @@ const SelectTargetDialog = memo(
       tagsList,
       flattenDepartmentList,
       departmentKeyValue,
+      groupArr,
+      canSelect,
+      setChatId,
+      setGroupArr,
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
@@ -46,32 +51,37 @@ const SelectTargetDialog = memo(
     const {
       departmentSelectedList,
       tagsValue,
+      isShowDialog,
+      groupOwner,
+      groupName,
+      tipsObject,
+      groupDeptUserSelectedList,
+      defaultGroupOwner,
+      groupDeptUserList,
+      createLoading,
+      setCreateLoading,
+      setGroupName,
+      setGroupOwner,
+      setIsShowDialog,
       handleDeptOrUserClick,
       setSearchToDeptValue,
-      setTagsValue
+      setTagsValue,
+      handleTypeIsCanSelect,
+      handleCreateGroup
     } = useAction({
       open,
       AppId,
       departmentKeyValue,
       departmentAndUserList,
       isLoading,
+      lastTagsValue,
+      tagsList,
+      clickName,
+      setGroupArr,
+      setOpenFunction,
       setDeptUserList,
       setOuterTagsValue
     })
-
-    useEffect(() => {
-      if (!!tagsList && !!lastTagsValue && lastTagsValue?.length > 0) {
-        const selectTagsList: ITagsList[] = []
-        lastTagsValue.forEach((item) => {
-          const findItem = tagsList.find((i) => i.tagId === Number(item))
-          if (!!findItem) {
-            selectTagsList.push(findItem)
-          }
-        })
-
-        setTagsValue(selectTagsList)
-      }
-    }, [tagsList, lastTagsValue])
 
     const recursiveRenderDeptList = (
       data: IDepartmentAndUserListValue[],
@@ -86,7 +96,6 @@ const SelectTargetDialog = memo(
               type: deptUserData.type,
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
-              canSelect: deptUserData.selected,
               children: []
             }
             return (
@@ -104,7 +113,7 @@ const SelectTargetDialog = memo(
                       )
                   }}
                 >
-                  {deptUserData.canSelect && (
+                  {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
                     <Checkbox
                       edge="start"
                       checked={deptUserData.selected}
@@ -144,15 +153,21 @@ const SelectTargetDialog = memo(
 
     return (
       <div>
-        <Dialog
-          open={open}
-          PaperProps={{
-            sx: {
-              overflowY: "unset"
-            }
-          }}
-        >
-          <DialogTitle>{clickName}</DialogTitle>
+        <Dialog open={open} PaperProps={{ sx: { overflowY: "unset" } }}>
+          <DialogTitle
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
+          >
+            <>{clickName}</>
+            {clickName === "选择发送目标" && (
+              <Button variant="outlined" onClick={() => setIsShowDialog(true)}>
+                创建群组
+              </Button>
+            )}
+          </DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             <div
               style={{
@@ -161,67 +176,122 @@ const SelectTargetDialog = memo(
                 position: "relative"
               }}
             >
-              {departmentKeyValue?.data.length > 0 ? (
-                recursiveRenderDeptList(departmentKeyValue.data, 0)
-              ) : (
+              {(clickName === "选择发送目标"
+                ? departmentKeyValue?.data.length > 0 &&
+                  recursiveRenderDeptList(departmentKeyValue.data, 0)
+                : groupDeptUserList &&
+                  groupDeptUserList.length > 0 &&
+                  groupDeptUserList &&
+                  recursiveRenderDeptList(groupDeptUserList, 0)) || (
                 <CircularProgress
                   style={{
                     position: "absolute",
                     width: "2rem",
                     height: "2rem",
-                    left: "13rem",
-                    top: "5.5rem"
+                    left: "50%",
+                    top: "50%",
+                    margin: "-1rem 0 0 -1rem"
                   }}
                 />
               )}
             </div>
 
-            {flattenDepartmentList && (
-              <Autocomplete
-                id="sreach-input"
-                disablePortal
-                openOnFocus
-                multiple
-                disableCloseOnSelect
-                size="small"
-                value={departmentSelectedList}
-                options={flattenDepartmentList}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.parentid as string}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={
-                      clickName === "选择发送目标"
-                        ? "部门与用户搜索"
-                        : "用户搜索"
+            {flattenDepartmentList &&
+              (clickName === "选择发送目标" ? (
+                <Autocomplete
+                  id="sreach-input"
+                  disablePortal
+                  openOnFocus
+                  multiple
+                  disableCloseOnSelect
+                  size="small"
+                  componentsProps={{
+                    paper: { elevation: 3 },
+                    popper: {
+                      placement: "top"
                     }
-                  />
-                )}
-                onChange={(e, value) => {
-                  value && setSearchToDeptValue(value)
-                }}
-                renderGroup={(params) => {
-                  const { key, group, children } = params
-                  return <div key={key}>{children}</div>
-                }}
-                renderOption={(props, option, state) => {
-                  let style = Object.assign(
-                    option.type === DepartmentAndUserType.Department
-                      ? { color: "#666" }
-                      : { paddingLeft: "2rem" },
-                    { fontSize: "0.9rem" }
-                  )
-                  !option.canSelect && (props.onClick = () => {})
-                  return (
-                    <li {...props} style={style}>
-                      {option.name}
-                    </li>
-                  )
-                }}
-              />
-            )}
+                  }}
+                  value={
+                    clickName === "选择发送目标"
+                      ? departmentSelectedList
+                      : groupDeptUserSelectedList
+                  }
+                  options={flattenDepartmentList}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  groupBy={(option) => option.parentid as string}
+                  renderInput={(params) => (
+                    <TextField {...params} label={"部门与用户搜索"} />
+                  )}
+                  onChange={(e, value) => value && setSearchToDeptValue(value)}
+                  renderGroup={(params) => {
+                    const { key, group, children } = params
+                    return <div key={key}>{children}</div>
+                  }}
+                  renderOption={(props, option, state) => {
+                    let style = Object.assign(
+                      option.type === DepartmentAndUserType.Department
+                        ? { color: "#666" }
+                        : { paddingLeft: "2rem" },
+                      { fontSize: "0.9rem" }
+                    )
+                    !handleTypeIsCanSelect(canSelect, option.type) &&
+                      (props.onClick = () => {})
+                    return (
+                      <li {...props} style={style}>
+                        {option.name}
+                      </li>
+                    )
+                  }}
+                />
+              ) : (
+                <Autocomplete
+                  id="sreach-input"
+                  disablePortal
+                  openOnFocus
+                  multiple
+                  disableCloseOnSelect
+                  size="small"
+                  componentsProps={{
+                    paper: { elevation: 3 },
+                    popper: {
+                      placement: "top"
+                    }
+                  }}
+                  value={groupDeptUserSelectedList}
+                  options={flattenDepartmentList}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  groupBy={(option) => option.parentid as string}
+                  renderInput={(params) => (
+                    <TextField {...params} label={"用户搜索"} />
+                  )}
+                  onChange={(e, value) => value && setSearchToDeptValue(value)}
+                  renderGroup={(params) => {
+                    const { key, group, children } = params
+                    return <div key={key}>{children}</div>
+                  }}
+                  renderOption={(props, option, state) => {
+                    let style = Object.assign(
+                      option.type === DepartmentAndUserType.Department
+                        ? { color: "#666" }
+                        : { paddingLeft: "2rem" },
+                      { fontSize: "0.9rem" }
+                    )
+                    !handleTypeIsCanSelect(canSelect, option.type) &&
+                      (props.onClick = () => {})
+                    return (
+                      <li {...props} style={style}>
+                        {option.name}
+                      </li>
+                    )
+                  }}
+                />
+              ))}
 
             {clickName === "选择发送目标" ? (
               <>
@@ -229,20 +299,21 @@ const SelectTargetDialog = memo(
                   id="group-list"
                   disablePortal
                   openOnFocus
-                  multiple
                   disableCloseOnSelect
                   disableClearable
-                  limitTags={2}
                   size="small"
-                  sx={{
-                    margin: "1rem 0 calc(1rem - 4px)"
-                  }}
-                  value={tagsValue}
-                  options={tagsList}
-                  getOptionLabel={(option) => option.tagName}
+                  sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
+                  options={groupArr}
+                  componentsProps={{ paper: { elevation: 3 } }}
+                  getOptionLabel={(option) => option.chatName}
                   isOptionEqualToValue={(option, value) =>
-                    option.tagId === value.tagId
+                    option.chatId === value.chatId
                   }
+                  renderOption={(props, option, state) => (
+                    <li {...props} key={option.chatId}>
+                      {option.chatName}
+                    </li>
+                  )}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -252,9 +323,7 @@ const SelectTargetDialog = memo(
                       label="群组列表"
                     />
                   )}
-                  onChange={(e, value) => {
-                    setTagsValue(value)
-                  }}
+                  onChange={(e, value) => setChatId && setChatId(value.chatId)}
                 />
                 <Autocomplete
                   id="tags-list"
@@ -267,6 +336,7 @@ const SelectTargetDialog = memo(
                   size="small"
                   value={tagsValue}
                   options={tagsList}
+                  componentsProps={{ paper: { elevation: 3 } }}
                   getOptionLabel={(option) => option.tagName}
                   isOptionEqualToValue={(option, value) =>
                     option.tagId === value.tagId
@@ -280,62 +350,104 @@ const SelectTargetDialog = memo(
                       label="标签列表"
                     />
                   )}
-                  onChange={(e, value) => {
-                    setTagsValue(value)
-                  }}
+                  onChange={(e, value) => setTagsValue(value)}
                 />
               </>
             ) : (
               <>
-                <TextField size="small" fullWidth label={"群名"} />
+                <TextField
+                  sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
+                  size="small"
+                  fullWidth
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  label={"群名"}
+                />
                 <Autocomplete
                   id="group-list"
+                  size="small"
                   disablePortal
                   openOnFocus
-                  multiple
-                  disableCloseOnSelect
                   disableClearable
-                  limitTags={2}
-                  size="small"
-                  value={tagsValue}
-                  options={tagsList}
-                  getOptionLabel={(option) => option.tagName}
+                  value={groupOwner}
+                  options={groupDeptUserSelectedList.concat(defaultGroupOwner)}
+                  getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(option, value) =>
-                    option.tagId === value.tagId
+                    option.id === value.id
                   }
+                  getOptionDisabled={(option) => option.id === "-1"}
+                  componentsProps={{ paper: { elevation: 3 } }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       className={styles.InputButton}
+                      sx={{
+                        input: {
+                          color: groupOwner.id === "-1" ? "#999" : "333"
+                        }
+                      }}
                       margin="dense"
                       type="button"
                       label="群主选择"
                     />
                   )}
                   onChange={(e, value) => {
-                    setTagsValue(value)
+                    setGroupOwner(value)
                   }}
                 />
               </>
             )}
           </DialogContent>
           <DialogActions>
-            <Button
+            <Button onClick={() => setOpenFunction(false)}>取消</Button>
+
+            <LoadingButton
+              loading={createLoading}
+              loadingIndicator="Loading…"
+              variant="text"
               onClick={() => {
-                setOpenFunction(false)
-              }}
-            >
-              取消
-            </Button>
-            <Button
-              onClick={() => {
-                setOpenFunction(false)
+                setCreateLoading(true)
+                clickName !== "选择发送目标"
+                  ? handleCreateGroup()
+                  : setOpenFunction(false)
               }}
             >
               {clickName === "选择发送目标" ? "确定" : "创建"}
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </Dialog>
+
+        {/* ----- 创建群组 ----- */}
+        {clickName === "选择发送目标" && (
+          <SelectTargetDialog
+            open={isShowDialog}
+            AppId={AppId}
+            departmentAndUserList={departmentAndUserList}
+            departmentKeyValue={departmentKeyValue}
+            flattenDepartmentList={flattenDepartmentList}
+            isLoading={isLoading}
+            tagsList={tagsList}
+            groupArr={groupArr}
+            canSelect={DeptUserCanSelectStatus.User}
+            setGroupArr={setGroupArr}
+            setOpenFunction={setIsShowDialog}
+            setDeptUserList={setDeptUserList}
+            setOuterTagsValue={setTagsValue}
+            lastTagsValue={lastTagsValue}
+            clickName={"创建群组"}
+            groupDeptUserSelectedList={groupDeptUserSelectedList}
+          />
+        )}
+
+        {/* 消息提示 */}
+        <Snackbar
+          message={tipsObject.msg}
+          open={tipsObject.show}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center"
+          }}
+        />
       </div>
     )
   },

@@ -5,7 +5,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField,
+  TextField
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
@@ -15,13 +15,14 @@ import SelectTargetDialog from "../select-target-dialog"
 import {
   messageTypeList,
   sendTypeList,
-  timeZone,
+  timeZone
 } from "../../../../dtos/send-message-job"
 import {
+  DeptUserCanSelectStatus,
   FileObject,
   MessageDataFileType,
   MessageJobSendType,
-  PictureText,
+  PictureText
 } from "../../../../dtos/enterprise"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import TimeSelector from "../time-selector"
@@ -35,7 +36,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
-    isFromNoticeSetting = false,
+    isFromNoticeSetting = false
   } = props
 
   const {
@@ -77,20 +78,23 @@ const SelectContent = memo((props: SelectContentProps) => {
     setCronError,
     switchTimeZone,
     isLoadStop,
+    setChatId,
+    groupArr,
+    setGroupArr,
     lastTimeTagsList,
     lastTimePictureText,
     lastTimeFile,
     inputRef,
     fileDelete,
     clickName,
-    setClickName,
+    setClickName
   } = useAction({
     getSendData,
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
-    clearData,
+    clearData
   })
 
   const fileOrImage = (file: FileObject, state: string) => {
@@ -302,34 +306,15 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            marginTop: "0.8rem",
+            marginTop: "0.8rem"
           }}
           variant="contained"
           onClick={() => {
             setIsShowDialog(true)
             setClickName("选择发送目标")
-            setDepartmentAndUserList([])
-            setFlattenDepartmentList([])
           }}
         >
           选择发送目标
-        </Button>
-        <Button
-          sx={{
-            height: "3.5rem",
-            fontSize: "1rem",
-            flexShrink: "0",
-            marginTop: "0.8rem",
-          }}
-          variant="contained"
-          onClick={() => {
-            setIsShowDialog(true)
-            setClickName("选择群组人员")
-            setDepartmentAndUserList([])
-            setFlattenDepartmentList([])
-          }}
-        >
-          创建群组
         </Button>
 
         <SelectTargetDialog
@@ -340,11 +325,15 @@ const SelectContent = memo((props: SelectContentProps) => {
           flattenDepartmentList={searchKeyValue}
           isLoading={isTreeViewLoading}
           tagsList={tagsList}
+          groupArr={groupArr}
+          canSelect={DeptUserCanSelectStatus.Both}
+          setGroupArr={setGroupArr}
           setOpenFunction={setIsShowDialog}
           setDeptUserList={setDepartmentAndUserList}
           setOuterTagsValue={setTagsValue}
           lastTagsValue={lastTimeTagsList}
           clickName={clickName}
+          setChatId={setChatId}
         />
       </div>
       <div className={styles.typeShow}>
@@ -383,7 +372,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                   variant="outlined"
                   component="label"
                   sx={{
-                    width: "6rem",
+                    width: "6rem"
                   }}
                 >
                   上传文件
@@ -440,7 +429,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             <FormControl
               style={{
                 width: 252,
-                margin: "0.8rem 0",
+                margin: "0.8rem 0"
               }}
             >
               <InputLabel id="demo-simple-select-label">时区</InputLabel>
