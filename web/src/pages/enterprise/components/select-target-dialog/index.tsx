@@ -21,11 +21,43 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  DeptUserCanSelectStatus
+  DeptUserCanSelectStatus,
+  ITagsList
 } from "../../../../dtos/enterprise"
-import { memo } from "react"
-import { CircularProgress, Snackbar } from "@mui/material"
+import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
+import { memo, useEffect } from "react"
+
+const fiteringDeptAndUsers = (
+  options: IDepartmentAndUserListValue[],
+  state: FilterOptionsState<IDepartmentAndUserListValue>
+) => {
+  if (state.inputValue !== "") {
+    const array: IDepartmentAndUserListValue[] = []
+    const findArray = options.filter((item) =>
+      item.name.toUpperCase().includes(state.inputValue.toUpperCase())
+    )
+    for (let i = 0; i < findArray.length; i++) {
+      array.push(findArray[i])
+      const findParent = options.find(
+        (item) => item.name === findArray[i].parentid
+      )
+      if (!!findParent) {
+        const index = array.findIndex(
+          (item) => item.name === findArray[i].parentid
+        )
+        if (index === -1) {
+          const index = array.findIndex(
+            (item) => item.parentid === findParent.name
+          )
+          array.splice(index, 0, findParent)
+        }
+      }
+    }
+    return array
+  }
+  return options
+}
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -228,6 +260,9 @@ const SelectTargetDialog = memo(
                   renderInput={(params) => (
                     <TextField {...params} label={"部门与用户搜索"} />
                   )}
+                  filterOptions={(options, state) =>
+                    fiteringDeptAndUsers(options, state)
+                  }
                   onChange={(e, value) => value && setSearchToDeptValue(value)}
                   renderGroup={(params) => {
                     const { key, group, children } = params
@@ -268,6 +303,9 @@ const SelectTargetDialog = memo(
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(option, value) =>
                     option.id === value.id
+                  }
+                  filterOptions={(options, state) =>
+                    fiteringDeptAndUsers(options, state)
                   }
                   groupBy={(option) => option.parentid as string}
                   renderInput={(params) => (
