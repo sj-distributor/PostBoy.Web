@@ -21,7 +21,7 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  ITagsList
+  ITagsList,
 } from "../../../../dtos/enterprise"
 import { memo, useEffect } from "react"
 import { CircularProgress } from "@mui/material"
@@ -40,7 +40,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       lastTagsValue,
-      isLoadStop
+      isLoadStop,
     } = props
 
     const {
@@ -48,7 +48,7 @@ const SelectTargetDialog = memo(
       tagsValue,
       handleDeptOrUserClick,
       setSearchToDeptValue,
-      setTagsValue
+      setTagsValue,
     } = useAction({
       open,
       AppId,
@@ -56,7 +56,7 @@ const SelectTargetDialog = memo(
       departmentAndUserList,
       isLoading,
       setDeptUserList,
-      setOuterTagsValue
+      setOuterTagsValue,
     })
 
     useEffect(() => {
@@ -87,7 +87,7 @@ const SelectTargetDialog = memo(
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
               canSelect: deptUserData.selected,
-              children: []
+              children: [],
             }
             return (
               <div key={deptUserData.id}>
@@ -99,7 +99,7 @@ const SelectTargetDialog = memo(
                       handleDeptOrUserClick(
                         ClickType.Collapse,
                         Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed
+                          isCollapsed: deptUserData.isCollapsed,
                         })
                       )
                   }}
@@ -148,11 +148,8 @@ const SelectTargetDialog = memo(
           open={open}
           PaperProps={{
             sx: {
-              overflowY: "unset"
-            }
-          }}
-          onClose={() => {
-            setOpenFunction(false)
+              overflowY: "unset",
+            },
           }}
         >
           <DialogTitle>选择发送目标</DialogTitle>
@@ -161,7 +158,7 @@ const SelectTargetDialog = memo(
               style={{
                 height: "15rem",
                 overflowY: "auto",
-                position: "relative"
+                position: "relative",
               }}
             >
               {departmentKeyValue?.data.length > 0 ? (
@@ -173,7 +170,7 @@ const SelectTargetDialog = memo(
                     width: "2rem",
                     height: "2rem",
                     left: "13rem",
-                    top: "5.5rem"
+                    top: "5.5rem",
                   }}
                 />
               )}
@@ -188,7 +185,7 @@ const SelectTargetDialog = memo(
                 disableCloseOnSelect
                 size="small"
                 sx={{
-                  margin: "1rem 0 1rem"
+                  margin: "1rem 0 1rem",
                 }}
                 value={departmentSelectedList}
                 options={flattenDepartmentList}
@@ -204,6 +201,35 @@ const SelectTargetDialog = memo(
                 renderGroup={(params) => {
                   const { key, group, children } = params
                   return <div key={key}>{children}</div>
+                }}
+                filterOptions={(options, state) => {
+                  if (state.inputValue !== "") {
+                    const array: IDepartmentAndUserListValue[] = []
+                    const findArray = options.filter((item) =>
+                      item.name
+                        .toUpperCase()
+                        .includes(state.inputValue.toUpperCase())
+                    )
+                    for (let i = 0; i < findArray.length; i++) {
+                      array.push(findArray[i])
+                      const findParent = options.find(
+                        (item) => item.name === findArray[i].parentid
+                      )
+                      if (!!findParent) {
+                        const index = array.findIndex(
+                          (item) => item.name === findArray[i].parentid
+                        )
+                        if (index === -1) {
+                          const index = array.findIndex(
+                            (item) => item.parentid === findParent.name
+                          )
+                          array.splice(index, 0, findParent)
+                        }
+                      }
+                    }
+                    return array
+                  }
+                  return options
                 }}
                 renderOption={(props, option, state) => {
                   let style = Object.assign(
