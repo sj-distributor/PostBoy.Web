@@ -187,6 +187,11 @@ const SelectTargetDialog = memo(
                 sx={{
                   margin: "1rem 0 1rem",
                 }}
+                componentsProps={{
+                  popper: {
+                    placement: "top",
+                  },
+                }}
                 value={departmentSelectedList}
                 options={flattenDepartmentList}
                 getOptionLabel={(option) => option.name}
