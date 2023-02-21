@@ -1,5 +1,5 @@
 import { clone, flatten, isEmpty, uniqWith } from "ramda"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -125,8 +125,9 @@ export const useAction = (props: SelectContentHookProps) => {
 
   const inputRef = useRef<HTMLInputElement>(null)
   // 群组列表
-  const [groupArr, setGroupArr] = useState<IWorkCorpAppGroup[]>([])
+  const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
   const [chatId, setChatId] = useState<string>("")
+  const [isRefresh, setIsRefresh] = useState(false)
 
   // 初始化企业数组
   useEffect(() => {
@@ -175,10 +176,20 @@ export const useAction = (props: SelectContentHookProps) => {
         }
       )
       GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
-        data && setGroupArr(data)
+        data && setGroupList(data)
       })
     }
   }, [corpAppValue?.appId])
+
+  useEffect(() => {
+    isShowDialog &&
+      isRefresh &&
+      corpAppValue &&
+      GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+        data && setGroupList(data)
+      }) === undefined &&
+      setIsRefresh(false)
+  }, [isShowDialog, isRefresh])
 
   // 默认选择第一个App对象
   useEffect(() => {
@@ -330,6 +341,7 @@ export const useAction = (props: SelectContentHookProps) => {
     for (const key in sourceData) {
       const e = sourceData[key]
       if (selectedList.some((item) => item === e.id)) e.selected = true
+      else e.selected = false
       e.children.length > 0 &&
         recursiveDeptOrUserToSelectedList(e.children, [...selectedList])
     }
@@ -865,6 +877,14 @@ export const useAction = (props: SelectContentHookProps) => {
       setDateValue("")
       setEndDateValue("")
       setCronExp("0 0 * * *")
+      setChatId("")
+      setDepartmentAndUserList((prev) => {
+        const newValue = prev.filter((x) => x)
+        newValue.forEach((item) => {
+          recursiveDeptOrUserToSelectedList(item.data, [])
+        })
+        return newValue
+      })
     }
   }, [clearData, isNewOrUpdate])
 
@@ -889,6 +909,7 @@ export const useAction = (props: SelectContentHookProps) => {
     searchKeyValue,
     isTreeViewLoading,
     tagsList,
+    chatId,
     setChatId,
     setTagsValue,
     title,
@@ -896,8 +917,9 @@ export const useAction = (props: SelectContentHookProps) => {
     content,
     setContent,
     fileUpload,
-    groupArr,
-    setGroupArr,
+    groupList,
+    setGroupList,
+    setIsRefresh,
     fileAccept,
     file,
     pictureText,

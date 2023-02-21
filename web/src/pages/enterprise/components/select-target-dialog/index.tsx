@@ -37,15 +37,17 @@ const SelectTargetDialog = memo(
       tagsList,
       flattenDepartmentList,
       departmentKeyValue,
-      groupArr,
+      groupList,
       canSelect,
+      lastTagsValue,
+      clickName,
+      chatId,
+      setIsRefresh,
       setChatId,
-      setGroupArr,
+      setGroupList,
       setOpenFunction,
       setDeptUserList,
-      setOuterTagsValue,
-      lastTagsValue,
-      clickName
+      setOuterTagsValue
     } = props
 
     const {
@@ -59,7 +61,6 @@ const SelectTargetDialog = memo(
       defaultGroupOwner,
       groupDeptUserList,
       createLoading,
-      setCreateLoading,
       setGroupName,
       setGroupOwner,
       setIsShowDialog,
@@ -77,7 +78,7 @@ const SelectTargetDialog = memo(
       lastTagsValue,
       tagsList,
       clickName,
-      setGroupArr,
+      setIsRefresh,
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue
@@ -181,8 +182,14 @@ const SelectTargetDialog = memo(
                   recursiveRenderDeptList(departmentKeyValue.data, 0)
                 : groupDeptUserList &&
                   groupDeptUserList.length > 0 &&
-                  groupDeptUserList &&
-                  recursiveRenderDeptList(groupDeptUserList, 0)) || (
+                  (() => {
+                    const activeData = groupDeptUserList.find(
+                      (x) => x.key === AppId
+                    )
+                    return (
+                      activeData && recursiveRenderDeptList(activeData.data, 0)
+                    )
+                  })()) || (
                 <CircularProgress
                   style={{
                     position: "absolute",
@@ -211,11 +218,7 @@ const SelectTargetDialog = memo(
                       placement: "top"
                     }
                   }}
-                  value={
-                    clickName === "选择发送目标"
-                      ? departmentSelectedList
-                      : groupDeptUserSelectedList
-                  }
+                  value={departmentSelectedList}
                   options={flattenDepartmentList}
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(option, value) =>
@@ -248,7 +251,7 @@ const SelectTargetDialog = memo(
                 />
               ) : (
                 <Autocomplete
-                  id="sreach-input"
+                  id="sreach-input-group"
                   disablePortal
                   openOnFocus
                   multiple
@@ -299,11 +302,11 @@ const SelectTargetDialog = memo(
                   id="group-list"
                   disablePortal
                   openOnFocus
-                  disableCloseOnSelect
                   disableClearable
                   size="small"
                   sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
-                  options={groupArr}
+                  value={groupList.filter((x) => x.chatId === chatId)[0]}
+                  options={groupList}
                   componentsProps={{ paper: { elevation: 3 } }}
                   getOptionLabel={(option) => option.chatName}
                   isOptionEqualToValue={(option, value) =>
@@ -364,7 +367,7 @@ const SelectTargetDialog = memo(
                   label={"群名"}
                 />
                 <Autocomplete
-                  id="group-list"
+                  id="group-owner"
                   size="small"
                   disablePortal
                   openOnFocus
@@ -400,13 +403,11 @@ const SelectTargetDialog = memo(
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenFunction(false)}>取消</Button>
-
             <LoadingButton
               loading={createLoading}
               loadingIndicator="Loading…"
               variant="text"
               onClick={() => {
-                setCreateLoading(true)
                 clickName !== "选择发送目标"
                   ? handleCreateGroup()
                   : setOpenFunction(false)
@@ -427,13 +428,15 @@ const SelectTargetDialog = memo(
             flattenDepartmentList={flattenDepartmentList}
             isLoading={isLoading}
             tagsList={tagsList}
-            groupArr={groupArr}
             canSelect={DeptUserCanSelectStatus.User}
-            setGroupArr={setGroupArr}
             setOpenFunction={setIsShowDialog}
             setDeptUserList={setDeptUserList}
             setOuterTagsValue={setTagsValue}
             lastTagsValue={lastTagsValue}
+            setGroupList={setGroupList}
+            groupList={groupList}
+            chatId={chatId}
+            setIsRefresh={setIsRefresh}
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
           />
@@ -456,7 +459,8 @@ const SelectTargetDialog = memo(
       prevProps.open === nextProps.open &&
       prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
       prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
-      prevProps.AppId === nextProps.AppId
+      prevProps.AppId === nextProps.AppId &&
+      prevProps.groupList === nextProps.groupList
     )
   }
 )

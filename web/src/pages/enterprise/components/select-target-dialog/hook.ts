@@ -21,8 +21,8 @@ const useAction = (props: {
   lastTagsValue: string[] | undefined
   tagsList: ITagsList[]
   clickName: string
-  setGroupArr: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
   setOpenFunction: (open: boolean) => void
+  setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
 }) => {
@@ -34,7 +34,7 @@ const useAction = (props: {
     isLoading,
     tagsList,
     clickName,
-    setGroupArr,
+    setIsRefresh,
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
@@ -64,10 +64,13 @@ const useAction = (props: {
     show: false,
     msg: ""
   })
-  const [groupDeptUserList, setGroupDeptUserList] =
-    useState<IDepartmentAndUserListValue[]>()
+  const [groupDeptUserList, setGroupDeptUserList] = useState<
+    IDepartmentKeyControl[]
+  >([])
 
   const [createLoading, setCreateLoading] = useState(false)
+
+  const [groupValue, setGroupValue] = useState<IWorkCorpAppGroup>()
 
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
@@ -132,14 +135,21 @@ const useAction = (props: {
           return newValue
         })
       : setGroupDeptUserList((prev) => {
-          const newValue = prev?.filter((e) => !!e)
-          newValue &&
-            recursiveSeachDeptOrUser(newValue, clickedItem, (e, item) => {
-              e.id === item.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected))
-            })
+          const newValue = prev.filter((e) => !!e)
+          const activeData = newValue.find(
+            (e) => e.key === departmentKeyValue.key
+          )
+          activeData &&
+            recursiveSeachDeptOrUser(
+              activeData.data,
+              clickedItem,
+              (e, item) => {
+                e.id === item.id &&
+                  (type === ClickType.Collapse
+                    ? (e.isCollapsed = !e.isCollapsed)
+                    : (e.selected = !e.selected))
+              }
+            )
           return newValue
         })
   }
@@ -156,17 +166,20 @@ const useAction = (props: {
         return defaultGroupOwner
       })
       setGroupDeptUserList((prev) => {
-        const newValue = prev?.filter((e) => !!e)
-        if (newValue) {
+        const newValue = prev.filter((e) => !!e)
+        const activeData = newValue.find(
+          (e) => e.key === departmentKeyValue.key
+        )
+        if (activeData) {
           valueArr.length > 0
             ? valueArr.forEach((item) => {
-                recursiveSeachDeptOrUser(newValue, item, (user) => {
+                recursiveSeachDeptOrUser(activeData.data, item, (user) => {
                   user.selected = !!valueArr.find((e) => e.id === user.id)
                 })
               })
             : recursiveSeachDeptOrUser(
-                newValue,
-                newValue[0],
+                activeData.data,
+                activeData.data[0],
                 (user) => (user.selected = false)
               )
         }
@@ -215,11 +228,15 @@ const useAction = (props: {
       ? setTipsObject({ show: true, msg: "Please select a valid group owner" })
       : !groupName
       ? setTipsObject({ show: true, msg: "Please input a valid group name" })
-      : groupDeptUserSelectedList.length <= 0
-      ? setTipsObject({ show: true, msg: "Please select multiple valid users" })
+      : groupDeptUserSelectedList.length <= 1
+      ? setTipsObject({
+          show: true,
+          msg: "Please select 2 or more valid users"
+        })
       : !AppId
       ? setTipsObject({ show: true, msg: "Error for no AppId provided" })
       : (() => {
+          setCreateLoading(true)
           requestData = {
             appId: AppId,
             name: groupName,
@@ -230,13 +247,7 @@ const useAction = (props: {
           PostWeChatWorkGroupCreate(requestData).then((data) => {
             if (data && data.errmsg === "ok") {
               setTipsObject({ msg: "创建成功", show: true })
-              setGroupArr((prev) => [
-                ...prev,
-                {
-                  chatId: data.chatid,
-                  chatName: groupName
-                }
-              ])
+              setIsRefresh(true)
               setTimeout(() => {
                 setCreateLoading(false)
               }, 500)
@@ -252,11 +263,12 @@ const useAction = (props: {
   useEffect(() => {
     // 限制条件下群组部门列表变化同步到群组搜索选择列表
     !isLoading &&
-      groupDeptUserList &&
+      !!groupDeptUserList &&
       groupDeptUserList.length > 0 &&
       setGroupDeptUserSelectedList((prev) => {
         const newValue = prev.filter((e) => !!e)
-        recursiveDeptList(groupDeptUserList, newValue)
+        const activeData = groupDeptUserList.find((x) => x.key === AppId)
+        activeData && recursiveDeptList(activeData.data, newValue)
         return newValue
       })
   }, [groupDeptUserList])
@@ -274,10 +286,12 @@ const useAction = (props: {
 
   useEffect(() => {
     // 当第一次拿到选择目标部门列表复制给群组部门列表
-    departmentAndUserList &&
-      (!groupDeptUserList ||
-        departmentKeyValue?.data[0] !== groupDeptUserList[0]) &&
-      setGroupDeptUserList(clone(departmentKeyValue?.data))
+    departmentKeyValue &&
+      departmentAndUserList.length > 0 &&
+      (!groupDeptUserList
+        ? setGroupDeptUserList(clone(departmentAndUserList))
+        : groupDeptUserList.every((item) => item.key !== AppId) &&
+          setGroupDeptUserList((prev) => [...prev, clone(departmentKeyValue)]))
   }, [departmentAndUserList, AppId])
 
   useEffect(() => {
@@ -325,6 +339,8 @@ const useAction = (props: {
     defaultGroupOwner,
     groupDeptUserList,
     createLoading,
+    groupValue,
+    setGroupValue,
     setCreateLoading,
     setGroupDeptUserList,
     setGroupDeptUserSelectedList,

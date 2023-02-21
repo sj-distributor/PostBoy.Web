@@ -115,12 +115,14 @@ export interface ITargetDialogProps {
   tagsList: ITagsList[]
   lastTagsValue?: string[] | undefined
   clickName: string
-  groupArr: IWorkCorpAppGroup[]
+  groupList: IWorkCorpAppGroup[]
   canSelect: DeptUserCanSelectStatus
   groupDeptUserSelectedList?: IDepartmentAndUserListValue[]
+  chatId: string
+  setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setOpenFunction: (open: boolean) => void
-  setGroupArr: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
+  setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
 }

@@ -27,6 +27,7 @@ import {
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import TimeSelector from "../time-selector"
 import DateSelector from "../date-selector"
+import { GetWeChatWorkCorpAppGroups } from "../../../../api/enterprise"
 
 const SelectContent = memo((props: SelectContentProps) => {
   const {
@@ -53,6 +54,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     timeZoneValue,
     isShowDialog,
     setIsShowDialog,
+    setIsRefresh,
     departmentAndUserList,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
@@ -78,9 +80,10 @@ const SelectContent = memo((props: SelectContentProps) => {
     setCronError,
     switchTimeZone,
     isLoadStop,
+    chatId,
     setChatId,
-    groupArr,
-    setGroupArr,
+    groupList,
+    setGroupList,
     lastTimeTagsList,
     lastTimePictureText,
     lastTimeFile,
@@ -325,14 +328,16 @@ const SelectContent = memo((props: SelectContentProps) => {
           flattenDepartmentList={searchKeyValue}
           isLoading={isTreeViewLoading}
           tagsList={tagsList}
-          groupArr={groupArr}
+          groupList={groupList}
           canSelect={DeptUserCanSelectStatus.Both}
-          setGroupArr={setGroupArr}
+          setGroupList={setGroupList}
           setOpenFunction={setIsShowDialog}
           setDeptUserList={setDepartmentAndUserList}
           setOuterTagsValue={setTagsValue}
+          setIsRefresh={setIsRefresh}
           lastTagsValue={lastTimeTagsList}
           clickName={clickName}
+          chatId={chatId}
           setChatId={setChatId}
         />
       </div>
@@ -451,20 +456,22 @@ const SelectContent = memo((props: SelectContentProps) => {
             </FormControl>
           </div>
         )}
-        <DateSelector
-          sendTypeValue={sendTypeValue}
-          dateValue={dateValue}
-          setDateValue={setDateValue}
-          showErrorPrompt={showErrorPrompt}
-        />
-        <TimeSelector
-          sendTypeValue={sendTypeValue}
-          cronExp={cronExp}
-          setCronExp={setCronExp}
-          setCronError={setCronError}
-          endDateValue={endDateValue}
-          setEndDateValue={setEndDateValue}
-        />
+        {sendTypeValue === MessageJobSendType.Delayed && (
+          <DateSelector
+            dateValue={dateValue}
+            setDateValue={setDateValue}
+            showErrorPrompt={showErrorPrompt}
+          />
+        )}
+        {sendTypeValue === MessageJobSendType.Recurring && (
+          <TimeSelector
+            cronExp={cronExp}
+            setCronExp={setCronExp}
+            setCronError={setCronError}
+            endDateValue={endDateValue}
+            setEndDateValue={setEndDateValue}
+          />
+        )}
       </div>
     </div>
   )
