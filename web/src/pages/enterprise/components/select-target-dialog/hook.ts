@@ -273,35 +273,33 @@ const useAction = (props: {
   }, [AppId])
 
   useEffect(() => {
+    const handleData = (
+      prev: IDepartmentAndUserListValue[],
+      listData: IDepartmentKeyControl[]
+    ) => {
+      const newValue = prev.filter((x) => x)
+      const hasData = listData.find((x) => x.key === AppId)
+      hasData &&
+        recursiveSeachDeptOrUser(hasData.data, (e) => {
+          e.selected && newValue.push(e)
+        })
+      return newValue
+    }
     setOuterTagsValue(tagsValue)
-    // 切换应用时清空上次应用数据
-    !open && setDepartmentSelectedList([])
-    !open && setGroupDeptUserSelectedList([])
-  }, [open])
-
-  useEffect(() => {
-    open &&
-      (clickName === "选择发送目标"
-        ? setDepartmentSelectedList((prev) => {
-            const newValue = prev.filter((x) => x)
-            const hasData = departmentAndUserList.find((x) => x.key === AppId)
-            // console.log(hasData, newValue)
-            hasData &&
-              recursiveSeachDeptOrUser(hasData.data, (e) => {
-                e.selected && newValue.push(e)
-              })
-            return newValue
-          })
-        : setGroupDeptUserSelectedList((prev) => {
-            const newValue = prev.filter((x) => x)
-            const hasData = groupDeptUserList.find((x) => x.key === AppId)
-            // console.log(hasData, newValue)
-            hasData &&
-              recursiveSeachDeptOrUser(hasData.data, (e) => {
-                e.selected && newValue.push(e)
-              })
-            return newValue
-          }))
+    // 打开时load上次选中的数据
+    open
+      ? clickName === "选择发送目标"
+        ? setDepartmentSelectedList((prev) =>
+            handleData(prev, departmentAndUserList)
+          )
+        : setGroupDeptUserSelectedList((prev) =>
+            handleData(prev, groupDeptUserList)
+          )
+      : // 关闭时清空上次选中数据
+        (() => {
+          setDepartmentSelectedList([])
+          setGroupDeptUserSelectedList([])
+        })()
   }, [open])
 
   useEffect(() => {
