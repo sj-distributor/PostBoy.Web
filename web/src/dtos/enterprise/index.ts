@@ -60,11 +60,10 @@ export interface IDepartmentUsersData {
 export interface IDepartmentAndUserListValue {
   id: number | string
   name: string
-  type?: DepartmentAndUserType
+  type: DepartmentAndUserType
   parentid: string | number[]
   selected: boolean
   isCollapsed?: boolean
-  canSelect?: boolean
   children: IDepartmentAndUserListValue[]
 }
 
@@ -79,6 +78,10 @@ export interface IDepartmentResponse extends IResponseMsg {
 
 export interface IDepartmentUsersResonse extends IResponseMsg {
   userlist: IDepartmentUsersData[]
+}
+
+export interface ICreateGroupResonse extends IResponseMsg {
+  chatid: string
 }
 
 export interface IMessageTypeData {
@@ -111,10 +114,23 @@ export interface ITargetDialogProps {
   isLoading: boolean
   tagsList: ITagsList[]
   lastTagsValue?: string[] | undefined
-  isLoadStop: boolean
+  clickName: string
+  groupList: IWorkCorpAppGroup[]
+  canSelect: DeptUserCanSelectStatus
+  groupDeptUserSelectedList?: IDepartmentAndUserListValue[]
+  chatId: string
+  setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
+  setChatId?: React.Dispatch<React.SetStateAction<string>>
   setOpenFunction: (open: boolean) => void
+  setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
+}
+
+export enum DeptUserCanSelectStatus {
+  Department,
+  User,
+  Both
 }
 
 export interface ITargetDialogValue {
@@ -348,6 +364,19 @@ export const messageJobSendType = {
   [MessageJobSendType.Fire]: "即时发送",
   [MessageJobSendType.Delayed]: "定时发送",
   [MessageJobSendType.Recurring]: "周期发送"
+}
+
+export interface IWorkGroupCreate {
+  appId: string
+  name: string
+  owner: string
+  chatId?: string
+  userList: string[]
+}
+
+export interface IWorkCorpAppGroup {
+  chatId: string
+  chatName: string
 }
 
 export interface IGetDeptAndUsersResponse {

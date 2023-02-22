@@ -1,10 +1,11 @@
 import { clone, flatten, isEmpty, uniqWith } from "ramda"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
   GetDeptsAndUserList,
   GetTagsList,
+  GetWeChatWorkCorpAppGroups
 } from "../../../../api/enterprise"
 import {
   DepartmentAndUserType,
@@ -20,12 +21,13 @@ import {
   ISearchList,
   ITagsList,
   ITagsListResponse,
+  IWorkCorpAppGroup,
   MessageDataFileType,
   MessageJobSendType,
   PictureText,
   SendData,
   SendObject,
-  SendParameter,
+  SendParameter
 } from "../../../../dtos/enterprise"
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job"
 import { convertBase64 } from "../../../../uilts/convert-base64"
@@ -38,7 +40,7 @@ export const useAction = (props: SelectContentHookProps) => {
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
-    clearData,
+    clearData
   } = props
 
   // 拿到的企业对象
@@ -78,7 +80,7 @@ export const useAction = (props: SelectContentHookProps) => {
   // 发送人员
   const [sendObject, setSendObject] = useState<SendObject>({
     toUsers: [],
-    toParties: [],
+    toParties: []
   })
   // 标题
   const [title, setTitle] = useState<string>("")
@@ -90,7 +92,7 @@ export const useAction = (props: SelectContentHookProps) => {
   const [file, setFile] = useState<FileObject>({
     fileContent: "",
     fileName: "",
-    fileType: messageTypeValue.type,
+    fileType: messageTypeValue.type
   })
   // 发送时间
   const [dateValue, setDateValue] = useState<string>("")
@@ -118,8 +120,14 @@ export const useAction = (props: SelectContentHookProps) => {
   )
   // 上次上传的File
   const [lastTimeFile, setLastTimeFile] = useState<FileObject>()
+  // 点击的是群组还是发送目标
+  const [clickName, setClickName] = useState<string>("")
 
   const inputRef = useRef<HTMLInputElement>(null)
+  // 群组列表
+  const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
+  const [chatId, setChatId] = useState<string>("")
+  const [isRefresh, setIsRefresh] = useState(false)
 
   // 初始化企业数组
   useEffect(() => {
@@ -150,7 +158,7 @@ export const useAction = (props: SelectContentHookProps) => {
               array.push({
                 id: item.id,
                 name: item.name,
-                appId: item.appId,
+                appId: item.appId
               })
             )
             setCorpAppList(array)
@@ -161,13 +169,27 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 获取Tags数组
   useEffect(() => {
-    corpAppValue?.appId !== undefined &&
+    if (corpAppValue?.appId !== undefined) {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
           tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
         }
       )
+      GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+        data && setGroupList(data)
+      })
+    }
   }, [corpAppValue?.appId])
+
+  useEffect(() => {
+    isShowDialog &&
+      isRefresh &&
+      corpAppValue &&
+      GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+        data && setGroupList(data)
+      }) === undefined &&
+      setIsRefresh(false)
+  }, [isShowDialog, isRefresh])
 
   // 默认选择第一个App对象
   useEffect(() => {
@@ -237,8 +259,6 @@ export const useAction = (props: SelectContentHookProps) => {
         type: DepartmentAndUserType.Department,
         parentid: String(department.parentid),
         selected: false,
-        // 能否选择,并显隐checkbox
-        canSelect: true,
         children: users.map((item) => ({
           id: item.userid,
           name: item.userid,
@@ -247,8 +267,8 @@ export const useAction = (props: SelectContentHookProps) => {
           selected: false,
           isCollapsed: false,
           canSelect: true,
-          children: [],
-        })),
+          children: []
+        }))
       }
 
       setDepartmentAndUserList((prev) => {
@@ -271,8 +291,7 @@ export const useAction = (props: SelectContentHookProps) => {
             parentid: department.name,
             type: DepartmentAndUserType.Department,
             selected: false,
-            canSelect: true,
-            children: [],
+            children: []
           },
           ...flatten(
             users.map((item) => ({
@@ -282,15 +301,15 @@ export const useAction = (props: SelectContentHookProps) => {
               type: DepartmentAndUserType.User,
               selected: false,
               canSelect: true,
-              children: [],
+              children: []
             }))
-          ),
+          )
         ]
         hasData
           ? (hasData.data = [...hasData.data, ...insertData])
           : newValue.push({
               key: AppId,
-              data: insertData,
+              data: insertData
             })
         return newValue
       })
@@ -302,40 +321,30 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }
 
-  const recursiveGetSelectedList = (
+  const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
-    selectedList: IDepartmentAndUserListValue[]
+    callback: (e: IDepartmentAndUserListValue) => void
   ) => {
     for (const key in hasData) {
-      const e = hasData[key]
-      e.selected && selectedList.push(e)
-      e.children.length > 0 &&
-        (selectedList = recursiveGetSelectedList(e.children, [...selectedList]))
+      callback(hasData[key])
+      hasData[key].children.length > 0 &&
+        recursiveSeachDeptOrUser(hasData[key].children, callback)
     }
-    return selectedList
-  }
-
-  const recursiveDeptOrUserToSelectedList = (
-    sourceData: IDepartmentAndUserListValue[],
-    selectedList: string[]
-  ) => {
-    for (const key in sourceData) {
-      const e = sourceData[key]
-      if (selectedList.some((item) => item === e.id)) e.selected = true
-      e.children.length > 0 &&
-        recursiveDeptOrUserToSelectedList(e.children, [...selectedList])
-    }
-    return sourceData
+    return hasData
   }
 
   useEffect(() => {
     if (isLoadStop && sendObject !== undefined && !!sendObject) {
+      const selectedList = [...sendObject.toParties, ...sendObject.toUsers]
       const array = departmentAndUserList.filter((x) => x)
       array.map((item) => {
         if (item.key === corpAppValue?.appId) {
-          item.data = recursiveDeptOrUserToSelectedList(
+          item.data = recursiveSeachDeptOrUser(
             departmentKeyValue?.data,
-            [...sendObject.toParties, ...sendObject.toUsers]
+            (e) => {
+              if (selectedList.some((item) => item === e.id)) e.selected = true
+              else e.selected = false
+            }
           )
         }
         return item
@@ -345,12 +354,17 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isLoadStop])
 
   useEffect(() => {
-    if (isLoadStop) {
+    if (!isShowDialog) {
+      const noneHandleSelected: IDepartmentAndUserListValue[] = []
+      recursiveSeachDeptOrUser(
+        departmentKeyValue?.data,
+        (e) => e.selected && noneHandleSelected.push(e)
+      )
       const selectedList = uniqWith(
         (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
           return a.id === b.id
         }
-      )(recursiveGetSelectedList(departmentKeyValue?.data, []))
+      )(noneHandleSelected)
       if (
         (isGetLastTimeData && isNewOrUpdate === "update") ||
         (!isGetLastTimeData &&
@@ -363,10 +377,10 @@ export const useAction = (props: SelectContentHookProps) => {
             .map((e) => String(e.id)),
           toParties: selectedList
             .filter((e) => e.type === DepartmentAndUserType.Department)
-            .map((e) => String(e.id)),
+            .map((e) => String(e.id))
         })
     }
-  }, [departmentAndUserList])
+  }, [isShowDialog])
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
@@ -375,6 +389,7 @@ export const useAction = (props: SelectContentHookProps) => {
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
     }
     if (
+      isShowDialog &&
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
@@ -391,12 +406,16 @@ export const useAction = (props: SelectContentHookProps) => {
         hasData && (hasData.data = [])
         return newValue
       })
+      setSendObject({
+        toUsers: [],
+        toParties: []
+      })
       // 开始load数据
       setIsLoadStop(false)
       setIsTreeViewLoading(true)
       loadDepartment(corpAppValue.appId)
     }
-  }, [corpAppValue?.appId])
+  }, [corpAppValue?.appId, isShowDialog])
 
   // 判断文件大小
   const judgingFileSize = (
@@ -449,7 +468,7 @@ export const useAction = (props: SelectContentHookProps) => {
               title: title,
               content: content,
               fileContent: base64 as string,
-              fileName: array[key].name,
+              fileName: array[key].name
             })
           }
           setPictureText(objectList)
@@ -472,7 +491,7 @@ export const useAction = (props: SelectContentHookProps) => {
           setFile((prev) => ({
             ...prev,
             fileName: file.name,
-            fileContent: base64 as string,
+            fileContent: base64 as string
           }))
         }
       }
@@ -485,7 +504,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setFile({
         fileName: "",
         fileContent: "",
-        fileType: 0,
+        fileType: 0
       })
     } else {
       const arr = pictureText.filter((x, i) => i !== index)
@@ -551,7 +570,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setFile({
         fileName: "",
         fileUrl: "",
-        fileType: messageTypeValue.type,
+        fileType: messageTypeValue.type
       })
     }
     if (inputRef.current) inputRef.current.value = ""
@@ -584,7 +603,7 @@ export const useAction = (props: SelectContentHookProps) => {
     switch (sendTypeValue) {
       case MessageJobSendType.Fire: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].title
         })
         break
       }
@@ -592,8 +611,8 @@ export const useAction = (props: SelectContentHookProps) => {
         setJobSetting({
           timezone: timeZone[timeZoneValue].title,
           delayedJob: {
-            enqueueAt: dateValue,
-          },
+            enqueueAt: dateValue
+          }
         })
         break
       }
@@ -603,11 +622,11 @@ export const useAction = (props: SelectContentHookProps) => {
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,
-                endDate: endDateValue,
+                endDate: endDateValue
               }
             : {
-                cronExpression: cronExp,
-              },
+                cronExpression: cronExp
+              }
         })
         break
       }
@@ -620,8 +639,8 @@ export const useAction = (props: SelectContentHookProps) => {
       case "文本": {
         setSendData({
           text: {
-            content: content,
-          },
+            content: content
+          }
         })
         break
       }
@@ -633,8 +652,8 @@ export const useAction = (props: SelectContentHookProps) => {
                 ? pictureText
                 : pictureText.length <= 0
                 ? lastTimePictureText
-                : pictureText,
-          },
+                : pictureText
+          }
         })
         break
       }
@@ -645,7 +664,7 @@ export const useAction = (props: SelectContentHookProps) => {
               ? file
               : !!file.fileName && !!file.fileContent
               ? file
-              : lastTimeFile,
+              : lastTimeFile
         })
         break
       }
@@ -657,13 +676,13 @@ export const useAction = (props: SelectContentHookProps) => {
     lastTimePictureText,
     lastTimeFile,
     messageTypeValue.title,
-    isNewOrUpdate,
+    isNewOrUpdate
   ])
 
   // sendParameter
   useEffect(() => {
     const a: SendParameter = {
-      appId: !!corpAppValue?.appId ? corpAppValue?.appId : "",
+      appId: !!corpAppValue?.appId ? corpAppValue?.appId : ""
     }
     if (!isEmpty(tagsNameList)) {
       a.toTags = tagsNameList
@@ -708,7 +727,7 @@ export const useAction = (props: SelectContentHookProps) => {
               title: item.title,
               content: item.content,
               fileUrl: item.fileUrl,
-              fileName: item.fileName,
+              fileName: item.fileName
             })
           )
           setLastTimePictureText(arr)
@@ -727,7 +746,7 @@ export const useAction = (props: SelectContentHookProps) => {
             workWeChatAppNotification.file?.fileType !== undefined
               ? workWeChatAppNotification.file?.fileType
               : 0,
-          fileUrl: workWeChatAppNotification.file?.fileUrl,
+          fileUrl: workWeChatAppNotification.file?.fileUrl
         })
 
         switch (workWeChatAppNotification.file?.fileType) {
@@ -779,7 +798,7 @@ export const useAction = (props: SelectContentHookProps) => {
         toParties:
           workWeChatAppNotification.toParties !== undefined
             ? workWeChatAppNotification.toParties
-            : [],
+            : []
       })
 
       updateMessageJobInformation.workWeChatAppNotification.toTags !==
@@ -798,32 +817,33 @@ export const useAction = (props: SelectContentHookProps) => {
       const metadata = [
         {
           key: "title",
-          value: title,
+          value: title
         },
         {
           key: "enterpriseName",
-          value: `${corpsValue?.corpName}`,
+          value: `${corpsValue?.corpName}`
         },
         {
           key: "enterpriseId",
-          value: `${corpsValue?.id}`,
+          value: `${corpsValue?.id}`
         },
         {
           key: "appName",
-          value: `${corpAppValue?.name}`,
+          value: `${corpAppValue?.name}`
         },
         {
           key: "weChatAppId",
-          value: `${corpAppValue?.appId}`,
+          value: `${corpAppValue?.appId}`
         },
         {
           key: "appId",
-          value: `${corpAppValue?.id}`,
-        },
+          value: `${corpAppValue?.id}`
+        }
       ]
       const workWeChatAppNotification = {
         ...sendParameter,
         ...sendData,
+        chatId
       }
 
       isNewOrUpdate === "new"
@@ -831,7 +851,7 @@ export const useAction = (props: SelectContentHookProps) => {
           getSendData({
             jobSetting: jobSetting,
             metadata: metadata,
-            workWeChatAppNotification: workWeChatAppNotification,
+            workWeChatAppNotification: workWeChatAppNotification
           })
         : getUpdateData !== undefined &&
           getUpdateData({
@@ -840,7 +860,7 @@ export const useAction = (props: SelectContentHookProps) => {
               : "",
             jobSetting: jobSetting,
             metadata: metadata,
-            workWeChatAppNotification: workWeChatAppNotification,
+            workWeChatAppNotification: workWeChatAppNotification
           })
     }
   }, [
@@ -850,7 +870,7 @@ export const useAction = (props: SelectContentHookProps) => {
     sendData,
     corpsValue,
     corpAppValue,
-    isNewOrUpdate,
+    isNewOrUpdate
   ])
 
   useEffect(() => {
@@ -865,17 +885,24 @@ export const useAction = (props: SelectContentHookProps) => {
       setTimeZoneValue(timeZone[0].value)
       setSendObject({
         toUsers: [],
-        toParties: [],
+        toParties: []
       })
       setPictureText([])
       setFile({
         fileContent: "",
         fileName: "",
-        fileType: messageTypeValue.type,
+        fileType: messageTypeValue.type
       })
       setDateValue("")
       setEndDateValue("")
       setCronExp("0 0 * * *")
+      setChatId("")
+      setDepartmentAndUserList((prev) => {
+        return prev.map((item) => {
+          recursiveSeachDeptOrUser(item.data, (e) => (e.selected = false))
+          return item
+        })
+      })
     }
   }, [clearData, isNewOrUpdate])
 
@@ -900,12 +927,17 @@ export const useAction = (props: SelectContentHookProps) => {
     searchKeyValue,
     isTreeViewLoading,
     tagsList,
+    chatId,
+    setChatId,
     setTagsValue,
     title,
     setTitle,
     content,
     setContent,
     fileUpload,
+    groupList,
+    setGroupList,
+    setIsRefresh,
     fileAccept,
     file,
     pictureText,
@@ -924,5 +956,8 @@ export const useAction = (props: SelectContentHookProps) => {
     inputRef,
     fileDelete,
     fileMark,
+    clickName,
+    setClickName,
+    setFlattenDepartmentList
   }
 }

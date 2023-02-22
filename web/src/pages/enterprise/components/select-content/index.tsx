@@ -5,7 +5,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField,
+  TextField
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
@@ -15,17 +15,19 @@ import SelectTargetDialog from "../select-target-dialog"
 import {
   messageTypeList,
   sendTypeList,
-  timeZone,
+  timeZone
 } from "../../../../dtos/send-message-job"
 import {
+  DeptUserCanSelectStatus,
   FileObject,
   MessageDataFileType,
   MessageJobSendType,
-  PictureText,
+  PictureText
 } from "../../../../dtos/enterprise"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import TimeSelector from "../time-selector"
 import DateSelector from "../date-selector"
+import { GetWeChatWorkCorpAppGroups } from "../../../../api/enterprise"
 
 const SelectContent = memo((props: SelectContentProps) => {
   const {
@@ -35,7 +37,7 @@ const SelectContent = memo((props: SelectContentProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
-    isFromNoticeSetting = false,
+    isFromNoticeSetting = false
   } = props
 
   const {
@@ -52,8 +54,10 @@ const SelectContent = memo((props: SelectContentProps) => {
     timeZoneValue,
     isShowDialog,
     setIsShowDialog,
+    setIsRefresh,
     departmentAndUserList,
     setDepartmentAndUserList,
+    setFlattenDepartmentList,
     departmentKeyValue,
     searchKeyValue,
     isTreeViewLoading,
@@ -76,19 +80,25 @@ const SelectContent = memo((props: SelectContentProps) => {
     setCronError,
     switchTimeZone,
     isLoadStop,
+    chatId,
+    setChatId,
+    groupList,
+    setGroupList,
     lastTimeTagsList,
     lastTimePictureText,
     lastTimeFile,
     inputRef,
     fileDelete,
-    fileMark,
+    clickName,
+    setClickName,
+    fileMark
   } = useAction({
     getSendData,
     isNewOrUpdate,
     getUpdateData,
     updateMessageJobInformation,
     showErrorPrompt,
-    clearData,
+    clearData
   })
 
   const fileOrImage = (file: FileObject, state: string) => {
@@ -300,11 +310,12 @@ const SelectContent = memo((props: SelectContentProps) => {
             height: "3.5rem",
             fontSize: "1rem",
             flexShrink: "0",
-            marginTop: "0.8rem",
+            marginTop: "0.8rem"
           }}
           variant="contained"
           onClick={() => {
             setIsShowDialog(true)
+            setClickName("选择发送目标")
           }}
         >
           选择发送目标
@@ -318,11 +329,17 @@ const SelectContent = memo((props: SelectContentProps) => {
           flattenDepartmentList={searchKeyValue}
           isLoading={isTreeViewLoading}
           tagsList={tagsList}
+          groupList={groupList}
+          canSelect={DeptUserCanSelectStatus.Both}
+          setGroupList={setGroupList}
           setOpenFunction={setIsShowDialog}
           setDeptUserList={setDepartmentAndUserList}
           setOuterTagsValue={setTagsValue}
-          isLoadStop={isLoadStop}
+          setIsRefresh={setIsRefresh}
           lastTagsValue={lastTimeTagsList}
+          clickName={clickName}
+          chatId={chatId}
+          setChatId={setChatId}
         />
       </div>
       <div className={styles.typeShow}>
@@ -361,7 +378,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                   variant="outlined"
                   component="label"
                   sx={{
-                    width: "6rem",
+                    width: "6rem"
                   }}
                 >
                   上传文件
@@ -419,7 +436,7 @@ const SelectContent = memo((props: SelectContentProps) => {
             <FormControl
               style={{
                 width: 252,
-                margin: "0.8rem 0",
+                margin: "0.8rem 0"
               }}
             >
               <InputLabel id="demo-simple-select-label">时区</InputLabel>
@@ -441,20 +458,22 @@ const SelectContent = memo((props: SelectContentProps) => {
             </FormControl>
           </div>
         )}
-        <DateSelector
-          sendTypeValue={sendTypeValue}
-          dateValue={dateValue}
-          setDateValue={setDateValue}
-          showErrorPrompt={showErrorPrompt}
-        />
-        <TimeSelector
-          sendTypeValue={sendTypeValue}
-          cronExp={cronExp}
-          setCronExp={setCronExp}
-          setCronError={setCronError}
-          endDateValue={endDateValue}
-          setEndDateValue={setEndDateValue}
-        />
+        {sendTypeValue === MessageJobSendType.Delayed && (
+          <DateSelector
+            dateValue={dateValue}
+            setDateValue={setDateValue}
+            showErrorPrompt={showErrorPrompt}
+          />
+        )}
+        {sendTypeValue === MessageJobSendType.Recurring && (
+          <TimeSelector
+            cronExp={cronExp}
+            setCronExp={setCronExp}
+            setCronError={setCronError}
+            endDateValue={endDateValue}
+            setEndDateValue={setEndDateValue}
+          />
+        )}
       </div>
     </div>
   )

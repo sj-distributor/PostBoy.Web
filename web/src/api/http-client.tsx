@@ -17,7 +17,7 @@ export interface IResponse<T> {
 export enum ResponseCode {
   Ok = 200,
   Unauthorized = 401,
-  InternalServerError = 500,
+  InternalServerError = 500
 }
 
 export async function base<T>(
@@ -35,8 +35,8 @@ export async function base<T>(
         (localStorage.getItem("token")
           ? (localStorage.getItem("token") as string)
           : ""),
-      "Content-Type": "application/json",
-    },
+      "Content-Type": "application/json"
+    }
   })
     .then((res) => res.json())
     .then((res: IResponse<T>) => {

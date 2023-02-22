@@ -217,10 +217,6 @@ const SendEmail = () => {
             value={emailCopyToString}
             className={styles.corpInput}
             sx={inputSx}
-            helperText={
-              !validateEmail(emailCopyToString) ? "Incorrect entry." : ""
-            }
-            error={!validateEmail(emailCopyToString)}
             onKeyDown={(e) =>
               handleKeyDown(e, setEmailCopyToArr, setEmailCopyToString)
             }
@@ -349,22 +345,24 @@ const SendEmail = () => {
                 </Select>
               </FormControl>
             )}
-            <div style={{ marginLeft: "1rem" }}>
-              <DateSelector
-                sendTypeValue={sendTypeValue}
-                dateValue={dateValue}
-                setDateValue={setDateValue}
-                showErrorPrompt={showErrorPrompt}
+            {sendTypeValue === MessageJobSendType.Delayed && (
+              <div style={{ marginLeft: "1rem" }}>
+                <DateSelector
+                  dateValue={dateValue}
+                  setDateValue={setDateValue}
+                  showErrorPrompt={showErrorPrompt}
+                />
+              </div>
+            )}
+            {sendTypeValue === MessageJobSendType.Recurring && (
+              <TimeSelector
+                cronExp={cronExp}
+                setCronExp={setCronExp}
+                setCronError={setCronError}
+                endDateValue={endDateValue}
+                setEndDateValue={setEndDateValue}
               />
-            </div>
-            <TimeSelector
-              sendTypeValue={sendTypeValue}
-              cronExp={cronExp}
-              setCronExp={setCronExp}
-              setCronError={setCronError}
-              endDateValue={endDateValue}
-              setEndDateValue={setEndDateValue}
-            />
+            )}
           </div>
         </DialogContent>
         <DialogActions>
