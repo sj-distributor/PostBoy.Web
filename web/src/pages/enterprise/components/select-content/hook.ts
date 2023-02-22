@@ -512,6 +512,27 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }
 
+  // 文件标记
+  const fileMark = useMemo(() => {
+    switch (messageTypeValue.type) {
+      case MessageDataFileType.File: {
+        return "文件大小限制20MB!"
+      }
+      case MessageDataFileType.Image: {
+        return "图片大小限制10MB,仅支持JPG和PNG格式!"
+      }
+      case MessageDataFileType.Video: {
+        return "视频大小限制10MB,仅支持MP4格式!"
+      }
+      case MessageDataFileType.Voice: {
+        return "语音大小限制2MB,仅支持AMR格式!"
+      }
+      default: {
+        return ""
+      }
+    }
+  }, [messageTypeValue.type])
+
   // 文件上传类型限制
   const fileAccept = useMemo(() => {
     if (messageTypeValue.groupBy === "文件")
@@ -934,6 +955,7 @@ export const useAction = (props: SelectContentHookProps) => {
     lastTimeFile,
     inputRef,
     fileDelete,
+    fileMark,
     clickName,
     setClickName,
     setFlattenDepartmentList

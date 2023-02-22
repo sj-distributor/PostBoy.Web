@@ -90,7 +90,8 @@ const SelectContent = memo((props: SelectContentProps) => {
     inputRef,
     fileDelete,
     clickName,
-    setClickName
+    setClickName,
+    fileMark
   } = useAction({
     getSendData,
     isNewOrUpdate,
@@ -406,6 +407,7 @@ const SelectContent = memo((props: SelectContentProps) => {
                     />
                   )}
                 </Button>
+                {!!fileMark && <div className={styles.mark}>{fileMark}</div>}
               </div>
               <div className={styles.information}>
                 {lastTimeFile !== undefined &&
