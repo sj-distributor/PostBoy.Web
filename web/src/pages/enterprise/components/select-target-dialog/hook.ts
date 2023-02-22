@@ -43,7 +43,7 @@ const useAction = (props: {
 
   const defaultGroupOwner = {
     id: "-1",
-    name: "No Option",
+    name: "随机群主",
     type: DepartmentAndUserType.User,
     parentid: "",
     selected: false,
@@ -196,9 +196,7 @@ const useAction = (props: {
   // 处理点击创建群组
   const handleCreateGroup = () => {
     let requestData: IWorkGroupCreate
-    !groupOwner?.id
-      ? setTipsObject({ show: true, msg: "Please select a valid group owner" })
-      : !groupName
+    !groupName
       ? setTipsObject({ show: true, msg: "Please input a valid group name" })
       : groupDeptUserSelectedList.length <= 1
       ? setTipsObject({
