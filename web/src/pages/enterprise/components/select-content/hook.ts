@@ -321,42 +321,30 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }
 
-  const recursiveGetSelectedList = (
+  const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
-    selectedList: IDepartmentAndUserListValue[]
+    callback: (e: IDepartmentAndUserListValue) => void
   ) => {
     for (const key in hasData) {
-      const e = hasData[key]
-      e.selected && selectedList.push(e)
-      e.children.length > 0 &&
-        (selectedList = recursiveGetSelectedList(e.children, [...selectedList]))
+      callback(hasData[key])
+      hasData[key].children.length > 0 &&
+        recursiveSeachDeptOrUser(hasData[key].children, callback)
     }
-    return selectedList
-  }
-
-  const recursiveDeptOrUserToSelectedList = (
-    sourceData: IDepartmentAndUserListValue[],
-    selectedList: string[]
-  ) => {
-    for (const key in sourceData) {
-      const e = sourceData[key]
-      if (selectedList.some((item) => item === e.id)) e.selected = true
-      else e.selected = false
-      e.children.length > 0 &&
-        recursiveDeptOrUserToSelectedList(e.children, [...selectedList])
-    }
-    return sourceData
+    return hasData
   }
 
   useEffect(() => {
     if (isLoadStop && sendObject !== undefined && !!sendObject) {
-      console.log([...sendObject.toParties, ...sendObject.toUsers])
+      const selectedList = [...sendObject.toParties, ...sendObject.toUsers]
       const array = departmentAndUserList.filter((x) => x)
       array.map((item) => {
         if (item.key === corpAppValue?.appId) {
-          item.data = recursiveDeptOrUserToSelectedList(
+          item.data = recursiveSeachDeptOrUser(
             departmentKeyValue?.data,
-            [...sendObject.toParties, ...sendObject.toUsers]
+            (e) => {
+              if (selectedList.some((item) => item === e.id)) e.selected = true
+              else e.selected = false
+            }
           )
         }
         return item
@@ -366,12 +354,17 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isLoadStop])
 
   useEffect(() => {
-    if (isLoadStop) {
+    if (!isShowDialog) {
+      const noneHandleSelected: IDepartmentAndUserListValue[] = []
+      recursiveSeachDeptOrUser(
+        departmentKeyValue?.data,
+        (e) => e.selected && noneHandleSelected.push(e)
+      )
       const selectedList = uniqWith(
         (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
           return a.id === b.id
         }
-      )(recursiveGetSelectedList(departmentKeyValue?.data, []))
+      )(noneHandleSelected)
       if (
         (isGetLastTimeData && isNewOrUpdate === "update") ||
         (!isGetLastTimeData &&
@@ -387,7 +380,7 @@ export const useAction = (props: SelectContentHookProps) => {
             .map((e) => String(e.id))
         })
     }
-  }, [departmentAndUserList])
+  }, [isShowDialog])
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
@@ -884,11 +877,10 @@ export const useAction = (props: SelectContentHookProps) => {
       setCronExp("0 0 * * *")
       setChatId("")
       setDepartmentAndUserList((prev) => {
-        const newValue = prev.filter((x) => x)
-        newValue.forEach((item) => {
-          recursiveDeptOrUserToSelectedList(item.data, [])
+        return prev.map((item) => {
+          recursiveSeachDeptOrUser(item.data, (e) => (e.selected = false))
+          return item
         })
-        return newValue
       })
     }
   }, [clearData, isNewOrUpdate])

@@ -82,10 +82,11 @@ const useAction = (props: {
     callback: (e: IDepartmentAndUserListValue) => void
   ) => {
     for (const key in hasData) {
-      const e = hasData[key]
-      callback(e)
-      e.children.length > 0 && recursiveSeachDeptOrUser(e.children, callback)
+      callback(hasData[key])
+      hasData[key].children.length > 0 &&
+        recursiveSeachDeptOrUser(hasData[key].children, callback)
     }
+    return hasData
   }
 
   const recursiveDeptList = (
