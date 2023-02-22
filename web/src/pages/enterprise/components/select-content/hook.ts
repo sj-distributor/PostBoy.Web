@@ -350,6 +350,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     if (isLoadStop && sendObject !== undefined && !!sendObject) {
+      console.log([...sendObject.toParties, ...sendObject.toUsers])
       const array = departmentAndUserList.filter((x) => x)
       array.map((item) => {
         if (item.key === corpAppValue?.appId) {
@@ -411,6 +412,10 @@ export const useAction = (props: SelectContentHookProps) => {
         const hasData = newValue.find((e) => e.key === corpAppValue.appId)
         hasData && (hasData.data = [])
         return newValue
+      })
+      setSendObject({
+        toUsers: [],
+        toParties: []
       })
       // 开始load数据
       setIsLoadStop(false)

@@ -21,12 +21,11 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  DeptUserCanSelectStatus,
-  ITagsList
+  DeptUserCanSelectStatus
 } from "../../../../dtos/enterprise"
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
-import { memo, useEffect } from "react"
+import { memo } from "react"
 
 const fiteringDeptAndUsers = (
   options: IDepartmentAndUserListValue[],
@@ -206,7 +205,8 @@ const SelectTargetDialog = memo(
               style={{
                 height: "15rem",
                 overflowY: "auto",
-                position: "relative"
+                position: "relative",
+                marginBottom: "1rem"
               }}
             >
               {(clickName === "选择发送目标"
@@ -235,104 +235,64 @@ const SelectTargetDialog = memo(
               )}
             </div>
 
-            {flattenDepartmentList &&
-              (clickName === "选择发送目标" ? (
-                <Autocomplete
-                  id="sreach-input"
-                  disablePortal
-                  openOnFocus
-                  multiple
-                  disableCloseOnSelect
-                  size="small"
-                  componentsProps={{
-                    paper: { elevation: 3 },
-                    popper: {
-                      placement: "top"
+            {flattenDepartmentList && (
+              <Autocomplete
+                id={"sreach-input" + clickName}
+                disablePortal
+                openOnFocus
+                multiple
+                disableCloseOnSelect
+                size="small"
+                componentsProps={{
+                  paper: { elevation: 3 },
+                  popper: {
+                    placement: "top"
+                  }
+                }}
+                value={
+                  clickName === "选择发送目标"
+                    ? departmentSelectedList
+                    : groupDeptUserSelectedList
+                }
+                options={flattenDepartmentList}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                groupBy={(option) => option.parentid as string}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={
+                      clickName === "选择发送目标"
+                        ? "部门与用户搜索"
+                        : "用户搜索"
                     }
-                  }}
-                  value={departmentSelectedList}
-                  options={flattenDepartmentList}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  groupBy={(option) => option.parentid as string}
-                  renderInput={(params) => (
-                    <TextField {...params} label={"部门与用户搜索"} />
-                  )}
-                  filterOptions={(options, state) =>
-                    fiteringDeptAndUsers(options, state)
-                  }
-                  onChange={(e, value) => value && setSearchToDeptValue(value)}
-                  renderGroup={(params) => {
-                    const { key, group, children } = params
-                    return <div key={key}>{children}</div>
-                  }}
-                  renderOption={(props, option, state) => {
-                    let style = Object.assign(
-                      option.type === DepartmentAndUserType.Department
-                        ? { color: "#666" }
-                        : { paddingLeft: "2rem" },
-                      { fontSize: "0.9rem" }
-                    )
-                    !handleTypeIsCanSelect(canSelect, option.type) &&
-                      (props.onClick = () => {})
-                    return (
-                      <li {...props} style={style}>
-                        {option.name}
-                      </li>
-                    )
-                  }}
-                />
-              ) : (
-                <Autocomplete
-                  id="sreach-input-group"
-                  disablePortal
-                  openOnFocus
-                  multiple
-                  disableCloseOnSelect
-                  size="small"
-                  componentsProps={{
-                    paper: { elevation: 3 },
-                    popper: {
-                      placement: "top"
-                    }
-                  }}
-                  value={groupDeptUserSelectedList}
-                  options={flattenDepartmentList}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  filterOptions={(options, state) =>
-                    fiteringDeptAndUsers(options, state)
-                  }
-                  groupBy={(option) => option.parentid as string}
-                  renderInput={(params) => (
-                    <TextField {...params} label={"用户搜索"} />
-                  )}
-                  onChange={(e, value) => value && setSearchToDeptValue(value)}
-                  renderGroup={(params) => {
-                    const { key, group, children } = params
-                    return <div key={key}>{children}</div>
-                  }}
-                  renderOption={(props, option, state) => {
-                    let style = Object.assign(
-                      option.type === DepartmentAndUserType.Department
-                        ? { color: "#666" }
-                        : { paddingLeft: "2rem" },
-                      { fontSize: "0.9rem" }
-                    )
-                    !handleTypeIsCanSelect(canSelect, option.type) &&
-                      (props.onClick = () => {})
-                    return (
-                      <li {...props} style={style}>
-                        {option.name}
-                      </li>
-                    )
-                  }}
-                />
-              ))}
+                  />
+                )}
+                filterOptions={(options, state) =>
+                  fiteringDeptAndUsers(options, state)
+                }
+                onChange={(e, value) => value && setSearchToDeptValue(value)}
+                renderGroup={(params) => {
+                  const { key, group, children } = params
+                  return <div key={key}>{children}</div>
+                }}
+                renderOption={(props, option, state) => {
+                  let style = Object.assign(
+                    option.type === DepartmentAndUserType.Department
+                      ? { color: "#666" }
+                      : { paddingLeft: "2rem" },
+                    { fontSize: "0.9rem" }
+                  )
+                  !handleTypeIsCanSelect(canSelect, option.type) &&
+                    (props.onClick = () => {})
+                  return (
+                    <li {...props} style={style}>
+                      {option.name}
+                    </li>
+                  )
+                }}
+              />
+            )}
 
             {clickName === "选择发送目标" ? (
               <>

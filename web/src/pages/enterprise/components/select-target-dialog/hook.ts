@@ -1,5 +1,5 @@
 import { clone } from "ramda"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { PostWeChatWorkGroupCreate } from "../../../../api/enterprise"
 import {
   IDepartmentAndUserListValue,
@@ -49,6 +49,10 @@ const useAction = (props: {
     selected: false,
     children: []
   }
+  const defaultGroupValue = {
+    chatId: "",
+    chatName: ""
+  }
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
     IDepartmentAndUserListValue[]
   >([])
@@ -70,21 +74,17 @@ const useAction = (props: {
 
   const [createLoading, setCreateLoading] = useState(false)
 
-  const [groupValue, setGroupValue] = useState<IWorkCorpAppGroup>()
+  const [groupValue, setGroupValue] =
+    useState<IWorkCorpAppGroup>(defaultGroupValue)
 
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
-    item: IDepartmentAndUserListValue,
-    callback: (
-      e: IDepartmentAndUserListValue,
-      item: IDepartmentAndUserListValue
-    ) => void
+    callback: (e: IDepartmentAndUserListValue) => void
   ) => {
     for (const key in hasData) {
       const e = hasData[key]
-      callback(e, item)
-      e.children.length > 0 &&
-        recursiveSeachDeptOrUser(e.children, item, callback)
+      callback(e)
+      e.children.length > 0 && recursiveSeachDeptOrUser(e.children, callback)
     }
   }
 
@@ -122,16 +122,12 @@ const useAction = (props: {
             (e) => e.key === departmentKeyValue.key
           )
           activeData &&
-            recursiveSeachDeptOrUser(
-              activeData.data,
-              clickedItem,
-              (e, item) => {
-                e.id === item.id &&
-                  (type === ClickType.Collapse
-                    ? (e.isCollapsed = !e.isCollapsed)
-                    : (e.selected = !e.selected))
-              }
-            )
+            recursiveSeachDeptOrUser(activeData.data, (e) => {
+              e.id === clickedItem.id &&
+                (type === ClickType.Collapse
+                  ? (e.isCollapsed = !e.isCollapsed)
+                  : (e.selected = !e.selected))
+            })
           return newValue
         })
       : setGroupDeptUserList((prev) => {
@@ -140,22 +136,35 @@ const useAction = (props: {
             (e) => e.key === departmentKeyValue.key
           )
           activeData &&
-            recursiveSeachDeptOrUser(
-              activeData.data,
-              clickedItem,
-              (e, item) => {
-                e.id === item.id &&
-                  (type === ClickType.Collapse
-                    ? (e.isCollapsed = !e.isCollapsed)
-                    : (e.selected = !e.selected))
-              }
-            )
+            recursiveSeachDeptOrUser(activeData.data, (e) => {
+              e.id === clickedItem.id &&
+                (type === ClickType.Collapse
+                  ? (e.isCollapsed = !e.isCollapsed)
+                  : (e.selected = !e.selected))
+            })
           return newValue
         })
   }
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
+    const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
+      const newValue = prev.filter((e) => !!e)
+      const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
+      if (activeData) {
+        valueArr.length > 0
+          ? valueArr.forEach((item) => {
+              recursiveSeachDeptOrUser(activeData.data, (user) => {
+                user.selected = !!valueArr.find((e) => e.id === user.id)
+              })
+            })
+          : recursiveSeachDeptOrUser(
+              activeData.data,
+              (user) => (user.selected = false)
+            )
+      }
+      return newValue
+    }
     if (clickName === "创建群组") {
       setGroupDeptUserSelectedList(valueArr)
       // 如果选择的department User list没有当前的用户之后置空群主选择
@@ -165,48 +174,10 @@ const useAction = (props: {
         }
         return defaultGroupOwner
       })
-      setGroupDeptUserList((prev) => {
-        const newValue = prev.filter((e) => !!e)
-        const activeData = newValue.find(
-          (e) => e.key === departmentKeyValue.key
-        )
-        if (activeData) {
-          valueArr.length > 0
-            ? valueArr.forEach((item) => {
-                recursiveSeachDeptOrUser(activeData.data, item, (user) => {
-                  user.selected = !!valueArr.find((e) => e.id === user.id)
-                })
-              })
-            : recursiveSeachDeptOrUser(
-                activeData.data,
-                activeData.data[0],
-                (user) => (user.selected = false)
-              )
-        }
-        return newValue
-      })
+      setGroupDeptUserList(handleDataUpdate)
     } else {
       setDepartmentSelectedList(valueArr)
-      setDeptUserList((prev) => {
-        const newValue = prev.filter((e) => !!e)
-        const activeData = newValue.find(
-          (e) => e.key === departmentKeyValue.key
-        )
-        if (activeData) {
-          valueArr.length > 0
-            ? valueArr.forEach((item) => {
-                recursiveSeachDeptOrUser(activeData.data, item, (user) => {
-                  user.selected = !!valueArr.find((e) => e.id === user.id)
-                })
-              })
-            : recursiveSeachDeptOrUser(
-                activeData.data,
-                activeData.data[0],
-                (user) => (user.selected = false)
-              )
-        }
-        return newValue
-      })
+      setDeptUserList(handleDataUpdate)
     }
   }
 
@@ -297,11 +268,40 @@ const useAction = (props: {
   useEffect(() => {
     // 切换应用时清空上次应用数据
     setDepartmentSelectedList([])
+    setGroupDeptUserSelectedList([])
     setTagsValue([])
   }, [AppId])
 
   useEffect(() => {
     setOuterTagsValue(tagsValue)
+    // 切换应用时清空上次应用数据
+    !open && setDepartmentSelectedList([])
+    !open && setGroupDeptUserSelectedList([])
+  }, [open])
+
+  useEffect(() => {
+    open &&
+      (clickName === "选择发送目标"
+        ? setDepartmentSelectedList((prev) => {
+            const newValue = prev.filter((x) => x)
+            const hasData = departmentAndUserList.find((x) => x.key === AppId)
+            // console.log(hasData, newValue)
+            hasData &&
+              recursiveSeachDeptOrUser(hasData.data, (e) => {
+                e.selected && newValue.push(e)
+              })
+            return newValue
+          })
+        : setGroupDeptUserSelectedList((prev) => {
+            const newValue = prev.filter((x) => x)
+            const hasData = groupDeptUserList.find((x) => x.key === AppId)
+            // console.log(hasData, newValue)
+            hasData &&
+              recursiveSeachDeptOrUser(hasData.data, (e) => {
+                e.selected && newValue.push(e)
+              })
+            return newValue
+          }))
   }, [open])
 
   useEffect(() => {
