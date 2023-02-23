@@ -5,7 +5,7 @@ import {
   GetMessageJob,
   GetMessageJobRecords,
   PostMessageJobDelete,
-  PostMessageJobUpdate,
+  PostMessageJobUpdate
 } from "../../api/enterprise"
 import {
   IDtoExtend,
@@ -18,7 +18,7 @@ import {
   MessageJobDestination,
   messageJobSendType,
   MessageJobSendType,
-  messageSendResultType,
+  messageSendResultType
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
 import { convertType } from "../../uilts/convert-type"
@@ -70,20 +70,22 @@ const messageJobConvertType = (
           : "",
         groupName: item.metadata.filter((item) => item.key === "groupName")[0]
           ?.value,
+        groupId: item.metadata.filter((item) => item.key === "groupId")[0]
+          ?.value,
         enterprise: {
           corpName: item.metadata.filter(
             (item) => item.key === "enterpriseName"
           )[0]?.value,
           id: item.metadata.filter((item) => item.key === "enterpriseId")[0]
-            ?.value,
+            ?.value
         },
         app: {
           name: item.metadata.filter((item) => item.key === "appName")[0]
             ?.value,
           id: item.metadata.filter((item) => item.key === "appId")[0]?.value,
           appId: item.metadata.filter((item) => item.key === "weChatAppId")[0]
-            ?.value,
-        },
+            ?.value
+        }
       }
       isRecordTypeWechat
         ? array.push(data)
@@ -103,7 +105,7 @@ export const useAction = (recordType: MessageJobDestination) => {
     messageJobs: [],
     rowCount: 0,
     pageSize: 10,
-    page: 0,
+    page: 0
   })
 
   const [deleteId, setDeleteId] = useState<string>("")
@@ -170,7 +172,7 @@ export const useAction = (recordType: MessageJobDestination) => {
           errorSendtheobject:
             JSON.parse(item.responseJson).invaliduser !== null
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
-              : "",
+              : ""
         })
       })
     return sendRecordArray
@@ -188,7 +190,7 @@ export const useAction = (recordType: MessageJobDestination) => {
   const onDeleteMessageJob = (id: string) => {
     deleteConfirmRef.current?.close()
     PostMessageJobDelete({
-      MessageJobId: id,
+      MessageJobId: id
     })
       .then((res) => {
         getMessageJob()
@@ -297,6 +299,6 @@ export const useAction = (recordType: MessageJobDestination) => {
     failSend,
     promptText,
     openError,
-    showErrorPrompt,
+    showErrorPrompt
   }
 }

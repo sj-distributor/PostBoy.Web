@@ -91,7 +91,9 @@ const SelectContent = memo((props: SelectContentProps) => {
     fileDelete,
     clickName,
     setClickName,
-    fileMark
+    fileMark,
+    sendType,
+    setSendType
   } = useAction({
     getSendData,
     isNewOrUpdate,
@@ -340,6 +342,8 @@ const SelectContent = memo((props: SelectContentProps) => {
           clickName={clickName}
           chatId={chatId}
           setChatId={setChatId}
+          sendType={sendType}
+          setSendType={setSendType}
         />
       </div>
       <div className={styles.typeShow}>

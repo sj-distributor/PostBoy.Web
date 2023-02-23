@@ -27,6 +27,7 @@ import {
   PictureText,
   SendData,
   SendObject,
+  SendObjOrGroup,
   SendParameter
 } from "../../../../dtos/enterprise"
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job"
@@ -128,6 +129,9 @@ export const useAction = (props: SelectContentHookProps) => {
   const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
   const [chatId, setChatId] = useState<string>("")
   const [isRefresh, setIsRefresh] = useState(false)
+  const [sendType, setSendType] = useState<SendObjOrGroup>(
+    SendObjOrGroup.Object
+  )
 
   // 初始化企业数组
   useEffect(() => {
@@ -406,10 +410,11 @@ export const useAction = (props: SelectContentHookProps) => {
         hasData && (hasData.data = [])
         return newValue
       })
-      setSendObject({
-        toUsers: [],
-        toParties: []
-      })
+      !updateMessageJobInformation?.workWeChatAppNotification &&
+        setSendObject({
+          toUsers: [],
+          toParties: []
+        })
       // 开始load数据
       setIsLoadStop(false)
       setIsTreeViewLoading(true)
@@ -682,14 +687,20 @@ export const useAction = (props: SelectContentHookProps) => {
   // sendParameter
   useEffect(() => {
     const a: SendParameter = {
+      ...sendParameter,
       appId: !!corpAppValue?.appId ? corpAppValue?.appId : ""
     }
     if (!isEmpty(tagsNameList)) {
       a.toTags = tagsNameList
-    } else if (!isEmpty(sendObject.toUsers)) {
+    }
+    if (!isEmpty(sendObject.toUsers)) {
       a.toUsers = sendObject.toUsers
-    } else if (!isEmpty(sendObject.toParties)) {
+    }
+    if (!isEmpty(sendObject.toParties)) {
       a.toParties = sendObject.toParties
+    }
+    if (!isEmpty(chatId)) {
+      a.chatId = chatId
     }
     setSendParameter(a)
   }, [corpAppValue?.id, tagsNameList, sendObject])
@@ -808,6 +819,10 @@ export const useAction = (props: SelectContentHookProps) => {
         )
 
       setIsGetLastTimeData(true)
+      // 回显群组名称
+      updateMessageJobInformation.groupId &&
+        setChatId(updateMessageJobInformation.groupId) === undefined &&
+        setSendType(SendObjOrGroup.Group)
     }
   }, [updateMessageJobInformation])
 
@@ -840,10 +855,33 @@ export const useAction = (props: SelectContentHookProps) => {
           value: `${corpAppValue?.id}`
         }
       ]
+      sendType === SendObjOrGroup.Group &&
+        chatId &&
+        groupList.length > 0 &&
+        metadata.push(
+          {
+            key: "groupName",
+            value: groupList.filter((x) => x.chatId === chatId)[0].chatName
+          },
+          {
+            key: "groupId",
+            value: chatId
+          }
+        )
+
+      // 在传出去外层前做判断, 不清除无用已选项
+      const handleSendParams = { ...sendParameter }
+      sendType === SendObjOrGroup.Group
+        ? (() => {
+            delete handleSendParams.toParties
+            delete handleSendParams.toUsers
+            delete handleSendParams.toTags
+          })()
+        : delete handleSendParams.chatId
+
       const workWeChatAppNotification = {
-        ...sendParameter,
-        ...sendData,
-        chatId
+        ...handleSendParams,
+        ...sendData
       }
 
       isNewOrUpdate === "new"
@@ -928,6 +966,8 @@ export const useAction = (props: SelectContentHookProps) => {
     isTreeViewLoading,
     tagsList,
     chatId,
+    sendType,
+    setSendType,
     setChatId,
     setTagsValue,
     title,

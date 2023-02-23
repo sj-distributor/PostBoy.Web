@@ -21,7 +21,8 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  DeptUserCanSelectStatus
+  DeptUserCanSelectStatus,
+  SendObjOrGroup
 } from "../../../../dtos/enterprise"
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
@@ -73,6 +74,8 @@ const SelectTargetDialog = memo(
       lastTagsValue,
       clickName,
       chatId,
+      sendType,
+      setSendType,
       setIsRefresh,
       setChatId,
       setGroupList,
@@ -92,6 +95,7 @@ const SelectTargetDialog = memo(
       defaultGroupOwner,
       groupDeptUserList,
       createLoading,
+      sendList,
       setGroupName,
       setGroupOwner,
       setIsShowDialog,
@@ -190,14 +194,43 @@ const SelectTargetDialog = memo(
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              height: "4rem"
             }}
           >
             <>{clickName}</>
             {clickName === "选择发送目标" && (
-              <Button variant="outlined" onClick={() => setIsShowDialog(true)}>
-                创建群组
-              </Button>
+              <div style={{ display: "flex" }}>
+                <Autocomplete
+                  disableClearable
+                  id="type-simple-select"
+                  value={sendType}
+                  size="small"
+                  sx={{ marginRight: "1rem" }}
+                  options={sendList}
+                  getOptionLabel={(x) =>
+                    x === SendObjOrGroup.Group ? "群组" : "对象"
+                  }
+                  onChange={(e, value) => {
+                    setSendType && setSendType(value)
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.InputButton}
+                      margin="dense"
+                      type="button"
+                      label="SendType"
+                    />
+                  )}
+                />
+                <Button
+                  variant="outlined"
+                  onClick={() => setIsShowDialog(true)}
+                >
+                  创建群组
+                </Button>
+              </div>
             )}
           </DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
@@ -235,124 +268,140 @@ const SelectTargetDialog = memo(
               )}
             </div>
 
-            {flattenDepartmentList && (
-              <Autocomplete
-                id={"sreach-input" + clickName}
-                disablePortal
-                openOnFocus
-                multiple
-                disableCloseOnSelect
-                size="small"
-                componentsProps={{
-                  paper: { elevation: 3 },
-                  popper: {
-                    placement: "top"
-                  }
-                }}
-                value={
-                  clickName === "选择发送目标"
-                    ? departmentSelectedList
-                    : groupDeptUserSelectedList
-                }
-                options={flattenDepartmentList}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.parentid as string}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={
-                      clickName === "选择发送目标"
-                        ? "部门与用户搜索"
-                        : "用户搜索"
-                    }
-                  />
-                )}
-                filterOptions={(options, state) =>
-                  fiteringDeptAndUsers(options, state)
-                }
-                onChange={(e, value) => value && setSearchToDeptValue(value)}
-                renderGroup={(params) => {
-                  const { key, group, children } = params
-                  return <div key={key}>{children}</div>
-                }}
-                renderOption={(props, option, state) => {
-                  let style = Object.assign(
-                    option.type === DepartmentAndUserType.Department
-                      ? { color: "#666" }
-                      : { paddingLeft: "2rem" },
-                    { fontSize: "0.9rem" }
-                  )
-                  !handleTypeIsCanSelect(canSelect, option.type) &&
-                    (props.onClick = () => {})
-                  return (
-                    <li {...props} style={style}>
-                      {option.name}
-                    </li>
-                  )
-                }}
-              />
-            )}
-
-            {clickName === "选择发送目标" ? (
-              <>
+            {clickName === "选择发送目标" &&
+            sendType !== SendObjOrGroup.Object ? (
+              <></>
+            ) : (
+              flattenDepartmentList && (
                 <Autocomplete
-                  id="group-list"
-                  disablePortal
-                  openOnFocus
-                  disableClearable
-                  size="small"
-                  sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
-                  value={groupList.filter((x) => x.chatId === chatId)[0]}
-                  options={groupList}
-                  componentsProps={{ paper: { elevation: 3 } }}
-                  getOptionLabel={(option) => option.chatName}
-                  isOptionEqualToValue={(option, value) =>
-                    option.chatId === value.chatId
-                  }
-                  renderOption={(props, option, state) => (
-                    <li {...props} key={option.chatId}>
-                      {option.chatName}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      className={styles.InputButton}
-                      margin="dense"
-                      type="button"
-                      label="群组列表"
-                    />
-                  )}
-                  onChange={(e, value) => setChatId && setChatId(value.chatId)}
-                />
-                <Autocomplete
-                  id="tags-list"
+                  id={"sreach-input" + clickName}
                   disablePortal
                   openOnFocus
                   multiple
                   disableCloseOnSelect
-                  disableClearable
-                  limitTags={2}
                   size="small"
-                  value={tagsValue}
-                  options={tagsList}
-                  componentsProps={{ paper: { elevation: 3 } }}
-                  getOptionLabel={(option) => option.tagName}
-                  isOptionEqualToValue={(option, value) =>
-                    option.tagId === value.tagId
+                  componentsProps={{
+                    paper: { elevation: 3 },
+                    popper: {
+                      placement: "top"
+                    }
+                  }}
+                  value={
+                    clickName === "选择发送目标"
+                      ? departmentSelectedList
+                      : groupDeptUserSelectedList
                   }
+                  options={flattenDepartmentList}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  groupBy={(option) => option.parentid as string}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      className={styles.InputButton}
-                      margin="dense"
-                      type="button"
-                      label="标签列表"
+                      label={
+                        clickName === "选择发送目标"
+                          ? "部门与用户搜索"
+                          : "用户搜索"
+                      }
                     />
                   )}
-                  onChange={(e, value) => setTagsValue(value)}
+                  filterOptions={(options, state) =>
+                    fiteringDeptAndUsers(options, state)
+                  }
+                  onChange={(e, value) => value && setSearchToDeptValue(value)}
+                  renderGroup={(params) => {
+                    const { key, group, children } = params
+                    return <div key={key}>{children}</div>
+                  }}
+                  renderOption={(props, option, state) => {
+                    let style = Object.assign(
+                      option.type === DepartmentAndUserType.Department
+                        ? { color: "#666" }
+                        : { paddingLeft: "2rem" },
+                      { fontSize: "0.9rem" }
+                    )
+                    !handleTypeIsCanSelect(canSelect, option.type) &&
+                      (props.onClick = () => {})
+                    return (
+                      <li {...props} style={style}>
+                        {option.name}
+                      </li>
+                    )
+                  }}
                 />
+              )
+            )}
+
+            {clickName === "选择发送目标" ? (
+              <>
+                {sendType === SendObjOrGroup.Group && (
+                  <Autocomplete
+                    id="group-list"
+                    disablePortal
+                    openOnFocus
+                    size="small"
+                    sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
+                    value={
+                      chatId
+                        ? groupList.filter((x) => x.chatId === chatId)[0]
+                        : null
+                    }
+                    options={groupList}
+                    componentsProps={{ paper: { elevation: 3 } }}
+                    getOptionLabel={(option) => option.chatName}
+                    isOptionEqualToValue={(option, value) =>
+                      option.chatId === value.chatId
+                    }
+                    renderOption={(props, option, state) => (
+                      <li {...props} key={option.chatId}>
+                        {option.chatName}
+                      </li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        className={styles.InputButton}
+                        margin="dense"
+                        type="button"
+                        label="群组列表"
+                      />
+                    )}
+                    onChange={(e, value) =>
+                      setChatId && setChatId(value ? value.chatId : "")
+                    }
+                  />
+                )}
+                {sendType === SendObjOrGroup.Object && (
+                  <Autocomplete
+                    id="tags-list"
+                    disablePortal
+                    openOnFocus
+                    multiple
+                    disableCloseOnSelect
+                    disableClearable
+                    limitTags={2}
+                    size="small"
+                    value={tagsValue}
+                    options={tagsList}
+                    componentsProps={{ paper: { elevation: 3 } }}
+                    getOptionLabel={(option) => option.tagName}
+                    isOptionEqualToValue={(option, value) =>
+                      option.tagId === value.tagId
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        className={styles.InputButton}
+                        margin="dense"
+                        type="button"
+                        label="标签列表"
+                      />
+                    )}
+                    onChange={(e, value) => setTagsValue(value)}
+                  />
+                )}
               </>
             ) : (
               <>
@@ -458,7 +507,9 @@ const SelectTargetDialog = memo(
       prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
       prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
       prevProps.AppId === nextProps.AppId &&
-      prevProps.groupList === nextProps.groupList
+      prevProps.groupList === nextProps.groupList &&
+      prevProps.chatId === nextProps.chatId &&
+      prevProps.sendType === nextProps.sendType
     )
   }
 )
