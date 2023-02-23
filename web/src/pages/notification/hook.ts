@@ -68,6 +68,10 @@ const messageJobConvertType = (
           : item.emailNotification
           ? item.emailNotification.subject
           : "",
+        groupName: item.metadata.filter((item) => item.key === "groupName")[0]
+          ?.value,
+        groupId: item.metadata.filter((item) => item.key === "groupId")[0]
+          ?.value,
         enterprise: {
           corpName: item.metadata.filter(
             (item) => item.key === "enterpriseName"

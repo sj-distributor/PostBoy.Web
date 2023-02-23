@@ -25,7 +25,8 @@ export const parameterJudgment = (
     } else if (
       data.workWeChatAppNotification?.toTags === undefined &&
       data.workWeChatAppNotification?.toUsers === undefined &&
-      data.workWeChatAppNotification?.toParties === undefined
+      data.workWeChatAppNotification?.toParties === undefined &&
+      data.workWeChatAppNotification?.chatId === undefined
     ) {
       showErrorPrompt("Please select an object to send!")
     } else if (

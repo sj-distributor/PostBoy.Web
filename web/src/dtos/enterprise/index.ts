@@ -119,6 +119,8 @@ export interface ITargetDialogProps {
   canSelect: DeptUserCanSelectStatus
   groupDeptUserSelectedList?: IDepartmentAndUserListValue[]
   chatId: string
+  sendType?: SendObjOrGroup
+  setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setOpenFunction: (open: boolean) => void
@@ -306,6 +308,8 @@ export interface ILastShowTableData extends IMessageJob {
   title: string
   content?: string
   sendType: string
+  groupName?: string
+  groupId?: string
   enterprise: {
     id: string
     corpName: string
@@ -369,7 +373,7 @@ export const messageJobSendType = {
 export interface IWorkGroupCreate {
   appId: string
   name: string
-  owner: string
+  owner?: string
   chatId?: string
   userList: string[]
 }
@@ -386,4 +390,9 @@ export interface IGetDeptAndUsersResponse {
 export interface IDeptAndUserList {
   department: IDepartmentData
   users: IDepartmentUsersData[]
+}
+
+export enum SendObjOrGroup {
+  Object,
+  Group
 }

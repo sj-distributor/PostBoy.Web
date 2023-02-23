@@ -45,7 +45,7 @@ const SendNotice = React.memo(
       failSend,
       promptText,
       openError,
-      showErrorPrompt
+      showErrorPrompt,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -67,7 +67,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor
+          params.row.isDelete && styles.deletedColor,
       },
       {
         field: "content",
@@ -81,7 +81,7 @@ const SendNotice = React.memo(
         cellClassName: (params: GridCellParams) =>
           params.row.isDelete && styles.deletedColor,
         renderCell: (params: GridCellParams) =>
-          asyncTootip(params.row.content, styles.tooltip)
+          asyncTootip(params.row.content, styles.tooltip),
       },
       {
         field: "jobCronExpressionDesc",
@@ -93,7 +93,7 @@ const SendNotice = React.memo(
         sortable: false,
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor
+          params.row.isDelete && styles.deletedColor,
       },
       {
         field: "createdDate",
@@ -107,7 +107,7 @@ const SendNotice = React.memo(
         cellClassName: (params: GridCellParams) =>
           params.row.isDelete && styles.deletedColor,
         renderCell: (params: GridCellParams) =>
-          moment(params.row.createdDate).format("YYYY/MM/DD HH:mm")
+          moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
       },
       {
         field: "sendType",
@@ -119,7 +119,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor
+          params.row.isDelete && styles.deletedColor,
       },
       {
         field: "operate",
@@ -148,7 +148,8 @@ const SendNotice = React.memo(
                     ? [
                         ...params.row.workWeChatAppNotification.toParties,
                         ...params.row.workWeChatAppNotification.toTags,
-                        ...params.row.workWeChatAppNotification.toUsers
+                        ...params.row.workWeChatAppNotification.toUsers,
+                        [params.row.groupName],
                       ].join(";")
                     : "",
                   params.row.correlationId
@@ -164,8 +165,8 @@ const SendNotice = React.memo(
               【删除】
             </p>
           </div>
-        )
-      }
+        ),
+      },
     ]
 
     return (
@@ -175,14 +176,14 @@ const SendNotice = React.memo(
           open={openError}
           anchorOrigin={{
             vertical: "top",
-            horizontal: "center"
+            horizontal: "center",
           }}
         />
         <Snackbar
           open={failSend}
           anchorOrigin={{
             vertical: "top",
-            horizontal: "center"
+            horizontal: "center",
           }}
         >
           <Alert severity="error">
@@ -198,7 +199,7 @@ const SendNotice = React.memo(
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            paddingTop: "1rem"
+            paddingTop: "1rem",
           }}
         >
           <LoadingButton

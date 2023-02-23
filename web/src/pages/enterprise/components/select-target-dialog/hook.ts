@@ -9,7 +9,8 @@ import {
   ClickType,
   DeptUserCanSelectStatus,
   IWorkGroupCreate,
-  IWorkCorpAppGroup
+  IWorkCorpAppGroup,
+  SendObjOrGroup
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -43,7 +44,7 @@ const useAction = (props: {
 
   const defaultGroupOwner = {
     id: "-1",
-    name: "No Option",
+    name: "随机群主",
     type: DepartmentAndUserType.User,
     parentid: "",
     selected: false,
@@ -71,6 +72,10 @@ const useAction = (props: {
   const [groupDeptUserList, setGroupDeptUserList] = useState<
     IDepartmentKeyControl[]
   >([])
+  const [sendList, setSendList] = useState([
+    SendObjOrGroup.Group,
+    SendObjOrGroup.Object
+  ])
 
   const [createLoading, setCreateLoading] = useState(false)
 
@@ -196,9 +201,7 @@ const useAction = (props: {
   // 处理点击创建群组
   const handleCreateGroup = () => {
     let requestData: IWorkGroupCreate
-    !groupOwner?.id
-      ? setTipsObject({ show: true, msg: "Please select a valid group owner" })
-      : !groupName
+    !groupName
       ? setTipsObject({ show: true, msg: "Please input a valid group name" })
       : groupDeptUserSelectedList.length <= 1
       ? setTipsObject({
@@ -215,18 +218,28 @@ const useAction = (props: {
             owner: groupOwner.id as string,
             userList: groupDeptUserSelectedList.map((item) => item.id as string)
           }
+          if (requestData.owner === defaultGroupOwner.id)
+            delete requestData.owner
           setOpenFunction(false)
           PostWeChatWorkGroupCreate(requestData).then((data) => {
             if (data && data.errmsg === "ok") {
               setTipsObject({ msg: "创建成功", show: true })
               setIsRefresh(true)
-              setTimeout(() => {
-                setCreateLoading(false)
-              }, 500)
+              setCreateLoading(false)
               // 清空数据
-              setGroupDeptUserSelectedList([])
+              setGroupDeptUserList((prev) => {
+                const newValue = prev.filter((x) => x)
+                const hasData = newValue.find((x) => x.key === AppId)
+                hasData &&
+                  recursiveSeachDeptOrUser(hasData.data, (e) => {
+                    e.selected = false
+                  })
+                return newValue
+              })
               setGroupOwner(defaultGroupOwner)
               setGroupName("")
+            } else {
+              data && setTipsObject({ msg: data.errmsg, show: true })
             }
           })
         })()
@@ -339,6 +352,7 @@ const useAction = (props: {
     groupDeptUserList,
     createLoading,
     groupValue,
+    sendList,
     setGroupValue,
     setCreateLoading,
     setGroupDeptUserList,
