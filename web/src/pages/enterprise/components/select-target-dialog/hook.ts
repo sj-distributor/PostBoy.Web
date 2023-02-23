@@ -73,8 +73,8 @@ const useAction = (props: {
     IDepartmentKeyControl[]
   >([])
   const [sendList, setSendList] = useState([
-    SendObjOrGroup.Group,
-    SendObjOrGroup.Object
+    SendObjOrGroup.Object,
+    SendObjOrGroup.Group
   ])
 
   const [createLoading, setCreateLoading] = useState(false)

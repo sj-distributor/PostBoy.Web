@@ -345,13 +345,18 @@ const SelectTargetDialog = memo(
                     openOnFocus
                     size="small"
                     sx={{ margin: "1rem 0 0" }}
+                    componentsProps={{
+                      paper: { elevation: 3 },
+                      popper: {
+                        placement: "top"
+                      }
+                    }}
                     value={
                       chatId
                         ? groupList.filter((x) => x.chatId === chatId)[0]
                         : null
                     }
                     options={groupList}
-                    componentsProps={{ paper: { elevation: 3 } }}
                     getOptionLabel={(option) => option.chatName}
                     isOptionEqualToValue={(option, value) =>
                       option.chatId === value.chatId
