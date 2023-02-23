@@ -371,7 +371,7 @@ const SelectTargetDialog = memo(
                         {...params}
                         className={styles.InputButton}
                         margin="dense"
-                        type="button"
+                        type="text"
                         label="群组列表"
                       />
                     )}
