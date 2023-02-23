@@ -200,37 +200,9 @@ const SelectTargetDialog = memo(
           >
             <>{clickName}</>
             {clickName === "选择发送目标" && (
-              <div style={{ display: "flex" }}>
-                <Autocomplete
-                  disableClearable
-                  id="type-simple-select"
-                  value={sendType}
-                  size="small"
-                  sx={{ marginRight: "1rem" }}
-                  options={sendList}
-                  getOptionLabel={(x) =>
-                    x === SendObjOrGroup.Group ? "群组" : "对象"
-                  }
-                  onChange={(e, value) => {
-                    setSendType && setSendType(value)
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      className={styles.InputButton}
-                      margin="dense"
-                      type="button"
-                      label="SendType"
-                    />
-                  )}
-                />
-                <Button
-                  variant="outlined"
-                  onClick={() => setIsShowDialog(true)}
-                >
-                  创建群组
-                </Button>
-              </div>
+              <Button variant="outlined" onClick={() => setIsShowDialog(true)}>
+                创建群组
+              </Button>
             )}
           </DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
@@ -267,6 +239,30 @@ const SelectTargetDialog = memo(
                 />
               )}
             </div>
+            {clickName === "选择发送目标" && (
+              <Autocomplete
+                disableClearable
+                fullWidth
+                id="type-simple-select"
+                value={sendType}
+                size="small"
+                options={sendList}
+                getOptionLabel={(x) =>
+                  x === SendObjOrGroup.Group ? "群组" : "对象"
+                }
+                onChange={(e, value) => {
+                  setSendType && setSendType(value)
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    className={styles.InputButton}
+                    margin="dense"
+                    type="button"
+                  />
+                )}
+              />
+            )}
 
             {clickName === "选择发送目标" &&
             sendType !== SendObjOrGroup.Object ? (
@@ -280,6 +276,12 @@ const SelectTargetDialog = memo(
                   multiple
                   disableCloseOnSelect
                   size="small"
+                  sx={{
+                    margin:
+                      clickName === "选择发送目标"
+                        ? "1rem 0 calc(1rem - 4px)"
+                        : ""
+                  }}
                   componentsProps={{
                     paper: { elevation: 3 },
                     popper: {
@@ -342,7 +344,7 @@ const SelectTargetDialog = memo(
                     disablePortal
                     openOnFocus
                     size="small"
-                    sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
+                    sx={{ margin: "1rem 0 0" }}
                     value={
                       chatId
                         ? groupList.filter((x) => x.chatId === chatId)[0]
