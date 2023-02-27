@@ -27,7 +27,6 @@ import {
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import TimeSelector from "../time-selector"
 import DateSelector from "../date-selector"
-import { GetWeChatWorkCorpAppGroups } from "../../../../api/enterprise"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
