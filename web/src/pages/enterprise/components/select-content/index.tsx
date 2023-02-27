@@ -353,49 +353,51 @@ const SelectContent = memo(
           />
         </div>
         <div className={styles.typeShow}>
-          <div className={styles.rowBox}>
-            <div className={styles.titleAndContentinputBox}>
-              <Autocomplete
-                openOnFocus
-                disablePortal
-                fullWidth
-                multiple
-                readOnly
-                id="Autocomplete-messageTypeListId"
-                disableClearable
-                options={[]}
-                className={styles.input}
-                value={selectedShowArr}
-                popupIcon={<></>}
-                getOptionLabel={(option) =>
-                  typeof option === "string" ? option : option.chatName
-                }
-                isOptionEqualToValue={(option, value) =>
-                  typeof option === "string"
-                    ? !!option
-                    : typeof value !== "string"
-                    ? option.chatId === value.chatId
-                    : typeof option === "string"
-                    ? option === value
-                    : false
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.corpInput}
-                    type="button"
-                    label="发送目标"
-                    onClick={() => {
-                      setIsShowDialog(true)
-                      setClickName("选择发送目标")
-                    }}
-                  />
-                )}
-                PopperComponent={() => <></>}
-                onChange={(e, value) => {}}
-              />
+          {selectedShowArr.length > 0 && (
+            <div className={styles.rowBox}>
+              <div className={styles.titleAndContentinputBox}>
+                <Autocomplete
+                  openOnFocus
+                  disablePortal
+                  fullWidth
+                  multiple
+                  readOnly
+                  id="Autocomplete-messageTypeListId"
+                  disableClearable
+                  options={[]}
+                  className={styles.input}
+                  value={selectedShowArr}
+                  popupIcon={<></>}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.chatName
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    typeof option === "string"
+                      ? !!option
+                      : typeof value !== "string"
+                      ? option.chatId === value.chatId
+                      : typeof option === "string"
+                      ? option === value
+                      : false
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.corpInput}
+                      type="button"
+                      label="发送目标"
+                      onClick={() => {
+                        setIsShowDialog(true)
+                        setClickName("选择发送目标")
+                      }}
+                    />
+                  )}
+                  PopperComponent={() => <></>}
+                  onChange={(e, value) => {}}
+                />
+              </div>
             </div>
-          </div>
+          )}
           <div className={styles.rowBox}>
             <div className={styles.titleAndContentinputBox}>
               <TextField
