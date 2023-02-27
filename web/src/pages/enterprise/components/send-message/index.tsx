@@ -19,6 +19,7 @@ import { MessageJobDestination } from "../../../../dtos/enterprise"
 const SendMessage = () => {
   const {
     setSendData,
+    sendData,
     clickSendRecord,
     isShowMessageParams,
     setIsShowMessageParams,
@@ -69,6 +70,7 @@ const SendMessage = () => {
       <div className={styles.selectInputBox}>
         <SelectContent
           getSendData={setSendData}
+          sendData={sendData}
           isNewOrUpdate={"new"}
           showErrorPrompt={showErrorPrompt}
           clearData={clearData}

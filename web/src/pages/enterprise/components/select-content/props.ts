@@ -1,10 +1,11 @@
 import {
   ILastShowTableData,
   ISendMessageCommand,
-  IUpdateMessageCommand,
+  IUpdateMessageCommand
 } from "../../../../dtos/enterprise"
 
 export interface SelectContentProps {
+  sendData?: ISendMessageCommand
   getSendData?: React.Dispatch<
     React.SetStateAction<ISendMessageCommand | undefined>
   >
@@ -19,6 +20,7 @@ export interface SelectContentProps {
 }
 
 export interface SelectContentHookProps {
+  outerSendData: ISendMessageCommand | undefined
   getSendData?: React.Dispatch<
     React.SetStateAction<ISendMessageCommand | undefined>
   >

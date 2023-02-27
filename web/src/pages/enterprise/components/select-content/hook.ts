@@ -36,6 +36,7 @@ import { SelectContentHookProps } from "./props"
 
 export const useAction = (props: SelectContentHookProps) => {
   const {
+    outerSendData,
     getSendData,
     isNewOrUpdate,
     getUpdateData,
@@ -133,6 +134,34 @@ export const useAction = (props: SelectContentHookProps) => {
     SendObjOrGroup.Object
   )
 
+  const selectedShowArr = useMemo(() => {
+    const result = []
+    const partiesSelected = flattenDepartmentList.find(
+      (e) => e.key === corpAppValue?.appId
+    )?.data
+
+    if (sendType === SendObjOrGroup.Object) {
+      outerSendData?.workWeChatAppNotification?.toParties &&
+        partiesSelected &&
+        result.push(
+          ...partiesSelected
+            .filter((e) =>
+              outerSendData.workWeChatAppNotification?.toParties?.some(
+                (item) => item === String(e.id)
+              )
+            )
+            .map((e) => e.name)
+        )
+      outerSendData?.workWeChatAppNotification?.toUsers &&
+        result.push(...outerSendData.workWeChatAppNotification.toUsers)
+      outerSendData?.workWeChatAppNotification?.toTags &&
+        result.push(...outerSendData.workWeChatAppNotification.toTags)
+    } else {
+      result.push(...groupList.filter((x) => x.chatId === chatId))
+    }
+    return result
+  }, [outerSendData?.workWeChatAppNotification, chatId])
+
   // 初始化企业数组
   useEffect(() => {
     GetCorpsList().then((data: ICorpData[] | null | undefined) => {
@@ -181,6 +210,13 @@ export const useAction = (props: SelectContentHookProps) => {
       )
       GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
         data && setGroupList(data)
+      })
+      // 清空切换应用时的已选值
+      setChatId("")
+      setTagsValue([])
+      setSendObject({
+        toUsers: [],
+        toParties: []
       })
     }
   }, [corpAppValue?.appId])
@@ -687,7 +723,6 @@ export const useAction = (props: SelectContentHookProps) => {
   // sendParameter
   useEffect(() => {
     const a: SendParameter = {
-      ...sendParameter,
       appId: !!corpAppValue?.appId ? corpAppValue?.appId : ""
     }
     if (!isEmpty(tagsNameList)) {
@@ -967,6 +1002,7 @@ export const useAction = (props: SelectContentHookProps) => {
     tagsList,
     chatId,
     sendType,
+    selectedShowArr,
     setSendType,
     setChatId,
     setTagsValue,

@@ -104,6 +104,7 @@ const useAction = () => {
 
   return {
     setSendData,
+    sendData,
     promptText,
     openError,
     clickSendRecord,
