@@ -533,7 +533,7 @@ const SelectContent = memo(
     )
   },
   (prevProps, nextProps) => {
-    return prevProps.sendData === nextProps.sendData
+    return prevProps.sendData === nextProps.sendData && prevProps === nextProps
   }
 )
 
