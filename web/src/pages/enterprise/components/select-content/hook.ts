@@ -588,7 +588,7 @@ export const useAction = (props: SelectContentHookProps) => {
           return "video/mp4"
         }
         default: {
-          return "application/*"
+          return ""
         }
       }
   }, [messageTypeValue])
