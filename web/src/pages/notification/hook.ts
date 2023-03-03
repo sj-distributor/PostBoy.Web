@@ -111,6 +111,7 @@ export const useAction = (recordType: MessageJobDestination) => {
   const [deleteId, setDeleteId] = useState<string>("")
   const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([])
   const [alertShow, setAlertShow] = useBoolean(false)
+  const [deleteShow, setDeleteShow] = useBoolean(false)
   const [loading, setLoading] = useBoolean(false)
 
   const [promptText, setPromptText] = useState<string>("")
@@ -134,6 +135,10 @@ export const useAction = (recordType: MessageJobDestination) => {
     if (item.jobType !== MessageJobSendType.Fire) {
       setUpdateMessageJobInformation(item)
       noticeSettingRef.current?.open()
+      return
+    }
+    if(item.isDelete){
+      setDeleteShow.setTrue()
       return
     }
     setAlertShow.setTrue()
@@ -168,11 +173,17 @@ export const useAction = (recordType: MessageJobDestination) => {
           result: item.result,
           state: messageSendResultType[item.result],
           sendTheObject:
-            recordType === MessageJobDestination.WorkWeChat ? toObject : sendTo,
+            item.target !== null
+              ? item.target
+              : recordType === MessageJobDestination.WorkWeChat
+              ? toObject
+              : sendTo,
           errorSendtheobject:
-            JSON.parse(item.responseJson).invaliduser !== null
+            item.exception !== null
+              ? item.exception
+              : JSON.parse(item.responseJson).invaliduser !== null
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
-              : ""
+              : "",
         })
       })
     return sendRecordArray
@@ -254,7 +265,11 @@ export const useAction = (recordType: MessageJobDestination) => {
     setDto((prev) => ({ ...prev, [k]: v }))
   }
 
-  const onDeleteMessageJobConfirm = (id: string) => {
+  const onDeleteMessageJobConfirm = (id: string, isDelete: boolean) => {
+    if(isDelete){
+      setDeleteShow.setTrue()
+      return
+    }
     deleteConfirmRef.current?.open()
     setDeleteId(id)
   }
@@ -266,6 +281,14 @@ export const useAction = (recordType: MessageJobDestination) => {
       }, 1200)
     }
   }, [alertShow])
+
+  useEffect(() => {
+    if (deleteShow) {
+      setTimeout(() => {
+        setDeleteShow.setFalse()
+      }, 1200)
+    }
+  }, [deleteShow])
 
   // 延迟关闭警告提示
   useEffect(() => {
@@ -289,6 +312,7 @@ export const useAction = (recordType: MessageJobDestination) => {
     sendRecordList,
     updateMessageJobInformation,
     alertShow,
+    deleteShow,
     deleteId,
     loading,
     setLoading,

@@ -35,6 +35,7 @@ const SendNotice = React.memo(
       sendRecordList,
       updateMessageJobInformation,
       alertShow,
+      deleteShow,
       deleteId,
       loading,
       setLoading,
@@ -160,7 +161,7 @@ const SendNotice = React.memo(
             </p>
             <p
               className={styles.text}
-              onClick={() => onDeleteMessageJobConfirm(params.row.id)}
+              onClick={() => onDeleteMessageJobConfirm(params.row.id, params.row.isDelete)}
             >
               【删除】
             </p>
@@ -193,6 +194,11 @@ const SendNotice = React.memo(
         {alertShow && (
           <Alert severity="error" className={styles.alert}>
             即时发送类型不能设置!
+          </Alert>
+        )}
+         {deleteShow && (
+          <Alert severity="error" className={styles.alert}>
+            该条发送记录已被删除,不能做任何操作!
           </Alert>
         )}
         <div
