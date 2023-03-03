@@ -209,6 +209,8 @@ export enum MessageJobDestination {
 
 export interface IMessageJobRecord extends IMessageJobRecordSame {
   responseJson: string
+  target: string
+  exception: string
 }
 
 export interface IMessageJobRecordSame {
