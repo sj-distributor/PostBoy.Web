@@ -36,14 +36,13 @@ const TimeSelector = (props: {
             locale={"zh_CN"}
           />
         </div>
-        {moment(endDateValue).format("yyyy-MM-DDTHH:mm")}
         <TextField
           label="终止时间"
           type="datetime-local"
           sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
           defaultValue={
             !!endDateValue
-              ? moment(endDateValue).format("yyyy-MM-DDThh:mm")
+              ? moment(endDateValue).format("yyyy-MM-DDTHH:mm")
               : ""
           }
           InputLabelProps={{
