@@ -36,6 +36,7 @@ const TimeSelector = (props: {
             locale={"zh_CN"}
           />
         </div>
+        {moment(endDateValue).format("yyyy-MM-DDTHH:mm")}
         <TextField
           label="终止时间"
           type="datetime-local"
