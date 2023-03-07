@@ -42,7 +42,7 @@ const TimeSelector = (props: {
           sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
           defaultValue={
             !!endDateValue
-              ? moment(endDateValue).format("yyyy-MM-DDThh:mm")
+              ? moment(endDateValue).format("yyyy-MM-DDTHH:mm")
               : ""
           }
           InputLabelProps={{
