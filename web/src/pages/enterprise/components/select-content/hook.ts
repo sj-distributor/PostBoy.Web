@@ -5,7 +5,8 @@ import {
   GetCorpsList,
   GetDeptsAndUserList,
   GetTagsList,
-  GetWeChatWorkCorpAppGroups
+  GetWeChatWorkCorpAppGroups,
+  PostAttachmentUpload,
 } from "../../../../api/enterprise"
 import {
   DepartmentAndUserType,
@@ -33,6 +34,10 @@ import {
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job"
 import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
+import * as wangEditor from "@wangeditor/editor"
+import { annexEditorConfig } from "../../../../uilts/wangEditor"
+
+type InsertFnType = (url: string, alt: string, href: string) => void
 
 export const useAction = (props: SelectContentHookProps) => {
   const {
@@ -134,6 +139,41 @@ export const useAction = (props: SelectContentHookProps) => {
     SendObjOrGroup.Object
   )
 
+  const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null)
+
+  const [html, setHtml] = useState("")
+
+  const editorConfig = {
+    placeholder: "请输入内容...",
+    autoFocus: false,
+    hoverbarKeys: {
+      ...annexEditorConfig.hoverbarKeys,
+    },
+    MENU_CONF: {
+      uploadImage: {
+        async customUpload(file: File, insertFn: InsertFnType) {
+          if (file.size / 1024 > 10 * 1024) {
+            showErrorPrompt("The Image size is too large!")
+            return
+          }
+          const formData = new FormData()
+          formData.append("file", file)
+          PostAttachmentUpload(formData).then((res) => {
+            if (res) insertFn(res?.fileUrl, res.fileName, res.filePath)
+          })
+        },
+      },
+    },
+  }
+
+  useEffect(() => {
+    return () => {
+      if (editor == null) return
+      editor.destroy()
+      setEditor(null)
+    }
+  }, [editor])
+
   const selectedShowArr = useMemo(() => {
     const result = []
     const partiesSelected = flattenDepartmentList.find(
@@ -202,7 +242,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 获取Tags数组
   useEffect(() => {
-    if (corpAppValue?.appId !== undefined) {
+    if (corpAppValue?.appId !== undefined && isNewOrUpdate === "new") {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
           tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
@@ -446,6 +486,7 @@ export const useAction = (props: SelectContentHookProps) => {
         hasData && (hasData.data = [])
         return newValue
       })
+
       !updateMessageJobInformation?.workWeChatAppNotification &&
         setSendObject({
           toUsers: [],
@@ -499,7 +540,7 @@ export const useAction = (props: SelectContentHookProps) => {
       const isExceedSize = judgingFileSize("图文", array)
       if (isExceedSize) {
         e.target.value = ""
-        showErrorPrompt("The file size is too large！")
+        showErrorPrompt("The file size is too large!")
       } else {
         if (array.length > 0) {
           const objectList: PictureText[] = []
@@ -507,7 +548,7 @@ export const useAction = (props: SelectContentHookProps) => {
             const base64 = await convertBase64(array[key])
             objectList.push({
               title: title,
-              content: content,
+              content: html,
               fileContent: base64 as string,
               fileName: array[key].name
             })
@@ -622,7 +663,7 @@ export const useAction = (props: SelectContentHookProps) => {
     if (messageTypeValue.groupBy === "" && messageTypeValue.title === "图文") {
       if (pictureText.length > 0) {
         const newArr = pictureText.map((item) => {
-          item.content = content
+          item.content = html
           item.title = title
           return item
         })
@@ -630,14 +671,14 @@ export const useAction = (props: SelectContentHookProps) => {
       }
       if (lastTimePictureText.length > 0) {
         const lastArr = lastTimePictureText.map((item) => {
-          item.content = content
+          item.content = html
           item.title = title
           return item
         })
         setLastTimePictureText(lastArr)
       }
     }
-  }, [content, title])
+  }, [html, title])
 
   // jobSetting参数
   useEffect(() => {
@@ -680,7 +721,7 @@ export const useAction = (props: SelectContentHookProps) => {
       case "文本": {
         setSendData({
           text: {
-            content: content
+            content: `${title}<br>${content}`,
           }
         })
         break
@@ -711,6 +752,7 @@ export const useAction = (props: SelectContentHookProps) => {
       }
     }
   }, [
+    title,
     content,
     pictureText,
     file,
@@ -742,6 +784,11 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     if (updateMessageJobInformation !== undefined) {
+      GetWeChatWorkCorpAppGroups(updateMessageJobInformation.app.id).then(
+        (data) => {
+          data && setGroupList(data)
+        }
+      )
       setCorpsValue(updateMessageJobInformation.enterprise)
       setCorpAppValue(updateMessageJobInformation.app)
       setSendTypeValue(updateMessageJobInformation.jobType)
@@ -782,7 +829,7 @@ export const useAction = (props: SelectContentHookProps) => {
         }
         setLastTimePictureText(workWeChatAppNotification.mpNews?.articles)
         setMessageTypeValue(messageTypeList[1])
-        setContent(workWeChatAppNotification.mpNews?.articles[0].content)
+        setHtml(workWeChatAppNotification.mpNews?.articles[0].content)
       } else if (workWeChatAppNotification.file !== null) {
         setLastTimeFile({
           fileName: !!workWeChatAppNotification.file?.fileName
@@ -976,6 +1023,8 @@ export const useAction = (props: SelectContentHookProps) => {
           return item
         })
       })
+      setHtml("")
+      setEditor(null)
     }
   }, [clearData, isNewOrUpdate])
 
@@ -1034,6 +1083,11 @@ export const useAction = (props: SelectContentHookProps) => {
     fileMark,
     clickName,
     setClickName,
-    setFlattenDepartmentList
+    setFlattenDepartmentList,
+    editor,
+    setEditor,
+    editorConfig,
+    html,
+    setHtml,
   }
 }

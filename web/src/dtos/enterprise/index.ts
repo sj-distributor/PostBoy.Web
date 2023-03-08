@@ -398,3 +398,12 @@ export enum SendObjOrGroup {
   Object,
   Group
 }
+
+export interface UploadAttachmentResponseData {
+  id: string
+  createdDate: string
+  fileUrl: string
+  fileName: string
+  fileSize: number
+  filePath: string
+}
