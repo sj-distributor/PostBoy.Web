@@ -20,25 +20,6 @@ export enum ResponseCode {
   InternalServerError = 500,
 }
 
-const getHeader = (fromData: FormData) => {
-  return fromData
-    ? {
-        Authorization:
-          "Bearer " +
-          (localStorage.getItem("token")
-            ? (localStorage.getItem("token") as string)
-            : ""),
-        "Content-Type": "application/json",
-      }
-    : {
-        Authorization:
-          "Bearer " +
-          (localStorage.getItem("token")
-            ? (localStorage.getItem("token") as string)
-            : ""),
-      }
-}
-
 export async function base<T>(
   url: string,
   method: "get" | "post",
