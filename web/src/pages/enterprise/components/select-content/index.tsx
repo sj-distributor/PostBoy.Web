@@ -27,6 +27,8 @@ import {
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import TimeSelector from "../time-selector"
 import DateSelector from "../date-selector"
+import { Editor, Toolbar } from "@wangeditor/editor-for-react"
+import * as wangEditor from "@wangeditor/editor"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -95,7 +97,12 @@ const SelectContent = memo(
       fileMark,
       sendType,
       setSendType,
-      selectedShowArr
+      selectedShowArr,
+      editor,
+      setEditor,
+      html,
+      setHtml,
+      editorConfig,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -192,6 +199,33 @@ const SelectContent = memo(
         : messageTypeValue.title !== "图文"
         ? !!file && fileOrImage(file, state)
         : !!pictureText && pictureImage(pictureText, state)
+    }
+
+    const toolbarConfig: Partial<wangEditor.IToolbarConfig> = {
+      toolbarKeys: [
+        "fontFamily",
+        "fontSize",
+        "color",
+        "|",
+        "bold",
+        "italic",
+        "underline",
+        "through",
+        "bgColor",
+        "sup",
+        "sub",
+        "|",
+        "bulletedList",
+        "numberedList",
+        "justifyJustify",
+        "delIndent",
+        "indent",
+        "|",
+        "insertLink",
+        "redo",
+        "undo",
+        "uploadImage",
+      ],
     }
 
     return (
@@ -407,9 +441,7 @@ const SelectContent = memo(
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              {(messageTypeValue.type === MessageDataFileType.Text ||
-                (messageTypeValue.type === MessageDataFileType.Image &&
-                  messageTypeValue.groupBy === "")) && (
+              {messageTypeValue.type === MessageDataFileType.Text && (
                 <TextField
                   className={styles.input}
                   label="内容"
@@ -420,6 +452,25 @@ const SelectContent = memo(
                   onChange={(e) => setContent(e.target.value)}
                 />
               )}
+              {messageTypeValue.type === MessageDataFileType.Image &&
+                messageTypeValue.groupBy === "" && (
+                  <div style={{ border: "0.1rem solid #BEBEBE" }}>
+                    <Toolbar
+                      editor={editor}
+                      defaultConfig={toolbarConfig}
+                      mode="default"
+                      style={{ borderBottom: "1px solid #ccc" }}
+                    />
+                    <Editor
+                      defaultConfig={editorConfig}
+                      value={html}
+                      onCreated={setEditor}
+                      onChange={(editor) => setHtml(editor.getHtml())}
+                      mode="default"
+                      style={{ height: "25rem" }}
+                    />
+                  </div>
+                )}
             </div>
           </div>
           <div className={styles.rowBox}>
@@ -435,48 +486,53 @@ const SelectContent = memo(
                       width: "6rem"
                     }}
                   >
-                    上传文件
                     {messageTypeValue.title === "图文" ? (
-                      <input
-                        ref={inputRef}
-                        hidden
-                        type="file"
-                        accept="image/jpg,image/png"
-                        multiple
-                        onChange={(e) =>
-                          !!e.target.files &&
-                          fileUpload(e.target.files, "图文", e)
-                        }
-                      />
+                      <>
+                        封面图片
+                        <input
+                          ref={inputRef}
+                          hidden
+                          type="file"
+                          accept="image/jpg, image/png"
+                          multiple
+                          onChange={(e) =>
+                            !!e.target.files &&
+                            fileUpload(e.target.files, "图文", e)
+                          }
+                        />
+                      </>
                     ) : (
-                      <input
-                        ref={inputRef}
-                        hidden
-                        type="file"
-                        accept={fileAccept}
-                        onChange={(e) =>
-                          !!e.target.files &&
-                          fileUpload(e.target.files, "文件", e)
-                        }
-                      />
+                      <>
+                        上传文件
+                        <input
+                          ref={inputRef}
+                          hidden
+                          type="file"
+                          accept={fileAccept}
+                          onChange={(e) =>
+                            !!e.target.files &&
+                            fileUpload(e.target.files, "文件", e)
+                          }
+                        />
+                      </>
                     )}
                   </Button>
                   {!!fileMark && <div className={styles.mark}>{fileMark}</div>}
                 </div>
                 <div className={styles.information}>
-                  {lastTimeFile !== undefined &&
-                    lastTimePictureText !== undefined && (
-                      <>
-                        <div className={styles.sendBox}>
-                          {displayByType(
-                            "old",
-                            lastTimeFile,
-                            lastTimePictureText
-                          )}
-                        </div>
-                        <div className={styles.separate} />
-                      </>
-                    )}
+                  {(lastTimeFile !== undefined ||
+                    lastTimePictureText !== undefined) && (
+                    <>
+                      <div className={styles.sendBox}>
+                        {displayByType(
+                          "old",
+                          lastTimeFile,
+                          lastTimePictureText
+                        )}
+                      </div>
+                      <div className={styles.separate} />
+                    </>
+                  )}
                   <div className={styles.sendBox}>
                     {displayByType("new", file, pictureText)}
                   </div>
