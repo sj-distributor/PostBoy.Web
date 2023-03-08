@@ -535,7 +535,7 @@ export const useAction = (props: SelectContentHookProps) => {
         Array.from(files).length > 8
           ? Array.from(files).slice(-8)
           : Array.from(files)
-      
+
       const isExceedSize = judgingFileSize("图文", array)
       const isHaveJpegImage = array.some((x) => x.type === "image/jpeg")
       if (isExceedSize) {
