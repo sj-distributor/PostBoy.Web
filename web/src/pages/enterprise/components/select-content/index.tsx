@@ -521,7 +521,7 @@ const SelectContent = memo(
                 </div>
                 <div className={styles.information}>
                   {(lastTimeFile !== undefined ||
-                    lastTimePictureText !== undefined) && (
+                    lastTimePictureText !== undefined) && isNewOrUpdate === "update" && (
                     <>
                       <div className={styles.sendBox}>
                         {displayByType(

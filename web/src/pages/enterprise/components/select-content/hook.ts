@@ -538,13 +538,9 @@ export const useAction = (props: SelectContentHookProps) => {
           : Array.from(files)
 
       const isExceedSize = judgingFileSize("图文", array)
-      const isHaveJpegImage = array.some((x) => x.type === "image/jpeg")
       if (isExceedSize) {
         e.target.value = ""
         showErrorPrompt("The file size is too large!")
-      } else if (isHaveJpegImage) {
-        e.target.value = ""
-        showErrorPrompt("The Image Type is Jpeg!")
       } else {
         if (array.length > 0) {
           const objectList: PictureText[] = []
@@ -567,15 +563,9 @@ export const useAction = (props: SelectContentHookProps) => {
           Array.from(files),
           messageTypeValue.type
         )
-        const isHaveJpegImage = Array.from(files).some(
-          (x) => x.type === "image/jpeg"
-        )
         if (isExceedSize) {
           e.target.value = ""
           showErrorPrompt("The file size is too large！")
-        } else if (isHaveJpegImage) {
-          e.target.value = ""
-          showErrorPrompt("The Image Type is Jpeg!")
         } else {
           const file = files[0]
           const base64 = await convertBase64(file)
