@@ -1,7 +1,7 @@
 import {
   ISendMessageCommand,
   IUpdateMessageCommand,
-  MessageDataFileType
+  MessageDataFileType,
 } from "../../dtos/enterprise"
 
 export const parameterJudgment = (
@@ -35,17 +35,29 @@ export const parameterJudgment = (
       data.workWeChatAppNotification?.file === undefined
     ) {
       showErrorPrompt("Please fill in the sending information!")
-    } else if (!data.metadata?.find((x) => x.key === "title")?.value) {
+    } else if (
+      (!data.metadata?.find((x) => x.key === "title")?.value &&
+        data.metadata?.find((x) => x.key === "title") === undefined) ||
+      (data.metadata?.find((x) => x.key === "title") !== undefined &&
+        data.metadata?.find((x) => x.key === "title")?.value.length === 0)
+    ) {
       showErrorPrompt("Please fill in the title!")
     } else if (
       data.workWeChatAppNotification?.text !== undefined &&
-      !data.workWeChatAppNotification?.text.content
+      (!data.workWeChatAppNotification?.text.content ||
+        data.workWeChatAppNotification?.text.content === "")
     ) {
       showErrorPrompt("Please fill in the sending text!")
     } else if (
       data.workWeChatAppNotification !== undefined &&
       data.workWeChatAppNotification.mpNews !== undefined &&
-      data.workWeChatAppNotification.mpNews.articles.length <= 0
+      (data.workWeChatAppNotification.mpNews.articles.length <= 0 ||
+        data.workWeChatAppNotification.mpNews.articles.some(
+          (x) => x.content === "<p><br></p>"
+        ) ||
+        data.workWeChatAppNotification.mpNews.articles.some(
+          (x) => x.title === ""
+        ))
     ) {
       showErrorPrompt("Please fill in the graphic information!")
     } else if (
