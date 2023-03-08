@@ -454,7 +454,7 @@ const SelectContent = memo(
               )}
               {messageTypeValue.type === MessageDataFileType.Image &&
                 messageTypeValue.groupBy === "" && (
-                  <div style={{ border: "0.1rem solid #BEBEBE" }}>
+                  <div style={{ border: "0.1rem solid #BEBEBE", margin: "0.8rem 0" }}>
                     <Toolbar
                       editor={editor}
                       defaultConfig={toolbarConfig}

@@ -4,8 +4,8 @@ export async function Get<T>(url: string) {
   return base<T>(url, "get")
 }
 
-export async function Post<T>(url: string, data?: object, fromData?: FormData) {
-  return base<T>(url, "post", data, fromData)
+export async function Post<T>(url: string, data?: object | FormData) {
+  return base<T>(url, "post", data)
 }
 
 export interface IResponse<T> {
@@ -23,30 +23,24 @@ export enum ResponseCode {
 export async function base<T>(
   url: string,
   method: "get" | "post",
-  data?: object,
-  fromData?: FormData
+  data?: object | FormData
 ) {
   const settings = (window as any).appSettings as AppSettings
-  const header: { Authorization: string; "Content-Type"?: string } = fromData
-    ? {
-        Authorization:
-          "Bearer " +
-          (localStorage.getItem("token")
-            ? (localStorage.getItem("token") as string)
-            : ""),
-      }
-    : {
-        Authorization:
-          "Bearer " +
-          (localStorage.getItem("token")
-            ? (localStorage.getItem("token") as string)
-            : ""),
-        "Content-Type": "application/json",
-      }
+  const headers: { Authorization: string; "Content-Type"?: string } = {
+    Authorization:
+      "Bearer " +
+      (localStorage.getItem("token")
+        ? (localStorage.getItem("token") as string)
+        : ""),
+  }
+  const isFormData = data instanceof FormData
+  if (!isFormData) headers["Content-Type"] = "application/json"
+  const body = isFormData ? data : JSON.stringify(data)
+
   return await fetch(`${settings.serverUrl}${url}`, {
     method: method,
-    body: data ? JSON.stringify(data) : fromData ? fromData : undefined,
-    headers: header,
+    body: body,
+    headers: headers,
   })
     .then((res) => res.json())
     .then((res: IResponse<T>) => {

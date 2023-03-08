@@ -399,7 +399,7 @@ export enum SendObjOrGroup {
   Group
 }
 
-export interface AttachmentUploadReturnData {
+export interface UploadAttachmentResponseData {
   id: string
   createdDate: string
   fileUrl: string

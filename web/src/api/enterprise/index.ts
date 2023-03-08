@@ -16,7 +16,7 @@ import {
   IWorkGroupCreate,
   IGetDeptAndUsersResponse,
   ICreateGroupResonse,
-  AttachmentUploadReturnData,
+  UploadAttachmentResponseData,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -97,9 +97,8 @@ export const GetDeptsAndUserList = async (AppId: string) => {
 }
 
 export const PostAttachmentUpload = async (data: FormData) => {
-  return await Post<AttachmentUploadReturnData>(
+  return await Post<UploadAttachmentResponseData>(
     "/api/Attachment/upload",
-    undefined,
     data
   )
 }

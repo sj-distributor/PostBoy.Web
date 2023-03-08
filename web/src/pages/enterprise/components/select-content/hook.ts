@@ -242,7 +242,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 获取Tags数组
   useEffect(() => {
-    if (corpAppValue?.appId !== undefined) {
+    if (corpAppValue?.appId !== undefined && isNewOrUpdate === "new") {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
           tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
@@ -486,6 +486,7 @@ export const useAction = (props: SelectContentHookProps) => {
         hasData && (hasData.data = [])
         return newValue
       })
+
       !updateMessageJobInformation?.workWeChatAppNotification &&
         setSendObject({
           toUsers: [],
@@ -793,6 +794,11 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     if (updateMessageJobInformation !== undefined) {
+      GetWeChatWorkCorpAppGroups(updateMessageJobInformation.app.id).then(
+        (data) => {
+          data && setGroupList(data)
+        }
+      )
       setCorpsValue(updateMessageJobInformation.enterprise)
       setCorpAppValue(updateMessageJobInformation.app)
       setSendTypeValue(updateMessageJobInformation.jobType)
