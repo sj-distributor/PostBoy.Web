@@ -39,12 +39,7 @@ export const parameterJudgment = (
       } else if (
         workWeChatAppNotification.file !== undefined &&
         (workWeChatAppNotification.file.fileName.length <= 0 ||
-          workWeChatAppNotification.file.fileType ===
-            MessageDataFileType.Text ||
-          (workWeChatAppNotification.file.fileUrl !== undefined &&
-            workWeChatAppNotification.file.fileUrl.length <= 0) ||
-          (workWeChatAppNotification.file.fileContent !== undefined &&
-            workWeChatAppNotification.file.fileContent.length <= 0))
+          workWeChatAppNotification.file.fileType === MessageDataFileType.Text)
       ) {
         showErrorPrompt("Please upload the files to be sent!")
       } else if (
