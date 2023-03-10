@@ -456,8 +456,10 @@ const SelectContent = memo(
                 messageTypeValue.groupBy === "" && (
                   <div
                     style={{
-                      border: "0.1rem solid #BEBEBE",
+                      border: "1px solid #BEBEBE",
                       margin: "0.8rem 0",
+                      borderRadius: "4px",
+                      padding: "0.05rem",
                     }}
                   >
                     <Toolbar
