@@ -43,18 +43,28 @@ const useAction = () => {
       // 判断传入的信息是否填写正确
       if (parameterJudgment(cloneData, showErrorPrompt)) {
         if (!!cloneData) {
-          PostMessageSend(cloneData)
-            .then((res) => {
-              successAction.setTrue()
-              loadingAction.setFalse()
-              setTimeout(() => {
-                setClearData.setTrue()
-              }, 2000)
-            })
-            .catch((error) => {
-              loadingAction.setFalse()
-              failSendAction.setTrue()
-            })
+          const sendData = cloneData.workWeChatAppNotification
+          if (sendData) {
+            const { file, mpNews, text, ...data } = sendData
+            const isTextUndefined = text !== undefined
+            const isFileUndefined = file !== undefined
+            const isMpNewsUndefined = mpNews !== undefined
+            if (isTextUndefined) {
+              cloneData.workWeChatAppNotification = { ...data, text }
+              await sendMessage(
+                cloneData,
+                isTextUndefined && isFileUndefined ? () => {} : undefined
+              )
+            }
+            if (isFileUndefined) {
+              cloneData.workWeChatAppNotification = { ...data, file }
+              await sendMessage(cloneData)
+            }
+            if (isMpNewsUndefined) {
+              cloneData.workWeChatAppNotification = { ...data, mpNews }
+              await sendMessage(cloneData)
+            }
+          }
         }
       } else {
         loadingAction.setFalse()
@@ -62,13 +72,34 @@ const useAction = () => {
     }
   }
 
+  const sendMessage = async (
+    data: ISendMessageCommand,
+    thenFun?: () => void
+  ) => {
+    const defaultThenFun = () => {
+      successAction.setTrue()
+      loadingAction.setFalse()
+      setTimeout(() => {
+        setClearData.setTrue()
+      }, 2000)
+    }
+    await PostMessageSend(data)
+      .then(() => {
+        thenFun ? thenFun() : defaultThenFun()
+      })
+      .catch(() => {
+        loadingAction.setFalse()
+        failSendAction.setTrue()
+      })
+  }
+
   const buttonSx = {
     ...(success && {
       bgcolor: green[500],
       "&:hover": {
-        bgcolor: green[700]
-      }
-    })
+        bgcolor: green[700],
+      },
+    }),
   }
 
   // 弹出警告
@@ -117,7 +148,7 @@ const useAction = () => {
     showErrorPrompt,
     success,
     failSend,
-    clearData
+    clearData,
   }
 }
 
