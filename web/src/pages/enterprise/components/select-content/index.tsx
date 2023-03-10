@@ -567,11 +567,13 @@ const SelectContent = memo(
                     switchTimeZone(Number(e.target.value))
                   }}
                 >
-                  {timeZone.map((item, key) => (
-                    <MenuItem key={key} value={item.value}>
-                      {item.title}
-                    </MenuItem>
-                  ))}
+                  {timeZone
+                    .filter((x) => !x.disable)
+                    .map((item, key) => (
+                      <MenuItem key={key} value={item.value}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </div>

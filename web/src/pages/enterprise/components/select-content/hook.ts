@@ -69,7 +69,9 @@ export const useAction = (props: SelectContentHookProps) => {
     MessageJobSendType.Fire
   )
   // 时区选择
-  const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
+  const [timeZoneValue, setTimeZoneValue] = useState<number>(
+    timeZone.filter((x) => !x.disable)[0].value
+  )
   // 弹出选择对象框 boolean
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
   // 部门和用户数组

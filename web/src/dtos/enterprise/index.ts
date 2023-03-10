@@ -345,6 +345,7 @@ export interface SendTypeCustomListDto {
 export interface TimeZoneCustomListDto {
   title: string
   value: TimeType
+  disable: boolean
 }
 
 export enum ClickType {

@@ -14,7 +14,7 @@ import SendNotice from "../notification"
 import ClearIcon from "@mui/icons-material/Clear"
 import {
   MessageJobDestination,
-  MessageJobSendType
+  MessageJobSendType,
 } from "../../dtos/enterprise"
 import DateSelector from "../enterprise/components/date-selector"
 import TimeSelector from "../enterprise/components/time-selector"
@@ -28,7 +28,7 @@ import {
   DialogTitle,
   FormControl,
   InputLabel,
-  Snackbar
+  Snackbar,
 } from "@mui/material"
 import { green } from "@mui/material/colors"
 
@@ -80,7 +80,7 @@ const SendEmail = () => {
     handleClickSend,
     handleKeyDown,
     handleChange,
-    handleBlur
+    handleBlur,
   } = useAction()
 
   return (
@@ -90,7 +90,7 @@ const SendEmail = () => {
         open={openError}
         anchorOrigin={{
           vertical: "top",
-          horizontal: "center"
+          horizontal: "center",
         }}
       />
       <div className={styles.inputGroup}>
@@ -100,7 +100,7 @@ const SendEmail = () => {
           value={emailFrom.senderId}
           className={styles.selectInput}
           inputProps={{
-            type: "button"
+            type: "button",
           }}
           sx={inputSx}
           onChange={(event, child) => {
@@ -135,14 +135,14 @@ const SendEmail = () => {
                 top: "50%",
                 left: "50%",
                 marginTop: "-0.8rem",
-                marginLeft: "-0.8rem"
+                marginLeft: "-0.8rem",
               }}
             />
           )}
         </Box>
         <Button
           sx={{
-            marginLeft: "2rem"
+            marginLeft: "2rem",
           }}
           variant="contained"
           onClick={() => clickSendRecord("open")}
@@ -151,7 +151,7 @@ const SendEmail = () => {
         </Button>
         <Button
           sx={{
-            marginLeft: "2rem"
+            marginLeft: "2rem",
           }}
           variant="contained"
           onClick={() => setOpen(true)}
@@ -181,7 +181,7 @@ const SendEmail = () => {
                       marginLeft: "0.5rem",
                       border: !validateEmail(item)
                         ? "0.0625rem solid #d32f2f"
-                        : ""
+                        : "",
                     }}
                     label={item}
                     key={index}
@@ -203,7 +203,7 @@ const SendEmail = () => {
                   抄送
                 </Button>
               </InputAdornment>
-            )
+            ),
           }}
         />
       </div>
@@ -236,7 +236,7 @@ const SendEmail = () => {
                         marginLeft: "0.5rem",
                         border: !validateEmail(item)
                           ? "0.0625rem solid #d32f2f"
-                          : ""
+                          : "",
                       }}
                       label={item}
                       key={index}
@@ -251,7 +251,7 @@ const SendEmail = () => {
                     />
                   ))}
                 </InputAdornment>
-              )
+              ),
             }}
           />
         </div>
@@ -290,8 +290,8 @@ const SendEmail = () => {
         open={open}
         PaperProps={{
           sx: {
-            maxWidth: "none"
-          }
+            maxWidth: "none",
+          },
         }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -324,7 +324,7 @@ const SendEmail = () => {
               <FormControl
                 style={{
                   width: 252,
-                  margin: "0.8rem 0"
+                  margin: "0.8rem 0",
                 }}
               >
                 <InputLabel id="demo-simple-select-label">时区</InputLabel>
@@ -337,11 +337,13 @@ const SendEmail = () => {
                     setTimeZoneValue(Number(e.target.value))
                   }}
                 >
-                  {timeZone.map((item, key) => (
-                    <MenuItem key={key} value={item.value}>
-                      {item.title}
-                    </MenuItem>
-                  ))}
+                  {timeZone
+                    .filter((x) => !x.disable)
+                    .map((item, key) => (
+                      <MenuItem key={key} value={item.value}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             )}
