@@ -125,7 +125,7 @@ const useAction = () => {
         setSendLoading(false)
         // 清空数据
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
         })
         editor && editor.setHtml("<p></p>")
         setEmailCopyToArr([])
@@ -295,13 +295,13 @@ const useAction = () => {
     switch (sendTypeValue) {
       case MessageJobSendType.Fire: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
         })
         break
       }
       case MessageJobSendType.Delayed: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           delayedJob: {
             enqueueAt: dateValue,
           },
@@ -310,7 +310,7 @@ const useAction = () => {
       }
       default: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,

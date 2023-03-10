@@ -363,6 +363,7 @@ const SendEmail = () => {
                 setCronError={setCronError}
                 endDateValue={endDateValue}
                 setEndDateValue={setEndDateValue}
+                showErrorPrompt={showErrorPrompt}
               />
             )}
           </div>

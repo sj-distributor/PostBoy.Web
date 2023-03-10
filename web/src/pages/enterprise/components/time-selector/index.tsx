@@ -9,9 +9,16 @@ const TimeSelector = (props: {
   setCronError: React.Dispatch<React.SetStateAction<string>>
   endDateValue: string
   setEndDateValue: React.Dispatch<React.SetStateAction<string>>
+  showErrorPrompt: (text: string) => void
 }) => {
-  const { cronExp, setCronExp, setCronError, endDateValue, setEndDateValue } =
-    props
+  const {
+    cronExp,
+    setCronExp,
+    setCronError,
+    endDateValue,
+    setEndDateValue,
+    showErrorPrompt,
+  } = props
 
   return (
     <div style={{ marginBottom: "1rem" }}>
@@ -19,13 +26,13 @@ const TimeSelector = (props: {
         style={{
           display: "flex",
           flexDirection: "column",
-          width: "100%"
+          width: "100%",
         }}
       >
         <div
           style={{
             display: "flex",
-            flexDirection: "row"
+            flexDirection: "row",
           }}
         >
           <Scheduler
@@ -40,16 +47,21 @@ const TimeSelector = (props: {
           label="终止时间"
           type="datetime-local"
           sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
-          defaultValue={
+          value={
             !!endDateValue
               ? moment(endDateValue).format("yyyy-MM-DDTHH:mm")
               : ""
           }
           InputLabelProps={{
-            shrink: true
+            shrink: true,
           }}
           onChange={(e) => {
-            setEndDateValue((e.target as HTMLInputElement).value)
+            if (new Date((e.target as HTMLInputElement).value) >= new Date()) {
+              setEndDateValue((e.target as HTMLInputElement).value)
+            } else {
+              e.preventDefault()
+              showErrorPrompt("The end time cannot exceed the current time!")
+            }
           }}
         />
       </div>

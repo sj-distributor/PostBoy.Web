@@ -687,13 +687,13 @@ export const useAction = (props: SelectContentHookProps) => {
     switch (sendTypeValue) {
       case MessageJobSendType.Fire: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
         })
         break
       }
       case MessageJobSendType.Delayed: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           delayedJob: {
             enqueueAt: dateValue,
           },
@@ -702,7 +702,7 @@ export const useAction = (props: SelectContentHookProps) => {
       }
       default: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,
@@ -1009,7 +1009,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setTagsValue([])
       setMessageTypeValue(messageTypeList[0])
       setSendTypeValue(MessageJobSendType.Fire)
-      setTimeZoneValue(timeZone[0].value)
+      setTimeZoneValue(timeZone.filter((x) => !x.disable)[0].value)
       setSendObject({
         toUsers: [],
         toParties: [],

@@ -84,8 +84,12 @@ const useAction = () => {
       }, 2000)
     }
     await PostMessageSend(data)
-      .then(() => {
-        thenFun ? thenFun() : defaultThenFun()
+      .then((res) => {
+        if (res) thenFun ? thenFun() : defaultThenFun()
+        else {
+          loadingAction.setFalse()
+          failSendAction.setTrue()
+        }
       })
       .catch(() => {
         loadingAction.setFalse()
