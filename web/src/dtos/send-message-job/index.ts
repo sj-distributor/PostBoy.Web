@@ -23,6 +23,11 @@ export const sendTypeList: SendTypeCustomListDto[] = [
 ]
 
 export const timeZone: TimeZoneCustomListDto[] = [
-  { title: "UTC", value: TimeType.UTC },
-  { title: "America/Los_Angeles", value: TimeType.America },
+  { title: "UTC", value: TimeType.UTC, disable: true, convertTimeZone: "UTC" },
+  {
+    title: "PST",
+    value: TimeType.America,
+    disable: false,
+    convertTimeZone: "America/Los_Angeles",
+  },
 ]

@@ -19,9 +19,15 @@ export const parameterJudgment = (
         showErrorPrompt("Please select delivery time!")
       } else if (
         jobSetting.recurringJob !== undefined &&
-        Array.from(jobSetting.recurringJob.cronExpression.trim()).length !== 5
+        jobSetting.recurringJob.cronExpression.trim().split(" ").length !== 5
       ) {
         showErrorPrompt("Please select the sending period!")
+      } else if (
+        jobSetting.recurringJob !== undefined &&
+        jobSetting.recurringJob.endDate &&
+        new Date(jobSetting.recurringJob.endDate) < new Date()
+      ) {
+        showErrorPrompt("The end time cannot exceed the current time!")
       } else if (
         (!metadata?.find((x) => x.key === "title")?.value &&
           metadata?.find((x) => x.key === "title") === undefined) ||

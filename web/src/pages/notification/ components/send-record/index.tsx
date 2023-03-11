@@ -36,6 +36,12 @@ const SendRecord = memo(
         width: 150,
         renderCell: (params: GridCellParams) =>
           moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
+        cellClassName: (params: GridCellParams) => {
+          if (params.row.errorSendtheobject !== "") {
+            return styles.deletedColor
+          }
+          return ""
+        },
       },
       {
         field: "sendTheObject",
@@ -49,6 +55,12 @@ const SendRecord = memo(
         flex: 1,
         renderCell: (params: GridCellParams) =>
           asyncTootip(params.row.sendTheObject, styles.title),
+        cellClassName: (params: GridCellParams) => {
+          if (params.row.errorSendtheobject !== "") {
+            return styles.deletedColor
+          }
+          return ""
+        },
       },
       {
         field: "state",
@@ -60,6 +72,12 @@ const SendRecord = memo(
         disableColumnMenu: true,
         sortable: false,
         width: 100,
+        cellClassName: (params: GridCellParams) => {
+          if (params.row.errorSendtheobject !== "") {
+            return styles.deletedColor
+          }
+          return ""
+        },
       },
       {
         field: "errorSendtheobject",
@@ -77,6 +95,12 @@ const SendRecord = memo(
             styles.title,
             params.row.result
           ),
+        cellClassName: (params: GridCellParams) => {
+          if (params.row.errorSendtheobject !== "") {
+            return styles.deletedColor
+          }
+          return ""
+        },
       },
     ]
 

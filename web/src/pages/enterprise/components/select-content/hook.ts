@@ -69,7 +69,9 @@ export const useAction = (props: SelectContentHookProps) => {
     MessageJobSendType.Fire
   )
   // 时区选择
-  const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
+  const [timeZoneValue, setTimeZoneValue] = useState<number>(
+    timeZone.filter((x) => !x.disable)[0].value
+  )
   // 弹出选择对象框 boolean
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
   // 部门和用户数组
@@ -685,13 +687,13 @@ export const useAction = (props: SelectContentHookProps) => {
     switch (sendTypeValue) {
       case MessageJobSendType.Fire: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
         })
         break
       }
       case MessageJobSendType.Delayed: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           delayedJob: {
             enqueueAt: dateValue,
           },
@@ -700,7 +702,7 @@ export const useAction = (props: SelectContentHookProps) => {
       }
       default: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,
@@ -1007,7 +1009,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setTagsValue([])
       setMessageTypeValue(messageTypeList[0])
       setSendTypeValue(MessageJobSendType.Fire)
-      setTimeZoneValue(timeZone[0].value)
+      setTimeZoneValue(timeZone.filter((x) => !x.disable)[0].value)
       setSendObject({
         toUsers: [],
         toParties: [],

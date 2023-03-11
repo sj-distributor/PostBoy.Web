@@ -12,7 +12,7 @@ import { timeZone } from "../../dtos/send-message-job"
 const useAction = () => {
   const defaultEmailValue = {
     displayName: "",
-    senderId: ""
+    senderId: "",
   }
   // 富文本框实例
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null) // 存储 editor 实例
@@ -54,7 +54,9 @@ const useAction = () => {
   // 终止时间
   const [endDateValue, setEndDateValue] = useState<string>("")
   // 时区选择
-  const [timeZoneValue, setTimeZoneValue] = useState<number>(timeZone[0].value)
+  const [timeZoneValue, setTimeZoneValue] = useState<number>(
+    timeZone.filter((x) => !x.disable)[0].value
+  )
   const [open, setOpen] = useState(false)
   const [sendLoading, setSendLoading] = useState(false)
 
@@ -100,8 +102,8 @@ const useAction = () => {
       "|",
       "insertLink",
       "redo",
-      "undo"
-    ]
+      "undo",
+    ],
   }
   // 点击发送
   const handleClickSend = () => {
@@ -112,8 +114,8 @@ const useAction = () => {
         subject: emailSubject,
         body: editor ? editor.getText() : "",
         to: emailToArr,
-        cc: emailCopyToArr
-      }
+        cc: emailCopyToArr,
+      },
     }
     setSendLoading(true)
     checkObject() &&
@@ -123,7 +125,7 @@ const useAction = () => {
         setSendLoading(false)
         // 清空数据
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title
+          timezone: timeZone[timeZoneValue].convertTimeZone,
         })
         editor && editor.setHtml("<p></p>")
         setEmailCopyToArr([])
@@ -145,14 +147,14 @@ const useAction = () => {
     placeholder: "请输入内容...",
     autoFocus: false,
     hoverbarKeys: {
-      ...annexEditorConfig.hoverbarKeys
+      ...annexEditorConfig.hoverbarKeys,
     },
     MENU_CONF: {
       uploadImage: {
         // server: "/api/upload" 图片上传地址
       },
-      ...annexEditorConfig.MENU_CONF
-    }
+      ...annexEditorConfig.MENU_CONF,
+    },
   }
 
   const inputSx = { marginLeft: "1rem", flex: 1 }
@@ -208,11 +210,11 @@ const useAction = () => {
     return string
       ? {
           helperText: !validateEmail(string) ? "Incorrect entry." : "",
-          error: !validateEmail(string)
+          error: !validateEmail(string),
         }
       : {
           helperText: "",
-          error: false
+          error: false,
         }
   }
 
@@ -293,30 +295,30 @@ const useAction = () => {
     switch (sendTypeValue) {
       case MessageJobSendType.Fire: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title
+          timezone: timeZone[timeZoneValue].convertTimeZone,
         })
         break
       }
       case MessageJobSendType.Delayed: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           delayedJob: {
-            enqueueAt: dateValue
-          }
+            enqueueAt: dateValue,
+          },
         })
         break
       }
       default: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,
-                endDate: endDateValue
+                endDate: endDateValue,
               }
             : {
-                cronExpression: cronExp
-              }
+                cronExpression: cronExp,
+              },
         })
         break
       }
@@ -371,7 +373,7 @@ const useAction = () => {
     handleClickSend,
     handleKeyDown,
     handleChange,
-    handleBlur
+    handleBlur,
   }
 }
 export default useAction
