@@ -95,6 +95,8 @@ export const useAction = (props: SelectContentHookProps) => {
   const [title, setTitle] = useState<string>("")
   // 内容
   const [content, setContent] = useState<string>("")
+  // 纯净内容
+  const [cleanContent, setCleanContent] = useState<string>("")
   // 图文
   const [pictureText, setPictureText] = useState<PictureText[]>([])
   // 文件
@@ -144,6 +146,8 @@ export const useAction = (props: SelectContentHookProps) => {
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null)
 
   const [html, setHtml] = useState("")
+
+  const [htmlText, setHtmlText] = useState("")
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -723,7 +727,12 @@ export const useAction = (props: SelectContentHookProps) => {
       case "文本": {
         setSendData({
           text: {
-            content: `${title}<br>${content}`,
+            content:
+              isNewOrUpdate === "new"
+                ? `${title}\r\n${content}`
+                : cleanContent !== undefined
+                ? `${title}\r\n${content}`
+                : content,
           },
         })
         break
@@ -750,7 +759,7 @@ export const useAction = (props: SelectContentHookProps) => {
               ? file
               : lastTimeFile,
           text: {
-            content: `${title}<br>${content}`,
+            content: `${title}\r\n${content}`,
           },
         }
 
@@ -767,6 +776,7 @@ export const useAction = (props: SelectContentHookProps) => {
     lastTimeFile,
     messageTypeValue.title,
     isNewOrUpdate,
+    cleanContent,
   ])
 
   // sendParameter
@@ -806,12 +816,16 @@ export const useAction = (props: SelectContentHookProps) => {
           : ""
       )
 
+      setCleanContent(updateMessageJobInformation.cleanContent)
+
       const workWeChatAppNotification =
         updateMessageJobInformation.workWeChatAppNotification
       if (workWeChatAppNotification.text !== null) {
         setMessageTypeValue(messageTypeList[0])
         setContent(
-          updateMessageJobInformation?.content !== undefined
+          updateMessageJobInformation.cleanContent !== undefined
+            ? updateMessageJobInformation.cleanContent
+            : updateMessageJobInformation?.content !== undefined
             ? updateMessageJobInformation?.content
             : ""
         )
@@ -943,6 +957,10 @@ export const useAction = (props: SelectContentHookProps) => {
           key: "appId",
           value: `${corpAppValue?.id}`,
         },
+        {
+          key: "cleanContent",
+          value: messageTypeValue.title === "图文" ? htmlText : content,
+        },
       ]
       sendType === SendObjOrGroup.Group &&
         chatId &&
@@ -992,12 +1010,16 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [
     title,
+    content,
     jobSetting,
     sendParameter,
     sendData,
     corpsValue,
     corpAppValue,
     isNewOrUpdate,
+    sendType,
+    chatId,
+    messageTypeValue.title,
   ])
 
   useEffect(() => {
@@ -1096,5 +1118,6 @@ export const useAction = (props: SelectContentHookProps) => {
     editorConfig,
     html,
     setHtml,
+    setHtmlText,
   }
 }

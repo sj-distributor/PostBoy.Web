@@ -5,7 +5,7 @@ import {
   GetMessageJob,
   GetMessageJobRecords,
   PostMessageJobDelete,
-  PostMessageJobUpdate
+  PostMessageJobUpdate,
 } from "../../api/enterprise"
 import {
   IDtoExtend,
@@ -18,16 +18,19 @@ import {
   MessageJobDestination,
   messageJobSendType,
   MessageJobSendType,
-  messageSendResultType
+  messageSendResultType,
 } from "../../dtos/enterprise"
 import { ModalBoxRef } from "../../dtos/modal"
 import { convertType } from "../../uilts/convert-type"
 import { parameterJudgment } from "../../uilts/parameter-judgment"
 
 const judgeContent = (
-  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto,
+  cleanContent: string
 ) => {
-  if (workWeChatAppNotification.text !== null) {
+  if (cleanContent !== undefined && !!cleanContent) {
+    return cleanContent
+  } else if (workWeChatAppNotification.text !== null) {
     return workWeChatAppNotification.text?.content
   } else if (workWeChatAppNotification.mpNews !== null) {
     return workWeChatAppNotification.mpNews?.articles[0].content
@@ -59,8 +62,15 @@ const messageJobConvertType = (
         destination: item.destination,
         workWeChatAppNotification: item.workWeChatAppNotification,
         metadata: item.metadata,
+        cleanContent: item.metadata.filter(
+          (item) => item.key === "cleanContent"
+        )[0]?.value,
         content: isRecordTypeWechat
-          ? judgeContent(item.workWeChatAppNotification)
+          ? judgeContent(
+              item.workWeChatAppNotification,
+              item.metadata.filter((item) => item.key === "cleanContent")[0]
+                ?.value
+            )
           : item.emailNotification?.body,
         emailNotification: item?.emailNotification,
         title: isRecordTypeWechat
@@ -77,15 +87,15 @@ const messageJobConvertType = (
             (item) => item.key === "enterpriseName"
           )[0]?.value,
           id: item.metadata.filter((item) => item.key === "enterpriseId")[0]
-            ?.value
+            ?.value,
         },
         app: {
           name: item.metadata.filter((item) => item.key === "appName")[0]
             ?.value,
           id: item.metadata.filter((item) => item.key === "appId")[0]?.value,
           appId: item.metadata.filter((item) => item.key === "weChatAppId")[0]
-            ?.value
-        }
+            ?.value,
+        },
       }
       isRecordTypeWechat
         ? array.push(data)
@@ -105,7 +115,7 @@ export const useAction = (recordType: MessageJobDestination) => {
     messageJobs: [],
     rowCount: 0,
     pageSize: 10,
-    page: 0
+    page: 0,
   })
 
   const [deleteId, setDeleteId] = useState<string>("")
@@ -137,7 +147,7 @@ export const useAction = (recordType: MessageJobDestination) => {
       noticeSettingRef.current?.open()
       return
     }
-    if(item.isDelete){
+    if (item.isDelete) {
       setDeleteShow.setTrue()
       return
     }
@@ -201,7 +211,7 @@ export const useAction = (recordType: MessageJobDestination) => {
   const onDeleteMessageJob = (id: string) => {
     deleteConfirmRef.current?.close()
     PostMessageJobDelete({
-      MessageJobId: id
+      MessageJobId: id,
     })
       .then((res) => {
         getMessageJob()
@@ -266,7 +276,7 @@ export const useAction = (recordType: MessageJobDestination) => {
   }
 
   const onDeleteMessageJobConfirm = (id: string, isDelete: boolean) => {
-    if(isDelete){
+    if (isDelete) {
       setDeleteShow.setTrue()
       return
     }
@@ -323,6 +333,6 @@ export const useAction = (recordType: MessageJobDestination) => {
     failSend,
     promptText,
     openError,
-    showErrorPrompt
+    showErrorPrompt,
   }
 }

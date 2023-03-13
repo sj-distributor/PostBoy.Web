@@ -103,6 +103,7 @@ const SelectContent = memo(
       html,
       setHtml,
       editorConfig,
+      setHtmlText,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -130,7 +131,7 @@ const SelectContent = memo(
 
                     {state === "new" && (
                       <HighlightOffIcon
-                        className={styles.deleteIcon}
+                        className={styles.deleteIconImage}
                         onClick={() => fileDelete("file")}
                       />
                     )}
@@ -144,15 +145,26 @@ const SelectContent = memo(
               <div>
                 {state === "new" ? "这次上传内容:" : "上次上传内容:"}
                 <div className={styles.picturebackground}>
-                  <a href={state === "new" ? file?.fileContent : file?.fileUrl}>
-                    {file?.fileName}
-                  </a>
-                  {state === "new" && (
-                    <HighlightOffIcon
-                      className={styles.deleteIcon}
-                      onClick={() => fileDelete("file")}
-                    />
-                  )}
+                  <div
+                    style={{
+                      position: "relative",
+                      padding: "0.25rem",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <a
+                      href={state === "new" ? file?.fileContent : file?.fileUrl}
+                    >
+                      {file?.fileName}
+                    </a>
+                    {state === "new" && (
+                      <HighlightOffIcon
+                        className={styles.deleteIconFile}
+                        onClick={() => fileDelete("file")}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             )
@@ -175,7 +187,7 @@ const SelectContent = memo(
                   />
                   {state === "new" && (
                     <HighlightOffIcon
-                      className={styles.deleteIcon}
+                      className={styles.deleteIconImage}
                       onClick={() => fileDelete("picture", index)}
                     />
                   )}
@@ -472,7 +484,10 @@ const SelectContent = memo(
                       defaultConfig={editorConfig}
                       value={html}
                       onCreated={setEditor}
-                      onChange={(editor) => setHtml(editor.getHtml())}
+                      onChange={(editor) => {
+                        setHtmlText(editor.getText())
+                        setHtml(editor.getHtml())
+                      }}
                       mode="default"
                       style={{ height: "25rem" }}
                     />

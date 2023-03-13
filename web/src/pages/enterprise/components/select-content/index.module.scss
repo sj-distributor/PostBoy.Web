@@ -15,11 +15,15 @@
   font-family: "Tahoma";
 }
 
-.deleteIcon {
+.deleteIconImage {
   cursor: pointer;
   position: absolute;
   right: -0.25rem;
   top: -0.25rem;
+}
+
+.deleteIconFile {
+  cursor: pointer;
 }
 
 .box {
