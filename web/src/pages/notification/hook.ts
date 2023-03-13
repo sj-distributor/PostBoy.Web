@@ -31,9 +31,12 @@ const judgeContent = (
   if (cleanContent !== undefined && !!cleanContent) {
     return cleanContent
   } else if (workWeChatAppNotification.text !== null) {
-    return workWeChatAppNotification.text?.content
+    return workWeChatAppNotification.text?.content.replace(/<.*?>/g, "")
   } else if (workWeChatAppNotification.mpNews !== null) {
-    return workWeChatAppNotification.mpNews?.articles[0].content
+    return workWeChatAppNotification.mpNews?.articles[0].content.replace(
+      /<.*?>/g,
+      ""
+    )
   } else {
     return "文件"
   }
