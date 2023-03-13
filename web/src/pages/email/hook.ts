@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { GetEmailData } from "../../api/email"
 import * as wangEditor from "@wangeditor/editor"
-import { IEmailInput, IEmailResonponse } from "../../dtos/email"
+import { IEmailResonponse } from "../../dtos/email"
 import { annexEditorConfig } from "../../uilts/wangEditor"
 import { ModalBoxRef } from "../../dtos/modal"
-import { PostMessageSend } from "../../api/enterprise"
+import { PostAttachmentUpload, PostMessageSend } from "../../api/enterprise"
 import { IJobSettingDto, MessageJobSendType } from "../../dtos/enterprise"
 import { useBoolean } from "ahooks"
 import { timeZone } from "../../dtos/send-message-job"
@@ -103,6 +103,7 @@ const useAction = () => {
       "insertLink",
       "redo",
       "undo",
+      "uploadAttachment",
     ],
   }
   // 点击发送
@@ -150,10 +151,19 @@ const useAction = () => {
       ...annexEditorConfig.hoverbarKeys,
     },
     MENU_CONF: {
-      uploadImage: {
-        // server: "/api/upload" 图片上传地址
-      },
       ...annexEditorConfig.MENU_CONF,
+      // “上传附件”菜单的配置
+      uploadAttachment: {
+        maxFileSize: 20 * 1024 * 1024, // 20M
+        // 用户自定义上传
+        customUpload: async (file: File, insertFn: Function) => {
+          const formData = new FormData()
+          formData.append("file", file)
+          PostAttachmentUpload(formData).then((res) => {
+            res && insertFn(file.name, res.fileUrl)
+          })
+        },
+      },
     },
   }
 
