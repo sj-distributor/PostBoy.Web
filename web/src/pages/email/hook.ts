@@ -112,7 +112,7 @@ const useAction = () => {
       emailNotification: {
         senderId: emailFrom.senderId,
         subject: emailSubject,
-        body: editor ? editor.getText() : "",
+        body: editor ? editor.getHtml() : "",
         to: emailToArr,
         cc: emailCopyToArr,
       },
