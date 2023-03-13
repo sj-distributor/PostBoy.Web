@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:global(.MuiAutocomplete-root .MuiInputLabel-outlined) {
+  transition: 0s all;
+}
+
+:global(.MuiAutocomplete-root legend) {
+  transition: 0s all;
+}

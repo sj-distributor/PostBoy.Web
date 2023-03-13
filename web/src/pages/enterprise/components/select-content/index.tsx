@@ -248,9 +248,9 @@ const SelectContent = memo(
               <Autocomplete
                 openOnFocus
                 disablePortal
-                id="Autocomplete-corpsDataId"
+                disableClearable
                 value={corpsValue}
-                disableClearable={true}
+                id="Autocomplete-corpsDataId"
                 options={corpsList}
                 className={styles.inputWrap}
                 style={{ marginRight: "1.6rem" }}
