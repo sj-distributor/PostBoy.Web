@@ -65,6 +65,7 @@ const messageJobConvertType = (
         cleanContent: item.metadata.filter(
           (item) => item.key === "cleanContent"
         )[0]?.value,
+        hasException: item.hasException,
         content: isRecordTypeWechat
           ? judgeContent(
               item.workWeChatAppNotification,
