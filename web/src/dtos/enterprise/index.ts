@@ -187,6 +187,7 @@ export interface IMessageJobBase {
   jobCronExpressionDesc: string
   destination: MessageJobDestination
   workWeChatAppNotification: IWorkWeChatAppNotificationDto
+  hasException: boolean
   metadata: {
     id: string
     createDate: string
