@@ -121,6 +121,14 @@ const useAction = () => {
   const handleClickSend = () => {
     const data = {
       jobSetting,
+      metadata: editor
+        ? [
+            {
+              key: "cleanContent",
+              value: editor.getText(),
+            },
+          ]
+        : [],
       emailNotification: {
         senderId: emailFrom.senderId,
         subject: emailSubject,
