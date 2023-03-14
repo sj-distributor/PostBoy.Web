@@ -68,7 +68,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor,
+          params.row.hasException && styles.deletedColor,
       },
       {
         field: "content",
@@ -80,7 +80,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor,
+          params.row.hasException && styles.deletedColor,
         renderCell: (params: GridCellParams) =>
           asyncTootip(params.row.content, styles.tooltip),
       },
@@ -94,7 +94,7 @@ const SendNotice = React.memo(
         sortable: false,
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor,
+          params.row.hasException && styles.deletedColor,
       },
       {
         field: "createdDate",
@@ -106,7 +106,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor,
+          params.row.hasException && styles.deletedColor,
         renderCell: (params: GridCellParams) =>
           moment(params.row.createdDate).format("YYYY/MM/DD HH:mm"),
       },
@@ -120,7 +120,7 @@ const SendNotice = React.memo(
         align: "center",
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor,
+          params.row.hasException && styles.deletedColor,
       },
       {
         field: "operate",
@@ -131,7 +131,7 @@ const SendNotice = React.memo(
         sortable: false,
         headerClassName: styles.tableBoxHeader,
         cellClassName: (params: GridCellParams) =>
-          params.row.isDelete && styles.deletedColor,
+          params.row.hasException && styles.deletedColor,
         renderCell: (params: GridCellParams) => (
           <div className={styles.operate}>
             {recordType ? (
@@ -161,7 +161,9 @@ const SendNotice = React.memo(
             </p>
             <p
               className={styles.text}
-              onClick={() => onDeleteMessageJobConfirm(params.row.id, params.row.isDelete)}
+              onClick={() =>
+                onDeleteMessageJobConfirm(params.row.id, params.row.isDelete)
+              }
             >
               【删除】
             </p>
@@ -196,7 +198,7 @@ const SendNotice = React.memo(
             即时发送类型不能设置!
           </Alert>
         )}
-         {deleteShow && (
+        {deleteShow && (
           <Alert severity="error" className={styles.alert}>
             该条发送记录已被删除,不能做任何操作!
           </Alert>

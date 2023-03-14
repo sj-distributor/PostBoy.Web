@@ -69,7 +69,7 @@ export interface IDepartmentAndUserListValue {
 
 export enum DepartmentAndUserType {
   Department,
-  User
+  User,
 }
 
 export interface IDepartmentResponse extends IResponseMsg {
@@ -95,7 +95,7 @@ export enum MessageDataFileType {
   Voice,
   Video,
   File,
-  Text
+  Text,
 }
 
 export interface FileObject {
@@ -132,7 +132,7 @@ export interface ITargetDialogProps {
 export enum DeptUserCanSelectStatus {
   Department,
   User,
-  Both
+  Both,
 }
 
 export interface ITargetDialogValue {
@@ -143,7 +143,7 @@ export interface ITargetDialogValue {
 export enum MessageWidgetShowStatus {
   ShowInput,
   ShowUpload,
-  ShowAll
+  ShowAll,
 }
 
 export interface ITagsListResponse extends IResponseMsg {
@@ -187,6 +187,7 @@ export interface IMessageJobBase {
   jobCronExpressionDesc: string
   destination: MessageJobDestination
   workWeChatAppNotification: IWorkWeChatAppNotificationDto
+  hasException: boolean
   metadata: {
     id: string
     createDate: string
@@ -199,12 +200,12 @@ export interface IMessageJobBase {
 export enum MessageJobSendType {
   Fire,
   Delayed,
-  Recurring
+  Recurring,
 }
 
 export enum MessageJobDestination {
   Email,
-  WorkWeChat
+  WorkWeChat,
 }
 
 export interface IMessageJobRecord extends IMessageJobRecordSame {
@@ -222,12 +223,12 @@ export interface IMessageJobRecordSame {
 
 export enum MessageSendResult {
   Ok,
-  Failed
+  Failed,
 }
 
 export const messageSendResultType = {
   [MessageSendResult.Ok]: "已发送",
-  [MessageSendResult.Failed]: "异常"
+  [MessageSendResult.Failed]: "异常",
 }
 
 export interface ISendMessageCommand {
@@ -295,7 +296,7 @@ export interface TextDto {
 
 export enum TimeType {
   UTC,
-  America
+  America,
 }
 
 export interface IDtoExtend {
@@ -308,6 +309,7 @@ export interface IDtoExtend {
 
 export interface ILastShowTableData extends IMessageJob {
   title: string
+  cleanContent: string
   content?: string
   sendType: string
   groupName?: string
@@ -351,7 +353,7 @@ export interface TimeZoneCustomListDto {
 
 export enum ClickType {
   Collapse,
-  Select
+  Select,
 }
 
 export interface SendObject {
@@ -371,7 +373,7 @@ export interface PictureText {
 export const messageJobSendType = {
   [MessageJobSendType.Fire]: "即时发送",
   [MessageJobSendType.Delayed]: "定时发送",
-  [MessageJobSendType.Recurring]: "周期发送"
+  [MessageJobSendType.Recurring]: "周期发送",
 }
 
 export interface IWorkGroupCreate {
@@ -398,7 +400,7 @@ export interface IDeptAndUserList {
 
 export enum SendObjOrGroup {
   Object,
-  Group
+  Group,
 }
 
 export interface UploadAttachmentResponseData {
