@@ -5,9 +5,14 @@ import { IEmailResonponse } from "../../dtos/email"
 import { annexEditorConfig } from "../../uilts/wangEditor"
 import { ModalBoxRef } from "../../dtos/modal"
 import { PostAttachmentUpload, PostMessageSend } from "../../api/enterprise"
-import { IJobSettingDto, MessageJobSendType } from "../../dtos/enterprise"
+import {
+  IJobSettingDto,
+  MessageJobSendType,
+  UploadAttachmentResponseData,
+} from "../../dtos/enterprise"
 import { useBoolean } from "ahooks"
 import { timeZone } from "../../dtos/send-message-job"
+import { clone } from "ramda"
 
 const useAction = () => {
   const defaultEmailValue = {
@@ -80,6 +85,12 @@ const useAction = () => {
       : sendRecordRef.current?.close()
   }
 
+  const [annexesList, setAnnexesList] = useState<
+    (UploadAttachmentResponseData & { name: string; fileContent: string })[]
+  >([])
+
+  type InsertImageFnType = (url: string, alt: string, href: string) => void
+
   const toolbarConfig: Partial<wangEditor.IToolbarConfig> = {
     toolbarKeys: [
       "fontFamily",
@@ -116,6 +127,12 @@ const useAction = () => {
         body: editor ? editor.getHtml() : "",
         to: emailToArr,
         cc: emailCopyToArr,
+        attachments: annexesList.map((item) => ({
+          fileName: item.fileName,
+          fileOriginalName: item.name,
+          fileUrl: item.fileUrl,
+          fileContent: item.fileContent,
+        })),
       },
     }
     setSendLoading(true)
@@ -131,6 +148,7 @@ const useAction = () => {
         editor && editor.setHtml("<p></p>")
         setEmailCopyToArr([])
         setEmailToArr([])
+        setAnnexesList([])
         setEmailToString("")
         setEmailCopyToString("")
         setEmailSubject("")
@@ -154,13 +172,40 @@ const useAction = () => {
       ...annexEditorConfig.MENU_CONF,
       // “上传附件”菜单的配置
       uploadAttachment: {
-        maxFileSize: 20 * 1024 * 1024, // 20M
         // 用户自定义上传
-        customUpload: async (file: File, insertFn: Function) => {
+        customUpload: (file: File) => {
+          if (file.size / 1024 > 20 * 1024) {
+            showErrorPrompt("The Image size is too large!")
+            return
+          }
+          const formData = new FormData()
+          const reader = new FileReader()
+          let base64 = ""
+          reader.readAsDataURL(file)
+          reader.onload = (res) => {
+            typeof res.target?.result === "string" &&
+              (base64 = res.target?.result)
+          }
+          formData.append("file", file)
+          PostAttachmentUpload(formData).then((res) => {
+            res &&
+              setAnnexesList((prev) => [
+                ...prev,
+                Object.assign(res, { name: file.name, fileContent: base64 }),
+              ])
+          })
+        },
+      },
+      uploadImage: {
+        customUpload(file: File, insertFn: InsertImageFnType) {
+          if (file.size / 1024 > 20 * 1024) {
+            showErrorPrompt("The Image size is too large!")
+            return
+          }
           const formData = new FormData()
           formData.append("file", file)
           PostAttachmentUpload(formData).then((res) => {
-            res && insertFn(file.name, res.fileUrl)
+            if (res) insertFn(res.fileUrl, res.fileName, res.filePath)
           })
         },
       },
@@ -264,12 +309,26 @@ const useAction = () => {
       setPromptText("please select a email from")
       openErrorAction.setTrue()
       return false
-    } else if (editor?.getText() === "") {
+    } else if (editor?.getHtml() === "<p><br></p>") {
       setPromptText("please enter email content")
       openErrorAction.setTrue()
       return false
     }
     return true
+  }
+
+  const handleAnnexDelete = (
+    deleteItem: UploadAttachmentResponseData & {
+      name: string
+      fileContent: string
+    }
+  ) => {
+    setAnnexesList((prev) => {
+      const newValue = clone(prev)
+      const deleteIndex = newValue.findIndex((x) => x.id === deleteItem.id)
+      newValue.splice(deleteIndex, 1)
+      return newValue
+    })
   }
 
   // 延迟关闭警告提示
@@ -359,6 +418,7 @@ const useAction = () => {
     promptText,
     openError,
     sendLoading,
+    annexesList,
     validateAttrFunc,
     setPromptText,
     setOpen,
@@ -384,6 +444,7 @@ const useAction = () => {
     handleKeyDown,
     handleChange,
     handleBlur,
+    handleAnnexDelete,
   }
 }
 export default useAction
