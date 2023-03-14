@@ -15,9 +15,11 @@ code {
 :global(.MuiAutocomplete-root .MuiInputLabel-outlined),
 :global(.MuiTextField-root .MuiInputLabel-outlined) {
   transition: 0s all;
+  transform: translate(14px, -9px) scale(0.75);
 }
 
 :global(.MuiTextField-root legend),
 :global(.MuiAutocomplete-root legend) {
   transition: 0s all;
+  max-width: 100%;
 }
