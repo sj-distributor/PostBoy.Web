@@ -241,6 +241,12 @@ export interface ISendMessageCommand {
     body: string
     to: string[]
     cc: string[]
+    attachments?: {
+      fileName: string
+      fileOriginalName: string
+      fileUrl: string
+      fileContent: string
+    }[]
   }
   workWeChatAppNotification?: IWorkWeChatAppNotificationDto
 }
