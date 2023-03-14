@@ -317,7 +317,10 @@ const useAction = () => {
       setPromptText("please select a email from")
       openErrorAction.setTrue()
       return false
-    } else if (editor?.getHtml() === "<p><br></p>") {
+    } else if (
+      editor?.getHtml() === "<p><br></p>" ||
+      editor?.getHtml() === "<p></p>"
+    ) {
       setPromptText("please enter email content")
       openErrorAction.setTrue()
       return false
