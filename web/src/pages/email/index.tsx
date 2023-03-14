@@ -57,6 +57,7 @@ const SendEmail = () => {
     promptText,
     openError,
     sendLoading,
+    annexesList,
     validateAttrFunc,
     setOpen,
     setTimeZoneValue,
@@ -81,6 +82,7 @@ const SendEmail = () => {
     handleKeyDown,
     handleChange,
     handleBlur,
+    handleAnnexDelete,
   } = useAction()
 
   return (
@@ -269,6 +271,23 @@ const SendEmail = () => {
           }}
         />
       </div>
+      {annexesList.length > 0 && (
+        <div className={styles.annexes}>
+          {annexesList.map((item, index) => {
+            return (
+              <Chip
+                label={item.name}
+                variant="outlined"
+                sx={{
+                  margin: "0.5rem 0.5rem",
+                }}
+                key={index}
+                onDelete={() => handleAnnexDelete(item)}
+              />
+            )
+          })}
+        </div>
+      )}
       <div className={styles.editorBox}>
         <Toolbar
           editor={editor}

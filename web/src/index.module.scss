@@ -1,21 +1,23 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
-:global(.MuiAutocomplete-root .MuiInputLabel-outlined) {
+:global(.MuiAutocomplete-root .MuiInputLabel-outlined),
+:global(.MuiTextField-root .MuiInputLabel-outlined) {
   transition: 0s all;
 }
 
+:global(.MuiTextField-root legend),
 :global(.MuiAutocomplete-root legend) {
   transition: 0s all;
 }

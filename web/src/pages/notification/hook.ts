@@ -75,7 +75,8 @@ const messageJobConvertType = (
               item.metadata.filter((item) => item.key === "cleanContent")[0]
                 ?.value
             )
-          : item.emailNotification?.body,
+          : item.metadata.filter((item) => item.key === "cleanContent")[0]
+              ?.value ?? item.emailNotification?.body.replace(/<.*?>/g, ""),
         emailNotification: item?.emailNotification,
         title: isRecordTypeWechat
           ? item.metadata.filter((item) => item.key === "title")[0]?.value
