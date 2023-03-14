@@ -196,7 +196,8 @@ export const useAction = (recordType: MessageJobDestination) => {
           errorSendtheobject:
             item.exception !== null
               ? item.exception
-              : JSON.parse(item.responseJson).invaliduser !== null
+              : JSON.parse(item.responseJson).invaliduser !== null &&
+                JSON.parse(item.responseJson).invaliduser !== undefined
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
               : "",
         })
