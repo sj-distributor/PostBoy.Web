@@ -1,3 +1,4 @@
+import moment from "moment"
 import {
   ISendMessageCommand,
   IUpdateMessageCommand,
@@ -25,7 +26,8 @@ export const parameterJudgment = (
       } else if (
         jobSetting.recurringJob !== undefined &&
         jobSetting.recurringJob.endDate &&
-        new Date(jobSetting.recurringJob.endDate) < new Date()
+        moment(jobSetting.recurringJob.endDate).format("DD.MM.YYYY HH:mm") >=
+          moment().format("DD.MM.YYYY HH:mm")
       ) {
         showErrorPrompt("The end time cannot exceed the current time!")
       } else if (
