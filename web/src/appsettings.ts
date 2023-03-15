@@ -1,6 +1,5 @@
 export interface AppSettings {
   serverUrl: string
-  webName: string
 }
 
 const settings = (window as any).appSettings
@@ -16,7 +15,6 @@ export async function InitialAppSetting() {
   })
     .then((res) => res.json())
     .then((res: AppSettings) => {
-      document.title = res.webName
       ;(window as any).appSettings = res
     })
 }
