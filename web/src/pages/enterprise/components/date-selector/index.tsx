@@ -14,19 +14,19 @@ const DateSelector = (props: {
         label="发送时间"
         type="datetime-local"
         sx={{ width: 250, margin: "0.8rem 0" }}
-        defaultValue={
-          !!dateValue ? moment(dateValue).format("yyyy-MM-DDThh:mm") : ""
-        }
+        value={dateValue}
         InputLabelProps={{
-          shrink: true
+          shrink: true,
         }}
         onChange={(e) => {
-          const time = moment((e.target as HTMLInputElement).value).valueOf()
-          const nowTime = moment(new Date()).valueOf()
-          if (time <= nowTime) {
-            showErrorPrompt("Please select a time later than the current time")
-          } else {
+          if (
+            moment((e.target as HTMLInputElement).value).format(
+              "DD.MM.YYYY HH:mm"
+            ) >= moment().format("DD.MM.YYYY HH:mm")
+          ) {
             setDateValue((e.target as HTMLInputElement).value)
+          } else {
+            showErrorPrompt("Please select a time later than the current time")
           }
         }}
       />

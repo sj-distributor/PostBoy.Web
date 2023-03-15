@@ -1,6 +1,5 @@
 import { TextField } from "@mui/material"
 import Scheduler from "smart-cron"
-import { MessageJobSendType } from "../../../../dtos/enterprise"
 import moment from "moment"
 
 const TimeSelector = (props: {
@@ -47,16 +46,16 @@ const TimeSelector = (props: {
           label="终止时间"
           type="datetime-local"
           sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
-          value={
-            !!endDateValue
-              ? moment(endDateValue).format("yyyy-MM-DDTHH:mm")
-              : ""
-          }
+          value={endDateValue}
           InputLabelProps={{
             shrink: true,
           }}
           onChange={(e) => {
-            if (new Date((e.target as HTMLInputElement).value) >= new Date()) {
+            if (
+              moment((e.target as HTMLInputElement).value).format(
+                "DD.MM.YYYY HH:mm"
+              ) >= moment().format("DD.MM.YYYY HH:mm")
+            ) {
               setEndDateValue((e.target as HTMLInputElement).value)
             } else {
               e.preventDefault()
