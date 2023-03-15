@@ -51,7 +51,11 @@ const TimeSelector = (props: {
             shrink: true,
           }}
           onChange={(e) => {
-            if (new Date((e.target as HTMLInputElement).value) >= new Date()) {
+            if (
+              moment((e.target as HTMLInputElement).value).format(
+                "DD.MM.YYYY HH:mm"
+              ) >= moment().format("DD.MM.YYYY HH:mm")
+            ) {
               setEndDateValue((e.target as HTMLInputElement).value)
             } else {
               e.preventDefault()
