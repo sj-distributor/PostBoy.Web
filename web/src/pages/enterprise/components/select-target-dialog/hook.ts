@@ -10,6 +10,7 @@ import {
   DeptUserCanSelectStatus,
   IWorkGroupCreate,
   SendObjOrGroup,
+  IFirstState,
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -22,6 +23,9 @@ const useAction = (props: {
   tagsList: ITagsList[]
   clickName: string
   chatId: string
+  outTagsValue?: ITagsList[]
+  updatedDeptUserList: boolean
+  isUpdate: boolean
   setOpenFunction: (open: boolean) => void
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
@@ -37,12 +41,15 @@ const useAction = (props: {
     tagsList,
     clickName,
     chatId,
+    outTagsValue,
+    updatedDeptUserList,
+    lastTagsValue,
+    isUpdate,
     setChatId,
     setIsRefresh,
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
-    lastTagsValue,
   } = props
 
   const defaultGroupOwner = {
@@ -76,9 +83,7 @@ const useAction = (props: {
     SendObjOrGroup.Group,
   ])
 
-  const [firstDeptUserList, setFirstDeptUserList] = useState<
-    IDepartmentKeyControl[]
-  >([])
+  const [firstState, setFirstState] = useState<IFirstState>()
 
   const [createLoading, setCreateLoading] = useState(false)
 
@@ -294,12 +299,11 @@ const useAction = (props: {
   }, [departmentAndUserList, AppId])
 
   const clearSelected = () => {
-    // 切换应用时清空上次应用数据
-    setDepartmentSelectedList([])
-    setGroupDeptUserSelectedList([])
-    setTagsValue([])
-    setDeptUserList(firstDeptUserList)
-    setChatId && setChatId(groupValue)
+    if (firstState) {
+      setTagsValue(firstState.tagsValue)
+      setDeptUserList(firstState.deptUserList)
+      setChatId && setChatId(firstState.chatId)
+    }
   }
 
   useEffect(() => {
@@ -307,9 +311,14 @@ const useAction = (props: {
   }, [AppId])
 
   useEffect(() => {
-    open && setFirstDeptUserList(clone(departmentAndUserList))
-    open && setGroupValue(chatId)
-  }, [open])
+    open &&
+      (!firstState || (isUpdate && updatedDeptUserList)) &&
+      setFirstState({
+        tagsValue: outTagsValue ?? [],
+        chatId,
+        deptUserList: clone(departmentAndUserList),
+      })
+  }, [open, updatedDeptUserList])
 
   useEffect(() => {
     const handleData = (

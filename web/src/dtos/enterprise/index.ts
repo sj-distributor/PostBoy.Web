@@ -120,6 +120,9 @@ export interface ITargetDialogProps {
   groupDeptUserSelectedList?: IDepartmentAndUserListValue[]
   chatId: string
   sendType?: SendObjOrGroup
+  outTagsValue?: ITagsList[]
+  updatedDeptUserList: boolean
+  isUpdate: boolean
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
@@ -416,4 +419,10 @@ export interface UploadAttachmentResponseData {
   fileName: string
   fileSize: number
   filePath: string
+}
+
+export interface IFirstState {
+  chatId: string
+  deptUserList: IDepartmentKeyControl[]
+  tagsValue: ITagsList[]
 }

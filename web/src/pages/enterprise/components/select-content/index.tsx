@@ -104,6 +104,8 @@ const SelectContent = memo(
       setHtml,
       editorConfig,
       setHtmlText,
+      tagsValue,
+      updatedDeptUserList,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -387,6 +389,7 @@ const SelectContent = memo(
             setGroupList={setGroupList}
             setOpenFunction={setIsShowDialog}
             setDeptUserList={setDepartmentAndUserList}
+            outTagsValue={tagsValue}
             setOuterTagsValue={setTagsValue}
             setIsRefresh={setIsRefresh}
             lastTagsValue={lastTimeTagsList}
@@ -395,6 +398,8 @@ const SelectContent = memo(
             setChatId={setChatId}
             sendType={sendType}
             setSendType={setSendType}
+            updatedDeptUserList={updatedDeptUserList}
+            isUpdate={!!updateMessageJobInformation}
           />
         </div>
         <div className={styles.typeShow}>
