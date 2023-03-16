@@ -1,5 +1,5 @@
 import { clone } from "ramda"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { PostWeChatWorkGroupCreate } from "../../../../api/enterprise"
 import {
   IDepartmentAndUserListValue,
@@ -9,7 +9,6 @@ import {
   ClickType,
   DeptUserCanSelectStatus,
   IWorkGroupCreate,
-  IWorkCorpAppGroup,
   SendObjOrGroup,
 } from "../../../../dtos/enterprise"
 
