@@ -1,5 +1,5 @@
 import { clone } from "ramda"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { PostWeChatWorkGroupCreate } from "../../../../api/enterprise"
 import {
   IDepartmentAndUserListValue,
@@ -9,8 +9,8 @@ import {
   ClickType,
   DeptUserCanSelectStatus,
   IWorkGroupCreate,
-  IWorkCorpAppGroup,
-  SendObjOrGroup
+  SendObjOrGroup,
+  IFirstState,
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -22,7 +22,13 @@ const useAction = (props: {
   lastTagsValue: string[] | undefined
   tagsList: ITagsList[]
   clickName: string
+  chatId: string
+  outerTagsValue?: ITagsList[]
+  isUpdatedDeptUser: boolean
+  sendType?: SendObjOrGroup
+  setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setOpenFunction: (open: boolean) => void
+  setChatId?: React.Dispatch<React.SetStateAction<string>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
@@ -35,11 +41,17 @@ const useAction = (props: {
     isLoading,
     tagsList,
     clickName,
+    chatId,
+    outerTagsValue,
+    isUpdatedDeptUser,
+    lastTagsValue,
+    sendType,
+    setSendType,
+    setChatId,
     setIsRefresh,
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
-    lastTagsValue
   } = props
 
   const defaultGroupOwner = {
@@ -48,11 +60,7 @@ const useAction = (props: {
     type: DepartmentAndUserType.User,
     parentid: "",
     selected: false,
-    children: []
-  }
-  const defaultGroupValue = {
-    chatId: "",
-    chatName: ""
+    children: [],
   }
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
     IDepartmentAndUserListValue[]
@@ -67,20 +75,21 @@ const useAction = (props: {
   const [groupName, setGroupName] = useState("")
   const [tipsObject, setTipsObject] = useState({
     show: false,
-    msg: ""
+    msg: "",
   })
   const [groupDeptUserList, setGroupDeptUserList] = useState<
     IDepartmentKeyControl[]
   >([])
   const [sendList, setSendList] = useState([
     SendObjOrGroup.Object,
-    SendObjOrGroup.Group
+    SendObjOrGroup.Group,
   ])
+
+  const [firstState, setFirstState] = useState<IFirstState>()
 
   const [createLoading, setCreateLoading] = useState(false)
 
-  const [groupValue, setGroupValue] =
-    useState<IWorkCorpAppGroup>(defaultGroupValue)
+  const [groupValue, setGroupValue] = useState<string>("")
 
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
@@ -109,7 +118,7 @@ const useAction = (props: {
             type: DepartmentAndUserType.User,
             parentid: String(e.parentid),
             selected: e.selected,
-            children: []
+            children: [],
           })
         : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1)
       e.children.length > 0 && recursiveDeptList(e.children, changeList)
@@ -206,7 +215,7 @@ const useAction = (props: {
       : groupDeptUserSelectedList.length <= 1
       ? setTipsObject({
           show: true,
-          msg: "Please select 2 or more valid users"
+          msg: "Please select 2 or more valid users",
         })
       : !AppId
       ? setTipsObject({ show: true, msg: "Error for no AppId provided" })
@@ -216,7 +225,9 @@ const useAction = (props: {
             appId: AppId,
             name: groupName,
             owner: groupOwner.id as string,
-            userList: groupDeptUserSelectedList.map((item) => item.id as string)
+            userList: groupDeptUserSelectedList.map(
+              (item) => item.id as string
+            ),
           }
           if (requestData.owner === defaultGroupOwner.id)
             delete requestData.owner
@@ -243,6 +254,17 @@ const useAction = (props: {
             }
           })
         })()
+  }
+
+  const handleConfirm = () => {
+    setOpenFunction(false)
+    setOuterTagsValue(tagsValue)
+    setFirstState(undefined)
+  }
+
+  const handleCancel = () => {
+    setOpenFunction(false)
+    clearSelected()
   }
 
   useEffect(() => {
@@ -279,12 +301,30 @@ const useAction = (props: {
           setGroupDeptUserList((prev) => [...prev, clone(departmentKeyValue)]))
   }, [departmentAndUserList, AppId])
 
+  const clearSelected = () => {
+    if (firstState) {
+      setTagsValue(firstState.tagsValue)
+      setDeptUserList(firstState.deptUserList)
+      setChatId && setChatId(firstState.chatId)
+      setSendType && setSendType(firstState.sendType)
+      setFirstState(undefined)
+    }
+  }
+
   useEffect(() => {
-    // 切换应用时清空上次应用数据
-    setDepartmentSelectedList([])
-    setGroupDeptUserSelectedList([])
-    setTagsValue([])
+    clearSelected()
   }, [AppId])
+
+  useEffect(() => {
+    open &&
+      isUpdatedDeptUser &&
+      setFirstState({
+        tagsValue: outerTagsValue ?? [],
+        chatId,
+        deptUserList: clone(departmentAndUserList),
+        sendType: sendType ?? SendObjOrGroup.Object,
+      })
+  }, [open, isUpdatedDeptUser])
 
   useEffect(() => {
     const handleData = (
@@ -299,7 +339,6 @@ const useAction = (props: {
         })
       return newValue
     }
-    setOuterTagsValue(tagsValue)
     // 打开时load上次选中的数据
     open
       ? clickName === "选择发送目标"
@@ -364,7 +403,9 @@ const useAction = (props: {
     setTagsValue,
     handleDeptOrUserClick,
     setSearchToDeptValue,
-    handleCreateGroup
+    handleCreateGroup,
+    handleConfirm,
+    handleCancel,
   }
 }
 export default useAction

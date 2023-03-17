@@ -22,7 +22,7 @@ import {
   ITargetDialogProps,
   IDepartmentAndUserListValue,
   DeptUserCanSelectStatus,
-  SendObjOrGroup
+  SendObjOrGroup,
 } from "../../../../dtos/enterprise"
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
@@ -75,13 +75,15 @@ const SelectTargetDialog = memo(
       clickName,
       chatId,
       sendType,
+      outerTagsValue,
+      isUpdatedDeptUser,
       setSendType,
       setIsRefresh,
       setChatId,
       setGroupList,
       setOpenFunction,
       setDeptUserList,
-      setOuterTagsValue
+      setOuterTagsValue,
     } = props
 
     const {
@@ -103,7 +105,9 @@ const SelectTargetDialog = memo(
       setSearchToDeptValue,
       setTagsValue,
       handleTypeIsCanSelect,
-      handleCreateGroup
+      handleCreateGroup,
+      handleConfirm,
+      handleCancel,
     } = useAction({
       open,
       AppId,
@@ -113,10 +117,16 @@ const SelectTargetDialog = memo(
       lastTagsValue,
       tagsList,
       clickName,
+      chatId,
+      outerTagsValue,
+      isUpdatedDeptUser,
+      sendType,
+      setSendType,
+      setChatId,
       setIsRefresh,
       setOpenFunction,
       setDeptUserList,
-      setOuterTagsValue
+      setOuterTagsValue,
     })
 
     const recursiveRenderDeptList = (
@@ -132,7 +142,7 @@ const SelectTargetDialog = memo(
               type: deptUserData.type,
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
-              children: []
+              children: [],
             }
             return (
               <div key={deptUserData.id}>
@@ -144,7 +154,7 @@ const SelectTargetDialog = memo(
                       handleDeptOrUserClick(
                         ClickType.Collapse,
                         Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed
+                          isCollapsed: deptUserData.isCollapsed,
                         })
                       )
                   }}
@@ -195,7 +205,7 @@ const SelectTargetDialog = memo(
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              height: "4rem"
+              height: "4rem",
             }}
           >
             <>{clickName}</>
@@ -211,7 +221,7 @@ const SelectTargetDialog = memo(
                 height: "15rem",
                 overflowY: "auto",
                 position: "relative",
-                marginBottom: "1rem"
+                marginBottom: "1rem",
               }}
             >
               {(clickName === "选择发送目标"
@@ -234,7 +244,7 @@ const SelectTargetDialog = memo(
                     height: "2rem",
                     left: "50%",
                     top: "50%",
-                    margin: "-1rem 0 0 -1rem"
+                    margin: "-1rem 0 0 -1rem",
                   }}
                 />
               )}
@@ -280,13 +290,13 @@ const SelectTargetDialog = memo(
                     margin:
                       clickName === "选择发送目标"
                         ? "1rem 0 calc(1rem - 4px)"
-                        : ""
+                        : "",
                   }}
                   componentsProps={{
                     paper: { elevation: 3 },
                     popper: {
-                      placement: "top"
-                    }
+                      placement: "top",
+                    },
                   }}
                   value={
                     clickName === "选择发送目标"
@@ -348,8 +358,8 @@ const SelectTargetDialog = memo(
                     componentsProps={{
                       paper: { elevation: 3 },
                       popper: {
-                        placement: "top"
-                      }
+                        placement: "top",
+                      },
                     }}
                     value={
                       chatId
@@ -375,9 +385,9 @@ const SelectTargetDialog = memo(
                         label="群组列表"
                       />
                     )}
-                    onChange={(e, value) =>
+                    onChange={(e, value) => {
                       setChatId && setChatId(value ? value.chatId : "")
-                    }
+                    }}
                   />
                 )}
                 {sendType === SendObjOrGroup.Object && (
@@ -440,8 +450,8 @@ const SelectTargetDialog = memo(
                       className={styles.InputButton}
                       sx={{
                         input: {
-                          color: groupOwner.id === "-1" ? "#999" : "333"
-                        }
+                          color: groupOwner.id === "-1" ? "#999" : "333",
+                        },
                       }}
                       margin="dense"
                       type="button"
@@ -456,7 +466,7 @@ const SelectTargetDialog = memo(
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenFunction(false)}>取消</Button>
+            <Button onClick={handleCancel}>取消</Button>
             <LoadingButton
               loading={createLoading}
               loadingIndicator="Loading…"
@@ -464,7 +474,7 @@ const SelectTargetDialog = memo(
               onClick={() => {
                 clickName !== "选择发送目标"
                   ? handleCreateGroup()
-                  : setOpenFunction(false)
+                  : handleConfirm()
               }}
             >
               {clickName === "选择发送目标" ? "确定" : "创建"}
@@ -493,6 +503,7 @@ const SelectTargetDialog = memo(
             setIsRefresh={setIsRefresh}
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
+            isUpdatedDeptUser={isUpdatedDeptUser}
           />
         )}
 
@@ -502,7 +513,7 @@ const SelectTargetDialog = memo(
           open={tipsObject.show}
           anchorOrigin={{
             vertical: "top",
-            horizontal: "center"
+            horizontal: "center",
           }}
         />
       </div>

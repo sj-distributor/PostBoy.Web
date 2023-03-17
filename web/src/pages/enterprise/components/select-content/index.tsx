@@ -60,7 +60,6 @@ const SelectContent = memo(
       setIsRefresh,
       departmentAndUserList,
       setDepartmentAndUserList,
-      setFlattenDepartmentList,
       departmentKeyValue,
       searchKeyValue,
       isTreeViewLoading,
@@ -104,6 +103,8 @@ const SelectContent = memo(
       setHtml,
       editorConfig,
       setHtmlText,
+      tagsValue,
+      isUpdatedDeptUser,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -387,6 +388,7 @@ const SelectContent = memo(
             setGroupList={setGroupList}
             setOpenFunction={setIsShowDialog}
             setDeptUserList={setDepartmentAndUserList}
+            outerTagsValue={tagsValue}
             setOuterTagsValue={setTagsValue}
             setIsRefresh={setIsRefresh}
             lastTagsValue={lastTimeTagsList}
@@ -395,6 +397,7 @@ const SelectContent = memo(
             setChatId={setChatId}
             sendType={sendType}
             setSendType={setSendType}
+            isUpdatedDeptUser={isUpdatedDeptUser}
           />
         </div>
         <div className={styles.typeShow}>
@@ -615,7 +618,10 @@ const SelectContent = memo(
     )
   },
   (prevProps, nextProps) => {
-    return prevProps.sendData === nextProps.sendData && prevProps === nextProps
+    return (
+      prevProps.sendData === nextProps.sendData &&
+      JSON.stringify(prevProps) === JSON.stringify(nextProps)
+    )
   }
 )
 
