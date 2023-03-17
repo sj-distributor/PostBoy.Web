@@ -20,7 +20,6 @@ const useAction = (
   outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void,
   emailUpdateData?: ILastShowTableData
 ) => {
-  // console.log(emailUpdateData)
   const emailObj = emailUpdateData?.emailNotification
   const defaultEmailValue = {
     displayName: "",
