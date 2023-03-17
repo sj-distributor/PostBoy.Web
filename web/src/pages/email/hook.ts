@@ -7,6 +7,8 @@ import { ModalBoxRef } from "../../dtos/modal"
 import { PostAttachmentUpload, PostMessageSend } from "../../api/enterprise"
 import {
   IJobSettingDto,
+  ILastShowTableData,
+  IUpdateMessageCommand,
   MessageJobSendType,
   UploadAttachmentResponseData,
 } from "../../dtos/enterprise"
@@ -14,7 +16,12 @@ import { useBoolean } from "ahooks"
 import { timeZone } from "../../dtos/send-message-job"
 import { clone } from "ramda"
 
-const useAction = () => {
+const useAction = (
+  outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void,
+  emailUpdateData?: ILastShowTableData
+) => {
+  // console.log(emailUpdateData)
+  const emailObj = emailUpdateData?.emailNotification
   const defaultEmailValue = {
     displayName: "",
     senderId: "",
@@ -22,7 +29,7 @@ const useAction = () => {
   // 富文本框实例
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null) // 存储 editor 实例
   // 富文本框html
-  const [html, setHtml] = useState("")
+  const [html, setHtml] = useState(emailObj?.body ?? "")
   // 邮件的从
   const [emailFrom, setEmailFrom] =
     useState<IEmailResonponse>(defaultEmailValue)
@@ -31,15 +38,19 @@ const useAction = () => {
   // 发送邮件地址input值
   const [emailToString, setEmailToString] = useState("")
   // 发送邮件地址 确认列表
-  const [emailToArr, setEmailToArr] = useState<string[]>([])
+  const [emailToArr, setEmailToArr] = useState<string[]>(emailObj?.to ?? [])
   // 抄送邮箱地址的input值
   const [emailCopyToString, setEmailCopyToString] = useState("")
   // 抄送邮箱地址的 确定列表
-  const [emailCopyToArr, setEmailCopyToArr] = useState<string[]>([])
+  const [emailCopyToArr, setEmailCopyToArr] = useState<string[]>(
+    emailObj?.cc ?? []
+  )
   // 邮箱主题
-  const [emailSubject, setEmailSubject] = useState("")
+  const [emailSubject, setEmailSubject] = useState(emailObj?.subject ?? "")
   // 是否显示抄送
-  const [isShowCopyto, setIsShowCopyto] = useState(false)
+  const [isShowCopyto, setIsShowCopyto] = useState(
+    emailObj?.cc.length && emailObj?.cc.length > 0
+  )
   // 发送记录的ref
   const sendRecordRef = useRef<ModalBoxRef>(null)
   // 周期发送的设置value
@@ -342,6 +353,42 @@ const useAction = () => {
     })
   }
 
+  useEffect(() => {
+    outterGetUpdateData &&
+      outterGetUpdateData(() => {
+        if (checkObject())
+          return {
+            jobSetting: jobSetting ?? {
+              timezone: timeZone[timeZoneValue].convertTimeZone,
+            },
+            metadata: editor
+              ? [
+                  {
+                    key: "cleanContent",
+                    value: editor.getText(),
+                  },
+                ]
+              : [],
+            emailNotification: {
+              senderId: emailFrom.senderId,
+              subject: emailSubject,
+              body: editor ? editor.getHtml() : "",
+              to: emailToArr,
+              cc: emailCopyToArr,
+            },
+            messageJobId: "",
+          }
+        else return undefined
+      })
+  }, [
+    jobSetting,
+    editor?.getText(),
+    emailFrom,
+    emailSubject,
+    emailToArr,
+    emailCopyToArr,
+  ])
+
   // 延迟关闭警告提示
   useEffect(() => {
     if (openError) {
@@ -356,7 +403,9 @@ const useAction = () => {
       // 获取发送信息
       if (data && data.length > 0) {
         setEmailList(data)
-        setEmailFrom(data[0])
+        setEmailFrom(
+          data.find((x) => x.senderId === emailObj?.senderId) ?? data[0]
+        )
       }
     })
   }, [])

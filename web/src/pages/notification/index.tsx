@@ -1,4 +1,14 @@
-import { Alert, AlertTitle, Button, Snackbar, Tooltip } from "@mui/material"
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Snackbar,
+  Tooltip,
+} from "@mui/material"
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid"
 import styles from "./index.module.scss"
 import moment from "moment"
@@ -10,6 +20,7 @@ import React from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
 import RestartAltIcon from "@mui/icons-material/RestartAlt"
 import { MessageJobDestination } from "../../dtos/enterprise"
+import SendEmail from "../email"
 
 const asyncTootip = (title: string, styles: string) => {
   return (
@@ -48,6 +59,10 @@ const SendNotice = React.memo(
       openError,
       showErrorPrompt,
       onEmailSetting,
+      handleEmailConfirm,
+      handleEmailCancel,
+      showEmail,
+      outterGetUpdateData,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -138,7 +153,9 @@ const SendNotice = React.memo(
             <p
               className={styles.text}
               onClick={() => {
-                recordType ? onSetting(params.row) : onEmailSetting()
+                recordType === MessageJobDestination.WorkWeChat
+                  ? onSetting(params.row)
+                  : onEmailSetting(params.row)
               }}
             >
               【设置】
@@ -301,6 +318,27 @@ const SendNotice = React.memo(
         >
           <SendRecord sendRecordList={sendRecordList} />
         </ModalBox>
+
+        <Dialog
+          open={showEmail}
+          PaperProps={{
+            sx: {
+              maxWidth: "65rem",
+            },
+          }}
+        >
+          <DialogTitle>邮件设置</DialogTitle>
+          <DialogContent>
+            <SendEmail
+              emailUpdateData={updateMessageJobInformation}
+              outterGetUpdateData={outterGetUpdateData}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleEmailConfirm}>确定</Button>
+            <Button onClick={handleEmailCancel}>取消</Button>
+          </DialogActions>
+        </Dialog>
       </div>
     )
   }

@@ -264,7 +264,7 @@ export interface IUpdateMessageCommand {
     to: string[]
     cc: string[]
   }
-  workWeChatAppNotification: IWorkWeChatAppNotificationDto
+  workWeChatAppNotification?: IWorkWeChatAppNotificationDto
 }
 
 export interface IJobSettingDto {

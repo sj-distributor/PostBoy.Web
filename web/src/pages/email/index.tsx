@@ -13,6 +13,8 @@ import ModalBox from "../../components/modal/modal"
 import SendNotice from "../notification"
 import ClearIcon from "@mui/icons-material/Clear"
 import {
+  ILastShowTableData,
+  IUpdateMessageCommand,
   MessageJobDestination,
   MessageJobSendType,
 } from "../../dtos/enterprise"
@@ -32,7 +34,11 @@ import {
 } from "@mui/material"
 import { green } from "@mui/material/colors"
 
-const SendEmail = () => {
+const SendEmail = (props: {
+  emailUpdateData?: ILastShowTableData
+  outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void
+}) => {
+  const { emailUpdateData, outterGetUpdateData } = props
   const {
     toolbarConfig,
     editorConfig,
@@ -83,7 +89,7 @@ const SendEmail = () => {
     handleChange,
     handleBlur,
     handleAnnexDelete,
-  } = useAction()
+  } = useAction(outterGetUpdateData, emailUpdateData)
 
   return (
     <div className={styles.wrap}>
@@ -142,15 +148,17 @@ const SendEmail = () => {
             />
           )}
         </Box>
-        <Button
-          sx={{
-            marginLeft: "2rem",
-          }}
-          variant="contained"
-          onClick={() => clickSendRecord("open")}
-        >
-          发送记录
-        </Button>
+        {!emailUpdateData && (
+          <Button
+            sx={{
+              marginLeft: "2rem",
+            }}
+            variant="contained"
+            onClick={() => clickSendRecord("open")}
+          >
+            发送记录
+          </Button>
+        )}
         <Button
           sx={{
             marginLeft: "2rem",
