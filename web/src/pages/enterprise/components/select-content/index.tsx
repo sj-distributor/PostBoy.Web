@@ -104,7 +104,7 @@ const SelectContent = memo(
       editorConfig,
       setHtmlText,
       tagsValue,
-      updatedDeptUserList,
+      isUpdatedDeptUser,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -397,7 +397,7 @@ const SelectContent = memo(
             setChatId={setChatId}
             sendType={sendType}
             setSendType={setSendType}
-            isUpdatedDeptUser={updatedDeptUserList}
+            isUpdatedDeptUser={isUpdatedDeptUser}
           />
         </div>
         <div className={styles.typeShow}>

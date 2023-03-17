@@ -143,7 +143,7 @@ export const useAction = (props: SelectContentHookProps) => {
     SendObjOrGroup.Object
   )
 
-  const [updatedDeptUserList, setUpdatedDeptUserList] = useState(false)
+  const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false)
 
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null)
 
@@ -446,7 +446,7 @@ export const useAction = (props: SelectContentHookProps) => {
         }
         return item
       })
-      setUpdatedDeptUserList(true)
+      setIsUpdatedDeptUser(true)
       setDepartmentAndUserList(array)
     }
   }, [isLoadStop])
@@ -1132,6 +1132,6 @@ export const useAction = (props: SelectContentHookProps) => {
     setHtml,
     setHtmlText,
     tagsValue,
-    updatedDeptUserList,
+    isUpdatedDeptUser,
   }
 }
