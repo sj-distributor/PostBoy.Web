@@ -47,6 +47,7 @@ const SendNotice = React.memo(
       promptText,
       openError,
       showErrorPrompt,
+      onEmailSetting,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -134,13 +135,15 @@ const SendNotice = React.memo(
           params.row.hasException && styles.deletedColor,
         renderCell: (params: GridCellParams) => (
           <div className={styles.operate}>
-            {recordType ? (
-              <p className={styles.text} onClick={() => onSetting(params.row)}>
-                【设置】
-              </p>
-            ) : (
-              <></>
-            )}
+            <p
+              className={styles.text}
+              onClick={() => {
+                recordType ? onSetting(params.row) : onEmailSetting()
+              }}
+            >
+              【设置】
+            </p>
+
             <p
               className={styles.text}
               onClick={() =>

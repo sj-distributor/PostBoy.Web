@@ -159,6 +159,8 @@ export const useAction = (recordType: MessageJobDestination) => {
     setAlertShow.setTrue()
   }
 
+  const onEmailSetting = () => {}
+
   // 弹出警告
   const showErrorPrompt = (text: string) => {
     setPromptText(text)
@@ -340,5 +342,6 @@ export const useAction = (recordType: MessageJobDestination) => {
     promptText,
     openError,
     showErrorPrompt,
+    onEmailSetting,
   }
 }
