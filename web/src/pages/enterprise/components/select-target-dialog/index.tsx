@@ -76,7 +76,7 @@ const SelectTargetDialog = memo(
       chatId,
       sendType,
       outerTagsValue,
-      updatedDeptUserList,
+      isUpdatedDeptUser,
       setSendType,
       setIsRefresh,
       setChatId,
@@ -119,7 +119,7 @@ const SelectTargetDialog = memo(
       clickName,
       chatId,
       outerTagsValue,
-      updatedDeptUserList,
+      isUpdatedDeptUser,
       sendType,
       setSendType,
       setChatId,
@@ -503,7 +503,7 @@ const SelectTargetDialog = memo(
             setIsRefresh={setIsRefresh}
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
-            updatedDeptUserList={updatedDeptUserList}
+            isUpdatedDeptUser={isUpdatedDeptUser}
           />
         )}
 

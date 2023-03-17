@@ -121,7 +121,7 @@ export interface ITargetDialogProps {
   chatId: string
   sendType?: SendObjOrGroup
   outerTagsValue?: ITagsList[]
-  updatedDeptUserList: boolean
+  isUpdatedDeptUser: boolean
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>

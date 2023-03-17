@@ -397,7 +397,7 @@ const SelectContent = memo(
             setChatId={setChatId}
             sendType={sendType}
             setSendType={setSendType}
-            updatedDeptUserList={updatedDeptUserList}
+            isUpdatedDeptUser={updatedDeptUserList}
           />
         </div>
         <div className={styles.typeShow}>
