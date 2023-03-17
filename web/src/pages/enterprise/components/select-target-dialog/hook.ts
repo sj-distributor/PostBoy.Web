@@ -23,9 +23,10 @@ const useAction = (props: {
   tagsList: ITagsList[]
   clickName: string
   chatId: string
-  outTagsValue?: ITagsList[]
+  outerTagsValue?: ITagsList[]
   updatedDeptUserList: boolean
-  isUpdate: boolean
+  sendType?: SendObjOrGroup
+  setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setOpenFunction: (open: boolean) => void
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
@@ -41,10 +42,11 @@ const useAction = (props: {
     tagsList,
     clickName,
     chatId,
-    outTagsValue,
+    outerTagsValue,
     updatedDeptUserList,
     lastTagsValue,
-    isUpdate,
+    sendType,
+    setSendType,
     setChatId,
     setIsRefresh,
     setOpenFunction,
@@ -257,6 +259,7 @@ const useAction = (props: {
   const handleConfirm = () => {
     setOpenFunction(false)
     setOuterTagsValue(tagsValue)
+    setFirstState(undefined)
   }
 
   const handleCancel = () => {
@@ -303,6 +306,8 @@ const useAction = (props: {
       setTagsValue(firstState.tagsValue)
       setDeptUserList(firstState.deptUserList)
       setChatId && setChatId(firstState.chatId)
+      setSendType && setSendType(firstState.sendType)
+      setFirstState(undefined)
     }
   }
 
@@ -312,11 +317,12 @@ const useAction = (props: {
 
   useEffect(() => {
     open &&
-      (!firstState || (isUpdate && updatedDeptUserList)) &&
+      updatedDeptUserList &&
       setFirstState({
-        tagsValue: outTagsValue ?? [],
+        tagsValue: outerTagsValue ?? [],
         chatId,
         deptUserList: clone(departmentAndUserList),
+        sendType: sendType ?? SendObjOrGroup.Object,
       })
   }, [open, updatedDeptUserList])
 

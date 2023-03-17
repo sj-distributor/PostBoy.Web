@@ -1,5 +1,5 @@
 import { clone, flatten, isEmpty, uniqWith } from "ramda"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -187,28 +187,35 @@ export const useAction = (props: SelectContentHookProps) => {
     const partiesSelected = flattenDepartmentList.find(
       (e) => e.key === corpAppValue?.appId
     )?.data
+    const workWeChatAppNotification =
+      sendObject ??
+      outerSendData?.workWeChatAppNotification ??
+      updateMessageJobInformation?.workWeChatAppNotification
 
     if (sendType === SendObjOrGroup.Object) {
-      outerSendData?.workWeChatAppNotification?.toParties &&
+      workWeChatAppNotification?.toParties &&
         partiesSelected &&
         result.push(
           ...partiesSelected
             .filter((e) =>
-              outerSendData.workWeChatAppNotification?.toParties?.some(
+              workWeChatAppNotification?.toParties?.some(
                 (item) => item === String(e.id)
               )
             )
             .map((e) => e.name)
         )
-      outerSendData?.workWeChatAppNotification?.toUsers &&
-        result.push(...outerSendData.workWeChatAppNotification.toUsers)
-      outerSendData?.workWeChatAppNotification?.toTags &&
-        result.push(...outerSendData.workWeChatAppNotification.toTags)
+      workWeChatAppNotification?.toUsers &&
+        result.push(...workWeChatAppNotification.toUsers)
+      tagsValue && result.push(...tagsValue.map((x) => x.tagName))
     } else {
       result.push(...groupList.filter((x) => x.chatId === chatId))
     }
     return result
-  }, [outerSendData?.workWeChatAppNotification, chatId])
+  }, [
+    sendObject,
+    outerSendData?.workWeChatAppNotification,
+    updateMessageJobInformation?.workWeChatAppNotification,
+  ])
 
   // 初始化企业数组
   useEffect(() => {
@@ -250,7 +257,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 获取Tags数组
   useEffect(() => {
-    if (corpAppValue?.appId !== undefined && isNewOrUpdate === "new") {
+    if (corpAppValue?.appId !== undefined) {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
           tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
@@ -259,13 +266,15 @@ export const useAction = (props: SelectContentHookProps) => {
       GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
         data && setGroupList(data)
       })
-      // 清空切换应用时的已选值
-      setChatId("")
-      setTagsValue([])
-      setSendObject({
-        toUsers: [],
-        toParties: [],
-      })
+      if (isNewOrUpdate === "new") {
+        // 清空切换应用时的已选值
+        setChatId("")
+        setTagsValue([])
+        setSendObject({
+          toUsers: [],
+          toParties: [],
+        })
+      }
     }
   }, [corpAppValue?.appId])
 

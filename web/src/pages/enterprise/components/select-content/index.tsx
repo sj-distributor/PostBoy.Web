@@ -60,7 +60,6 @@ const SelectContent = memo(
       setIsRefresh,
       departmentAndUserList,
       setDepartmentAndUserList,
-      setFlattenDepartmentList,
       departmentKeyValue,
       searchKeyValue,
       isTreeViewLoading,
@@ -389,7 +388,7 @@ const SelectContent = memo(
             setGroupList={setGroupList}
             setOpenFunction={setIsShowDialog}
             setDeptUserList={setDepartmentAndUserList}
-            outTagsValue={tagsValue}
+            outerTagsValue={tagsValue}
             setOuterTagsValue={setTagsValue}
             setIsRefresh={setIsRefresh}
             lastTagsValue={lastTimeTagsList}
@@ -399,7 +398,6 @@ const SelectContent = memo(
             sendType={sendType}
             setSendType={setSendType}
             updatedDeptUserList={updatedDeptUserList}
-            isUpdate={!!updateMessageJobInformation}
           />
         </div>
         <div className={styles.typeShow}>
@@ -620,7 +618,10 @@ const SelectContent = memo(
     )
   },
   (prevProps, nextProps) => {
-    return prevProps.sendData === nextProps.sendData && prevProps === nextProps
+    return (
+      prevProps.sendData === nextProps.sendData &&
+      JSON.stringify(prevProps) === JSON.stringify(nextProps)
+    )
   }
 )
 

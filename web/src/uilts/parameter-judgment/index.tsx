@@ -26,7 +26,7 @@ export const parameterJudgment = (
       } else if (
         jobSetting.recurringJob !== undefined &&
         jobSetting.recurringJob.endDate &&
-        moment(jobSetting.recurringJob.endDate).format("DD.MM.YYYY HH:mm") >=
+        moment(jobSetting.recurringJob.endDate).format("DD.MM.YYYY HH:mm") <
           moment().format("DD.MM.YYYY HH:mm")
       ) {
         showErrorPrompt("The end time cannot exceed the current time!")

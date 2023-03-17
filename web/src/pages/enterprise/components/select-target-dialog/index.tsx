@@ -75,9 +75,8 @@ const SelectTargetDialog = memo(
       clickName,
       chatId,
       sendType,
-      outTagsValue,
+      outerTagsValue,
       updatedDeptUserList,
-      isUpdate,
       setSendType,
       setIsRefresh,
       setChatId,
@@ -119,9 +118,10 @@ const SelectTargetDialog = memo(
       tagsList,
       clickName,
       chatId,
-      outTagsValue,
+      outerTagsValue,
       updatedDeptUserList,
-      isUpdate,
+      sendType,
+      setSendType,
       setChatId,
       setIsRefresh,
       setOpenFunction,
@@ -386,8 +386,6 @@ const SelectTargetDialog = memo(
                       />
                     )}
                     onChange={(e, value) => {
-                      console.log(e, value)
-
                       setChatId && setChatId(value ? value.chatId : "")
                     }}
                   />
@@ -506,7 +504,6 @@ const SelectTargetDialog = memo(
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
             updatedDeptUserList={updatedDeptUserList}
-            isUpdate={isUpdate}
           />
         )}
 
