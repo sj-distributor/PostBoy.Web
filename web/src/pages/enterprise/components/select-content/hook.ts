@@ -208,10 +208,27 @@ export const useAction = (props: SelectContentHookProps) => {
         result.push(...workWeChatAppNotification.toUsers)
       tagsValue && result.push(...tagsValue.map((x) => x.tagName))
     } else {
-      result.push(...groupList.filter((x) => x.chatId === chatId))
+      let group: IWorkCorpAppGroup[] = []
+      if (
+        updateMessageJobInformation &&
+        updateMessageJobInformation.groupId &&
+        updateMessageJobInformation.groupName
+      )
+        group =
+          groupList.length > 0
+            ? groupList.filter((x) => x.chatId === chatId)
+            : [
+                {
+                  chatId: updateMessageJobInformation.groupId,
+                  chatName: updateMessageJobInformation.groupName,
+                },
+              ]
+
+      result.push(...group)
     }
     return result
   }, [
+    isShowDialog,
     sendObject,
     outerSendData?.workWeChatAppNotification,
     updateMessageJobInformation?.workWeChatAppNotification,
