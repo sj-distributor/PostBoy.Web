@@ -115,6 +115,8 @@ export const useAction = (recordType: MessageJobDestination) => {
   const sendRecordRef = useRef<ModalBoxRef>(null)
   const deleteConfirmRef = useRef<ModalBoxRef>(null)
 
+  const [showEmail, setShowEmail] = useState(false)
+
   const [dto, setDto] = useState<IDtoExtend>({
     loading: true,
     messageJobs: [],
@@ -138,6 +140,9 @@ export const useAction = (recordType: MessageJobDestination) => {
   const [updateMessageJobInformation, setUpdateMessageJobInformation] =
     useState<ILastShowTableData>()
 
+  const [emailUpdateData, setEmailUpdateData] =
+    useState<() => IUpdateMessageCommand | undefined>()
+
   const onNoticeCancel = () => {
     noticeSettingRef.current?.close()
   }
@@ -157,6 +162,34 @@ export const useAction = (recordType: MessageJobDestination) => {
       return
     }
     setAlertShow.setTrue()
+  }
+
+  const onEmailSetting = (item: ILastShowTableData) => {
+    setUpdateMessageJobInformation(item)
+    setShowEmail(true)
+  }
+
+  const outterGetUpdateData = (
+    callback: () => IUpdateMessageCommand | undefined
+  ) => {
+    setEmailUpdateData(() => callback)
+  }
+
+  const handleEmailConfirm = () => {
+    const data = emailUpdateData && emailUpdateData()
+    data &&
+      PostMessageJobUpdate(
+        Object.assign(data, {
+          messageJobId: updateMessageJobInformation?.id,
+        })
+      ).then((data) => {
+        data && getMessageJob()
+      })
+    setShowEmail(false)
+  }
+
+  const handleEmailCancel = () => {
+    setShowEmail(false)
   }
 
   // 弹出警告
@@ -229,9 +262,9 @@ export const useAction = (recordType: MessageJobDestination) => {
 
   const onUpdateMessageJob = (data: IUpdateMessageCommand) => {
     const cloneData = clone(data)
-    cloneData.workWeChatAppNotification = convertType(
-      cloneData.workWeChatAppNotification
-    )
+    cloneData.workWeChatAppNotification =
+      cloneData.workWeChatAppNotification &&
+      convertType(cloneData.workWeChatAppNotification)
     if (parameterJudgment(cloneData, showErrorPrompt)) {
       PostMessageJobUpdate(cloneData)
         .then(() => {
@@ -340,5 +373,11 @@ export const useAction = (recordType: MessageJobDestination) => {
     promptText,
     openError,
     showErrorPrompt,
+    onEmailSetting,
+    setShowEmail,
+    showEmail,
+    handleEmailConfirm,
+    handleEmailCancel,
+    outterGetUpdateData,
   }
 }
