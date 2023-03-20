@@ -9,7 +9,7 @@ import {
 
 export const messageTypeList: IMessageTypeData[] = [
   { title: "文本", groupBy: "", type: MessageDataFileType.Text },
-  { title: "图文", groupBy: "", type: MessageDataFileType.Image },
+  { title: "推文", groupBy: "", type: MessageDataFileType.Image },
   { title: "图片", groupBy: "文件", type: MessageDataFileType.Image },
   { title: "语音", groupBy: "文件", type: MessageDataFileType.Voice },
   { title: "视频", groupBy: "文件", type: MessageDataFileType.Video },

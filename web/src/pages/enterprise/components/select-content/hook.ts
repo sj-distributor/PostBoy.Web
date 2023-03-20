@@ -97,7 +97,7 @@ export const useAction = (props: SelectContentHookProps) => {
   const [content, setContent] = useState<string>("")
   // 纯净内容
   const [cleanContent, setCleanContent] = useState<string>("")
-  // 图文
+  // 推文
   const [pictureText, setPictureText] = useState<PictureText[]>([])
   // 文件
   const [file, setFile] = useState<FileObject>({
@@ -540,7 +540,7 @@ export const useAction = (props: SelectContentHookProps) => {
     files: File[],
     fileType?: MessageDataFileType
   ) => {
-    if (type === "图文") {
+    if (type === "推文") {
       return files.some((item) => item.size / 1024 > 1024 * 10)
     } else {
       switch (fileType) {
@@ -566,13 +566,13 @@ export const useAction = (props: SelectContentHookProps) => {
     type: string,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if (type === "图文") {
+    if (type === "推文") {
       const array =
         Array.from(files).length > 8
           ? Array.from(files).slice(-8)
           : Array.from(files)
 
-      const isExceedSize = judgingFileSize("图文", array)
+      const isExceedSize = judgingFileSize("推文", array)
       if (isExceedSize) {
         e.target.value = ""
         showErrorPrompt("The file size is too large!")
@@ -695,7 +695,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 图文上传时 标题内容自动更新
   useEffect(() => {
-    if (messageTypeValue.groupBy === "" && messageTypeValue.title === "图文") {
+    if (messageTypeValue.groupBy === "" && messageTypeValue.title === "推文") {
       if (pictureText.length > 0) {
         const newArr = pictureText.map((item) => {
           item.content = html
@@ -766,7 +766,7 @@ export const useAction = (props: SelectContentHookProps) => {
         })
         break
       }
-      case "图文": {
+      case "推文": {
         setSendData({
           mpNews: {
             articles:
@@ -988,7 +988,7 @@ export const useAction = (props: SelectContentHookProps) => {
         },
         {
           key: "cleanContent",
-          value: messageTypeValue.title === "图文" ? htmlText : content,
+          value: messageTypeValue.title === "推文" ? htmlText : content,
         },
       ]
       sendType === SendObjOrGroup.Group &&
