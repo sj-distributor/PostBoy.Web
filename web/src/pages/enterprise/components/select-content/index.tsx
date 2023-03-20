@@ -209,7 +209,7 @@ const SelectContent = memo(
         ? file !== undefined
           ? !!file && fileOrImage(file, state)
           : !!pictureText && pictureImage(pictureText, state)
-        : messageTypeValue.title !== "图文"
+        : messageTypeValue.title !== "推文"
         ? !!file && fileOrImage(file, state)
         : !!pictureText && pictureImage(pictureText, state)
     }
@@ -456,7 +456,7 @@ const SelectContent = memo(
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              {messageTypeValue.title !== "图文" && (
+              {messageTypeValue.title !== "推文" && (
                 <TextField
                   className={styles.input}
                   label="内容"
@@ -511,7 +511,7 @@ const SelectContent = memo(
                       width: "6rem",
                     }}
                   >
-                    {messageTypeValue.title === "图文" ? (
+                    {messageTypeValue.title === "推文" ? (
                       <>
                         封面图片
                         <input
@@ -522,7 +522,7 @@ const SelectContent = memo(
                           multiple
                           onChange={(e) =>
                             !!e.target.files &&
-                            fileUpload(e.target.files, "图文", e)
+                            fileUpload(e.target.files, "推文", e)
                           }
                         />
                       </>
