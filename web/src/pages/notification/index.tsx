@@ -335,7 +335,9 @@ const SendNotice = React.memo(
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleEmailConfirm}>确定</Button>
+            <Button variant="contained" onClick={handleEmailConfirm}>
+              提交
+            </Button>
             <Button onClick={handleEmailCancel}>取消</Button>
           </DialogActions>
         </Dialog>
