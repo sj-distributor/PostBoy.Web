@@ -15,6 +15,7 @@ import {
 import { useBoolean } from "ahooks"
 import { timeZone } from "../../dtos/send-message-job"
 import { clone } from "ramda"
+import moment from "moment"
 
 const useAction = (
   outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void,
@@ -334,6 +335,12 @@ const useAction = (
       setPromptText("please enter email content")
       openErrorAction.setTrue()
       return false
+    } else if (
+      !!jobSetting?.recurringJob &&
+      jobSetting.recurringJob.endDate &&
+      moment(jobSetting.recurringJob.endDate).isBefore(new Date(), "minute")
+    ) {
+      showErrorPrompt("The end time cannot exceed the current time!")
     }
     return true
   }
@@ -506,4 +513,5 @@ const useAction = (
     handleAnnexDelete,
   }
 }
+
 export default useAction
