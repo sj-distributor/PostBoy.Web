@@ -52,9 +52,10 @@ const TimeSelector = (props: {
           }}
           onChange={(e) => {
             if (
-              moment((e.target as HTMLInputElement).value).format(
-                "DD.MM.YYYY HH:mm"
-              ) >= moment().format("DD.MM.YYYY HH:mm")
+              moment((e.target as HTMLInputElement).value).isSameOrAfter(
+                new Date(),
+                "minute"
+              )
             ) {
               setEndDateValue((e.target as HTMLInputElement).value)
             } else {
