@@ -165,6 +165,10 @@ export const useAction = (recordType: MessageJobDestination) => {
   }
 
   const onEmailSetting = (item: ILastShowTableData) => {
+    if (item.jobType === MessageJobSendType.Fire) {
+      setAlertShow.setTrue()
+      return
+    }
     setUpdateMessageJobInformation(item)
     setShowEmail(true)
   }

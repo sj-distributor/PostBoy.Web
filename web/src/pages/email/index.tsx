@@ -125,15 +125,17 @@ const SendEmail = (props: {
           ))}
         </Select>
         <Box sx={{ position: "relative" }}>
-          <Button
-            variant="contained"
-            sx={{ marginLeft: "2rem" }}
-            endIcon={<SendIcon />}
-            disabled={sendLoading}
-            onClick={handleClickSend}
-          >
-            Send
-          </Button>
+          {!emailUpdateData && (
+            <Button
+              variant="contained"
+              sx={{ marginLeft: "2rem" }}
+              endIcon={<SendIcon />}
+              disabled={sendLoading}
+              onClick={handleClickSend}
+            >
+              Send
+            </Button>
+          )}
           {sendLoading && (
             <CircularProgress
               size={24}
