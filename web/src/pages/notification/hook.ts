@@ -191,7 +191,7 @@ export const useAction = (recordType: MessageJobDestination) => {
       ).then((data) => {
         data && getMessageJob()
       })
-    setShowEmail(false)
+    data && handleEmailCancel()
   }
 
   const handleEmailCancel = () => {

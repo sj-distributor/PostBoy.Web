@@ -9,7 +9,6 @@ import {
   IJobSettingDto,
   ILastShowTableData,
   IUpdateMessageCommand,
-  messageJobSendType,
   MessageJobSendType,
   UploadAttachmentResponseData,
 } from "../../dtos/enterprise"
@@ -23,6 +22,9 @@ const useAction = (
   emailUpdateData?: ILastShowTableData
 ) => {
   const emailObj = emailUpdateData?.emailNotification
+  const timeObj = emailUpdateData?.jobSettingJson
+    ? JSON.parse(emailUpdateData?.jobSettingJson)
+    : undefined
   const defaultEmailValue = {
     displayName: "",
     senderId: "",
@@ -55,21 +57,29 @@ const useAction = (
   // 发送记录的ref
   const sendRecordRef = useRef<ModalBoxRef>(null)
   // 周期发送的设置value
-  const [jobSetting, setJobSetting] = useState<IJobSettingDto>()
+  const [jobSetting, setJobSetting] = useState<IJobSettingDto>(
+    timeObj ?? undefined
+  )
   // 提示语
   const [promptText, setPromptText] = useState("")
   // 提示显隐
   const [openError, openErrorAction] = useBoolean(false)
   // 循环周期
-  const [cronExp, setCronExp] = useState<string>("0 0 * * *")
+  const [cronExp, setCronExp] = useState<string>(
+    timeObj?.RecurringJob?.CronExpression ?? "0 0 * * *"
+  )
   // 发送类型选择
   const [sendTypeValue, setSendTypeValue] = useState<MessageJobSendType>(
-    MessageJobSendType.Fire
+    emailUpdateData?.jobType ?? MessageJobSendType.Fire
   )
   // 发送时间
-  const [dateValue, setDateValue] = useState<string>("")
+  const [dateValue, setDateValue] = useState<string>(
+    timeObj?.DelayedJob?.EnqueueAt ?? ""
+  )
   // 终止时间
-  const [endDateValue, setEndDateValue] = useState<string>("")
+  const [endDateValue, setEndDateValue] = useState<string>(
+    timeObj?.RecurringJob?.EndDate ?? ""
+  )
   // 时区选择
   const [timeZoneValue, setTimeZoneValue] = useState<number>(
     timeZone.filter((x) => !x.disable)[0].value
@@ -362,7 +372,8 @@ const useAction = (
           new Date(),
           "minute"
         )) ||
-      !jobSetting?.recurringJob?.endDate
+      (sendTypeValue === MessageJobSendType.Recurring &&
+        !jobSetting?.recurringJob?.endDate)
     ) {
       openErrorAction.setTrue()
       setPromptText("The end time cannot exceed the current time!")
