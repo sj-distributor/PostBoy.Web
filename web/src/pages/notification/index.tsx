@@ -161,22 +161,22 @@ const SendNotice = React.memo(
             >
               【设置】
             </p>
-
             <p
               className={styles.text}
-              onClick={() =>
+              onClick={() => {
+                const appNot = params.row.workWeChatAppNotification
                 onSend(
                   recordType === MessageJobDestination.WorkWeChat
                     ? [
-                        ...params.row.workWeChatAppNotification.toParties,
-                        ...params.row.workWeChatAppNotification.toTags,
-                        ...params.row.workWeChatAppNotification.toUsers,
+                        ...(appNot.toParties ? appNot.toParties : []),
+                        ...(appNot.toTags ? appNot.toTags : []),
+                        ...(appNot.toUsers ? appNot.toUsers : []),
                         [params.row.groupName],
                       ].join(";")
                     : "",
                   params.row.correlationId
                 )
-              }
+              }}
             >
               【发送记录】
             </p>

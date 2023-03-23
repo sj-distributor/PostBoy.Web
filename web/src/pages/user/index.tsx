@@ -64,8 +64,8 @@ const User = () => {
                 variant="contained"
                 className={styles.addButton}
                 onClick={(event) => {
-                  addApikeyRef.current?.open()
                   setUserAccountId(item.id)
+                  addApikeyRef.current?.open()
                   event.stopPropagation()
                 }}
               >
