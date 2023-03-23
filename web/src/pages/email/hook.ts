@@ -158,26 +158,31 @@ const useAction = (
     setSendLoading(true)
     checkObject() &&
       PostMessageSend(data).then((data) => {
-        setPromptText("发送成功")
-        openErrorAction.setTrue()
-        setSendLoading(false)
-        // 清空数据
-        setJobSetting({
-          timezone: timeZone[timeZoneValue].convertTimeZone,
-        })
-        editor && editor.setHtml("<p></p>")
-        setEmailCopyToArr([])
-        setEmailToArr([])
-        setAnnexesList([])
-        setEmailToString("")
-        setEmailCopyToString("")
-        setEmailSubject("")
-        setSendTypeValue(MessageJobSendType.Fire)
-        setTimeZoneValue(timeZone[0].value)
-        setCronError("")
-        setCronExp("0 0 * * *")
-        setEndDateValue("")
-        setDateValue("")
+        if (data) {
+          setPromptText("发送成功")
+          openErrorAction.setTrue()
+          setSendLoading(false)
+          // 清空数据
+          setJobSetting({
+            timezone: timeZone[timeZoneValue].convertTimeZone,
+          })
+          editor && editor.setHtml("<p></p>")
+          setEmailCopyToArr([])
+          setEmailToArr([])
+          setAnnexesList([])
+          setEmailToString("")
+          setEmailCopyToString("")
+          setEmailSubject("")
+          setSendTypeValue(MessageJobSendType.Fire)
+          setTimeZoneValue(timeZone.filter((x) => !x.disable)[0].value)
+          setCronError("")
+          setCronExp("0 0 * * *")
+          setEndDateValue("")
+          setDateValue("")
+        } else {
+          openErrorAction.setTrue()
+          setPromptText("发送失败")
+        }
       })
     setSendLoading(false)
   }
@@ -294,13 +299,6 @@ const useAction = (
   }
 
   const checkObject = () => {
-    jobSetting?.recurringJob &&
-      console.log(
-        !moment(jobSetting.recurringJob.endDate).isSameOrAfter(
-          new Date(),
-          "minute"
-        )
-      )
     if (
       !emailToString &&
       (emailToArr.length <= 0 || emailToArr.some((x) => !validateEmail(x)))
@@ -343,26 +341,34 @@ const useAction = (
       setPromptText("please enter email content")
       openErrorAction.setTrue()
       return false
-    } else if (sendTypeValue !== MessageJobSendType.Fire) {
-      console.log(jobSetting)
-      openErrorAction.setTrue()
+    } else if (
       sendTypeValue === MessageJobSendType.Delayed &&
-        !!jobSetting?.delayedJob?.enqueueAt &&
-        setPromptText("Please select delivery time!")
+      !jobSetting?.delayedJob?.enqueueAt
+    ) {
+      openErrorAction.setTrue()
+      setPromptText("Please select delivery time!")
+      return false
+    } else if (
       sendTypeValue === MessageJobSendType.Recurring &&
-        jobSetting?.recurringJob?.cronExpression.trim().split(" ").length !==
-          5 &&
-        setPromptText("Please select the sending period!")
-      !!jobSetting?.recurringJob &&
+      jobSetting?.recurringJob?.cronExpression.trim().split(" ").length !== 5
+    ) {
+      openErrorAction.setTrue()
+      setPromptText("Please select the sending period!")
+      return false
+    } else if (
+      (!!jobSetting?.recurringJob &&
         jobSetting.recurringJob.endDate &&
         !moment(jobSetting.recurringJob.endDate).isSameOrAfter(
           new Date(),
           "minute"
-        ) &&
-        setPromptText("The end time cannot exceed the current time!")
+        )) ||
+      !jobSetting?.recurringJob?.endDate
+    ) {
+      openErrorAction.setTrue()
+      setPromptText("The end time cannot exceed the current time!")
       return false
     }
-    return false
+    return true
   }
 
   const handleAnnexDelete = (

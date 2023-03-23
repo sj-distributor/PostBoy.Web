@@ -63,6 +63,7 @@ const SendNotice = React.memo(
       handleEmailCancel,
       showEmail,
       outterGetUpdateData,
+      recordRowLoading,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -316,7 +317,10 @@ const SendNotice = React.memo(
           onCancel={onSendCancel}
           title={"发送记录"}
         >
-          <SendRecord sendRecordList={sendRecordList} />
+          <SendRecord
+            loading={recordRowLoading}
+            sendRecordList={sendRecordList}
+          />
         </ModalBox>
 
         <Dialog

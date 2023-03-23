@@ -22,7 +22,7 @@ const asyncTootip = (
 
 const SendRecord = memo(
   (props: SendRecordProps) => {
-    const { sendRecordList } = props
+    const { loading, sendRecordList } = props
 
     const columns: GridColumns = [
       {
@@ -107,6 +107,7 @@ const SendRecord = memo(
     return (
       <Box className={styles.tableWrap}>
         <DataGrid
+          loading={loading}
           showCellRightBorder
           showColumnRightBorder
           rows={sendRecordList}
