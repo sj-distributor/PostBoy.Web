@@ -384,6 +384,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev)
         const hasData = newValue.find((e) => e.key === AppId)
+        let idList = []
         // 是否现有key的数据
         hasData && hasData.data.length > 0
           ? (idList = recursiveDeptList(
