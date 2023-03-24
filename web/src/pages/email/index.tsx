@@ -64,6 +64,7 @@ const SendEmail = (props: {
     openError,
     sendLoading,
     annexesList,
+    choosenJobSetting,
     validateAttrFunc,
     setOpen,
     setTimeZoneValue,
@@ -125,15 +126,17 @@ const SendEmail = (props: {
           ))}
         </Select>
         <Box sx={{ position: "relative" }}>
-          <Button
-            variant="contained"
-            sx={{ marginLeft: "2rem" }}
-            endIcon={<SendIcon />}
-            disabled={sendLoading}
-            onClick={handleClickSend}
-          >
-            Send
-          </Button>
+          {!emailUpdateData && (
+            <Button
+              variant="contained"
+              sx={{ marginLeft: "2rem" }}
+              endIcon={<SendIcon />}
+              disabled={sendLoading}
+              onClick={handleClickSend}
+            >
+              Send
+            </Button>
+          )}
           {sendLoading && (
             <CircularProgress
               size={24}
@@ -277,6 +280,18 @@ const SendEmail = (props: {
           onChange={(e) => {
             setEmailSubject(e.target.value)
           }}
+        />
+      </div>
+      <div className={styles.inputGroup}>
+        <TextField
+          className={`${styles.corpInput} ${styles.inputButton}`}
+          label="发送参数:"
+          type="button"
+          multiline
+          variant="outlined"
+          value={choosenJobSetting}
+          sx={{ cursor: "pointer" }}
+          onClick={() => setOpen(true)}
         />
       </div>
       {annexesList.length > 0 && (

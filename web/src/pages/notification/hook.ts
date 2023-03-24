@@ -143,6 +143,8 @@ export const useAction = (recordType: MessageJobDestination) => {
   const [emailUpdateData, setEmailUpdateData] =
     useState<() => IUpdateMessageCommand | undefined>()
 
+  const [recordRowLoading, setRecordRowLoading] = useState(false)
+
   const onNoticeCancel = () => {
     noticeSettingRef.current?.close()
   }
@@ -165,6 +167,10 @@ export const useAction = (recordType: MessageJobDestination) => {
   }
 
   const onEmailSetting = (item: ILastShowTableData) => {
+    if (item.jobType === MessageJobSendType.Fire) {
+      setAlertShow.setTrue()
+      return
+    }
     setUpdateMessageJobInformation(item)
     setShowEmail(true)
   }
@@ -185,7 +191,7 @@ export const useAction = (recordType: MessageJobDestination) => {
       ).then((data) => {
         data && getMessageJob()
       })
-    setShowEmail(false)
+    data && handleEmailCancel()
   }
 
   const handleEmailCancel = () => {
@@ -240,9 +246,13 @@ export const useAction = (recordType: MessageJobDestination) => {
 
   const onSend = async (toObject: string, id: string) => {
     sendRecordRef.current?.open()
+    setRecordRowLoading(true)
     await GetMessageJobRecords(id).then((res) => {
       if (!!res) {
+        setRecordRowLoading(false)
         setSendRecordList(messageRecordConvertType(res, toObject))
+      } else {
+        setRecordRowLoading(false)
       }
     })
   }
@@ -379,5 +389,6 @@ export const useAction = (recordType: MessageJobDestination) => {
     handleEmailConfirm,
     handleEmailCancel,
     outterGetUpdateData,
+    recordRowLoading,
   }
 }

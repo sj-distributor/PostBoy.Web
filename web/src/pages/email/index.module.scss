@@ -17,6 +17,14 @@
 
     .corpInput {
       flex: 1;
+
+      &.inputButton {
+        :global(.MuiInputBase-multiline),
+        :global(textarea) {
+          cursor: pointer;
+          caret-color: transparent;
+        }
+      }
     }
 
     & > span {

@@ -63,6 +63,7 @@ const SendNotice = React.memo(
       handleEmailCancel,
       showEmail,
       outterGetUpdateData,
+      recordRowLoading,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -160,22 +161,22 @@ const SendNotice = React.memo(
             >
               【设置】
             </p>
-
             <p
               className={styles.text}
-              onClick={() =>
+              onClick={() => {
+                const appNot = params.row.workWeChatAppNotification
                 onSend(
                   recordType === MessageJobDestination.WorkWeChat
                     ? [
-                        ...params.row.workWeChatAppNotification.toParties,
-                        ...params.row.workWeChatAppNotification.toTags,
-                        ...params.row.workWeChatAppNotification.toUsers,
+                        ...(appNot.toParties ? appNot.toParties : []),
+                        ...(appNot.toTags ? appNot.toTags : []),
+                        ...(appNot.toUsers ? appNot.toUsers : []),
                         [params.row.groupName],
                       ].join(";")
                     : "",
                   params.row.correlationId
                 )
-              }
+              }}
             >
               【发送记录】
             </p>
@@ -316,7 +317,10 @@ const SendNotice = React.memo(
           onCancel={onSendCancel}
           title={"发送记录"}
         >
-          <SendRecord sendRecordList={sendRecordList} />
+          <SendRecord
+            loading={recordRowLoading}
+            sendRecordList={sendRecordList}
+          />
         </ModalBox>
 
         <Dialog
@@ -335,7 +339,9 @@ const SendNotice = React.memo(
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleEmailConfirm}>确定</Button>
+            <Button variant="contained" onClick={handleEmailConfirm}>
+              提交
+            </Button>
             <Button onClick={handleEmailCancel}>取消</Button>
           </DialogActions>
         </Dialog>

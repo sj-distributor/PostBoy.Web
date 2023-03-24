@@ -15,12 +15,19 @@ import {
 import { useBoolean } from "ahooks"
 import { timeZone } from "../../dtos/send-message-job"
 import { clone } from "ramda"
+import moment from "moment"
+import cronstrue from "cronstrue/i18n"
+
+import "cronstrue/locales/zh_CN"
 
 const useAction = (
   outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void,
   emailUpdateData?: ILastShowTableData
 ) => {
   const emailObj = emailUpdateData?.emailNotification
+  const timeObj = emailUpdateData?.jobSettingJson
+    ? JSON.parse(emailUpdateData?.jobSettingJson)
+    : undefined
   const defaultEmailValue = {
     displayName: "",
     senderId: "",
@@ -53,27 +60,38 @@ const useAction = (
   // 发送记录的ref
   const sendRecordRef = useRef<ModalBoxRef>(null)
   // 周期发送的设置value
-  const [jobSetting, setJobSetting] = useState<IJobSettingDto>()
+  const [jobSetting, setJobSetting] = useState<IJobSettingDto>(
+    timeObj ?? undefined
+  )
   // 提示语
   const [promptText, setPromptText] = useState("")
   // 提示显隐
   const [openError, openErrorAction] = useBoolean(false)
   // 循环周期
-  const [cronExp, setCronExp] = useState<string>("0 0 * * *")
+  const [cronExp, setCronExp] = useState<string>(
+    timeObj?.RecurringJob?.CronExpression ?? "0 0 * * *"
+  )
   // 发送类型选择
   const [sendTypeValue, setSendTypeValue] = useState<MessageJobSendType>(
-    MessageJobSendType.Fire
+    emailUpdateData?.jobType ?? MessageJobSendType.Fire
   )
   // 发送时间
-  const [dateValue, setDateValue] = useState<string>("")
+  const [dateValue, setDateValue] = useState<string>(
+    timeObj?.DelayedJob?.EnqueueAt ?? ""
+  )
   // 终止时间
-  const [endDateValue, setEndDateValue] = useState<string>("")
+  const [endDateValue, setEndDateValue] = useState<string>(
+    timeObj?.RecurringJob?.EndDate ?? ""
+  )
   // 时区选择
   const [timeZoneValue, setTimeZoneValue] = useState<number>(
     timeZone.filter((x) => !x.disable)[0].value
   )
-  const [open, setOpen] = useState(false)
-  const [sendLoading, setSendLoading] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
+
+  const [sendLoading, setSendLoading] = useState<boolean>(false)
+
+  const [choosenJobSetting, setChoosenJobSetting] = useState<string>("")
 
   // 弹出警告
   const showErrorPrompt = (text: string) => {
@@ -156,26 +174,32 @@ const useAction = (
     setSendLoading(true)
     checkObject() &&
       PostMessageSend(data).then((data) => {
-        setPromptText("发送成功")
-        openErrorAction.setTrue()
-        setSendLoading(false)
-        // 清空数据
-        setJobSetting({
-          timezone: timeZone[timeZoneValue].convertTimeZone,
-        })
-        editor && editor.setHtml("<p></p>")
-        setEmailCopyToArr([])
-        setEmailToArr([])
-        setAnnexesList([])
-        setEmailToString("")
-        setEmailCopyToString("")
-        setEmailSubject("")
-        setSendTypeValue(MessageJobSendType.Fire)
-        setTimeZoneValue(timeZone[0].value)
-        setCronError("")
-        setCronExp("0 0 * * *")
-        setEndDateValue("")
-        setDateValue("")
+        if (data) {
+          setPromptText("发送成功")
+          openErrorAction.setTrue()
+          setSendLoading(false)
+          // 清空数据
+          setJobSetting({
+            timezone: timeZone[timeZoneValue].convertTimeZone,
+          })
+          setChoosenJobSetting("")
+          editor && editor.setHtml("<p></p>")
+          setEmailCopyToArr([])
+          setEmailToArr([])
+          setAnnexesList([])
+          setEmailToString("")
+          setEmailCopyToString("")
+          setEmailSubject("")
+          setSendTypeValue(MessageJobSendType.Fire)
+          setTimeZoneValue(timeZone.filter((x) => !x.disable)[0].value)
+          setCronError("")
+          setCronExp("0 0 * * *")
+          setEndDateValue("")
+          setDateValue("")
+        } else {
+          openErrorAction.setTrue()
+          setPromptText("发送失败")
+        }
       })
     setSendLoading(false)
   }
@@ -334,6 +358,33 @@ const useAction = (
       setPromptText("please enter email content")
       openErrorAction.setTrue()
       return false
+    } else if (
+      sendTypeValue === MessageJobSendType.Delayed &&
+      !jobSetting?.delayedJob?.enqueueAt
+    ) {
+      openErrorAction.setTrue()
+      setPromptText("Please select delivery time!")
+      return false
+    } else if (
+      sendTypeValue === MessageJobSendType.Recurring &&
+      jobSetting?.recurringJob?.cronExpression.trim().split(" ").length !== 5
+    ) {
+      openErrorAction.setTrue()
+      setPromptText("Please select the sending period!")
+      return false
+    } else if (
+      (!!jobSetting?.recurringJob &&
+        jobSetting.recurringJob.endDate &&
+        !moment(jobSetting.recurringJob.endDate).isSameOrAfter(
+          new Date(),
+          "minute"
+        )) ||
+      (sendTypeValue === MessageJobSendType.Recurring &&
+        !jobSetting?.recurringJob?.endDate)
+    ) {
+      openErrorAction.setTrue()
+      setPromptText("The end time cannot exceed the current time!")
+      return false
     }
     return true
   }
@@ -425,6 +476,7 @@ const useAction = (
         setJobSetting({
           timezone: timeZone[timeZoneValue].convertTimeZone,
         })
+        setChoosenJobSetting("")
         break
       }
       case MessageJobSendType.Delayed: {
@@ -434,11 +486,14 @@ const useAction = (
             enqueueAt: dateValue,
           },
         })
+        setChoosenJobSetting(
+          `发送类型: 指定日期, 时区: ${timeZone[timeZoneValue].convertTimeZone}, 发送时间: ${dateValue}`
+        )
         break
       }
       default: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].convertTimeZone,
+          timezone: timeZone[timeZoneValue].title,
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,
@@ -448,6 +503,14 @@ const useAction = (
                 cronExpression: cronExp,
               },
         })
+        setChoosenJobSetting(
+          `发送类型: 周期发送, 时区: ${
+            timeZone[timeZoneValue].title
+          }, 发送时间: ${cronstrue.toString(cronExp, {
+            use24HourTimeFormat: true,
+            locale: "zh_CN",
+          })}${!!endDateValue ? `, 终止时间: ${endDateValue}` : ""}`
+        )
         break
       }
     }
@@ -478,6 +541,7 @@ const useAction = (
     openError,
     sendLoading,
     annexesList,
+    choosenJobSetting,
     validateAttrFunc,
     setPromptText,
     setOpen,
@@ -506,4 +570,5 @@ const useAction = (
     handleAnnexDelete,
   }
 }
+
 export default useAction
