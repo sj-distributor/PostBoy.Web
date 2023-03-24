@@ -386,8 +386,14 @@ export const useAction = (props: SelectContentHookProps) => {
         const hasData = newValue.find((e) => e.key === AppId)
         // 是否现有key的数据
         hasData && hasData.data.length > 0
-          ? recursiveDeptList(hasData.data, defaultChild, department, [])
+          ? (idList = recursiveDeptList(
+              hasData.data,
+              defaultChild,
+              department,
+              []
+            ))
           : newValue.push({ key: AppId, data: [defaultChild] })
+        idList.length === 0 && hasData?.data.push(defaultChild)
         return newValue
       })
 
