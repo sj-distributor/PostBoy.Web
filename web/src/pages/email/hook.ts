@@ -487,13 +487,13 @@ const useAction = (
           },
         })
         setChoosenJobSetting(
-          `发送类型: 指定日期, 时区: ${timeZone[timeZoneValue].convertTimeZone}, 发送时间: ${dateValue}`
+          `发送类型: 指定日期, 时区: ${timeZone[timeZoneValue].title}, 发送时间: ${dateValue}`
         )
         break
       }
       default: {
         setJobSetting({
-          timezone: timeZone[timeZoneValue].title,
+          timezone: timeZone[timeZoneValue].convertTimeZone,
           recurringJob: !!endDateValue
             ? {
                 cronExpression: cronExp,
