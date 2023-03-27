@@ -182,7 +182,7 @@ const useAction = (
           setJobSetting({
             timezone: timeZone[timeZoneValue].convertTimeZone,
           })
-          setChoosenJobSetting("")
+          setChoosenJobSetting("发送类型: 即时发送")
           editor && editor.setHtml("<p></p>")
           setEmailCopyToArr([])
           setEmailToArr([])
@@ -476,7 +476,7 @@ const useAction = (
         setJobSetting({
           timezone: timeZone[timeZoneValue].convertTimeZone,
         })
-        setChoosenJobSetting("")
+        setChoosenJobSetting("发送类型: 即时发送")
         break
       }
       case MessageJobSendType.Delayed: {
