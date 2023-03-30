@@ -35,27 +35,29 @@ const useAction = (
   // 富文本框实例
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null) // 存储 editor 实例
   // 富文本框html
-  const [html, setHtml] = useState(emailObj?.body ?? "")
+  const [html, setHtml] = useState<string>(emailObj?.body ?? "")
   // 邮件的从
   const [emailFrom, setEmailFrom] =
     useState<IEmailResonponse>(defaultEmailValue)
   // 邮件从的用户列表
   const [emailList, setEmailList] = useState<IEmailResonponse[]>([])
   // 发送邮件地址input值
-  const [emailToString, setEmailToString] = useState("")
+  const [emailToString, setEmailToString] = useState<string>("")
   // 发送邮件地址 确认列表
   const [emailToArr, setEmailToArr] = useState<string[]>(emailObj?.to ?? [])
   // 抄送邮箱地址的input值
-  const [emailCopyToString, setEmailCopyToString] = useState("")
+  const [emailCopyToString, setEmailCopyToString] = useState<string>("")
   // 抄送邮箱地址的 确定列表
   const [emailCopyToArr, setEmailCopyToArr] = useState<string[]>(
     emailObj?.cc ?? []
   )
   // 邮箱主题
-  const [emailSubject, setEmailSubject] = useState(emailObj?.subject ?? "")
+  const [emailSubject, setEmailSubject] = useState<string>(
+    emailObj?.subject ?? ""
+  )
   // 是否显示抄送
-  const [isShowCopyto, setIsShowCopyto] = useState(
-    emailObj?.cc.length && emailObj?.cc.length > 0
+  const [isShowCopyto, setIsShowCopyto] = useState<boolean>(
+    !!emailObj?.cc && emailObj?.cc.length > 0
   )
   // 发送记录的ref
   const sendRecordRef = useRef<ModalBoxRef>(null)
@@ -64,7 +66,7 @@ const useAction = (
     timeObj ?? undefined
   )
   // 提示语
-  const [promptText, setPromptText] = useState("")
+  const [promptText, setPromptText] = useState<string>("")
   // 提示显隐
   const [openError, openErrorAction] = useBoolean(false)
   // 循环周期
