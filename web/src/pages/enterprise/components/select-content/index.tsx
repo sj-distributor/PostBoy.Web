@@ -257,6 +257,7 @@ const SelectContent = memo(
                 style={{ marginRight: "1.6rem" }}
                 getOptionLabel={(option) => option.corpName}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                getOptionDisabled={() => true}
                 renderInput={(params) => (
                   <TextField
                     {...params}
