@@ -12,6 +12,7 @@ export interface ICorpAppData {
   appId: string
   id: string
   name: string
+  display: boolean
 }
 
 export interface ICorpAppListApiData {
@@ -326,11 +327,7 @@ export interface ILastShowTableData extends IMessageJob {
     id: string
     corpName: string
   }
-  app: {
-    id: string
-    name: string
-    appId: string
-  }
+  app: ICorpAppData
 }
 
 export interface ILastShowTableEmailData {
