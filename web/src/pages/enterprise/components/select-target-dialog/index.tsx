@@ -409,6 +409,7 @@ const SelectTargetDialog = memo(
                         disableClearable
                         limitTags={2}
                         size="small"
+                        sx={{ display: "none" }}
                         value={tagsValue}
                         options={tagsList}
                         componentsProps={{ paper: { elevation: 3 } }}
