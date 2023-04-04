@@ -254,15 +254,16 @@ export const useAction = (props: SelectContentHookProps) => {
       GetCorpAppList({ CorpId: corpsValue.id }).then(
         (corpAppResult: ICorpAppData[] | null | undefined) => {
           if (corpAppResult) {
-            const array: { id: string; name: string; appId: string }[] = []
+            const array: ICorpAppData[] = []
             corpAppResult.forEach((item) =>
               array.push({
                 id: item.id,
                 name: item.name,
                 appId: item.appId,
+                display: item.display,
               })
             )
-            setCorpAppList(array)
+            setCorpAppList(array.filter((x) => x.display))
           }
         }
       )
@@ -980,6 +981,10 @@ export const useAction = (props: SelectContentHookProps) => {
         {
           key: "appName",
           value: `${corpAppValue?.name}`,
+        },
+        {
+          key: "display",
+          value: `${corpAppValue?.display}`,
         },
         {
           key: "weChatAppId",

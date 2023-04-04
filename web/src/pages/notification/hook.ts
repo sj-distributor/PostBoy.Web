@@ -100,6 +100,9 @@ const messageJobConvertType = (
           id: item.metadata.filter((item) => item.key === "appId")[0]?.value,
           appId: item.metadata.filter((item) => item.key === "weChatAppId")[0]
             ?.value,
+          display: Boolean(
+            item.metadata.filter((item) => item.key === "display")[0]?.value
+          ),
         },
       }
       isRecordTypeWechat
