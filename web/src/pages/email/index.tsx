@@ -24,10 +24,6 @@ import { sendTypeList, timeZone } from "../../dtos/send-message-job"
 import {
   Box,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   InputLabel,
   Snackbar,
@@ -59,14 +55,11 @@ const SendEmail = (props: {
     endDateValue,
     cronExp,
     timeZoneValue,
-    open,
     promptText,
     openError,
     sendLoading,
     annexesList,
-    choosenJobSetting,
     validateAttrFunc,
-    setOpen,
     setTimeZoneValue,
     setCronError,
     setDateValue,
@@ -162,15 +155,27 @@ const SendEmail = (props: {
             发送记录
           </Button>
         )}
-        <Button
-          sx={{
-            marginLeft: "2rem",
-          }}
-          variant="contained"
-          onClick={() => setOpen(true)}
-        >
-          设置发送类型
-        </Button>
+
+        <FormControl sx={{ ml: "2rem" }}>
+          <InputLabel id="demo-simple-select-autowidth-label">
+            发送类型
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-autowidth-label"
+            id="demo-simple-select"
+            value={sendTypeValue}
+            label="发送类型"
+            onChange={(e) => {
+              setSendTypeValue(Number(e.target.value))
+            }}
+          >
+            {sendTypeList.map((item, key) => (
+              <MenuItem key={key} value={item.value}>
+                {item.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </div>
       <div className={styles.inputGroup}>
         <span>到:</span>
@@ -282,18 +287,7 @@ const SendEmail = (props: {
           }}
         />
       </div>
-      <div className={styles.inputGroup}>
-        <TextField
-          className={`${styles.corpInput} ${styles.inputButton}`}
-          label="发送参数:"
-          type="button"
-          multiline
-          variant="outlined"
-          value={choosenJobSetting}
-          sx={{ cursor: "pointer" }}
-          onClick={() => setOpen(true)}
-        />
-      </div>
+
       {annexesList.length > 0 && (
         <div className={styles.annexes}>
           {annexesList.map((item, index) => {
@@ -328,92 +322,55 @@ const SendEmail = (props: {
         />
       </div>
 
-      <Dialog
-        open={open}
-        PaperProps={{
-          sx: {
-            maxWidth: "none",
-          },
-        }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">设置发送类型</DialogTitle>
-        <DialogContent sx={{ minWidth: "30rem" }}>
-          <FormControl fullWidth sx={{ m: "1rem 0 1rem 0" }}>
-            <InputLabel id="demo-simple-select-autowidth-label">
-              发送类型
-            </InputLabel>
+      <div className={styles.timeSelector}>
+        {(sendTypeValue === MessageJobSendType.Delayed ||
+          sendTypeValue === MessageJobSendType.Recurring) && (
+          <FormControl
+            style={{
+              width: 252,
+              margin: "0.8rem 0",
+            }}
+          >
+            <InputLabel id="demo-simple-select-label">时区</InputLabel>
             <Select
-              labelId="demo-simple-select-autowidth-label"
+              labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={sendTypeValue}
-              label="发送类型"
+              value={timeZoneValue}
+              label="时区"
               onChange={(e) => {
-                setSendTypeValue(Number(e.target.value))
+                setTimeZoneValue(Number(e.target.value))
               }}
             >
-              {sendTypeList.map((item, key) => (
-                <MenuItem key={key} value={item.value}>
-                  {item.title}
-                </MenuItem>
-              ))}
+              {timeZone
+                .filter((x) => !x.disable)
+                .map((item, key) => (
+                  <MenuItem key={key} value={item.value}>
+                    {item.title}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
-          <div className={styles.dateSelector}>
-            {(sendTypeValue === MessageJobSendType.Delayed ||
-              sendTypeValue === MessageJobSendType.Recurring) && (
-              <FormControl
-                style={{
-                  width: 252,
-                  margin: "0.8rem 0",
-                }}
-              >
-                <InputLabel id="demo-simple-select-label">时区</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={timeZoneValue}
-                  label="时区"
-                  onChange={(e) => {
-                    setTimeZoneValue(Number(e.target.value))
-                  }}
-                >
-                  {timeZone
-                    .filter((x) => !x.disable)
-                    .map((item, key) => (
-                      <MenuItem key={key} value={item.value}>
-                        {item.title}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            )}
-            {sendTypeValue === MessageJobSendType.Delayed && (
-              <div style={{ marginLeft: "1rem" }}>
-                <DateSelector
-                  dateValue={dateValue}
-                  setDateValue={setDateValue}
-                  showErrorPrompt={showErrorPrompt}
-                />
-              </div>
-            )}
-            {sendTypeValue === MessageJobSendType.Recurring && (
-              <TimeSelector
-                cronExp={cronExp}
-                setCronExp={setCronExp}
-                setCronError={setCronError}
-                endDateValue={endDateValue}
-                setEndDateValue={setEndDateValue}
-                showErrorPrompt={showErrorPrompt}
-              />
-            )}
+        )}
+        {sendTypeValue === MessageJobSendType.Delayed && (
+          <div style={{ marginLeft: "1rem" }}>
+            <DateSelector
+              dateValue={dateValue}
+              setDateValue={setDateValue}
+              showErrorPrompt={showErrorPrompt}
+            />
           </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>确定</Button>
-        </DialogActions>
-      </Dialog>
+        )}
+        {sendTypeValue === MessageJobSendType.Recurring && (
+          <TimeSelector
+            cronExp={cronExp}
+            setCronExp={setCronExp}
+            setCronError={setCronError}
+            endDateValue={endDateValue}
+            setEndDateValue={setEndDateValue}
+            showErrorPrompt={showErrorPrompt}
+          />
+        )}
+      </div>
 
       <ModalBox
         ref={sendRecordRef}
