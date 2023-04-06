@@ -89,11 +89,8 @@ const useAction = (
   const [timeZoneValue, setTimeZoneValue] = useState<number>(
     timeZone.filter((x) => !x.disable)[0].value
   )
-  const [open, setOpen] = useState<boolean>(false)
 
   const [sendLoading, setSendLoading] = useState<boolean>(false)
-
-  const [choosenJobSetting, setChoosenJobSetting] = useState<string>("")
 
   // 弹出警告
   const showErrorPrompt = (text: string) => {
@@ -184,7 +181,6 @@ const useAction = (
           setJobSetting({
             timezone: timeZone[timeZoneValue].convertTimeZone,
           })
-          setChoosenJobSetting("发送类型: 即时发送")
           editor && editor.setHtml("<p></p>")
           setEmailCopyToArr([])
           setEmailToArr([])
@@ -478,7 +474,6 @@ const useAction = (
         setJobSetting({
           timezone: timeZone[timeZoneValue].convertTimeZone,
         })
-        setChoosenJobSetting("发送类型: 即时发送")
         break
       }
       case MessageJobSendType.Delayed: {
@@ -488,9 +483,6 @@ const useAction = (
             enqueueAt: dateValue,
           },
         })
-        setChoosenJobSetting(
-          `发送类型: 指定日期, 时区: ${timeZone[timeZoneValue].title}, 发送时间: ${dateValue}`
-        )
         break
       }
       default: {
@@ -505,14 +497,6 @@ const useAction = (
                 cronExpression: cronExp,
               },
         })
-        setChoosenJobSetting(
-          `发送类型: 周期发送, 时区: ${
-            timeZone[timeZoneValue].title
-          }, 发送时间: ${cronstrue.toString(cronExp, {
-            use24HourTimeFormat: true,
-            locale: "zh_CN",
-          })}${!!endDateValue ? `, 终止时间: ${endDateValue}` : ""}`
-        )
         break
       }
     }
@@ -538,15 +522,12 @@ const useAction = (
     endDateValue,
     cronExp,
     timeZoneValue,
-    open,
     promptText,
     openError,
     sendLoading,
     annexesList,
-    choosenJobSetting,
     validateAttrFunc,
     setPromptText,
-    setOpen,
     setTimeZoneValue,
     setCronError,
     setCronExp,
