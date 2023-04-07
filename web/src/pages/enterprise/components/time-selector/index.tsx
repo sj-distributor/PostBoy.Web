@@ -57,7 +57,9 @@ const TimeSelector = (props: {
                 "minute"
               )
             ) {
-              setEndDateValue((e.target as HTMLInputElement).value)
+              setEndDateValue(
+                (e.target as HTMLInputElement).value.replace("T", " ")
+              )
             } else {
               e.preventDefault()
               showErrorPrompt("The end time cannot exceed the current time!")

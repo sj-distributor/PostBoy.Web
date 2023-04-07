@@ -254,16 +254,7 @@ export const useAction = (props: SelectContentHookProps) => {
       GetCorpAppList({ CorpId: corpsValue.id }).then(
         (corpAppResult: ICorpAppData[] | null | undefined) => {
           if (corpAppResult) {
-            const array: ICorpAppData[] = []
-            corpAppResult.forEach((item) =>
-              array.push({
-                id: item.id,
-                name: item.name,
-                appId: item.appId,
-                display: item.display,
-              })
-            )
-            setCorpAppList(array.filter((x) => x.display))
+            setCorpAppList(corpAppResult.filter((x) => x.display))
           }
         }
       )

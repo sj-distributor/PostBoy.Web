@@ -24,7 +24,7 @@ const DateSelector = (props: {
               "DD.MM.YYYY HH:mm"
             ) >= moment().format("DD.MM.YYYY HH:mm")
           ) {
-            setDateValue((e.target as HTMLInputElement).value)
+            setDateValue((e.target as HTMLInputElement).value.replace("T", " "))
           } else {
             showErrorPrompt("Please select a time later than the current time")
           }

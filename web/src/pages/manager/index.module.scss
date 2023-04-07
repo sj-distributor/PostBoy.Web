@@ -1,0 +1,52 @@
+.user {
+  padding: 1.5rem 0;
+  background-color: #f2f3f4;
+  overflow-y: scroll;
+  height: calc(100vh - 7rem);
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .accordion {
+    background-color: #f2f3f4;
+    box-shadow: none;
+
+    .accordionSummary {
+      margin: 0 1.5rem 0.5rem;
+      background-color: #ffffff;
+      border-radius: 0.2rem;
+
+      .listText {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .addButton {
+      height: 1.5rem;
+      margin-left: 1.5rem;
+      font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    }
+
+    .accordionDetails {
+      display: flex;
+      align-items: center;
+      margin: 0rem 3rem 0.5rem;
+      height: 1rem;
+      background-color: #ffffff;
+      border-radius: 0.2rem;
+    }
+  }
+  .accordion::before {
+    background-color: #f2f3f4;
+    box-shadow: none;
+    border-width: none;
+    border: #f2f3f4;
+  }
+
+  .registerButton {
+    height: 2rem;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}

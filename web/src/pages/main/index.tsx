@@ -3,17 +3,20 @@ import { Link, Outlet } from "react-router-dom"
 import { routerArray } from "../../router/elementRoute"
 import useMainAction from "./hook"
 import UserInformation from "./components/user-information"
+import { RouteItem } from "../../dtos/route-type"
 
 const Main = () => {
   const { clickMainIndex, setMainClickIndex, haveAdministrator } =
     useMainAction()
 
+  const verifyPermissions = (item: RouteItem) =>
+    ["/user", "/manager"].includes(item.path) ? !!haveAdministrator : true
+
   const routerTabBar = () => {
     return routerArray.map((item, index) => {
       return (
         <div key={index} className={styles.item}>
-          {((haveAdministrator && item.head === "用户管理") ||
-            item.head !== "用户管理") && (
+          {verifyPermissions(item) && (
             <Link
               to={item.path}
               onClick={() => {

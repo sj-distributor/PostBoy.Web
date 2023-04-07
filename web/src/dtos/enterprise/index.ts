@@ -12,6 +12,7 @@ export interface ICorpAppData {
   appId: string
   id: string
   name: string
+  workWeChatCorpId: string
   display: boolean
 }
 
