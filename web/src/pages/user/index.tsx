@@ -5,10 +5,11 @@ import AccordionDetails from "@mui/material/AccordionDetails"
 import Typography from "@mui/material/Typography"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import useAction from "./hook"
-import { Button } from "@mui/material"
+import { Alert, AlertTitle, Button, Snackbar } from "@mui/material"
 import ModalBox from "../../components/modal/modal"
 import AddApiKeyPopup from "./component/add-aipkey"
 import RegistrationPopup from "./component/registration"
+import { isEmpty } from "ramda"
 
 const User = () => {
   const {
@@ -23,15 +24,29 @@ const User = () => {
     setUserApikey,
     onListClick,
     setUserAccountId,
+    success,
+    successAction,
   } = useAction()
 
   return (
     <div className={styles.user}>
+      <Snackbar
+        open={success}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert severity="success">
+          <AlertTitle>Success!</AlertTitle>
+        </Alert>
+      </Snackbar>
       {/* 注册用户弹窗 */}
       <ModalBox ref={registerRef} onCancel={onRegisterCancel}>
         <RegistrationPopup
           onRegisterCancel={onRegisterCancel}
           setUsersList={setUsersList}
+          successAction={successAction}
         />
       </ModalBox>
       {/* 添加apikey弹窗 */}
@@ -41,6 +56,7 @@ const User = () => {
           onAddApikeyCancel={onAddApikeyCancel}
           userApikeyList={userApikeyList}
           setUserApikey={setUserApikey}
+          successAction={successAction}
         />
       </ModalBox>
       <Button
@@ -65,8 +81,8 @@ const User = () => {
                 className={styles.addButton}
                 onClick={(event) => {
                   setUserAccountId(item.id)
-                  addApikeyRef.current?.open()
                   event.stopPropagation()
+                  addApikeyRef.current?.open()
                 }}
               >
                 添加apikey
