@@ -5,6 +5,20 @@
   z-index: 10;
   padding: 5rem;
   padding-bottom: 7.3rem;
+  position: relative;
+
+  .progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffffd8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
 
   .loginBox {
     width: 23.4rem;

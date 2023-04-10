@@ -1,8 +1,9 @@
 import styles from "./index.module.scss"
-import { Button, TextField } from "@mui/material"
+import { Button, CircularProgress, TextField } from "@mui/material"
 import useAction from "./hook"
 import { IUserApikeysResponse } from "../../../../dtos/user-management"
 import { memo } from "react"
+import { Actions } from "ahooks/lib/useBoolean"
 
 const AddApiKeyPopup = memo(
   (props: {
@@ -12,19 +13,45 @@ const AddApiKeyPopup = memo(
     setUserApikey: React.Dispatch<
       React.SetStateAction<IUserApikeysResponse[][]>
     >
+    successAction: Actions
   }) => {
-    const { userAccountId, onAddApikeyCancel, userApikeyList, setUserApikey } =
-      props
-    const { apiKey, setAipKey, description, setDescription, addApiKeySubmit } =
-      useAction({
-        userAccountId,
-        onAddApikeyCancel,
-        userApikeyList,
-        setUserApikey,
-      })
+    const {
+      userAccountId,
+      onAddApikeyCancel,
+      userApikeyList,
+      setUserApikey,
+      successAction,
+    } = props
+
+    const {
+      apiKey,
+      setAipKey,
+      description,
+      setDescription,
+      addApiKeySubmit,
+      isLoading,
+    } = useAction({
+      userAccountId,
+      onAddApikeyCancel,
+      userApikeyList,
+      setUserApikey,
+      successAction,
+    })
 
     return (
       <div className={styles.pageWrap}>
+        {isLoading && (
+          <div className={styles.progress}>
+            <CircularProgress
+              color="primary"
+              sx={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          </div>
+        )}
         <div className={styles.addBox}>
           <div className={styles.addTitleBox}>
             <div className={styles.title}>Add ApiKey</div>
