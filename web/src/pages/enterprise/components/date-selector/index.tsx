@@ -1,6 +1,5 @@
 import { TextField } from "@mui/material"
 import moment from "moment"
-import { MessageJobSendType } from "../../../../dtos/enterprise"
 
 const DateSelector = (props: {
   dateValue: string

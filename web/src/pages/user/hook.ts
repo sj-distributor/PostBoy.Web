@@ -27,7 +27,6 @@ const useAction = () => {
       const clickApiKeyUserId: string[] = openApikeyUserId
       clickApiKeyUserId.push(userId)
       setOpenApikeyUserId(clickApiKeyUserId)
-      console.log(123)
       await GetUserApikeys(userId).then((res) => {
         if (!!res) {
           const apikeyList = userApikeyList

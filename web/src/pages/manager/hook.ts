@@ -12,13 +12,9 @@ const useAction = () => {
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[][]>([])
   const [corpAppLoadedList, setCorpAppLoadedList] = useState<string[]>([])
 
-  const onAddCorpCancel = () => {
-    addCorpRef.current?.close()
-  }
+  const onAddCorpCancel = () => addCorpRef.current?.close()
 
-  const onAddAppCancel = () => {
-    addAppRef.current?.close()
-  }
+  const onAddAppCancel = () => addAppRef.current?.close()
 
   const onListClick = async (userId: string) => {
     if (!corpAppLoadedList.some((x) => x === userId)) {
@@ -27,12 +23,10 @@ const useAction = () => {
         await GetCorpAppList({
           CorpId: userId,
         })
-      setTimeout(() => {
-        !!corpAppResult &&
-          setCorpAppList((prev) => {
-            return [...prev, corpAppResult.filter((x) => x.display)]
-          })
-      }, 500)
+      !!corpAppResult &&
+        setCorpAppList((prev) => {
+          return [...prev, corpAppResult.filter((x) => x.display)]
+        })
     }
   }
   // 初始化企业数组

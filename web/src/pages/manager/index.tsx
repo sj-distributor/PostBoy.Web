@@ -7,6 +7,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import useAction from "./hook"
 import { Button, CircularProgress } from "@mui/material"
 import ModalBox from "../../components/modal/modal"
+import Add from "./component/add"
 
 const User = () => {
   const {
@@ -24,7 +25,7 @@ const User = () => {
     <div className={styles.user}>
       {/* 注册用户弹窗 */}
       <ModalBox ref={addCorpRef} onCancel={onAddCorpCancel}>
-        <></>
+        <Add />
       </ModalBox>
       {/* 添加apikey弹窗 */}
       <ModalBox ref={addAppRef} onCancel={onAddAppCancel}>
