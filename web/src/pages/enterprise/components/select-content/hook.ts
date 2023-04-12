@@ -488,7 +488,11 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
+      setIsTreeViewLoading(true)
       const deptListResponse = await GetDeptsAndUserList(AppId)
+      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+        setIsTreeViewLoading(false)
+
       !!deptListResponse &&
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
     }
@@ -518,7 +522,6 @@ export const useAction = (props: SelectContentHookProps) => {
         })
       // 开始load数据
       setIsLoadStop(false)
-      setIsTreeViewLoading(true)
       loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue?.appId, isShowDialog])

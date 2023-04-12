@@ -1,7 +1,7 @@
 import Home from "../pages/home"
 import Enterprise from "../pages/enterprise"
 import SendEmail from "../pages/email"
-import Manager from "../pages/manager"
+import Manager from "../pages/app-manager"
 import User from "../pages/user"
 import { RouteItem } from "../dtos/route-type"
 import "../fonts/iconfont/iconfont.css"
