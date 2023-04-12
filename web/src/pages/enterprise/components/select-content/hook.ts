@@ -232,14 +232,8 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 初始化企业数组
   useEffect(() => {
-    GetCorpsList().then((data: ICorpData[] | null | undefined) => {
-      if (data) {
-        const array: { id: string; corpName: string }[] = []
-        data.forEach((item) =>
-          array.push({ id: item.id, corpName: item.corpName })
-        )
-        setCorpsList(array)
-      }
+    GetCorpsList().then((data) => {
+      data && setCorpsList(data)
     })
   }, [])
 
@@ -970,6 +964,10 @@ export const useAction = (props: SelectContentHookProps) => {
           value: `${corpsValue?.id}`,
         },
         {
+          key: "enterpriseCorpId",
+          value: `${corpsValue?.corpId}`,
+        },
+        {
           key: "appName",
           value: `${corpAppValue?.name}`,
         },
@@ -980,6 +978,10 @@ export const useAction = (props: SelectContentHookProps) => {
         {
           key: "weChatAppId",
           value: `${corpAppValue?.appId}`,
+        },
+        {
+          key: "agentId",
+          value: `${corpAppValue?.agentId}`,
         },
         {
           key: "appId",

@@ -5,36 +5,50 @@ import AccordionDetails from "@mui/material/AccordionDetails"
 import Typography from "@mui/material/Typography"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import useAction from "./hook"
-import { Button, CircularProgress } from "@mui/material"
+import { Button, CircularProgress, Snackbar } from "@mui/material"
 import ModalBox from "../../components/modal/modal"
 import Add from "./component/add"
+import { AddOrModify, RowDataType } from "../../dtos/app-manager"
 
 const User = () => {
   const {
     corpsList,
     corpAppList,
     corpAppLoadedList,
-    addCorpRef,
+    dialogRef,
+    rowData,
+    rowDataType,
+    defaultCorpRowData,
+    defaultAppRowData,
+    tipsText,
+    setTipsText,
+    setRowData,
+    setRowDataType,
     onAddCorpCancel,
-    addAppRef,
-    onAddAppCancel,
     onListClick,
+    reload,
   } = useAction()
 
   return (
     <div className={styles.user}>
-      {/* 注册用户弹窗 */}
-      <ModalBox ref={addCorpRef} onCancel={onAddCorpCancel}>
-        <Add />
-      </ModalBox>
-      {/* 添加apikey弹窗 */}
-      <ModalBox ref={addAppRef} onCancel={onAddAppCancel}>
-        <></>
+      <ModalBox ref={dialogRef} onCancel={onAddCorpCancel}>
+        <Add
+          rowData={rowData}
+          rowDataType={rowDataType}
+          onAddApikeyCancel={onAddCorpCancel}
+          reload={reload}
+          tipsText={tipsText}
+          setTipsText={setTipsText}
+        />
       </ModalBox>
       <Button
         variant="contained"
         className={styles.registerButton}
-        onClick={addCorpRef.current?.open}
+        onClick={() => {
+          setRowData(defaultCorpRowData)
+          setRowDataType(AddOrModify.Add)
+          dialogRef.current?.open()
+        }}
       >
         新增企业
       </Button>
@@ -51,7 +65,13 @@ const User = () => {
               variant="contained"
               className={styles.addButton}
               onClick={(event) => {
-                addAppRef.current?.open()
+                setRowData(
+                  Object.assign(defaultAppRowData, {
+                    data: { workWeChatCorpId: item.id },
+                  })
+                )
+                setRowDataType(AddOrModify.Add)
+                dialogRef.current?.open()
                 event.stopPropagation()
               }}
             >
@@ -61,7 +81,9 @@ const User = () => {
               variant="contained"
               className={styles.addButton}
               onClick={(event) => {
-                addAppRef.current?.open()
+                setRowData({ data: item, key: RowDataType.Corporation })
+                setRowDataType(AddOrModify.Modify)
+                dialogRef.current?.open()
                 event.stopPropagation()
               }}
             >
@@ -75,19 +97,24 @@ const User = () => {
               )}
           </AccordionSummary>
           {corpAppList.map((items) => {
-            return items.map((apikeyItem, apikeyIndex) => {
-              if (apikeyItem.workWeChatCorpId === item.id) {
+            return items.map((appItem, appIndex) => {
+              if (appItem.workWeChatCorpId === item.id) {
                 return (
                   <AccordionDetails
-                    key={apikeyIndex}
+                    key={appIndex}
                     className={styles.accordionDetails}
                   >
-                    <Typography>{apikeyItem.name}</Typography>
+                    <Typography>{appItem.name}</Typography>
                     <Button
                       variant="contained"
                       className={styles.addButton}
                       onClick={(event) => {
-                        addAppRef.current?.open()
+                        setRowData({
+                          data: appItem,
+                          key: RowDataType.Application,
+                        })
+                        setRowDataType(AddOrModify.Modify)
+                        dialogRef.current?.open()
                         event.stopPropagation()
                       }}
                     >
@@ -100,6 +127,14 @@ const User = () => {
           })}
         </Accordion>
       ))}
+      <Snackbar
+        message={tipsText}
+        open={!!tipsText}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
     </div>
   )
 }

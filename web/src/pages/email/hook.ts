@@ -16,9 +16,6 @@ import { useBoolean } from "ahooks"
 import { timeZone } from "../../dtos/send-message-job"
 import { clone } from "ramda"
 import moment from "moment"
-import cronstrue from "cronstrue/i18n"
-
-import "cronstrue/locales/zh_CN"
 
 const useAction = (
   outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void,

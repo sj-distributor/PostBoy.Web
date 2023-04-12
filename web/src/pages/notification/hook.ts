@@ -93,6 +93,9 @@ const messageJobConvertType = (
           )[0]?.value,
           id: item.metadata.filter((item) => item.key === "enterpriseId")[0]
             ?.value,
+          corpId: item.metadata.filter(
+            (item) => item.key === "enterpriseCorpId"
+          )[0]?.value,
         },
         app: {
           name: item.metadata.filter((item) => item.key === "appName")[0]
@@ -103,6 +106,9 @@ const messageJobConvertType = (
           workWeChatCorpId: item.metadata.filter(
             (item) => item.key === "enterpriseId"
           )[0]?.value,
+          agentId: Number(
+            item.metadata.filter((item) => item.key === "agentId")[0]?.value
+          ),
           display: Boolean(
             item.metadata.filter((item) => item.key === "display")[0]?.value
           ),

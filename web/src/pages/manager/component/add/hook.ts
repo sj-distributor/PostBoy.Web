@@ -1,54 +1,113 @@
-import { clone, isEmpty } from "ramda"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
-  GetUserApikeys,
-  PostUserApikeysAdd,
-} from "../../../../api/user-management"
-import { IUserApikeysResponse } from "../../../../dtos/user-management"
+  AddApplication,
+  AddCorp,
+  ModifyApplication,
+  ModifyCorp,
+} from "../../../../api/app-manager"
+import {
+  AddOrModify,
+  RowDataType,
+  IManagerAppKeyData,
+  IManagerCorpKeyData,
+  IRequestCorpAdd,
+  IRequestAppAdd,
+} from "../../../../dtos/app-manager"
 
 const useAction = (props: {
-  userAccountId: string
+  rowData: IManagerCorpKeyData | IManagerAppKeyData
+  rowDataType: AddOrModify
+  tipsText: string
   onAddApikeyCancel: () => void
-  userApikeyList: IUserApikeysResponse[][]
-  setUserApikey: React.Dispatch<React.SetStateAction<IUserApikeysResponse[][]>>
+  reload: (corpUpdateId?: string) => void
+  setTipsText: React.Dispatch<React.SetStateAction<string>>
 }) => {
-  const { userAccountId, onAddApikeyCancel, userApikeyList, setUserApikey } =
-    props
-  const [apiKey, setAipKey] = useState<string>("")
-  const [description, setDescription] = useState<string>("")
+  const { rowData, rowDataType, onAddApikeyCancel, reload, setTipsText } = props
+  const [name, setName] = useState<string>("")
+  const [secret, setSecret] = useState<string>("")
+  const [corpId, setCorpId] = useState<string>("")
+  const [appId, setAppId] = useState<string>("")
+  const [agentId, setAgentId] = useState<number>(0)
+  const [display, setDisplay] = useState<boolean>(true)
 
-  const addApiKeySubmit = async () => {
-    await PostUserApikeysAdd({
-      apiKey: apiKey,
-      description: description,
-      userAccountId: userAccountId,
-    }).then(async () => {
-      await GetUserApikeys(userAccountId).then((res) => {
-        if (!!res) {
-          if (isEmpty(userApikeyList[0])) {
-            const newList = clone(userApikeyList)
-            newList[0] = res
-            setUserApikey(newList)
-          } else {
-            const userApikeyListClone = clone(userApikeyList)
-            const newList = userApikeyListClone.map((items) => {
-              if (items[0].userAccountId === res[0].userAccountId) {
-                items = res
-              }
-              return items
-            })
-            setUserApikey(newList)
-          }
-        }
-      })
-      onAddApikeyCancel()
-    })
-
-    setAipKey("")
-    setDescription("")
+  const handleSubmit = async () => {
+    if (rowData.key === RowDataType.Corporation) {
+      const requestCorpData: IRequestCorpAdd = {
+        corpName: name,
+        corpId,
+        contactSecret: secret,
+      }
+      rowDataType === AddOrModify.Add
+        ? AddCorp([requestCorpData]).then(success)
+        : ModifyCorp([{ ...requestCorpData, id: rowData.data.id }]).then(
+            success
+          )
+    } else {
+      const requestAppData: IRequestAppAdd = {
+        appId,
+        name,
+        secret,
+        display,
+        agentId: Number(agentId),
+        workWeChatCorpId: rowData.data.workWeChatCorpId,
+      }
+      rowDataType === AddOrModify.Add
+        ? AddApplication([requestAppData]).then(success)
+        : ModifyApplication([{ ...requestAppData, id: rowData.data.id }]).then(
+            success
+          )
+    }
+    onAddApikeyCancel()
+    clearData()
   }
 
-  return { apiKey, setAipKey, description, setDescription, addApiKeySubmit }
+  const success = () => {
+    setTipsText(`${rowDataType} success`)
+    rowData.key === RowDataType.Corporation
+      ? reload()
+      : reload(rowData.data.workWeChatCorpId)
+  }
+
+  const clearData = () => {
+    setName("")
+    setSecret("")
+    setDisplay(true)
+  }
+
+  useEffect(() => {
+    if (rowDataType === AddOrModify.Modify) {
+      // Init data
+      if (rowData.key === RowDataType.Corporation) {
+        setName(rowData.data.corpName)
+        setCorpId(rowData.data.corpId)
+        setSecret(rowData.data.contactSecret)
+      } else {
+        setName(rowData.data.name)
+        setAppId(rowData.data.appId)
+        setAgentId(rowData.data.agentId)
+        setSecret(rowData.data.secret)
+        setDisplay(rowData.data.display)
+      }
+    } else {
+      clearData()
+    }
+  }, [])
+
+  return {
+    name,
+    secret,
+    display,
+    corpId,
+    appId,
+    agentId,
+    setAgentId,
+    setAppId,
+    setCorpId,
+    setDisplay,
+    setSecret,
+    setName,
+    handleSubmit,
+  }
 }
 
 export default useAction
