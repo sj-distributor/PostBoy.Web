@@ -7,14 +7,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import useAction from "./hook"
 import { Button, CircularProgress, Snackbar } from "@mui/material"
 import ModalBox from "../../components/modal/modal"
-import Add from "./component/add"
+import CorpAppDialog from "./component/corp-app-dialog"
 import { AddOrModify, RowDataType } from "../../dtos/app-manager"
 
 const User = () => {
   const {
     corpsList,
     corpAppList,
-    corpAppLoadedList,
     dialogRef,
     rowData,
     rowDataType,
@@ -32,7 +31,7 @@ const User = () => {
   return (
     <div className={styles.user}>
       <ModalBox ref={dialogRef} onCancel={onAddCorpCancel}>
-        <Add
+        <CorpAppDialog
           rowData={rowData}
           rowDataType={rowDataType}
           onAddApikeyCancel={onAddCorpCancel}
@@ -89,12 +88,6 @@ const User = () => {
             >
               修改
             </Button>
-            {corpAppLoadedList.includes(item.id) &&
-              !corpAppList.find((x) => x[0].workWeChatCorpId === item.id) && (
-                <div className={styles.addButton} style={{ color: "#bbb" }}>
-                  <CircularProgress size="1.5rem" color="inherit" />
-                </div>
-              )}
           </AccordionSummary>
           {corpAppList.map((items) => {
             return items.map((appItem, appIndex) => {
