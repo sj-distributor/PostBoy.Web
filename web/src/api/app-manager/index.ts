@@ -32,6 +32,6 @@ export const ModifyApplication = async (data: IManagerAppData[]) => {
   })
 }
 
-export const GetSecretData = async (data: ISecretRequset) => {
-  return await Post<ISecretData[]>("/api/Wechat/work/secrets?", data)
+export const PostSecretData = async (data: ISecretRequset) => {
+  return await Post<ISecretData[]>("/api/Wechat/work/secrets", data)
 }
