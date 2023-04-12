@@ -1,6 +1,6 @@
 import { clone } from "ramda"
 import { useEffect, useRef, useState } from "react"
-import { GetSecretData } from "../../api/app-manager"
+import { PostSecretData } from "../../api/app-manager"
 import { GetCorpAppList, GetCorpsList } from "../../api/enterprise"
 import {
   IManagerAppData,
@@ -59,7 +59,7 @@ const useAction = () => {
   const loadCorpList = () => {
     GetCorpsList().then((corpData) => {
       corpData &&
-        GetSecretData({
+        PostSecretData({
           ids: corpData.map((x) => x.id),
           secretType: 0,
         }).then((secretData) => {
@@ -82,7 +82,7 @@ const useAction = () => {
       CorpId,
     })
     !!corpAppResult &&
-      GetSecretData({
+      PostSecretData({
         ids: corpAppResult.map((x) => x.id),
         secretType: 1,
       }).then((secretData) => {
