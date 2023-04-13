@@ -232,14 +232,8 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 初始化企业数组
   useEffect(() => {
-    GetCorpsList().then((data: ICorpData[] | null | undefined) => {
-      if (data) {
-        const array: { id: string; corpName: string }[] = []
-        data.forEach((item) =>
-          array.push({ id: item.id, corpName: item.corpName })
-        )
-        setCorpsList(array)
-      }
+    GetCorpsList().then((data) => {
+      data && setCorpsList(data)
     })
   }, [])
 
@@ -254,16 +248,7 @@ export const useAction = (props: SelectContentHookProps) => {
       GetCorpAppList({ CorpId: corpsValue.id }).then(
         (corpAppResult: ICorpAppData[] | null | undefined) => {
           if (corpAppResult) {
-            const array: ICorpAppData[] = []
-            corpAppResult.forEach((item) =>
-              array.push({
-                id: item.id,
-                name: item.name,
-                appId: item.appId,
-                display: item.display,
-              })
-            )
-            setCorpAppList(array.filter((x) => x.display))
+            setCorpAppList(corpAppResult.filter((x) => x.display))
           }
         }
       )
@@ -503,7 +488,11 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
+      setIsTreeViewLoading(true)
       const deptListResponse = await GetDeptsAndUserList(AppId)
+      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+        setIsTreeViewLoading(false)
+
       !!deptListResponse &&
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
     }
@@ -533,7 +522,6 @@ export const useAction = (props: SelectContentHookProps) => {
         })
       // 开始load数据
       setIsLoadStop(false)
-      setIsTreeViewLoading(true)
       loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue?.appId, isShowDialog])
@@ -979,6 +967,10 @@ export const useAction = (props: SelectContentHookProps) => {
           value: `${corpsValue?.id}`,
         },
         {
+          key: "enterpriseCorpId",
+          value: `${corpsValue?.corpId}`,
+        },
+        {
           key: "appName",
           value: `${corpAppValue?.name}`,
         },
@@ -989,6 +981,10 @@ export const useAction = (props: SelectContentHookProps) => {
         {
           key: "weChatAppId",
           value: `${corpAppValue?.appId}`,
+        },
+        {
+          key: "agentId",
+          value: `${corpAppValue?.agentId}`,
         },
         {
           key: "appId",

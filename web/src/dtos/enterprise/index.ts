@@ -5,6 +5,7 @@ export interface IResponseMsg {
 
 export interface ICorpData {
   corpName: string
+  corpId: string
   id: string
 }
 
@@ -12,7 +13,9 @@ export interface ICorpAppData {
   appId: string
   id: string
   name: string
+  workWeChatCorpId: string
   display: boolean
+  agentId: number
 }
 
 export interface ICorpAppListApiData {
@@ -323,10 +326,7 @@ export interface ILastShowTableData extends IMessageJob {
   sendType: string
   groupName?: string
   groupId?: string
-  enterprise: {
-    id: string
-    corpName: string
-  }
+  enterprise: ICorpData
   app: ICorpAppData
 }
 

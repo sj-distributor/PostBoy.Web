@@ -129,6 +129,15 @@ const SelectTargetDialog = memo(
       setOuterTagsValue,
     })
 
+    const center = () =>
+      (clickName === "选择发送目标" ? !departmentKeyValue : !groupDeptUserList)
+        ? {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }
+        : {}
+
     const recursiveRenderDeptList = (
       data: IDepartmentAndUserListValue[],
       pl: number
@@ -216,11 +225,7 @@ const SelectTargetDialog = memo(
             )}
           </DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
-            {(
-              clickName === "选择发送目标"
-                ? departmentKeyValue?.data.length > 0
-                : groupDeptUserList && groupDeptUserList.length > 0
-            ) ? (
+            {!isLoading ? (
               <>
                 <div
                   style={{
@@ -228,9 +233,13 @@ const SelectTargetDialog = memo(
                     overflowY: "auto",
                     position: "relative",
                     marginBottom: "1rem",
+                    ...center(),
                   }}
                 >
                   {(clickName === "选择发送目标"
+                    ? !departmentKeyValue
+                    : !groupDeptUserList) && <div>No Data</div>}
+                  {clickName === "选择发送目标"
                     ? departmentKeyValue?.data.length > 0 &&
                       recursiveRenderDeptList(departmentKeyValue.data, 0)
                     : groupDeptUserList &&
@@ -243,18 +252,7 @@ const SelectTargetDialog = memo(
                           activeData &&
                           recursiveRenderDeptList(activeData.data, 0)
                         )
-                      })()) || (
-                    <CircularProgress
-                      style={{
-                        position: "absolute",
-                        width: "2rem",
-                        height: "2rem",
-                        left: "50%",
-                        top: "50%",
-                        margin: "-1rem 0 0 -1rem",
-                      }}
-                    />
-                  )}
+                      })()}
                 </div>
                 {clickName === "选择发送目标" && (
                   <Autocomplete
@@ -552,6 +550,7 @@ const SelectTargetDialog = memo(
       prevProps.AppId === nextProps.AppId &&
       prevProps.groupList === nextProps.groupList &&
       prevProps.chatId === nextProps.chatId &&
+      prevProps.isLoading === nextProps.isLoading &&
       prevProps.sendType === nextProps.sendType
     )
   }

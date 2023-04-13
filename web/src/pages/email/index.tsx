@@ -119,17 +119,6 @@ const SendEmail = (props: {
           ))}
         </Select>
         <Box sx={{ position: "relative" }}>
-          {!emailUpdateData && (
-            <Button
-              variant="contained"
-              sx={{ marginLeft: "2rem" }}
-              endIcon={<SendIcon />}
-              disabled={sendLoading}
-              onClick={handleClickSend}
-            >
-              Send
-            </Button>
-          )}
           {sendLoading && (
             <CircularProgress
               size={24}
@@ -144,17 +133,6 @@ const SendEmail = (props: {
             />
           )}
         </Box>
-        {!emailUpdateData && (
-          <Button
-            sx={{
-              marginLeft: "2rem",
-            }}
-            variant="contained"
-            onClick={() => clickSendRecord("open")}
-          >
-            发送记录
-          </Button>
-        )}
 
         <FormControl sx={{ ml: "2rem" }}>
           <InputLabel id="demo-simple-select-autowidth-label">
@@ -369,6 +347,32 @@ const SendEmail = (props: {
             setEndDateValue={setEndDateValue}
             showErrorPrompt={showErrorPrompt}
           />
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingBottom: "2rem",
+        }}
+      >
+        {!emailUpdateData && (
+          <>
+            <Button
+              variant="contained"
+              sx={{
+                height: "3.5rem",
+                width: "7rem",
+                fontSize: "1rem",
+              }}
+              disabled={sendLoading}
+              onClick={handleClickSend}
+            >
+              发送
+            </Button>
+            <Button onClick={() => clickSendRecord("open")}>发送记录</Button>
+          </>
         )}
       </div>
 
