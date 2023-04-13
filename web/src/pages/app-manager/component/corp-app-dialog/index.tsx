@@ -7,7 +7,8 @@ import {
 } from "../../../../dtos/app-manager"
 import useAction from "./hook"
 import styles from "./index.module.scss"
-const Add = (props: {
+
+const CorpAppDialog = (props: {
   rowData: IManagerCorpKeyData | IManagerAppKeyData
   rowDataType: AddOrModify
   tipsText: string
@@ -60,7 +61,7 @@ const Add = (props: {
         <TextField
           fullWidth
           label={`${subjectText} Name`}
-          className={styles.apiKey}
+          className={styles.TextField}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -69,7 +70,7 @@ const Add = (props: {
           <TextField
             fullWidth
             label="Corporation Id"
-            className={styles.apiKey}
+            className={styles.TextField}
             value={corpId}
             onChange={(e) => setCorpId(e.target.value)}
           />
@@ -78,7 +79,7 @@ const Add = (props: {
             <TextField
               fullWidth
               label="App Id"
-              className={styles.apiKey}
+              className={styles.TextField}
               value={appId}
               onChange={(e) => setAppId(e.target.value)}
             />
@@ -86,7 +87,7 @@ const Add = (props: {
               fullWidth
               type="number"
               label="Agent Id"
-              className={styles.apiKey}
+              className={styles.TextField}
               value={agentId}
               onChange={(e) => setAgentId(Number(e.target.value))}
             />
@@ -137,4 +138,4 @@ const Add = (props: {
   )
 }
 
-export default Add
+export default CorpAppDialog
