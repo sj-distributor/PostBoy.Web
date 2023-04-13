@@ -37,6 +37,7 @@ const Add = (props: {
     setDisplay,
     setSecret,
     handleSubmit,
+    validate,
   } = useAction({
     rowData,
     rowDataType,
@@ -127,7 +128,7 @@ const Add = (props: {
               setTipsText(String(error))
             }
           }}
-          disabled={!name}
+          disabled={!validate()}
         >
           Submit
         </Button>

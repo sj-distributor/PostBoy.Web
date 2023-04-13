@@ -74,6 +74,14 @@ const useAction = (props: {
     setDisplay(true)
   }
 
+  const validate = () => {
+    if (rowData.key === RowDataType.Corporation) {
+      return [name, secret, corpId].every((x) => !!x)
+    } else {
+      return [name, secret, appId, agentId].every((x) => !!x)
+    }
+  }
+
   useEffect(() => {
     if (rowDataType === AddOrModify.Modify) {
       // Init data
@@ -107,6 +115,7 @@ const useAction = (props: {
     setSecret,
     setName,
     handleSubmit,
+    validate,
   }
 }
 

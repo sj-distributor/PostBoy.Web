@@ -49,6 +49,10 @@ const useAction = () => {
 
   const onAddCorpCancel = () => dialogRef.current?.close()
 
+  const reload = (corpUpdateId?: string) => {
+    corpUpdateId ? loadAppList(corpUpdateId) : loadCorpList()
+  }
+
   const onListClick = async (corpId: string) => {
     if (!corpAppLoadedList.some((x) => x === corpId)) {
       setCorpAppLoadedList((prev) => [...prev, corpId])
@@ -103,10 +107,6 @@ const useAction = () => {
             return newResult
           })
       })
-  }
-
-  const reload = (corpUpdateId?: string) => {
-    corpUpdateId ? loadAppList(corpUpdateId) : loadCorpList()
   }
 
   // 初始化企业数组
