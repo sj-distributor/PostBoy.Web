@@ -3,6 +3,8 @@ import {
   Button,
   FormControl,
   InputLabel,
+  List,
+  ListItemButton,
   MenuItem,
   Select,
   TextField,
@@ -29,6 +31,7 @@ import TimeSelector from "../time-selector"
 import DateSelector from "../date-selector"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import * as wangEditor from "@wangeditor/editor"
+import { MentionsInput, Mention } from "react-mentions"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -105,6 +108,9 @@ const SelectContent = memo(
       setHtmlText,
       tagsValue,
       isUpdatedDeptUser,
+      isFocusing,
+      focusAction,
+      mentionList,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -172,6 +178,21 @@ const SelectContent = memo(
           }
         }
     }
+
+    const customMentionsList = (children: React.ReactNode) => (
+      <List
+        sx={{ maxHeight: "12rem", overflowY: "auto" }}
+        aria-label="main mailbox folders"
+        onMouseMove={(e) => {
+          e.preventDefault()
+        }}
+        onKeyDown={() => {
+          console.log(1)
+        }}
+      >
+        {children}
+      </List>
+    )
 
     const pictureImage = (pictureText: PictureText[], state: string) => {
       return (
@@ -456,17 +477,58 @@ const SelectContent = memo(
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              {messageTypeValue.title !== "推文" && (
-                <TextField
-                  className={styles.input}
-                  label="内容"
-                  multiline
-                  rows={6}
-                  variant="outlined"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-              )}
+              {messageTypeValue.title !== "推文" &&
+                (messageTypeValue.title !== "文本" ? (
+                  <TextField
+                    className={styles.input}
+                    label="内容"
+                    multiline
+                    rows={6}
+                    variant="outlined"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                ) : (
+                  <div style={{ position: "relative" }}>
+                    <div
+                      className={styles.mentionsInputWrap}
+                      style={{ color: isFocusing ? "#1664b3" : "" }}
+                    >
+                      内容
+                    </div>
+                    <MentionsInput
+                      className={styles.MentionsInput}
+                      value={content}
+                      allowSuggestionsAboveCursor
+                      customSuggestionsContainer={(children) =>
+                        customMentionsList(children)
+                      }
+                      suggestionsPortalHost={
+                        document.querySelector(".App") ?? undefined
+                      }
+                      onFocus={focusAction.setTrue}
+                      onBlur={focusAction.setFalse}
+                      onChange={(e, _, newPlainTextValue) =>
+                        setContent(newPlainTextValue)
+                      }
+                    >
+                      <Mention
+                        trigger="@"
+                        data={mentionList}
+                        appendSpaceOnAdd
+                        displayTransform={(_, display) => `@${display}`}
+                        renderSuggestion={(entry) => {
+                          return (
+                            <ListItemButton id={`${entry.id}`}>
+                              {entry.display}
+                            </ListItemButton>
+                          )
+                        }}
+                      />
+                    </MentionsInput>
+                  </div>
+                ))}
+
               {messageTypeValue.type === MessageDataFileType.Image &&
                 messageTypeValue.groupBy === "" && (
                   <div

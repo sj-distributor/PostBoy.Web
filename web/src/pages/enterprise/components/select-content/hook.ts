@@ -4,6 +4,8 @@ import {
   GetCorpAppList,
   GetCorpsList,
   GetDeptsAndUserList,
+  GetGroupDetail,
+  GetGroupUsersDetail,
   GetTagsList,
   GetWeChatWorkCorpAppGroups,
   PostAttachmentUpload,
@@ -18,6 +20,7 @@ import {
   IDepartmentKeyControl,
   IDeptAndUserList,
   IJobSettingDto,
+  IMentionList,
   IMessageTypeData,
   ISearchList,
   ITagsList,
@@ -36,6 +39,7 @@ import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
 import * as wangEditor from "@wangeditor/editor"
 import { annexEditorConfig } from "../../../../uilts/wangEditor"
+import { useBoolean } from "ahooks"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
 
@@ -150,6 +154,10 @@ export const useAction = (props: SelectContentHookProps) => {
   const [html, setHtml] = useState("")
 
   const [htmlText, setHtmlText] = useState("")
+
+  const [isFocusing, focusAction] = useBoolean(false)
+
+  const [mentionList, setMentionList] = useState<IMentionList[]>([])
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -482,6 +490,26 @@ export const useAction = (props: SelectContentHookProps) => {
           toParties: selectedList
             .filter((e) => e.type === DepartmentAndUserType.Department)
             .map((e) => String(e.id)),
+        })
+
+      chatId &&
+        corpAppValue?.appId &&
+        GetGroupDetail(corpAppValue.appId, chatId).then((data) => {
+          data &&
+            data.errcode === 0 &&
+            GetGroupUsersDetail({
+              appId: corpAppValue.appId,
+              userIds: data.chat_info.userlist,
+            }).then((userList) => {
+              userList &&
+                userList.length > 0 &&
+                setMentionList(
+                  userList.map((item) => ({
+                    id: item.name,
+                    display: item.name,
+                  }))
+                )
+            })
         })
     }
   }, [isShowDialog])
@@ -1152,7 +1180,10 @@ export const useAction = (props: SelectContentHookProps) => {
     html,
     setHtml,
     setHtmlText,
+    isFocusing,
+    focusAction,
     tagsValue,
     isUpdatedDeptUser,
+    mentionList,
   }
 }
