@@ -26,46 +26,27 @@ import { Fragment, useRef, useState } from "react";
 import DateTime from "./component/date-time";
 import "@wangeditor/editor/dist/css/style.css";
 import style from "./index.module.scss";
+import { SelectType } from "../../dtos/meeting-seetings";
 
 export default function SelectLabels() {
   const {
-    SelectType,
     editor,
     html,
     toolbarConfig,
     selectData,
     editorConfig,
     selectGroup,
+    openAnnexList,
+    anchorRef,
     handleChange,
     setHtml,
     setEditor,
+    handleToggle,
+    handleClose,
+    getEndDate,
+    getStateDate,
   } = useAction();
 
-  const [openAnnexList, setOpenAnnexList] = useState(false);
-  const anchorRef = useRef<HTMLDivElement>(null);
-
-  const handleToggle = () => {
-    setOpenAnnexList((prevOpen) => !prevOpen);
-  };
-
-  const handleClose = (event: Event) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-
-    setOpenAnnexList(false);
-  };
-
-  //获取时间
-  const getEndDate = (data: { time: string; date: string }) => {
-    console.log(data);
-  };
-  const getStateDate = (data: { time: string; date: string }) => {
-    console.log(data);
-  };
   return (
     <div className={style.container}>
       <div className={style.appointmentMeeting}>

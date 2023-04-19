@@ -4,26 +4,27 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import "dayjs/locale/zh-cn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { DateTimeProps } from "../../../../dtos/meeting-seetings";
 
-const DateTime = (props: {
-  selectList: { value: string; lable: string }[];
-  getDateTimeData: (data: { date: string; time: string }) => void;
-}) => {
+const DateTime = (props: DateTimeProps) => {
   const { selectList, getDateTimeData } = props;
-  const [dtData, setDtData] = useState({
-    date: "",
-    time: "",
-  });
-
-  const handleChangeDateTime = async (event: any, type: string) => {
-    let newData = dtData;
-    type === "date" && (newData.date = dayjs(event).format("DD/MM/YYYY"));
-    type === "time" && (newData.time = event.target.value);
-    await setDtData(newData);
-    await getDateTimeData(dtData);
+  const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState<string>("");
+  const handleChangeDate = (vlaue: dayjs.Dayjs | null) => {
+    setDate((vl) => dayjs(vlaue).format("DD/MM/YYYY"));
   };
 
+  const handleChangeTime = (event: SelectChangeEvent) => {
+    setTime((vl) => event.target.value);
+  };
+
+  useEffect(() => {
+    getDateTimeData({
+      date,
+      time,
+    });
+  }, [date, time]);
   return (
     <>
       <Grid container columns={100} justifyContent="space-between">
@@ -36,14 +37,14 @@ const DateTime = (props: {
               defaultValue={dayjs("3-15")}
               format="M月D日 ddd"
               sx={{ width: "100%" }}
-              onChange={(newDate) => handleChangeDateTime(newDate, "date")}
+              onChange={(newDate) => handleChangeDate(newDate)}
             />
           </LocalizationProvider>
         </Grid>
         <Grid xs={100} md={49}>
           <Select
             defaultValue={selectList && selectList[0].value}
-            onChange={(e: SelectChangeEvent) => handleChangeDateTime(e, "time")}
+            onChange={(e: SelectChangeEvent) => handleChangeTime(e)}
             displayEmpty
             inputProps={{ "aria-label": "Without label" }}
             sx={{ width: "100%" }}

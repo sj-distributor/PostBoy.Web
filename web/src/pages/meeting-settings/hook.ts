@@ -1,16 +1,12 @@
 import { SelectChangeEvent } from "@mui/material";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
+import { SelectDataType, SelectGroupType } from "../../dtos/meeting-seetings";
 
 const useAction = () => {
-  enum SelectType {
-    startTime = 0,
-    endTime = 1,
-  }
-
-  const [selectData, setSelectData] = useState([
+  const [selectData, setSelectData] = useState<SelectDataType[][]>([
     [
       {
         value: "1:00",
@@ -40,7 +36,7 @@ const useAction = () => {
       },
     ],
   ]);
-  const [selectGroup, setSelectGroup] = useState([
+  const [selectGroup, setSelectGroup] = useState<SelectGroupType[]>([
     {
       title: "提醒",
       key: "reminderTime",
@@ -96,11 +92,28 @@ const useAction = () => {
       ],
     },
   ]);
-  // 富文本框实例
-  const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null); // 存储 editor 实例
-  // 富文本框html
+  const [openAnnexList, setOpenAnnexList] = useState<boolean>(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  const handleToggle = () => {
+    setOpenAnnexList((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event: Event) => {
+    if (
+      anchorRef.current &&
+      anchorRef.current.contains(event.target as HTMLElement)
+    ) {
+      return;
+    }
+
+    setOpenAnnexList(false);
+  };
+
+  const getEndDate = (data: { time: string; date: string }) => {};
+  const getStateDate = (data: { time: string; date: string }) => {};
+  const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null);
   const [html, setHtml] = useState<string>("");
-  // 编辑器配置
   const editorConfig: Partial<IEditorConfig> = {
     placeholder: "请输入描述",
   };
@@ -115,27 +128,30 @@ const useAction = () => {
     ],
   };
 
-  const handleChange = async (event: SelectChangeEvent, type: string) => {
-    console.log(type, event.target.value);
-    let newList = selectGroup;
-    await newList.forEach(
+  const handleChange = (event: SelectChangeEvent, type: string) => {
+    const newList = selectGroup;
+    newList.forEach(
       (item) => item.key === type && (item.value = event.target.value)
     );
-    await setSelectGroup(newList);
-    console.log(selectGroup);
+    setSelectGroup(newList);
   };
 
   return {
-    SelectType,
     editor,
     html,
     toolbarConfig,
     selectData,
     editorConfig,
     selectGroup,
+    openAnnexList,
+    anchorRef,
     handleChange,
     setEditor,
     setHtml,
+    handleClose,
+    handleToggle,
+    getEndDate,
+    getStateDate,
   };
 };
 

@@ -40,8 +40,8 @@ export const routerArray: RouteItem[] = [
   },
   {
     path: "/meetingSettings",
-    head: "会议设置",
-    icons: "iconfont iconemail",
+    head: "",
+    icons: "",
     element: <MeetingSettings />,
   },
 ];
