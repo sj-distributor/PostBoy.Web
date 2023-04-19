@@ -6,6 +6,7 @@ import {
   List,
   ListItemButton,
   MenuItem,
+  Paper,
   Select,
   TextField,
 } from "@mui/material"
@@ -180,18 +181,14 @@ const SelectContent = memo(
     }
 
     const customMentionsList = (children: React.ReactNode) => (
-      <List
-        sx={{ maxHeight: "12rem", overflowY: "auto" }}
-        aria-label="main mailbox folders"
-        onMouseMove={(e) => {
-          e.preventDefault()
-        }}
-        onKeyDown={() => {
-          console.log(1)
-        }}
-      >
-        {children}
-      </List>
+      <Paper>
+        <List
+          sx={{ maxHeight: "14rem", overflowY: "auto" }}
+          aria-label="main mailbox folders"
+        >
+          {children}
+        </List>
+      </Paper>
     )
 
     const pictureImage = (pictureText: PictureText[], state: string) => {
