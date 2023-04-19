@@ -57,7 +57,14 @@ export const useAction = (props: SelectContentHookProps) => {
   // 拿到的企业对象
   const [corpsValue, setCorpsValue] = useState<ICorpData>()
   // 拿到的App对象
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>({
+    appId: "",
+    id: "",
+    name: "",
+    workWeChatCorpId: "",
+    display: true,
+    agentId: 0,
+  })
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -264,15 +271,16 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 获取Tags数组
   useEffect(() => {
-    if (corpAppValue?.appId !== undefined) {
+    if (corpAppValue?.appId) {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
           tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
         }
       )
-      GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
-        data && setGroupList(data)
-      })
+      corpAppValue.id &&
+        GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+          data && setGroupList(data)
+        })
       if (isNewOrUpdate === "new") {
         // 清空切换应用时的已选值
         setChatId("")

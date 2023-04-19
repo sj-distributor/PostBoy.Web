@@ -287,29 +287,33 @@ const SelectContent = memo(
                   setCorpsValue(value)
                 }}
               />
-              <Autocomplete
-                openOnFocus
-                disablePortal
-                id="Autocomplete-corpAppListId"
-                value={corpAppValue}
-                options={corpAppList}
-                className={styles.inputWrap}
-                style={{ marginRight: "1.6rem" }}
-                disableClearable
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(e, value) => {
-                  setCorpAppValue(value)
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.corpInput}
-                    type="button"
-                    label="选择应用"
-                  />
-                )}
-              />
+              {corpAppValue && (
+                <Autocomplete
+                  openOnFocus
+                  disablePortal
+                  id="Autocomplete-corpAppListId"
+                  value={corpAppValue}
+                  options={corpAppList}
+                  className={styles.inputWrap}
+                  style={{ marginRight: "1.6rem" }}
+                  disableClearable
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  onChange={(e, value) => {
+                    setCorpAppValue(value)
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.corpInput}
+                      type="button"
+                      label="选择应用"
+                    />
+                  )}
+                />
+              )}
             </>
           )}
 
