@@ -3,7 +3,11 @@ import dayjs from "dayjs";
 import { useRef, useState } from "react";
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
-import { SelectDataType, SelectGroupType } from "../../dtos/meeting-seetings";
+import {
+  DateTimeData,
+  SelectDataType,
+  SelectGroupType,
+} from "../../dtos/meeting-seetings";
 
 const useAction = () => {
   const [selectData, setSelectData] = useState<SelectDataType[][]>([
@@ -110,8 +114,8 @@ const useAction = () => {
     setOpenAnnexList(false);
   };
 
-  const getEndDate = (data: { time: string; date: string }) => {};
-  const getStateDate = (data: { time: string; date: string }) => {};
+  const getEndDate = (data: DateTimeData) => {};
+  const getStateDate = (data: DateTimeData) => {};
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null);
   const [html, setHtml] = useState<string>("");
   const editorConfig: Partial<IEditorConfig> = {
