@@ -511,12 +511,13 @@ export const useAction = (props: SelectContentHookProps) => {
             }).then((userList) => {
               userList &&
                 userList.length > 0 &&
-                setMentionList(
-                  userList.map((item) => ({
+                setMentionList([
+                  { id: `所有人(${userList.length})`, display: "所有人" },
+                  ...userList.map((item) => ({
                     id: item.name,
                     display: item.name,
-                  }))
-                )
+                  })),
+                ])
             })
         })
     }
@@ -1126,6 +1127,17 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [clearData, isNewOrUpdate])
 
+  const detectMentionToDelete = (value: string, key: string) => {
+    const afterPattern = /[^@]+$/
+    const beforePattern = /.*(?=@[^@]*$)/
+    key === "Backspace" &&
+      value.slice(-1) === " " &&
+      mentionList.some(
+        (item) => item.display === value.match(afterPattern)?.[0].trim()
+      ) &&
+      setContent(value.match(beforePattern)?.[0] ?? "")
+  }
+
   return {
     corpsValue,
     setCorpsValue,
@@ -1193,5 +1205,6 @@ export const useAction = (props: SelectContentHookProps) => {
     tagsValue,
     isUpdatedDeptUser,
     mentionList,
+    detectMentionToDelete,
   }
 }

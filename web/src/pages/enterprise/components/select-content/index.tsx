@@ -112,6 +112,7 @@ const SelectContent = memo(
       isFocusing,
       focusAction,
       mentionList,
+      detectMentionToDelete,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -509,9 +510,15 @@ const SelectContent = memo(
                       }
                       onFocus={focusAction.setTrue}
                       onBlur={focusAction.setFalse}
-                      onChange={(e, _, newPlainTextValue) =>
+                      onKeyDown={(e) => {
+                        detectMentionToDelete(
+                          (e.target as HTMLTextAreaElement).value,
+                          e.key
+                        )
+                      }}
+                      onChange={(event, _, newPlainTextValue) => {
                         setContent(newPlainTextValue)
-                      }
+                      }}
                     >
                       <Mention
                         trigger="@"
@@ -521,7 +528,7 @@ const SelectContent = memo(
                         renderSuggestion={(entry) => {
                           return (
                             <ListItemButton id={`${entry.id}`}>
-                              {entry.display}
+                              {entry.id}
                             </ListItemButton>
                           )
                         }}
