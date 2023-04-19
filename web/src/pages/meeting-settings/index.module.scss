@@ -1,0 +1,109 @@
+.meetingBtn {
+  display: flex;
+  color: #368aef;
+}
+
+.container {
+  height: 100%;
+}
+
+.appointmentMeeting {
+  background-color: #f2f3f4;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.appointmentPerson {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.appointmentPersonData {
+  display: flex;
+  justify-content: space-between;
+  border: 0.1rem solid #d8d9d9;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  background-color: #e8e8e8;
+}
+
+.fromDataItem {
+  width: 100%;
+}
+
+.participantData {
+  display: flex;
+  align-items: center;
+  height: 70%;
+  padding: 0.5rem 0.6rem;
+  border: 0.1rem solid #d8d9d9;
+  border-radius: 0.3rem;
+  background-color: #e8e8e8;
+}
+
+.participantName {
+  margin-left: 1rem;
+}
+
+.addParticipant {
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #d8d9d9;
+  height: 70%;
+  color: #368aef;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.addParticipantIcon {
+  padding: 0.1rem;
+  background-color: #2196f338;
+  border-radius: 0.3rem;
+  margin-right: 0.5rem;
+}
+
+.annexBtn {
+  width: fit-content;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #d8d9d9;
+}
+
+.annexBtnText {
+  padding: 0.4rem 4rem;
+  border-right: 0.1rem solid #d8d9d9;
+}
+
+.annexBtnIcon {
+  color: rgba(0, 0, 0, 0.54);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.editableTextarea {
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar {
+  border-bottom: 0.1rem solid #d8d9d9;
+}
+
+.editorText {
+  height: 6rem;
+}
+
+.setUpBtn {
+  border: 0.1rem solid #d8d9d9 !important;
+  background-color: transparent !important;
+  border-radius: 0.3rem;
+  padding: 0.4rem 4rem;
+  color: #000 !important;
+  cursor: pointer;
+  width: fit-content;
+}
