@@ -262,7 +262,7 @@ const SelectContent = memo(
     return (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
-          {!!corpsValue && !!corpAppValue && (
+          {!!corpsValue && (
             <>
               <Autocomplete
                 openOnFocus
