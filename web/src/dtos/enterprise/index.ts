@@ -115,6 +115,7 @@ export interface ITargetDialogProps {
   departmentKeyValue: IDepartmentKeyControl
   flattenDepartmentList: IDepartmentAndUserListValue[]
   AppId: string
+  CorpId: string
   isLoading: boolean
   tagsList: ITagsList[]
   lastTagsValue?: string[] | undefined

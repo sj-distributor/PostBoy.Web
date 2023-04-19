@@ -401,6 +401,7 @@ const SelectContent = memo(
           <SelectTargetDialog
             open={isShowDialog}
             AppId={corpAppValue ? corpAppValue.appId : ""}
+            CorpId={corpAppValue ? corpAppValue.id : ""}
             departmentAndUserList={departmentAndUserList}
             departmentKeyValue={departmentKeyValue}
             flattenDepartmentList={searchKeyValue}
