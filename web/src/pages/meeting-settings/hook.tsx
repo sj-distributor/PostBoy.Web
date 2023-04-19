@@ -102,8 +102,6 @@ const useAction = () => {
   const [html, setHtml] = useState<string>("");
   // 编辑器配置
   const editorConfig: Partial<IEditorConfig> = {
-    // TS 语法
-    // const editorConfig = {                         // JS 语法
     placeholder: "请输入描述",
   };
   const toolbarConfig: Partial<wangEditor.IToolbarConfig> = {

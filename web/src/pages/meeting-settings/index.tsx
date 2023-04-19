@@ -88,7 +88,7 @@ export default function SelectLabels() {
           </Grid>
           <Grid xs={24} md={22}>
             <Grid container columns={100} justifyContent="space-between">
-              <Grid xs={100} md={49}>
+              <Grid xs={100} md={49} sx={{ marginBottom: "10px" }}>
                 <div className={style.participantData}>
                   <Avatar
                     variant="square"
@@ -97,7 +97,7 @@ export default function SelectLabels() {
                   <div className={style.participantName}>MARS.PENG</div>
                 </div>
               </Grid>
-              <Grid xs={100} md={49}>
+              <Grid xs={100} md={49} sx={{ marginBottom: "10px" }}>
                 <div className={style.addParticipant}>
                   <AddIcon className={style.addParticipantIcon} />
                   添加参会人
