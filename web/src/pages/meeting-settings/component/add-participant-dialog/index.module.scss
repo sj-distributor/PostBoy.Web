@@ -1,0 +1,22 @@
+.noData {
+  text-align: center;
+  line-height: 25rem;
+}
+
+.selectedData {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.avatarName {
+  display: flex;
+  align-items: center;
+}
+
+.acatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+}

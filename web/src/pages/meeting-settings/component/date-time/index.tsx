@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { Select, MenuItem, SelectChangeEvent, Input } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -12,23 +12,22 @@ const DateTime = (props: DateTimeProps) => {
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string>("");
   const handleChangeDate = (vlaue: dayjs.Dayjs | null) => {
-    setDate((vl) => dayjs(vlaue).format("DD/MM/YYYY"));
+    setDate(dayjs(vlaue).format("DD/MM/YYYY"));
   };
 
-  const handleChangeTime = (event: SelectChangeEvent) => {
-    setTime((vl) => event.target.value);
-  };
+  const handleChangeTime = (value: string) => setTime(value);
 
   useEffect(() => {
     getDateTimeData({
       date,
       time,
     });
+    console.log(date, time);
   }, [date, time]);
   return (
     <>
       <Grid container columns={100} justifyContent="space-between">
-        <Grid xs={100} md={49} sx={{ marginBottom: "10px" }}>
+        <Grid xs={100} md={49} sx={{ paddingBottom: "1rem" }}>
           <LocalizationProvider
             dateAdapter={AdapterDayjs}
             adapterLocale="zh-cn"
@@ -41,23 +40,19 @@ const DateTime = (props: DateTimeProps) => {
             />
           </LocalizationProvider>
         </Grid>
-        <Grid xs={100} md={49}>
-          <Select
-            defaultValue={selectList && selectList[0].value}
-            onChange={(e: SelectChangeEvent) => handleChangeTime(e)}
-            displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
-            sx={{ width: "100%" }}
-          >
-            {selectList &&
-              selectList.map((item, index) => {
-                return (
-                  <MenuItem value={item.value} key={index}>
-                    {item.value}
-                  </MenuItem>
-                );
-              })}
-          </Select>
+        <Grid xs={100} md={49} sx={{ paddingBottom: "1rem" }}>
+          <Input
+            type="time"
+            sx={{
+              width: "100%",
+              height: "100%",
+              border: "1px solid #d8d9d9",
+              borderRadius: "0.3rem",
+              padding: "0.6rem 1rem",
+            }}
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          ></Input>
         </Grid>
       </Grid>
     </>

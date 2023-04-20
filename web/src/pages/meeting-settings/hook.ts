@@ -10,6 +10,7 @@ import {
 } from "../../dtos/meeting-seetings";
 
 const useAction = () => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [selectData, setSelectData] = useState<SelectDataType[][]>([
     [
       {
@@ -99,6 +100,10 @@ const useAction = () => {
   const [openAnnexList, setOpenAnnexList] = useState<boolean>(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
+  const setDialog = (value: boolean) => {
+    setOpenDialog(value);
+  };
+
   const handleToggle = () => {
     setOpenAnnexList((prevOpen) => !prevOpen);
   };
@@ -149,6 +154,8 @@ const useAction = () => {
     selectGroup,
     openAnnexList,
     anchorRef,
+    openDialog,
+    setDialog,
     handleChange,
     setEditor,
     setHtml,
