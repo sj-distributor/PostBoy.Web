@@ -1,6 +1,9 @@
 import { clone } from "ramda"
 import { useEffect, useState } from "react"
-import { PostWeChatWorkGroupCreate } from "../../../../api/enterprise"
+import {
+  GetWeChatWorkCorpAppGroups,
+  PostWeChatWorkGroupCreate,
+} from "../../../../api/enterprise"
 import {
   IDepartmentAndUserListValue,
   DepartmentAndUserType,
@@ -11,6 +14,7 @@ import {
   IWorkGroupCreate,
   SendObjOrGroup,
   IFirstState,
+  IWorkCorpAppGroup,
 } from "../../../../dtos/enterprise"
 
 const useAction = (props: {
@@ -26,12 +30,14 @@ const useAction = (props: {
   outerTagsValue?: ITagsList[]
   isUpdatedDeptUser: boolean
   sendType?: SendObjOrGroup
+  CorpId: string
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setOpenFunction: (open: boolean) => void
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
+  setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
 }) => {
   const {
     departmentAndUserList,
@@ -46,12 +52,14 @@ const useAction = (props: {
     isUpdatedDeptUser,
     lastTagsValue,
     sendType,
+    CorpId,
     setSendType,
     setChatId,
     setIsRefresh,
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
+    setGroupList,
   } = props
 
   const defaultGroupOwner = {
@@ -90,6 +98,10 @@ const useAction = (props: {
   const [createLoading, setCreateLoading] = useState(false)
 
   const [groupValue, setGroupValue] = useState<string>("")
+
+  const [groupPage, setGroupPage] = useState<number>(2)
+
+  const [groupIsNoData, setGroupIsNoData] = useState<boolean>(false)
 
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
@@ -267,6 +279,25 @@ const useAction = (props: {
     clearSelected()
   }
 
+  const onListBoxScrolling = (
+    scrollHeight: number,
+    scrollTop: number,
+    clientHeight: number
+  ) => {
+    scrollTop + clientHeight >= scrollHeight - 2 &&
+      !groupIsNoData &&
+      setGroupPage((prev) => prev + 1)
+  }
+
+  useEffect(() => {
+    CorpId &&
+      GetWeChatWorkCorpAppGroups(CorpId, groupPage).then((data) => {
+        data && data.length > 0
+          ? setGroupList((prev) => [...prev, ...data])
+          : setGroupIsNoData(true)
+      })
+  }, [groupPage])
+
   useEffect(() => {
     // 限制条件下群组部门列表变化同步到群组搜索选择列表
     !isLoading &&
@@ -352,6 +383,8 @@ const useAction = (props: {
         (() => {
           setDepartmentSelectedList([])
           setGroupDeptUserSelectedList([])
+          setGroupPage(2)
+          setGroupIsNoData(false)
         })()
   }, [open])
 
@@ -406,6 +439,7 @@ const useAction = (props: {
     handleCreateGroup,
     handleConfirm,
     handleCancel,
+    onListBoxScrolling,
   }
 }
 export default useAction

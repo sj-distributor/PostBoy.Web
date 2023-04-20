@@ -17,6 +17,8 @@ import {
   IGetDeptAndUsersResponse,
   ICreateGroupResonse,
   UploadAttachmentResponseData,
+  IGroupUserResponse,
+  IGroupDetailResponse,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -84,9 +86,13 @@ export const PostWeChatWorkGroupCreate = async (data: IWorkGroupCreate) => {
   return await Post<ICreateGroupResonse>(`/api/WeChat/work/group/create`, data)
 }
 
-export const GetWeChatWorkCorpAppGroups = async (corpApplicationId: string) => {
+export const GetWeChatWorkCorpAppGroups = async (
+  corpApplicationId: string,
+  page = 1,
+  pageSize = 15
+) => {
   return await Get<IWorkCorpAppGroup[]>(
-    `/api/WeChat/work/corp/app/groups?corpApplicationId=${corpApplicationId}`
+    `/api/WeChat/work/corp/app/groups?corpApplicationId=${corpApplicationId}&pageIndex=${page}&pageSize=${pageSize}`
   )
 }
 
@@ -101,4 +107,17 @@ export const PostAttachmentUpload = async (data: FormData) => {
     "/api/Attachment/upload",
     data
   )
+}
+
+export const GetGroupDetail = async (AppId: string, ChatId: string) => {
+  return await Get<IGroupDetailResponse>(
+    `/api/Wechat/work/group?AppId=${AppId}&ChatId=${ChatId}`
+  )
+}
+
+export const GetGroupUsersDetail = async (data: {
+  appId: string
+  userIds: string[]
+}) => {
+  return await Post<IGroupUserResponse[]>("/api/Wechat/work/users", data)
 }

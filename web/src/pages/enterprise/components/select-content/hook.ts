@@ -4,6 +4,8 @@ import {
   GetCorpAppList,
   GetCorpsList,
   GetDeptsAndUserList,
+  GetGroupDetail,
+  GetGroupUsersDetail,
   GetTagsList,
   GetWeChatWorkCorpAppGroups,
   PostAttachmentUpload,
@@ -18,6 +20,7 @@ import {
   IDepartmentKeyControl,
   IDeptAndUserList,
   IJobSettingDto,
+  IMentionList,
   IMessageTypeData,
   ISearchList,
   ITagsList,
@@ -36,6 +39,7 @@ import { convertBase64 } from "../../../../uilts/convert-base64"
 import { SelectContentHookProps } from "./props"
 import * as wangEditor from "@wangeditor/editor"
 import { annexEditorConfig } from "../../../../uilts/wangEditor"
+import { useBoolean } from "ahooks"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
 
@@ -51,9 +55,20 @@ export const useAction = (props: SelectContentHookProps) => {
   } = props
 
   // 拿到的企业对象
-  const [corpsValue, setCorpsValue] = useState<ICorpData>()
+  const [corpsValue, setCorpsValue] = useState<ICorpData>({
+    corpName: "",
+    corpId: "",
+    id: "",
+  })
   // 拿到的App对象
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>()
+  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>({
+    appId: "",
+    id: "",
+    name: "",
+    workWeChatCorpId: "",
+    display: true,
+    agentId: 0,
+  })
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -151,6 +166,10 @@ export const useAction = (props: SelectContentHookProps) => {
 
   const [htmlText, setHtmlText] = useState("")
 
+  const [isFocusing, focusAction] = useBoolean(false)
+
+  const [mentionList, setMentionList] = useState<IMentionList[]>([])
+
   const editorConfig = {
     placeholder: "请输入内容...",
     autoFocus: false,
@@ -239,12 +258,12 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个企业对象
   useEffect(() => {
-    corpsValue === undefined && setCorpsValue(corpsList[0])
+    !corpsValue.corpId && corpsList.length > 0 && setCorpsValue(corpsList[0])
   }, [corpsList])
 
   // 初始化App数组
   useEffect(() => {
-    !!corpsValue &&
+    !!corpsValue.corpId &&
       GetCorpAppList({ CorpId: corpsValue.id }).then(
         (corpAppResult: ICorpAppData[] | null | undefined) => {
           if (corpAppResult) {
@@ -256,15 +275,16 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 获取Tags数组
   useEffect(() => {
-    if (corpAppValue?.appId !== undefined) {
+    if (corpAppValue?.appId) {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
           tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
         }
       )
-      GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
-        data && setGroupList(data)
-      })
+      corpAppValue.id &&
+        GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+          data && setGroupList(data)
+        })
       if (isNewOrUpdate === "new") {
         // 清空切换应用时的已选值
         setChatId("")
@@ -289,7 +309,9 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个App对象
   useEffect(() => {
-    isNewOrUpdate === "new" && setCorpAppValue(corpAppList[0])
+    isNewOrUpdate === "new" &&
+      corpAppList.length > 0 &&
+      setCorpAppValue(corpAppList[0])
   }, [corpAppList, isNewOrUpdate])
 
   const departmentKeyValue = useMemo(() => {
@@ -482,6 +504,27 @@ export const useAction = (props: SelectContentHookProps) => {
           toParties: selectedList
             .filter((e) => e.type === DepartmentAndUserType.Department)
             .map((e) => String(e.id)),
+        })
+
+      chatId &&
+        corpAppValue?.appId &&
+        GetGroupDetail(corpAppValue.appId, chatId).then((data) => {
+          data &&
+            data.errcode === 0 &&
+            GetGroupUsersDetail({
+              appId: corpAppValue.appId,
+              userIds: data.chat_info.userlist,
+            }).then((userList) => {
+              userList &&
+                userList.length > 0 &&
+                setMentionList([
+                  { id: `所有人(${userList.length})`, display: "所有人" },
+                  ...userList.map((item) => ({
+                    id: item.name,
+                    display: item.name,
+                  })),
+                ])
+            })
         })
     }
   }, [isShowDialog])
@@ -1090,6 +1133,17 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [clearData, isNewOrUpdate])
 
+  const detectMentionToDelete = (value: string, key: string) => {
+    const afterPattern = /[^@]+$/
+    const beforePattern = /.*(?=@[^@]*$)/
+    key === "Backspace" &&
+      value.slice(-1) === " " &&
+      mentionList.some(
+        (item) => item.display === value.match(afterPattern)?.[0].trim()
+      ) &&
+      setContent(value.match(beforePattern)?.[0] ?? "")
+  }
+
   return {
     corpsValue,
     setCorpsValue,
@@ -1152,7 +1206,11 @@ export const useAction = (props: SelectContentHookProps) => {
     html,
     setHtml,
     setHtmlText,
+    isFocusing,
+    focusAction,
     tagsValue,
     isUpdatedDeptUser,
+    mentionList,
+    detectMentionToDelete,
   }
 }
