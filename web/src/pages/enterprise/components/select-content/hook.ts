@@ -263,7 +263,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 初始化App数组
   useEffect(() => {
-    !!corpsValue &&
+    !!corpsValue.corpId &&
       GetCorpAppList({ CorpId: corpsValue.id }).then(
         (corpAppResult: ICorpAppData[] | null | undefined) => {
           if (corpAppResult) {
