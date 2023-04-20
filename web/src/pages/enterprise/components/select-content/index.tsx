@@ -263,60 +263,52 @@ const SelectContent = memo(
     return (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
-          {!!corpsValue && (
-            <>
-              <Autocomplete
-                openOnFocus
-                disablePortal
-                disableClearable
-                value={corpsValue}
-                id="Autocomplete-corpsDataId"
-                options={corpsList}
-                className={styles.inputWrap}
-                style={{ marginRight: "1.6rem" }}
-                getOptionLabel={(option) => option.corpName}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.corpInput}
-                    type="button"
-                    label="选择企业"
-                  />
-                )}
-                onChange={(e, value) => {
-                  setCorpsValue(value)
-                }}
+          <Autocomplete
+            openOnFocus
+            disablePortal
+            disableClearable
+            value={corpsValue}
+            id="Autocomplete-corpsDataId"
+            options={corpsList}
+            className={styles.inputWrap}
+            style={{ marginRight: "1.6rem" }}
+            getOptionLabel={(option) => option.corpName}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                className={styles.corpInput}
+                type="button"
+                label="选择企业"
               />
-              {corpAppValue && (
-                <Autocomplete
-                  openOnFocus
-                  disablePortal
-                  id="Autocomplete-corpAppListId"
-                  value={corpAppValue}
-                  options={corpAppList}
-                  className={styles.inputWrap}
-                  style={{ marginRight: "1.6rem" }}
-                  disableClearable
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  onChange={(e, value) => {
-                    setCorpAppValue(value)
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      className={styles.corpInput}
-                      type="button"
-                      label="选择应用"
-                    />
-                  )}
-                />
-              )}
-            </>
-          )}
+            )}
+            onChange={(e, value) => {
+              setCorpsValue(value)
+            }}
+          />
+          <Autocomplete
+            openOnFocus
+            disablePortal
+            id="Autocomplete-corpAppListId"
+            value={corpAppValue}
+            options={corpAppList}
+            className={styles.inputWrap}
+            style={{ marginRight: "1.6rem" }}
+            disableClearable
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            onChange={(e, value) => {
+              setCorpAppValue(value)
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                className={styles.corpInput}
+                type="button"
+                label="选择应用"
+              />
+            )}
+          />
 
           <Autocomplete
             openOnFocus
