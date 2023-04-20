@@ -330,13 +330,11 @@ const SendEmail = (props: {
           </FormControl>
         )}
         {sendTypeValue === MessageJobSendType.Delayed && (
-          <div style={{ marginLeft: "1rem" }}>
-            <DateSelector
-              dateValue={dateValue}
-              setDateValue={setDateValue}
-              showErrorPrompt={showErrorPrompt}
-            />
-          </div>
+          <DateSelector
+            dateValue={dateValue}
+            setDateValue={setDateValue}
+            showErrorPrompt={showErrorPrompt}
+          />
         )}
         {sendTypeValue === MessageJobSendType.Recurring && (
           <TimeSelector

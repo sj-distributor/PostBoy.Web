@@ -115,6 +115,7 @@ export interface ITargetDialogProps {
   departmentKeyValue: IDepartmentKeyControl
   flattenDepartmentList: IDepartmentAndUserListValue[]
   AppId: string
+  CorpId: string
   isLoading: boolean
   tagsList: ITagsList[]
   lastTagsValue?: string[] | undefined
@@ -422,4 +423,41 @@ export interface IFirstState {
   deptUserList: IDepartmentKeyControl[]
   tagsValue: ITagsList[]
   sendType: SendObjOrGroup
+}
+
+export interface IGroupDetail {
+  chatId: string
+  name: string
+  owner: string
+  userlist: string[]
+}
+
+export interface IGroupDetailResponse extends IResponseMsg {
+  chat_info: IGroupDetail
+}
+
+export interface IGroupUserResponse {
+  userId: string
+  openUserId: string
+  name: string
+  englishName: string
+  alias: string
+  mainDepartment: number
+  department: number[]
+  order: number[]
+  directLeader: string[]
+  leaderInWhichDept: number[]
+  position: string
+  phoneNumber: string
+  email: string
+  bizMail: string
+  avatar: string
+  thumbAvatar: string
+  address: string
+  status: number
+}
+
+export interface IMentionList {
+  id: string
+  display: string
 }

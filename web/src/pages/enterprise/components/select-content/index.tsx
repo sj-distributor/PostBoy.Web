@@ -3,7 +3,10 @@ import {
   Button,
   FormControl,
   InputLabel,
+  List,
+  ListItemButton,
   MenuItem,
+  Paper,
   Select,
   TextField,
 } from "@mui/material"
@@ -29,6 +32,7 @@ import TimeSelector from "../time-selector"
 import DateSelector from "../date-selector"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import * as wangEditor from "@wangeditor/editor"
+import { MentionsInput, Mention } from "react-mentions"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -105,6 +109,10 @@ const SelectContent = memo(
       setHtmlText,
       tagsValue,
       isUpdatedDeptUser,
+      isFocusing,
+      focusAction,
+      mentionList,
+      detectMentionToDelete,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -172,6 +180,17 @@ const SelectContent = memo(
           }
         }
     }
+
+    const customMentionsList = (children: React.ReactNode) => (
+      <Paper>
+        <List
+          sx={{ maxHeight: "14rem", overflowY: "auto" }}
+          aria-label="main mailbox folders"
+        >
+          {children}
+        </List>
+      </Paper>
+    )
 
     const pictureImage = (pictureText: PictureText[], state: string) => {
       return (
@@ -244,7 +263,7 @@ const SelectContent = memo(
     return (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
-          {!!corpsValue && !!corpAppValue && (
+          {!!corpsValue && (
             <>
               <Autocomplete
                 openOnFocus
@@ -269,29 +288,33 @@ const SelectContent = memo(
                   setCorpsValue(value)
                 }}
               />
-              <Autocomplete
-                openOnFocus
-                disablePortal
-                id="Autocomplete-corpAppListId"
-                value={corpAppValue}
-                options={corpAppList}
-                className={styles.inputWrap}
-                style={{ marginRight: "1.6rem" }}
-                disableClearable
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(e, value) => {
-                  setCorpAppValue(value)
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.corpInput}
-                    type="button"
-                    label="选择应用"
-                  />
-                )}
-              />
+              {corpAppValue && (
+                <Autocomplete
+                  openOnFocus
+                  disablePortal
+                  id="Autocomplete-corpAppListId"
+                  value={corpAppValue}
+                  options={corpAppList}
+                  className={styles.inputWrap}
+                  style={{ marginRight: "1.6rem" }}
+                  disableClearable
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  onChange={(e, value) => {
+                    setCorpAppValue(value)
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={styles.corpInput}
+                      type="button"
+                      label="选择应用"
+                    />
+                  )}
+                />
+              )}
             </>
           )}
 
@@ -378,6 +401,7 @@ const SelectContent = memo(
           <SelectTargetDialog
             open={isShowDialog}
             AppId={corpAppValue ? corpAppValue.appId : ""}
+            CorpId={corpAppValue ? corpAppValue.id : ""}
             departmentAndUserList={departmentAndUserList}
             departmentKeyValue={departmentKeyValue}
             flattenDepartmentList={searchKeyValue}
@@ -456,17 +480,64 @@ const SelectContent = memo(
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              {messageTypeValue.title !== "推文" && (
-                <TextField
-                  className={styles.input}
-                  label="内容"
-                  multiline
-                  rows={6}
-                  variant="outlined"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-              )}
+              {messageTypeValue.title !== "推文" &&
+                (messageTypeValue.title !== "文本" ? (
+                  <TextField
+                    className={styles.input}
+                    label="内容"
+                    multiline
+                    rows={6}
+                    variant="outlined"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                ) : (
+                  <div style={{ position: "relative" }}>
+                    <div
+                      className={styles.mentionsInputWrap}
+                      style={{ color: isFocusing ? "#1664b3" : "" }}
+                    >
+                      内容
+                    </div>
+                    <MentionsInput
+                      className={styles.MentionsInput}
+                      value={content}
+                      allowSuggestionsAboveCursor
+                      customSuggestionsContainer={(children) =>
+                        customMentionsList(children)
+                      }
+                      suggestionsPortalHost={
+                        document.querySelector(".App") ?? undefined
+                      }
+                      onFocus={focusAction.setTrue}
+                      onBlur={focusAction.setFalse}
+                      onKeyDown={(e) => {
+                        detectMentionToDelete(
+                          (e.target as HTMLTextAreaElement).value,
+                          e.key
+                        )
+                      }}
+                      onChange={(event, _, newPlainTextValue) => {
+                        setContent(newPlainTextValue)
+                      }}
+                    >
+                      <Mention
+                        trigger="@"
+                        data={mentionList}
+                        appendSpaceOnAdd
+                        displayTransform={(_, display) => `@${display}`}
+                        renderSuggestion={(entry) => {
+                          return (
+                            <ListItemButton id={`${entry.id}`}>
+                              {entry.id}
+                            </ListItemButton>
+                          )
+                        }}
+                      />
+                    </MentionsInput>
+                  </div>
+                ))}
+
               {messageTypeValue.type === MessageDataFileType.Image &&
                 messageTypeValue.groupBy === "" && (
                   <div

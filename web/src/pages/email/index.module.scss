@@ -37,6 +37,7 @@
   .timeSelector {
     @extend .inputGroup;
     align-items: start;
+    flex-direction: column;
   }
 }
 

@@ -65,6 +65,7 @@ const SelectTargetDialog = memo(
       open,
       departmentAndUserList,
       AppId,
+      CorpId,
       isLoading,
       tagsList,
       flattenDepartmentList,
@@ -108,6 +109,7 @@ const SelectTargetDialog = memo(
       handleCreateGroup,
       handleConfirm,
       handleCancel,
+      onListBoxScrolling,
     } = useAction({
       open,
       AppId,
@@ -121,12 +123,14 @@ const SelectTargetDialog = memo(
       outerTagsValue,
       isUpdatedDeptUser,
       sendType,
+      CorpId,
       setSendType,
       setChatId,
       setIsRefresh,
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
+      setGroupList,
     })
 
     const center = () =>
@@ -364,9 +368,7 @@ const SelectTargetDialog = memo(
                         sx={{ margin: "1rem 0 0" }}
                         componentsProps={{
                           paper: { elevation: 3 },
-                          popper: {
-                            placement: "top",
-                          },
+                          popper: { placement: "top" },
                         }}
                         value={
                           chatId
@@ -383,6 +385,15 @@ const SelectTargetDialog = memo(
                             {option.chatName}
                           </li>
                         )}
+                        ListboxProps={{
+                          onScroll: (e) => {
+                            onListBoxScrolling(
+                              (e.target as HTMLElement).scrollHeight,
+                              (e.target as HTMLElement).scrollTop,
+                              (e.target as HTMLElement).clientHeight
+                            )
+                          },
+                        }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -510,6 +521,7 @@ const SelectTargetDialog = memo(
           <SelectTargetDialog
             open={isShowDialog}
             AppId={AppId}
+            CorpId={CorpId}
             departmentAndUserList={departmentAndUserList}
             departmentKeyValue={departmentKeyValue}
             flattenDepartmentList={flattenDepartmentList}
