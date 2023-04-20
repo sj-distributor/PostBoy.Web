@@ -55,7 +55,11 @@ export const useAction = (props: SelectContentHookProps) => {
   } = props
 
   // 拿到的企业对象
-  const [corpsValue, setCorpsValue] = useState<ICorpData>()
+  const [corpsValue, setCorpsValue] = useState<ICorpData>({
+    corpName: "",
+    corpId: "",
+    id: "",
+  })
   // 拿到的App对象
   const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>({
     appId: "",
@@ -254,12 +258,12 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个企业对象
   useEffect(() => {
-    corpsValue === undefined && setCorpsValue(corpsList[0])
+    !corpsValue.corpId && corpsList.length > 0 && setCorpsValue(corpsList[0])
   }, [corpsList])
 
   // 初始化App数组
   useEffect(() => {
-    !!corpsValue &&
+    !!corpsValue.corpId &&
       GetCorpAppList({ CorpId: corpsValue.id }).then(
         (corpAppResult: ICorpAppData[] | null | undefined) => {
           if (corpAppResult) {
@@ -305,7 +309,9 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个App对象
   useEffect(() => {
-    isNewOrUpdate === "new" && setCorpAppValue(corpAppList[0])
+    isNewOrUpdate === "new" &&
+      corpAppList.length > 0 &&
+      setCorpAppValue(corpAppList[0])
   }, [corpAppList, isNewOrUpdate])
 
   const departmentKeyValue = useMemo(() => {
