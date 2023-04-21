@@ -10,7 +10,9 @@ import {
 } from "../../dtos/meeting-seetings";
 
 const useAction = () => {
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openAddParticipantDialog, setOpenAddParticipantDialog] =
+    useState<boolean>(false);
+  const [openSettingsDialog, setOpenSettingsDialog] = useState<boolean>(false);
   const [selectData, setSelectData] = useState<SelectDataType[][]>([
     [
       {
@@ -100,10 +102,6 @@ const useAction = () => {
   const [openAnnexList, setOpenAnnexList] = useState<boolean>(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
-  const setDialog = (value: boolean) => {
-    setOpenDialog(value);
-  };
-
   const handleToggle = () => {
     setOpenAnnexList((prevOpen) => !prevOpen);
   };
@@ -145,6 +143,21 @@ const useAction = () => {
     setSelectGroup(newList);
   };
 
+  const [annexFile, setAnnexFile] = useState(["icon.png"]);
+  // 文件上传
+  const fileUpload = async (
+    files: FileList,
+    type: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let fileList = annexFile;
+    for (var i = 0; i < files.length; i++) {
+      var name = files[i].name;
+      fileList.findIndex((item) => item === name) === -1 && fileList.push(name);
+    }
+    setAnnexFile(fileList);
+  };
+
   return {
     editor,
     html,
@@ -154,8 +167,11 @@ const useAction = () => {
     selectGroup,
     openAnnexList,
     anchorRef,
-    openDialog,
-    setDialog,
+    openAddParticipantDialog,
+    openSettingsDialog,
+    annexFile,
+    setOpenAddParticipantDialog,
+    setOpenSettingsDialog,
     handleChange,
     setEditor,
     setHtml,
@@ -163,6 +179,7 @@ const useAction = () => {
     handleToggle,
     getEndDate,
     getStateDate,
+    fileUpload,
   };
 };
 

@@ -25,3 +25,18 @@ export interface SelectGroupType {
   data: SelectDataType[];
   isIcon?: boolean;
 }
+
+export interface DialogProps {
+  open: boolean;
+  setDialog: (value: boolean) => void;
+}
+
+export interface MeetingSettingList {
+  title: string;
+  border: boolean;
+  optionType?: "checkbox" | "input" | "dailog";
+  isOption?: boolean;
+  optionData?: string;
+  optionList?: SelectDataType[];
+  icon?: boolean;
+}

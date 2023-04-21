@@ -10,6 +10,8 @@ import {
   ClickAwayListener,
   Grow,
   Input,
+  ListItemIcon,
+  Menu,
   MenuList,
   Paper,
   Popper,
@@ -17,6 +19,7 @@ import {
 } from "@mui/material";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -29,6 +32,7 @@ import "@wangeditor/editor/dist/css/style.css";
 import style from "./index.module.scss";
 import { SelectType } from "../../dtos/meeting-seetings";
 import AddParticipantDialog from "./component/add-participant-dialog";
+import SeetingsDialog from "./component/settingsDialog";
 
 export default function SelectLabels() {
   const {
@@ -40,8 +44,11 @@ export default function SelectLabels() {
     selectGroup,
     openAnnexList,
     anchorRef,
-    openDialog,
-    setDialog,
+    openAddParticipantDialog,
+    openSettingsDialog,
+    annexFile,
+    setOpenAddParticipantDialog,
+    setOpenSettingsDialog,
     handleChange,
     setHtml,
     setEditor,
@@ -49,11 +56,32 @@ export default function SelectLabels() {
     handleClose,
     getEndDate,
     getStateDate,
+    fileUpload,
   } = useAction();
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const uploadAnnex = () => {
+    inputRef.current?.click();
+  };
   return (
     <>
-      <AddParticipantDialog open={openDialog} setDialog={setDialog} />
+      <AddParticipantDialog
+        open={openAddParticipantDialog}
+        setDialog={setOpenAddParticipantDialog}
+      />
+      <SeetingsDialog
+        open={openSettingsDialog}
+        setDialog={setOpenSettingsDialog}
+      />
       <div className={style.container}>
         <div className={style.appointmentMeeting}>
           <Grid container alignItems="center" columns={24} rowSpacing={2}>
@@ -61,14 +89,52 @@ export default function SelectLabels() {
               <ClearIcon />
             </Grid>
             <Grid xs={24} md={22}>
-              <div className={style.appointmentPersonData}>
-                <div>MARS.PENG预定的会议</div>
-                <div className={style.meetingBtn}>
-                  <VideocamIcon />
-                  会议
-                  <ArrowDropDownIcon />
-                </div>
-              </div>
+              <TextField
+                id="filled-start-adornment"
+                sx={{ width: "100%" }}
+                className={style.appointmentPersonData}
+                InputProps={{
+                  endAdornment: (
+                    <>
+                      <Button
+                        className={style.meetingBtn}
+                        id="basic-button"
+                        aria-controls={open ? "basic-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={handleClick}
+                      >
+                        <VideocamIcon />
+                        <span>会议</span>
+                        <ArrowDropDownIcon />
+                      </Button>
+                      <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleCloseMenu}
+                        MenuListProps={{
+                          "aria-labelledby": "basic-button",
+                        }}
+                      >
+                        <MenuItem onClick={handleCloseMenu}>
+                          <ListItemIcon>
+                            <VideocamIcon fontSize="small" />
+                          </ListItemIcon>
+                          会议
+                        </MenuItem>
+                        <MenuItem onClick={handleCloseMenu}>
+                          <ListItemIcon>
+                            <CalendarMonthIcon fontSize="small" />
+                          </ListItemIcon>
+                          日程
+                        </MenuItem>
+                      </Menu>
+                    </>
+                  ),
+                }}
+                variant="outlined"
+              />
             </Grid>
             <Grid xs={24} md={2}>
               参会人
@@ -87,7 +153,7 @@ export default function SelectLabels() {
                 <Grid xs={100} md={49} sx={{ marginBottom: "10px" }}>
                   <div
                     className={style.addParticipant}
-                    onClick={() => setDialog(true)}
+                    onClick={() => setOpenAddParticipantDialog(true)}
                   >
                     <AddIcon className={style.addParticipantIcon} />
                     添加参会人
@@ -136,7 +202,18 @@ export default function SelectLabels() {
                 aria-label="split button"
                 ref={anchorRef}
               >
-                <Button>添加附件</Button>
+                <Button onClick={() => uploadAnnex()}>添加附件</Button>
+                <input
+                  ref={inputRef}
+                  hidden
+                  type="file"
+                  accept="image/jpg, image/png"
+                  onChange={(e) =>
+                    !!e.target.files &&
+                    fileUpload(e.target.files, "会议附件", e)
+                  }
+                  multiple
+                />
                 <Button
                   size="small"
                   aria-controls={
@@ -171,9 +248,9 @@ export default function SelectLabels() {
                     <Paper>
                       <ClickAwayListener onClickAway={handleClose}>
                         <MenuList id="split-button-menu" autoFocusItem>
-                          <MenuItem>某某pdf文件</MenuItem>
-                          <MenuItem>某某word文件</MenuItem>
-                          <MenuItem>某某exl文件</MenuItem>
+                          {annexFile.map((item, index) => {
+                            return <MenuItem key={index}>{item}</MenuItem>;
+                          })}
                         </MenuList>
                       </ClickAwayListener>
                     </Paper>
@@ -243,7 +320,11 @@ export default function SelectLabels() {
               设置
             </Grid>
             <Grid xs={24} md={22}>
-              <Button variant="contained" component="label">
+              <Button
+                variant="contained"
+                component="label"
+                onClick={() => setOpenSettingsDialog(true)}
+              >
                 会议设置
               </Button>
             </Grid>

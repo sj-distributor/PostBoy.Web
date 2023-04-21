@@ -1,25 +1,38 @@
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
   Autocomplete,
   TextField,
   Box,
   Avatar,
+  List,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  ListItemButton,
+  ListItemIcon,
+  Checkbox,
+  Button,
 } from "@mui/material";
+import Collapse from "@mui/material/Collapse";
+import CancelIcon from "@mui/icons-material/Cancel";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useEffect, useState } from "react";
 import style from "./index.module.scss";
+import useAction from "./hook";
+import { DialogProps } from "../../../../dtos/meeting-seetings";
 
-const AddParticipantDialog = (props: {
-  open: boolean;
-  setDialog: (value: boolean) => void;
-}) => {
+const AddParticipantDialog = (props: DialogProps) => {
   const { open, setDialog } = props;
-  const [searchData, setSearchData] = useState([]);
+  const {
+    searchData,
+    openListItem,
+    dense,
+    selectedData,
+    secondary,
+    handleClick,
+    delSelectedItem,
+  } = useAction();
   return (
     <>
       <Dialog
@@ -28,7 +41,7 @@ const AddParticipantDialog = (props: {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogContent sx={{ width: "30rem", height: "auto" }}>
+        <DialogContent sx={{ width: "30rem" }}>
           <Grid container columns={100} justifyContent="space-between">
             <Grid xs={100} md={48}>
               <Autocomplete
@@ -37,26 +50,78 @@ const AddParticipantDialog = (props: {
                 options={searchData}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Movie" />
+                  <TextField {...params} label="联系人" />
                 )}
               />
               <Box sx={{ height: "25rem" }}>
-                {!searchData.length && (
-                  <div className={style.noData}>no Data</div>
-                )}
+                <List
+                  sx={{
+                    width: "100%",
+                    maxWidth: 360,
+                    bgcolor: "background.paper",
+                  }}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                >
+                  <ListItemButton onClick={handleClick}>
+                    <ListItemText primary="从群聊中选择" />
+                  </ListItemButton>
+                  <Collapse in={openListItem} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemIcon>
+                          <Checkbox edge="start" tabIndex={-1} disableRipple />
+                        </ListItemIcon>
+                        <ListItemText primary="Starred" />
+                      </ListItemButton>
+                    </List>
+                  </Collapse>
+                </List>
               </Box>
             </Grid>
-            <Grid xs={100} md={48}>
+            <Grid xs={100} md={48} sx={{ position: "relative" }}>
               <div>已选择·1</div>
-              <div className={style.selectedData}>
-                <div className={style.avatarName}>
-                  <Avatar
-                    variant="square"
-                    className={style.acatar}
-                    src="https://img1.baidu.com/it/u=928879359,2870156212&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1681578000&t=375470fe9a362c575908e7b397fa0e69"
-                  ></Avatar>
-                  <div className={style.participantName}>MARS.PENG</div>
-                </div>
+              <List dense={dense}>
+                {selectedData.map((item, index) => {
+                  return (
+                    <ListItem
+                      key={index}
+                      sx={{ paddingLeft: 0, paddingRight: 0 }}
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => delSelectedItem(index)}
+                        >
+                          <CancelIcon className={style.closeIcon} />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemAvatar>
+                        <Avatar
+                          variant="square"
+                          className={style.acatar}
+                          src={item.avatar}
+                        ></Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={item.name}
+                        secondary={secondary ? "Secondary text" : null}
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+              <div className={style.btnGroup}>
+                <Button
+                  sx={{ backgroundColor: "#ccc", color: "black" }}
+                  onClick={() => setDialog(false)}
+                >
+                  取消
+                </Button>
+                <Button variant="contained" onClick={() => setDialog(false)}>
+                  确定
+                </Button>
               </div>
             </Grid>
           </Grid>

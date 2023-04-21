@@ -1,0 +1,17 @@
+.dialogTiile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settingsList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.closeIcon {
+  color: #ccc;
+  cursor: pointer;
+}

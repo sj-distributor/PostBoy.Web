@@ -1,6 +1,8 @@
 .meetingBtn {
   display: flex;
   color: #368aef;
+  word-break: keep-all;
+  cursor: pointer;
 }
 
 .container {
@@ -21,12 +23,10 @@
 }
 
 .appointmentPersonData {
-  display: flex;
-  justify-content: space-between;
-  border: 0.1rem solid #d8d9d9;
-  padding: 1rem 1.5rem;
-  border-radius: 0.5rem;
   background-color: #e8e8e8;
+  & :focus {
+    background-color: white;
+  }
 }
 
 .fromDataItem {
