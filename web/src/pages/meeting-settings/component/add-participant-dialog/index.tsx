@@ -119,7 +119,11 @@ const AddParticipantDialog = (props: AddDialogProps) => {
                 borderLeft: "1px solid #ccc",
               }}
             >
-              <div className={style.selectTitle}>已选择·1</div>
+              <div className={style.selectTitle}>
+                {selectedData.length
+                  ? `已选择·${selectedData.length}`
+                  : "请选择"}
+              </div>
               <List dense={dense} className={style.selectedDataBox}>
                 {selectedData.map((item, index) => {
                   return (

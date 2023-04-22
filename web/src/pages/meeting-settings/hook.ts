@@ -110,9 +110,11 @@ const useAction = () => {
 
   const handleChange = (event: SelectChangeEvent, type: string) => {
     const newList = selectGroup;
+
     newList.forEach(
       (item) => item.key === type && (item.value = event.target.value)
     );
+
     setSelectGroup(newList);
   };
   // 文件上传
@@ -120,6 +122,7 @@ const useAction = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const inputRef = useRef<HTMLInputElement>(null);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
