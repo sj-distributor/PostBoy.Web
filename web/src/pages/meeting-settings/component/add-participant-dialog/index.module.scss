@@ -1,6 +1,15 @@
+.css-10hburv-MuiTypography-root {
+  font-size: 0.8rem;
+}
+
 .noData {
   text-align: center;
   line-height: 25rem;
+}
+
+.selectTitle {
+  font-size: 0.8rem;
+  font-weight: 400;
 }
 
 .selectedData {
@@ -16,11 +25,6 @@
   align-items: center;
 }
 
-.acatar {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
 .closeIcon {
   color: #ccc;
 }
@@ -33,5 +37,14 @@
   justify-content: space-between;
   & button {
     width: 45%;
+  }
+}
+
+.selectedDataBox {
+  height: 23rem;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

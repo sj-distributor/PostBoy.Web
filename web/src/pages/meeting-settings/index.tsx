@@ -9,13 +9,13 @@ import {
   ButtonGroup,
   ClickAwayListener,
   Grow,
-  Input,
   ListItemIcon,
   Menu,
   MenuList,
   Paper,
   Popper,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -30,7 +30,6 @@ import { Fragment, useRef, useState } from "react";
 import DateTime from "./component/date-time";
 import "@wangeditor/editor/dist/css/style.css";
 import style from "./index.module.scss";
-import { SelectType } from "../../dtos/meeting-seetings";
 import AddParticipantDialog from "./component/add-participant-dialog";
 import SeetingsDialog from "./component/settingsDialog";
 
@@ -39,7 +38,6 @@ export default function SelectLabels() {
     editor,
     html,
     toolbarConfig,
-    selectData,
     editorConfig,
     selectGroup,
     openAnnexList,
@@ -47,6 +45,12 @@ export default function SelectLabels() {
     openAddParticipantDialog,
     openSettingsDialog,
     annexFile,
+    inputRef,
+    open,
+    anchorEl,
+    handleClick,
+    handleCloseMenu,
+    uploadAnnex,
     setOpenAddParticipantDialog,
     setOpenSettingsDialog,
     handleChange,
@@ -57,26 +61,17 @@ export default function SelectLabels() {
     getEndDate,
     getStateDate,
     fileUpload,
+    fileDelete,
+    getSelectListData,
   } = useAction();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const uploadAnnex = () => {
-    inputRef.current?.click();
-  };
   return (
     <>
       <AddParticipantDialog
         open={openAddParticipantDialog}
         setDialog={setOpenAddParticipantDialog}
+        type="AddMembers"
+        getSelectListData={getSelectListData}
       />
       <SeetingsDialog
         open={openSettingsDialog}
@@ -166,20 +161,14 @@ export default function SelectLabels() {
               开始
             </Grid>
             <Grid xs={24} md={22}>
-              <DateTime
-                selectList={selectData[SelectType.startTime]}
-                getDateTimeData={getStateDate}
-              />
+              <DateTime getDateTimeData={getStateDate} />
             </Grid>
 
             <Grid xs={24} md={2}>
               结束
             </Grid>
             <Grid xs={24} md={22}>
-              <DateTime
-                selectList={selectData[SelectType.endTime]}
-                getDateTimeData={getEndDate}
-              />
+              <DateTime getDateTimeData={getEndDate} />
             </Grid>
 
             <Grid xs={24} md={2}>
@@ -249,7 +238,19 @@ export default function SelectLabels() {
                       <ClickAwayListener onClickAway={handleClose}>
                         <MenuList id="split-button-menu" autoFocusItem>
                           {annexFile.map((item, index) => {
-                            return <MenuItem key={index}>{item}</MenuItem>;
+                            return (
+                              <MenuItem key={index}>
+                                <Tooltip title={item.name}>
+                                  <div className={style.fileName}>
+                                    {item.name}
+                                  </div>
+                                </Tooltip>
+                                <ClearIcon
+                                  className={style.delFileIcon}
+                                  onClick={() => fileDelete("annex", index)}
+                                />
+                              </MenuItem>
+                            );
                           })}
                         </MenuList>
                       </ClickAwayListener>
@@ -292,6 +293,7 @@ export default function SelectLabels() {
                       onChange={(e) => handleChange(e, item.key)}
                       displayEmpty
                       inputProps={{ "aria-label": "Without label" }}
+                      label={item.value}
                       className={style.fromDataItem}
                     >
                       {item.data.map((cItem, index) => {
@@ -307,7 +309,7 @@ export default function SelectLabels() {
                                 }}
                               />
                             )}
-                            {cItem.value}
+                            {cItem.lable}
                           </MenuItem>
                         );
                       })}

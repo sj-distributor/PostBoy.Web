@@ -107,3 +107,16 @@
   cursor: pointer;
   width: fit-content;
 }
+
+.delFileIcon {
+  font-size: 1rem;
+  color: rgb(234, 91, 91);
+  margin-left: 1.5rem;
+}
+
+.fileName {
+  width: 6rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

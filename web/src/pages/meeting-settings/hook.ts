@@ -4,45 +4,18 @@ import { useRef, useState } from "react";
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
 import {
+  CalendarSelectData,
   DateTimeData,
-  SelectDataType,
+  ReminderTimeSelectData,
+  RepeatSelectData,
   SelectGroupType,
+  SelectParticipantList,
 } from "../../dtos/meeting-seetings";
 
 const useAction = () => {
   const [openAddParticipantDialog, setOpenAddParticipantDialog] =
     useState<boolean>(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState<boolean>(false);
-  const [selectData, setSelectData] = useState<SelectDataType[][]>([
-    [
-      {
-        value: "1:00",
-        lable: "1:00",
-      },
-      {
-        value: "2:00",
-        lable: "2:00",
-      },
-      {
-        value: "4:00",
-        lable: "4:00",
-      },
-    ],
-    [
-      {
-        value: "5:00",
-        lable: "5:00",
-      },
-      {
-        value: "6:00",
-        lable: "6:00",
-      },
-      {
-        value: "8:00",
-        lable: "8:00",
-      },
-    ],
-  ]);
   const [selectGroup, setSelectGroup] = useState<SelectGroupType[]>([
     {
       title: "提醒",
@@ -50,15 +23,15 @@ const useAction = () => {
       value: "",
       data: [
         {
-          value: "十五分钟前",
+          value: ReminderTimeSelectData.FifteenMinutesAgo,
           lable: "十五分钟前",
         },
         {
-          value: "会议开始时",
+          value: ReminderTimeSelectData.MeetingBegins,
           lable: "会议开始时",
         },
         {
-          value: "一小时前",
+          value: ReminderTimeSelectData.AnHourAgo,
           lable: "一小时前",
         },
       ],
@@ -69,11 +42,11 @@ const useAction = () => {
       value: "",
       data: [
         {
-          value: "不重复",
+          value: RepeatSelectData.Repeat,
           lable: "不重复",
         },
         {
-          value: "重复",
+          value: RepeatSelectData.NoRepeat,
           lable: "重复",
         },
       ],
@@ -85,15 +58,15 @@ const useAction = () => {
       isIcon: true,
       data: [
         {
-          value: "MARS.PENG的日历",
+          value: CalendarSelectData.CalendarForMARS,
           lable: "MARS.PENG的日历",
         },
         {
-          value: "ELK的日历",
+          value: CalendarSelectData.CalendarForELK,
           lable: "ELK的日历",
         },
         {
-          value: "JKL的日历",
+          value: CalendarSelectData.CalendarForJKL,
           lable: "JKL的日历",
         },
       ],
@@ -142,27 +115,42 @@ const useAction = () => {
     );
     setSelectGroup(newList);
   };
-
-  const [annexFile, setAnnexFile] = useState(["icon.png"]);
   // 文件上传
+  const [annexFile, setAnnexFile] = useState<File[] | []>([]);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const uploadAnnex = () => {
+    inputRef.current?.click();
+  };
+
   const fileUpload = async (
     files: FileList,
     type: string,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    let fileList = annexFile;
-    for (var i = 0; i < files.length; i++) {
-      var name = files[i].name;
-      fileList.findIndex((item) => item === name) === -1 && fileList.push(name);
-    }
-    setAnnexFile(fileList);
+    const array = Array.from(files);
+    setAnnexFile(array);
   };
 
+  const fileDelete = (name: string, index?: number) => {
+    const newFileList = annexFile.filter((item, i) => i !== index);
+    setAnnexFile(newFileList);
+  };
+  //获取选中成员
+  const getSelectListData = (data: SelectParticipantList[]) => {};
   return {
     editor,
     html,
     toolbarConfig,
-    selectData,
     editorConfig,
     selectGroup,
     openAnnexList,
@@ -170,6 +158,12 @@ const useAction = () => {
     openAddParticipantDialog,
     openSettingsDialog,
     annexFile,
+    inputRef,
+    open,
+    anchorEl,
+    handleClick,
+    handleCloseMenu,
+    uploadAnnex,
     setOpenAddParticipantDialog,
     setOpenSettingsDialog,
     handleChange,
@@ -180,6 +174,8 @@ const useAction = () => {
     getEndDate,
     getStateDate,
     fileUpload,
+    fileDelete,
+    getSelectListData,
   };
 };
 

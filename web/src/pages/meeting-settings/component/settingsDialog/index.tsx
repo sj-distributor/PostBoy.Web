@@ -3,36 +3,57 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
   Radio,
   RadioGroup,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import style from "./index.module.scss";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import useAction from "./hook";
-import { DialogProps } from "../../../../dtos/meeting-seetings";
+import {
+  SettingDialogProps,
+  MeetingCallReminder,
+} from "../../../../dtos/meeting-seetings";
 import AddParticipantDialog from "../add-participant-dialog";
-const SeetingsDialog = (props: DialogProps) => {
+import { VisibilityOff, Visibility } from "@mui/icons-material";
+const SeetingsDialog = (props: SettingDialogProps) => {
   const { open, setDialog } = props;
   const {
     meetingSettingList,
     openAddDialog,
+    showPassword,
+    radioDisabled,
+    addDialogType,
     setAddDialog,
     setIsOption,
     handleChange,
+    handleClickShowPassword,
+    handleMouseDownPassword,
+    setMembershipPassword,
+    setAppintRadio,
+    getSelectListData,
   } = useAction();
 
   return (
     <>
-      <AddParticipantDialog open={openAddDialog} setDialog={setAddDialog} />
+      <AddParticipantDialog
+        open={openAddDialog}
+        setDialog={setAddDialog}
+        type={addDialogType}
+        resettingAppointRadio={setAppintRadio}
+        getSelectListData={getSelectListData}
+      />
       <Dialog
         open={open}
         onClose={() => setDialog(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title" className={style.dialogTiile}>
+        <DialogTitle id="alert-dialog-title" className={style.dialogTitle}>
           <div>会议设置</div>
           <CloseIcon
             onClick={() => setDialog(false)}
@@ -51,7 +72,8 @@ const SeetingsDialog = (props: DialogProps) => {
                 >
                   <div className="title">{item.title}</div>
                   <div>
-                    {item.optionType === "checkbox" ? (
+                    {item.optionType === "checkbox" ||
+                    item.optionType === "input" ? (
                       <input
                         type="checkbox"
                         onChange={(event) => setIsOption(event, index)}
@@ -69,11 +91,9 @@ const SeetingsDialog = (props: DialogProps) => {
                   <RadioGroup
                     aria-labelledby="demo-controlled-radio-buttons-group"
                     name="controlled-radio-buttons-group"
-                    defaultValue={
-                      item.optionList.length && item.optionList[0].value
-                    }
                     onChange={(e) => handleChange(e, index)}
                     row
+                    value={item.optionData}
                   >
                     {item.optionList.map((oItem, index) => {
                       return (
@@ -82,6 +102,11 @@ const SeetingsDialog = (props: DialogProps) => {
                           control={<Radio size="small" />}
                           label={oItem.lable}
                           key={index}
+                          disabled={
+                            oItem.value === MeetingCallReminder.All &&
+                            item.title === "会议开始时来电提醒" &&
+                            !radioDisabled
+                          }
                           sx={{
                             "& .css-ahj2mt-MuiTypography-root": {
                               fontSize: "0.6rem",
@@ -91,6 +116,27 @@ const SeetingsDialog = (props: DialogProps) => {
                       );
                     })}
                   </RadioGroup>
+                )}
+                {item.optionType === "input" && item.isOption && (
+                  <OutlinedInput
+                    id="outlined-adornment-password"
+                    type={showPassword ? "text" : "password"}
+                    size="small"
+                    sx={{ width: "100%" }}
+                    onBlur={(e) => setMembershipPassword(e, index)}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
                 )}
               </Fragment>
             );

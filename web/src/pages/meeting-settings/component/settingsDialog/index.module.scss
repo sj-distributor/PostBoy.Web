@@ -1,4 +1,4 @@
-.dialogTiile {
+.dialogTitle {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -13,5 +13,6 @@
 
 .closeIcon {
   color: #ccc;
+  font-size: 1.8rem;
   cursor: pointer;
 }

@@ -14,18 +14,23 @@ import {
   ListItemIcon,
   Checkbox,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Grid from "@mui/material/Unstable_Grid2";
 import style from "./index.module.scss";
 import useAction from "./hook";
-import { DialogProps } from "../../../../dtos/meeting-seetings";
+import {
+  AddDialogProps,
+  MeetingCallReminder,
+} from "../../../../dtos/meeting-seetings";
 
-const AddParticipantDialog = (props: DialogProps) => {
-  const { open, setDialog } = props;
+const AddParticipantDialog = (props: AddDialogProps) => {
+  const { open, setDialog, type, resettingAppointRadio, getSelectListData } =
+    props;
   const {
-    searchData,
+    contactsData,
     openListItem,
     dense,
     selectedData,
@@ -33,6 +38,16 @@ const AddParticipantDialog = (props: DialogProps) => {
     handleClick,
     delSelectedItem,
   } = useAction();
+  const closeDialog = () => {
+    if (type === "DesignatedMembers") {
+      resettingAppointRadio && resettingAppointRadio(MeetingCallReminder.Host);
+    }
+    setDialog(false);
+  };
+  const confirm = () => {
+    setDialog(false);
+    getSelectListData(selectedData);
+  };
   return (
     <>
       <Dialog
@@ -42,46 +57,70 @@ const AddParticipantDialog = (props: DialogProps) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogContent sx={{ width: "30rem" }}>
-          <Grid container columns={100} justifyContent="space-between">
-            <Grid xs={100} md={48}>
+          <Grid container columns={24} justifyContent="space-between">
+            <Grid xs={24} md={12} sx={{ paddingRight: "0.5rem" }}>
               <Autocomplete
                 disablePortal
                 id="combo-box-demo"
-                options={searchData}
+                options={contactsData ? contactsData : []}
                 sx={{ width: "100%" }}
+                size="small"
                 renderInput={(params) => (
                   <TextField {...params} label="联系人" />
                 )}
               />
               <Box sx={{ height: "25rem" }}>
-                <List
-                  sx={{
-                    width: "100%",
-                    maxWidth: 360,
-                    bgcolor: "background.paper",
-                  }}
-                  component="nav"
-                  aria-labelledby="nested-list-subheader"
-                >
-                  <ListItemButton onClick={handleClick}>
-                    <ListItemText primary="从群聊中选择" />
-                  </ListItemButton>
-                  <Collapse in={openListItem} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 }}>
-                        <ListItemIcon>
-                          <Checkbox edge="start" tabIndex={-1} disableRipple />
-                        </ListItemIcon>
-                        <ListItemText primary="Starred" />
-                      </ListItemButton>
-                    </List>
-                  </Collapse>
-                </List>
+                {!contactsData && (
+                  <div className={style.noData}>
+                    <CircularProgress />
+                  </div>
+                )}
+
+                {contactsData && contactsData?.length >= 1 ? (
+                  <List
+                    sx={{
+                      width: "100%",
+                      maxWidth: 360,
+                      bgcolor: "background.paper",
+                    }}
+                    component="nav"
+                    aria-labelledby="nested-list-subheader"
+                  >
+                    <ListItemButton onClick={handleClick}>
+                      <ListItemText primary="从群聊中选择" />
+                    </ListItemButton>
+                    <Collapse in={openListItem} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding>
+                        <ListItemButton sx={{ pl: 4 }}>
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              size="small"
+                              tabIndex={-1}
+                              disableRipple
+                            />
+                          </ListItemIcon>
+                          <ListItemText primary="Starred" />
+                        </ListItemButton>
+                      </List>
+                    </Collapse>
+                  </List>
+                ) : (
+                  <div className={style.noData}>no Data</div>
+                )}
               </Box>
             </Grid>
-            <Grid xs={100} md={48} sx={{ position: "relative" }}>
-              <div>已选择·1</div>
-              <List dense={dense}>
+            <Grid
+              xs={24}
+              md={12}
+              sx={{
+                position: "relative",
+                paddingLeft: "0.5rem",
+                borderLeft: "1px solid #ccc",
+              }}
+            >
+              <div className={style.selectTitle}>已选择·1</div>
+              <List dense={dense} className={style.selectedDataBox}>
                 {selectedData.map((item, index) => {
                   return (
                     <ListItem
@@ -91,16 +130,19 @@ const AddParticipantDialog = (props: DialogProps) => {
                         <IconButton
                           edge="end"
                           aria-label="delete"
-                          onClick={() => delSelectedItem(index)}
+                          onClick={() => delSelectedItem(item.name)}
                         >
-                          <CancelIcon className={style.closeIcon} />
+                          <CancelIcon
+                            className={style.closeIcon}
+                            sx={{ fontSize: "1rem" }}
+                          />
                         </IconButton>
                       }
                     >
-                      <ListItemAvatar>
+                      <ListItemAvatar sx={{ minWidth: "2rem" }}>
                         <Avatar
                           variant="square"
-                          className={style.acatar}
+                          sx={{ width: 24, height: 24 }}
                           src={item.avatar}
                         ></Avatar>
                       </ListItemAvatar>
@@ -115,11 +157,11 @@ const AddParticipantDialog = (props: DialogProps) => {
               <div className={style.btnGroup}>
                 <Button
                   sx={{ backgroundColor: "#ccc", color: "black" }}
-                  onClick={() => setDialog(false)}
+                  onClick={() => closeDialog()}
                 >
                   取消
                 </Button>
-                <Button variant="contained" onClick={() => setDialog(false)}>
+                <Button variant="contained" onClick={() => confirm()}>
                   确定
                 </Button>
               </div>

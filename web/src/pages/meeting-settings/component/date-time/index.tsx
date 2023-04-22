@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { DateTimeProps } from "../../../../dtos/meeting-seetings";
 
 const DateTime = (props: DateTimeProps) => {
-  const { selectList, getDateTimeData } = props;
+  const { getDateTimeData } = props;
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string>("");
   const handleChangeDate = (vlaue: dayjs.Dayjs | null) => {
@@ -22,7 +22,6 @@ const DateTime = (props: DateTimeProps) => {
       date,
       time,
     });
-    console.log(date, time);
   }, [date, time]);
   return (
     <>
