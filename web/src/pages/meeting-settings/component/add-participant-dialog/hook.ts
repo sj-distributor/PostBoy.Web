@@ -35,8 +35,8 @@ const useAction = () => {
   };
 
   const delSelectedItem = (name: string) => {
-    const newList = selectedData;
-    setSelectedData([...newList.filter((item) => item.name !== name)]);
+    const newList = selectedData.filter((item) => item.name !== name);
+    setSelectedData([...newList]);
   };
 
   useEffect(() => {
