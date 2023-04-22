@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { Select, MenuItem, SelectChangeEvent, Input } from "@mui/material";
+import { Input } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -11,11 +11,8 @@ const DateTime = (props: DateTimeProps) => {
   const { getDateTimeData } = props;
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string>("");
-  const handleChangeDate = (vlaue: dayjs.Dayjs | null) => {
-    setDate(dayjs(vlaue).format("DD/MM/YYYY"));
-  };
-
-  const handleChangeTime = (value: string) => setTime(value);
+  const handleChangeDate = (value: dayjs.Dayjs | null) =>
+    setDate(dayjs(value).format("DD/MM/YYYY"));
 
   useEffect(() => {
     getDateTimeData({

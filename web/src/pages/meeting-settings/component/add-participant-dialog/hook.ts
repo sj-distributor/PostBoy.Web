@@ -43,7 +43,7 @@ const useAction = () => {
     setTimeout(() => {
       setContactsData([]);
     }, 2000);
-  });
+  }, [contactsData]);
 
   return {
     contactsData,
