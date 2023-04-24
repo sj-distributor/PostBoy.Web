@@ -1,5 +1,6 @@
 export interface DateTimeProps {
-  getDateTimeData: (data: DateTimeData) => void;
+  getDate: (data: string) => void;
+  getTime: (data: string) => void;
 }
 
 export interface DateTimeData {
@@ -68,6 +69,10 @@ export interface SelectGroupType {
   value: string | null;
   data: SelectDataType[];
   isIcon?: boolean;
+}
+
+export enum DefaultDisplay {
+  Participant = 5,
 }
 
 export interface AddDialogProps {

@@ -4,6 +4,7 @@ import { Editor, Toolbar } from "@wangeditor/editor-for-react";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import {
+  Autocomplete,
   Avatar,
   Button,
   ButtonGroup,
@@ -20,18 +21,20 @@ import {
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Brightness1Icon from "@mui/icons-material/Brightness1";
 import useAction from "./hook";
-import Grid from "@mui/material/Unstable_Grid2";
-import { Fragment, useRef, useState } from "react";
 import DateTime from "./component/date-time";
 import "@wangeditor/editor/dist/css/style.css";
 import style from "./index.module.scss";
 import AddParticipantDialog from "./component/add-participant-dialog";
 import SeetingsDialog from "./component/settingsDialog";
+
+import { DefaultDisplay } from "../../dtos/meeting-seetings";
 
 export default function SelectLabels() {
   const {
@@ -42,16 +45,44 @@ export default function SelectLabels() {
     selectGroup,
     openAnnexList,
     anchorRef,
-    openAddParticipantDialog,
     openSettingsDialog,
     annexFile,
     inputRef,
     open,
     anchorEl,
+    corpsValue,
+    setCorpsValue,
+    corpAppValue,
+    corpsList,
+    corpAppList,
+    participantList,
+    isShowMoreParticipantList,
+    isShowDialog,
+    departmentAndUserList,
+    departmentKeyValue,
+    searchKeyValue,
+    isTreeViewLoading,
+    tagsList,
+    groupList,
+    DeptUserCanSelectStatus,
+    setGroupList,
+    setIsShowDialog,
+    setDepartmentAndUserList,
+    tagsValue,
+    setTagsValue,
+    setIsRefresh,
+    lastTimeTagsList,
+    clickName,
+    chatId,
+    setChatId,
+    sendType,
+    setSendType,
+    isUpdatedDeptUser,
+    setIsShowMoreParticipantList,
+    setCorpAppValue,
     handleClick,
     handleCloseMenu,
     uploadAnnex,
-    setOpenAddParticipantDialog,
     setOpenSettingsDialog,
     handleChange,
     setHtml,
@@ -59,19 +90,39 @@ export default function SelectLabels() {
     handleToggle,
     handleClose,
     getEndDate,
-    getStateDate,
+    getStartDate,
+    getEndTime,
+    getStartTime,
     fileUpload,
     fileDelete,
-    getSelectListData,
   } = useAction();
 
   return (
     <>
       <AddParticipantDialog
-        open={openAddParticipantDialog}
-        setDialog={setOpenAddParticipantDialog}
-        type="AddMembers"
-        getSelectListData={getSelectListData}
+        open={isShowDialog}
+        AppId={corpAppValue ? corpAppValue.appId : ""}
+        CorpId={corpAppValue ? corpAppValue.id : ""}
+        departmentAndUserList={departmentAndUserList}
+        departmentKeyValue={departmentKeyValue}
+        flattenDepartmentList={searchKeyValue}
+        isLoading={isTreeViewLoading}
+        tagsList={tagsList}
+        groupList={groupList}
+        canSelect={DeptUserCanSelectStatus.Both}
+        setGroupList={setGroupList}
+        setOpenFunction={setIsShowDialog}
+        setDeptUserList={setDepartmentAndUserList}
+        outerTagsValue={tagsValue}
+        setOuterTagsValue={setTagsValue}
+        setIsRefresh={setIsRefresh}
+        lastTagsValue={lastTimeTagsList}
+        clickName={clickName}
+        chatId={chatId}
+        setChatId={setChatId}
+        sendType={sendType}
+        setSendType={setSendType}
+        isUpdatedDeptUser={isUpdatedDeptUser}
       />
       <SeetingsDialog
         open={openSettingsDialog}
@@ -79,11 +130,53 @@ export default function SelectLabels() {
       />
       <div className={style.container}>
         <div className={style.appointmentMeeting}>
-          <Grid container alignItems="center" columns={24} rowSpacing={2}>
-            <Grid xs={24} md={2}>
-              <ClearIcon />
-            </Grid>
-            <Grid xs={24} md={22}>
+          <div className={style.fromItem}>
+            <div className={style.title}>企业</div>
+            <div className={style.enterpriseApplications}>
+              <Autocomplete
+                openOnFocus
+                disablePortal
+                disableClearable
+                value={corpsValue}
+                id="Autocomplete-corpsDataId"
+                options={corpsList}
+                className={style.inputWrap}
+                getOptionLabel={(option) => option.corpName}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                renderInput={(params) => (
+                  <TextField {...params} type="button" label="选择企业" />
+                )}
+                onChange={(e, value) => {
+                  setCorpsValue(value);
+                }}
+              />
+            </div>
+          </div>
+          <div className={style.fromItem}>
+            <div className={style.title}>应用</div>
+            <div className={style.enterpriseApplications}>
+              <Autocomplete
+                openOnFocus
+                disablePortal
+                id="Autocomplete-corpAppListId"
+                value={corpAppValue}
+                options={corpAppList}
+                className={style.inputWrap}
+                disableClearable
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                onChange={(e, value) => {
+                  setCorpAppValue(value);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} type="button" label="选择应用" />
+                )}
+              />
+            </div>
+          </div>
+          <div className={style.fromItem}>
+            <div className={style.title}></div>
+            <div className={style.widthFull}>
               <TextField
                 id="filled-start-adornment"
                 sx={{ width: "100%" }}
@@ -130,62 +223,76 @@ export default function SelectLabels() {
                 }}
                 variant="outlined"
               />
-            </Grid>
-            <Grid xs={24} md={2}>
-              参会人
-            </Grid>
-            <Grid xs={24} md={22}>
-              <Grid container columns={100} justifyContent="space-between">
-                <Grid xs={100} md={49} sx={{ marginBottom: "10px" }}>
-                  <div className={style.participantData}>
-                    <Avatar
-                      variant="square"
-                      src="https://img1.baidu.com/it/u=928879359,2870156212&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1681578000&t=375470fe9a362c575908e7b397fa0e69"
-                    ></Avatar>
-                    <div className={style.participantName}>MARS.PENG</div>
-                  </div>
-                </Grid>
-                <Grid xs={100} md={49} sx={{ marginBottom: "10px" }}>
+            </div>
+          </div>
+          <div className={style.fromItem}>
+            <div className={style.title}>参会人</div>
+            <div className={style.participantDataBox}>
+              {participantList?.length &&
+                participantList
+                  .filter((item, index) =>
+                    isShowMoreParticipantList
+                      ? index <= DefaultDisplay.Participant
+                      : true
+                  )
+                  .map((item, index) => {
+                    return (
+                      <div className={style.participantData} key={index}>
+                        <Avatar variant="square" src={item.avatar}></Avatar>
+                        <div className={style.participantName}>{item.name}</div>
+                      </div>
+                    );
+                  })}
+              {participantList &&
+                participantList?.length >= DefaultDisplay.Participant && (
                   <div
-                    className={style.addParticipant}
-                    onClick={() => setOpenAddParticipantDialog(true)}
+                    className={style.showParticipantData}
+                    onClick={() => setIsShowMoreParticipantList((val) => !val)}
                   >
-                    <AddIcon className={style.addParticipantIcon} />
-                    添加参会人
+                    {isShowMoreParticipantList ? (
+                      <ExpandMoreIcon />
+                    ) : (
+                      <ExpandLessIcon />
+                    )}{" "}
+                    共{participantList.length}人
                   </div>
-                </Grid>
-              </Grid>
-            </Grid>
+                )}
+              <div
+                className={style.addParticipant}
+                onClick={() => setIsShowDialog(true)}
+              >
+                <AddIcon className={style.addParticipantIcon} />
+                添加参会人
+              </div>
+            </div>
+          </div>
 
-            <Grid xs={24} md={2}>
-              开始
-            </Grid>
-            <Grid xs={24} md={22}>
-              <DateTime getDateTimeData={getStateDate} />
-            </Grid>
-
-            <Grid xs={24} md={2}>
-              结束
-            </Grid>
-            <Grid xs={24} md={22}>
-              <DateTime getDateTimeData={getEndDate} />
-            </Grid>
-
-            <Grid xs={24} md={2}>
-              地址
-            </Grid>
-            <Grid xs={24} md={22}>
+          <div className={style.fromItem}>
+            <div className={style.title}>开始</div>
+            <div className={style.widthFull}>
+              <DateTime getTime={getStartTime} getDate={getStartDate} />
+            </div>
+          </div>
+          <div className={style.fromItem}>
+            <div className={style.title}>结束</div>
+            <div className={style.widthFull}>
+              <DateTime getTime={getEndTime} getDate={getEndDate} />
+            </div>
+          </div>
+          <div className={style.fromItem}>
+            <div className={style.title}>地址</div>
+            <div className={style.widthFull}>
               <TextField
                 id="multiline"
                 placeholder="添加地址"
                 className={style.fromDataItem}
                 variant="outlined"
               />
-            </Grid>
-            <Grid xs={24} md={2}>
-              附件
-            </Grid>
-            <Grid xs={24} md={22}>
+            </div>
+          </div>
+          <div className={style.fromItem}>
+            <div className={style.title}>附件</div>
+            <div className={style.widthFull}>
               <ButtonGroup
                 variant="contained"
                 aria-label="split button"
@@ -196,7 +303,6 @@ export default function SelectLabels() {
                   ref={inputRef}
                   hidden
                   type="file"
-                  accept="image/jpg, image/png"
                   onChange={(e) =>
                     !!e.target.files &&
                     fileUpload(e.target.files, "会议附件", e)
@@ -258,12 +364,12 @@ export default function SelectLabels() {
                   </Grow>
                 )}
               </Popper>
-            </Grid>
+            </div>
+          </div>
 
-            <Grid xs={24} md={2}>
-              描述
-            </Grid>
-            <Grid xs={24} md={22}>
+          <div className={style.fromItem}>
+            <div className={style.title}>描述</div>
+            <div className={style.widthFull}>
               <div className={style.editableTextarea}>
                 <Toolbar
                   editor={editor}
@@ -280,48 +386,46 @@ export default function SelectLabels() {
                   className={style.editorText}
                 />
               </div>
-            </Grid>
-            {selectGroup.map((item, index) => {
-              return (
-                <Fragment key={index}>
-                  <Grid xs={24} md={2}>
-                    {item.title}
-                  </Grid>
-                  <Grid xs={24} md={22}>
-                    <Select
-                      defaultValue={item.data[0].value}
-                      onChange={(e) => handleChange(e, item.key)}
-                      displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
-                      label={item.value}
-                      className={style.fromDataItem}
-                    >
-                      {item.data.map((cItem, index) => {
-                        return (
-                          <MenuItem value={cItem.value} key={index}>
-                            {item.isIcon && (
-                              <Brightness1Icon
-                                style={{
-                                  color: "368aef",
-                                  fontSize: "1rem",
-                                  verticalAlign: "text-top",
-                                  marginRight: "0.3rem",
-                                }}
-                              />
-                            )}
-                            {cItem.lable}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </Grid>
-                </Fragment>
-              );
-            })}
-            <Grid xs={24} md={2}>
-              设置
-            </Grid>
-            <Grid xs={24} md={22}>
+            </div>
+          </div>
+          {selectGroup.map((item, index) => {
+            return (
+              <div key={index} className={style.fromItem}>
+                <div className={style.title}>{item.title}</div>
+                <div className={style.widthFull}>
+                  <Select
+                    defaultValue={item.data[0].value}
+                    onChange={(e) => handleChange(e, item.key)}
+                    displayEmpty
+                    inputProps={{ "aria-label": "Without label" }}
+                    label={item.value}
+                    className={style.fromDataItem}
+                  >
+                    {item.data.map((cItem, index) => {
+                      return (
+                        <MenuItem value={cItem.value} key={index}>
+                          {item.isIcon && (
+                            <Brightness1Icon
+                              style={{
+                                color: "368aef",
+                                fontSize: "1rem",
+                                verticalAlign: "text-top",
+                                marginRight: "0.3rem",
+                              }}
+                            />
+                          )}
+                          {cItem.lable}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </div>
+              </div>
+            );
+          })}
+          <div className={style.fromItem}>
+            <div className={style.title}>设置</div>
+            <div className={style.widthFull}>
               <Button
                 variant="contained"
                 component="label"
@@ -329,8 +433,8 @@ export default function SelectLabels() {
               >
                 会议设置
               </Button>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
         </div>
       </div>
     </>

@@ -1,180 +1,571 @@
-import {
-  Dialog,
-  DialogContent,
-  Autocomplete,
-  TextField,
-  Box,
-  Avatar,
-  List,
-  IconButton,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  ListItemButton,
-  ListItemIcon,
-  Checkbox,
-  Button,
-  CircularProgress,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import TextField from "@mui/material/TextField";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import List from "@mui/material/List";
 import Collapse from "@mui/material/Collapse";
-import CancelIcon from "@mui/icons-material/Cancel";
-import Grid from "@mui/material/Unstable_Grid2";
-import style from "./index.module.scss";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Divider from "@mui/material/Divider";
+import Autocomplete from "@mui/material/Autocomplete";
+import Checkbox from "@mui/material/Checkbox";
 import useAction from "./hook";
+import styles from "./index.module.scss";
+
 import {
-  AddDialogProps,
-  MeetingCallReminder,
-} from "../../../../dtos/meeting-seetings";
+  ClickType,
+  DepartmentAndUserType,
+  ITargetDialogProps,
+  IDepartmentAndUserListValue,
+  DeptUserCanSelectStatus,
+  SendObjOrGroup,
+} from "../../../../dtos/enterprise";
+import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { memo } from "react";
 
-const AddParticipantDialog = (props: AddDialogProps) => {
-  const { open, setDialog, type, resettingAppointRadio, getSelectListData } =
-    props;
-  const {
-    contactsData,
-    openListItem,
-    dense,
-    selectedData,
-    secondary,
-    handleClick,
-    delSelectedItem,
-  } = useAction();
-  const closeDialog = () => {
-    if (type === "DesignatedMembers") {
-      resettingAppointRadio && resettingAppointRadio(MeetingCallReminder.Host);
+const fiteringDeptAndUsers = (
+  options: IDepartmentAndUserListValue[],
+  state: FilterOptionsState<IDepartmentAndUserListValue>
+) => {
+  if (state.inputValue !== "") {
+    const array: IDepartmentAndUserListValue[] = [];
+    const findArray = options.filter((item) =>
+      item.name.toUpperCase().includes(state.inputValue.toUpperCase())
+    );
+    for (let i = 0; i < findArray.length; i++) {
+      array.push(findArray[i]);
+      const findParent = options.find(
+        (item) => item.name === findArray[i].parentid
+      );
+      if (!!findParent) {
+        const index = array.findIndex(
+          (item) => item.name === findArray[i].parentid
+        );
+        if (index === -1) {
+          const index = array.findIndex(
+            (item) => item.parentid === findParent.name
+          );
+          array.splice(index, 0, findParent);
+        }
+      }
     }
-    setDialog(false);
-  };
-  const confirm = () => {
-    setDialog(false);
-    getSelectListData(selectedData);
-  };
-  return (
-    <>
-      <Dialog
-        open={open}
-        onClose={() => setDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogContent sx={{ width: "30rem" }}>
-          <Grid container columns={24} justifyContent="space-between">
-            <Grid xs={24} md={12} sx={{ paddingRight: "0.5rem" }}>
-              <Autocomplete
-                disablePortal
-                id="combo-box-demo"
-                options={contactsData ? contactsData : []}
-                sx={{ width: "100%" }}
-                size="small"
-                renderInput={(params) => (
-                  <TextField {...params} label="联系人" />
-                )}
-              />
-              <Box sx={{ height: "25rem" }}>
-                {!contactsData && (
-                  <div className={style.noData}>
-                    <CircularProgress />
-                  </div>
-                )}
-
-                {contactsData && contactsData?.length >= 1 ? (
-                  <List
-                    sx={{
-                      width: "100%",
-                      maxWidth: 360,
-                      bgcolor: "background.paper",
-                    }}
-                    component="nav"
-                    aria-labelledby="nested-list-subheader"
-                  >
-                    <ListItemButton onClick={handleClick}>
-                      <ListItemText primary="从群聊中选择" />
-                    </ListItemButton>
-                    <Collapse in={openListItem} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 4 }}>
-                          <ListItemIcon>
-                            <Checkbox
-                              edge="start"
-                              size="small"
-                              tabIndex={-1}
-                              disableRipple
-                            />
-                          </ListItemIcon>
-                          <ListItemText primary="Starred" />
-                        </ListItemButton>
-                      </List>
-                    </Collapse>
-                  </List>
-                ) : (
-                  <div className={style.noData}>no Data</div>
-                )}
-              </Box>
-            </Grid>
-            <Grid
-              xs={24}
-              md={12}
-              sx={{
-                position: "relative",
-                paddingLeft: "0.5rem",
-                borderLeft: "1px solid #ccc",
-              }}
-            >
-              <div className={style.selectTitle}>
-                {selectedData.length
-                  ? `已选择·${selectedData.length}`
-                  : "请选择"}
-              </div>
-              <List dense={dense} className={style.selectedDataBox}>
-                {selectedData.map((item, index) => {
-                  return (
-                    <ListItem
-                      key={index}
-                      sx={{ paddingLeft: 0, paddingRight: 0 }}
-                      secondaryAction={
-                        <IconButton
-                          edge="end"
-                          aria-label="delete"
-                          onClick={() => delSelectedItem(item.name)}
-                        >
-                          <CancelIcon
-                            className={style.closeIcon}
-                            sx={{ fontSize: "1rem" }}
-                          />
-                        </IconButton>
-                      }
-                    >
-                      <ListItemAvatar sx={{ minWidth: "2rem" }}>
-                        <Avatar
-                          variant="square"
-                          sx={{ width: 24, height: 24 }}
-                          src={item.avatar}
-                        ></Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={item.name}
-                        secondary={secondary ? "Secondary text" : null}
-                      />
-                    </ListItem>
-                  );
-                })}
-              </List>
-              <div className={style.btnGroup}>
-                <Button
-                  sx={{ backgroundColor: "#ccc", color: "black" }}
-                  onClick={() => closeDialog()}
-                >
-                  取消
-                </Button>
-                <Button variant="contained" onClick={() => confirm()}>
-                  确定
-                </Button>
-              </div>
-            </Grid>
-          </Grid>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+    return array;
+  }
+  return options;
 };
 
-export default AddParticipantDialog;
+const SelectTargetDialog = memo(
+  (props: ITargetDialogProps) => {
+    const {
+      open,
+      departmentAndUserList,
+      AppId,
+      CorpId,
+      isLoading,
+      tagsList,
+      flattenDepartmentList,
+      departmentKeyValue,
+      groupList,
+      canSelect,
+      lastTagsValue,
+      clickName,
+      chatId,
+      sendType,
+      outerTagsValue,
+      isUpdatedDeptUser,
+      setSendType,
+      setIsRefresh,
+      setChatId,
+      setGroupList,
+      setOpenFunction,
+      setDeptUserList,
+      setOuterTagsValue,
+    } = props;
+
+    const {
+      departmentSelectedList,
+      tagsValue,
+      isShowDialog,
+      groupOwner,
+      groupName,
+      tipsObject,
+      groupDeptUserSelectedList,
+      defaultGroupOwner,
+      groupDeptUserList,
+      createLoading,
+      sendList,
+      setGroupName,
+      setGroupOwner,
+      setIsShowDialog,
+      handleDeptOrUserClick,
+      setSearchToDeptValue,
+      setTagsValue,
+      handleTypeIsCanSelect,
+      handleCreateGroup,
+      handleConfirm,
+      handleCancel,
+      onListBoxScrolling,
+    } = useAction({
+      open,
+      AppId,
+      departmentKeyValue,
+      departmentAndUserList,
+      isLoading,
+      lastTagsValue,
+      tagsList,
+      clickName,
+      chatId,
+      outerTagsValue,
+      isUpdatedDeptUser,
+      sendType,
+      CorpId,
+      setSendType,
+      setChatId,
+      setIsRefresh,
+      setOpenFunction,
+      setDeptUserList,
+      setOuterTagsValue,
+      setGroupList,
+    });
+
+    const center = () =>
+      (clickName === "选择发送目标" ? !departmentKeyValue : !groupDeptUserList)
+        ? {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }
+        : {};
+
+    const recursiveRenderDeptList = (
+      data: IDepartmentAndUserListValue[],
+      pl: number
+    ) => {
+      const result = (
+        <List key={AppId} dense>
+          {data.map((deptUserData) => {
+            const insertData: IDepartmentAndUserListValue = {
+              id: deptUserData.id,
+              name: deptUserData.name,
+              type: deptUserData.type,
+              parentid: String(deptUserData.parentid),
+              selected: deptUserData.selected,
+              children: [],
+            };
+            return (
+              <div key={deptUserData.id}>
+                <ListItemButton
+                  sx={{ pl, height: "2.2rem" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deptUserData.children.length > 0 &&
+                      handleDeptOrUserClick(
+                        ClickType.Collapse,
+                        Object.assign(insertData, {
+                          isCollapsed: deptUserData.isCollapsed,
+                        })
+                      );
+                  }}
+                >
+                  {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
+                    <Checkbox
+                      edge="start"
+                      checked={deptUserData.selected}
+                      tabIndex={-1}
+                      disableRipple
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeptOrUserClick(ClickType.Select, insertData);
+                      }}
+                    />
+                  )}
+                  <ListItemText primary={deptUserData.name} />
+                  {deptUserData.children.length > 0 &&
+                    (!!deptUserData.isCollapsed ? (
+                      <ExpandLess />
+                    ) : (
+                      <ExpandMore />
+                    ))}
+                </ListItemButton>
+                {deptUserData.children.length > 0 && (
+                  <Collapse
+                    in={!!deptUserData.isCollapsed}
+                    timeout={0}
+                    unmountOnExit
+                  >
+                    {recursiveRenderDeptList(deptUserData.children, pl + 2)}
+                  </Collapse>
+                )}
+              </div>
+            );
+          })}
+          <Divider />
+        </List>
+      );
+      return result;
+    };
+
+    return (
+      <div>
+        <Dialog open={open} PaperProps={{ sx: { overflowY: "unset" } }}>
+          <DialogTitle
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              height: "4rem",
+            }}
+          >
+            <>{clickName}</>
+            {clickName === "选择发送目标" && (
+              <Button variant="outlined" onClick={() => setIsShowDialog(true)}>
+                创建群组
+              </Button>
+            )}
+          </DialogTitle>
+          <DialogContent sx={{ width: "30rem" }}>
+            {!isLoading ? (
+              <>
+                <div
+                  style={{
+                    height: "15rem",
+                    overflowY: "auto",
+                    position: "relative",
+                    marginBottom: "1rem",
+                    ...center(),
+                  }}
+                >
+                  {(clickName === "选择发送目标"
+                    ? !departmentKeyValue
+                    : !groupDeptUserList) && <div>No Data</div>}
+                  {clickName === "选择发送目标"
+                    ? departmentKeyValue?.data.length > 0 &&
+                      recursiveRenderDeptList(departmentKeyValue.data, 0)
+                    : groupDeptUserList &&
+                      groupDeptUserList.length > 0 &&
+                      (() => {
+                        const activeData = groupDeptUserList.find(
+                          (x) => x.key === AppId
+                        );
+                        return (
+                          activeData &&
+                          recursiveRenderDeptList(activeData.data, 0)
+                        );
+                      })()}
+                </div>
+                {clickName === "选择发送目标" && (
+                  <Autocomplete
+                    disableClearable
+                    fullWidth
+                    id="type-simple-select"
+                    value={sendType}
+                    size="small"
+                    options={sendList}
+                    getOptionLabel={(x) =>
+                      x === SendObjOrGroup.Group ? "群组" : "对象"
+                    }
+                    onChange={(e, value) => {
+                      setSendType && setSendType(value);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        className={styles.InputButton}
+                        margin="dense"
+                        type="button"
+                      />
+                    )}
+                  />
+                )}
+
+                {clickName === "选择发送目标" &&
+                sendType !== SendObjOrGroup.Object ? (
+                  <></>
+                ) : (
+                  flattenDepartmentList && (
+                    <Autocomplete
+                      id={"sreach-input" + clickName}
+                      disablePortal
+                      openOnFocus
+                      multiple
+                      disableCloseOnSelect
+                      size="small"
+                      sx={{
+                        margin:
+                          clickName === "选择发送目标"
+                            ? "1rem 0 calc(1rem - 4px)"
+                            : "",
+                      }}
+                      componentsProps={{
+                        paper: { elevation: 3 },
+                        popper: {
+                          placement: "top",
+                        },
+                      }}
+                      value={
+                        clickName === "选择发送目标"
+                          ? departmentSelectedList
+                          : groupDeptUserSelectedList
+                      }
+                      options={flattenDepartmentList}
+                      getOptionLabel={(option) => option.name}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      }
+                      groupBy={(option) => option.parentid as string}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={
+                            clickName === "选择发送目标"
+                              ? "部门与用户搜索"
+                              : "用户搜索"
+                          }
+                        />
+                      )}
+                      filterOptions={(options, state) =>
+                        fiteringDeptAndUsers(options, state)
+                      }
+                      onChange={(e, value) =>
+                        value && setSearchToDeptValue(value)
+                      }
+                      renderGroup={(params) => {
+                        const { key, group, children } = params;
+                        return <div key={key}>{children}</div>;
+                      }}
+                      renderOption={(props, option, state) => {
+                        let style = Object.assign(
+                          option.type === DepartmentAndUserType.Department
+                            ? { color: "#666" }
+                            : { paddingLeft: "2rem" },
+                          { fontSize: "0.9rem" }
+                        );
+                        !handleTypeIsCanSelect(canSelect, option.type) &&
+                          (props.onClick = () => {});
+                        return (
+                          <li {...props} style={style}>
+                            {option.name}
+                          </li>
+                        );
+                      }}
+                    />
+                  )
+                )}
+
+                {clickName === "选择发送目标" ? (
+                  <>
+                    {sendType === SendObjOrGroup.Group && (
+                      <Autocomplete
+                        id="group-list"
+                        disablePortal
+                        openOnFocus
+                        size="small"
+                        sx={{ margin: "1rem 0 0" }}
+                        componentsProps={{
+                          paper: { elevation: 3 },
+                          popper: { placement: "top" },
+                        }}
+                        value={
+                          chatId
+                            ? groupList.filter((x) => x.chatId === chatId)[0]
+                            : null
+                        }
+                        options={groupList}
+                        getOptionLabel={(option) => option.chatName}
+                        isOptionEqualToValue={(option, value) =>
+                          option.chatId === value.chatId
+                        }
+                        renderOption={(props, option, state) => (
+                          <li {...props} key={option.chatId}>
+                            {option.chatName}
+                          </li>
+                        )}
+                        ListboxProps={{
+                          onScroll: (e) => {
+                            onListBoxScrolling(
+                              (e.target as HTMLElement).scrollHeight,
+                              (e.target as HTMLElement).scrollTop,
+                              (e.target as HTMLElement).clientHeight
+                            );
+                          },
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            className={styles.InputButton}
+                            margin="dense"
+                            type="text"
+                            label="群组列表"
+                          />
+                        )}
+                        onChange={(e, value) => {
+                          setChatId && setChatId(value ? value.chatId : "");
+                        }}
+                      />
+                    )}
+                    {sendType === SendObjOrGroup.Object && (
+                      <Autocomplete
+                        id="tags-list"
+                        disablePortal
+                        openOnFocus
+                        multiple
+                        disableCloseOnSelect
+                        disableClearable
+                        limitTags={2}
+                        size="small"
+                        sx={{ display: "none" }}
+                        value={tagsValue}
+                        options={tagsList}
+                        componentsProps={{ paper: { elevation: 3 } }}
+                        getOptionLabel={(option) => option.tagName}
+                        isOptionEqualToValue={(option, value) =>
+                          option.tagId === value.tagId
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            className={styles.InputButton}
+                            margin="dense"
+                            type="button"
+                            label="标签列表"
+                          />
+                        )}
+                        onChange={(e, value) => setTagsValue(value)}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <TextField
+                      sx={{ margin: "1rem 0 calc(1rem - 4px)" }}
+                      size="small"
+                      fullWidth
+                      value={groupName}
+                      onChange={(e) => setGroupName(e.target.value)}
+                      label={"群名"}
+                    />
+                    <Autocomplete
+                      id="group-owner"
+                      size="small"
+                      disablePortal
+                      openOnFocus
+                      disableClearable
+                      value={groupOwner}
+                      options={groupDeptUserSelectedList.concat(
+                        defaultGroupOwner
+                      )}
+                      getOptionLabel={(option) => option.name}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      }
+                      getOptionDisabled={(option) => option.id === "-1"}
+                      componentsProps={{ paper: { elevation: 3 } }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          className={styles.InputButton}
+                          sx={{
+                            input: {
+                              color: groupOwner.id === "-1" ? "#999" : "333",
+                            },
+                          }}
+                          margin="dense"
+                          type="button"
+                          label="群主选择"
+                        />
+                      )}
+                      onChange={(e, value) => {
+                        setGroupOwner(value);
+                      }}
+                    />
+                  </>
+                )}
+              </>
+            ) : (
+              <CircularProgress
+                style={{
+                  position: "absolute",
+                  width: "2rem",
+                  height: "2rem",
+                  left: "50%",
+                  top: "50%",
+                  margin: "-1rem 0 0 -1rem",
+                }}
+              />
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancel}>取消</Button>
+            <LoadingButton
+              loading={createLoading}
+              loadingIndicator="Loading…"
+              variant="text"
+              onClick={() => {
+                clickName !== "选择发送目标"
+                  ? handleCreateGroup()
+                  : handleConfirm();
+              }}
+            >
+              {clickName === "选择发送目标" ? "确定" : "创建"}
+            </LoadingButton>
+          </DialogActions>
+        </Dialog>
+
+        {/* ----- 创建群组 ----- */}
+        {clickName === "选择发送目标" && (
+          <SelectTargetDialog
+            open={isShowDialog}
+            AppId={AppId}
+            CorpId={CorpId}
+            departmentAndUserList={departmentAndUserList}
+            departmentKeyValue={departmentKeyValue}
+            flattenDepartmentList={flattenDepartmentList}
+            isLoading={isLoading}
+            tagsList={tagsList}
+            canSelect={DeptUserCanSelectStatus.User}
+            setOpenFunction={setIsShowDialog}
+            setDeptUserList={setDeptUserList}
+            setOuterTagsValue={setTagsValue}
+            lastTagsValue={lastTagsValue}
+            setGroupList={setGroupList}
+            groupList={groupList}
+            chatId={chatId}
+            setIsRefresh={setIsRefresh}
+            clickName={"创建群组"}
+            groupDeptUserSelectedList={groupDeptUserSelectedList}
+            isUpdatedDeptUser={isUpdatedDeptUser}
+          />
+        )}
+
+        {/* 消息提示 */}
+        <Snackbar
+          message={tipsObject.msg}
+          open={tipsObject.show}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        />
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.open === nextProps.open &&
+      prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
+      prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
+      prevProps.AppId === nextProps.AppId &&
+      prevProps.groupList === nextProps.groupList &&
+      prevProps.chatId === nextProps.chatId &&
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.sendType === nextProps.sendType
+    );
+  }
+);
+
+export default SelectTargetDialog;

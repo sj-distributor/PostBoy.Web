@@ -1,50 +1,6 @@
-.css-10hburv-MuiTypography-root {
-  font-size: 0.8rem;
-}
-
-.noData {
-  text-align: center;
-  line-height: 25rem;
-}
-
-.selectTitle {
-  font-size: 0.8rem;
-  font-weight: 400;
-}
-
-.selectedData {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.avatarName {
-  display: flex;
-  align-items: center;
-}
-
-.closeIcon {
-  color: #ccc;
-}
-
-.btnGroup {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  & button {
-    width: 45%;
-  }
-}
-
-.selectedDataBox {
-  height: 23rem;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
+.InputButton {
+  :global(input[type="button" i]) {
+    text-align: left;
+    cursor: pointer;
   }
 }

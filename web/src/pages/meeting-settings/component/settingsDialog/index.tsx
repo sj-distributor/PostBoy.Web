@@ -40,13 +40,6 @@ const SeetingsDialog = (props: SettingDialogProps) => {
 
   return (
     <>
-      <AddParticipantDialog
-        open={openAddDialog}
-        setDialog={setAddDialog}
-        type={addDialogType}
-        resettingAppointRadio={setAppintRadio}
-        getSelectListData={getSelectListData}
-      />
       <Dialog
         open={open}
         onClose={() => setDialog(false)}

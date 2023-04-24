@@ -209,7 +209,9 @@ const useAction = () => {
 
   useEffect(() => {
     const isAppoint = meetingSettingList.filter(
-      (item, index) => item.optionData === MeetingCallReminder.Appoint
+      (item, index) =>
+        item.title === "会议开始时来电提醒" &&
+        item.optionData === MeetingCallReminder.Appoint
     );
     isAppoint.length >= 1 && setAddDialog(true);
     isAppoint.length >= 1 && setAddDialogType("DesignatedMembers");

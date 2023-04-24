@@ -11,8 +11,8 @@
 
 .appointmentMeeting {
   background-color: #f2f3f4;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 10rem;
+  padding-right: 10rem;
   padding-bottom: 2rem;
 }
 
@@ -35,23 +35,40 @@
 
 .participantData {
   display: flex;
+  width: 45%;
   align-items: center;
-  height: 70%;
+  margin-right: 0.8rem;
+  margin-bottom: 0.8rem;
+  min-width: 12rem;
   padding: 0.5rem 0.6rem;
   border: 0.1rem solid #d8d9d9;
   border-radius: 0.3rem;
   background-color: #e8e8e8;
 }
 
+.showParticipantData {
+  display: flex;
+  align-items: center;
+  width: 45%;
+  margin-right: 0.8rem;
+  margin-bottom: 0.8rem;
+  min-width: 12rem;
+  padding: 0.5rem 0.6rem;
+  border: 0.1rem solid #d8d9d9;
+  border-radius: 0.3rem;
+}
 .participantName {
   margin-left: 1rem;
 }
 
 .addParticipant {
   padding: 0.5rem 0.6rem;
+  min-width: 12rem;
+  width: 45%;
   border-radius: 0.3rem;
   border: 0.1rem solid #d8d9d9;
-  height: 70%;
+  margin-right: 0.8rem;
+  margin-bottom: 0.8rem;
   color: #368aef;
   cursor: pointer;
   display: flex;
@@ -119,4 +136,36 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.title {
+  width: 6rem;
+  min-width: 6rem;
+  text-align: center;
+  margin-right: 0.5rem;
+}
+
+.fromItem {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.participantDataBox {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.enterpriseApplications {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.inputWrap {
+  flex: 1 1;
+  min-width: 12rem;
+}
+.widthFull {
+  width: 100%;
+  min-width: 12rem;
 }
