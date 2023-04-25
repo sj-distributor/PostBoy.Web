@@ -54,21 +54,26 @@ export const useAction = (props: SelectContentHookProps) => {
     clearData,
   } = props
 
-  // 拿到的企业对象
-  const [corpsValue, setCorpsValue] = useState<ICorpData>({
+  const defaultCorpValue = {
     corpName: "",
     corpId: "",
     id: "",
-  })
-  // 拿到的App对象
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>({
+  }
+
+  const defaultAppValue = {
     appId: "",
     id: "",
     name: "",
     workWeChatCorpId: "",
     display: true,
     agentId: 0,
-  })
+  }
+
+  // 拿到的企业对象
+  const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
+  // 拿到的App对象
+  const [corpAppValue, setCorpAppValue] =
+    useState<ICorpAppData>(defaultAppValue)
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -170,6 +175,8 @@ export const useAction = (props: SelectContentHookProps) => {
 
   const [mentionList, setMentionList] = useState<IMentionList[]>([])
 
+  const [appLoading, setAppLoading] = useState<boolean>(true)
+
   const editorConfig = {
     placeholder: "请输入内容...",
     autoFocus: false,
@@ -263,14 +270,13 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 初始化App数组
   useEffect(() => {
-    !!corpsValue.corpId &&
-      GetCorpAppList({ CorpId: corpsValue.id }).then(
-        (corpAppResult: ICorpAppData[] | null | undefined) => {
-          if (corpAppResult) {
-            setCorpAppList(corpAppResult.filter((x) => x.display))
-          }
-        }
-      )
+    if (!!corpsValue.corpId) {
+      GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
+        setAppLoading(false)
+        setCorpAppValue(defaultAppValue)
+        corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display))
+      })
+    }
   }, [corpsValue?.id])
 
   // 获取Tags数组
@@ -1212,5 +1218,6 @@ export const useAction = (props: SelectContentHookProps) => {
     isUpdatedDeptUser,
     mentionList,
     detectMentionToDelete,
+    appLoading,
   }
 }
