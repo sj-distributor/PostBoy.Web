@@ -979,16 +979,11 @@ export const useAction = (props: SelectContentHookProps) => {
       setIsGetLastTimeData(true)
       // 回显群组名称
       if (updateMessageJobInformation.groupId) {
-        console.log(1)
         setChatId(updateMessageJobInformation.groupId)
         setSendType(SendObjOrGroup.Group)
       }
     }
   }, [updateMessageJobInformation])
-
-  useEffect(() => {
-    console.log(chatId)
-  }, [chatId])
 
   // 返回最终的数据给外层
   useEffect(() => {
