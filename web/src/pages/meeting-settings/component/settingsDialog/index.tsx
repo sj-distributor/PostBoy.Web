@@ -18,26 +18,29 @@ import {
   SettingDialogProps,
   MeetingCallReminder,
 } from "../../../../dtos/meeting-seetings";
-import AddParticipantDialog from "../add-participant-dialog";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 const SeetingsDialog = (props: SettingDialogProps) => {
-  const { open, setDialog } = props;
+  const {
+    open,
+    setDialog,
+    setOpenAddDialog,
+    openAddDialog,
+    appointList,
+    hostList,
+    setClickName,
+  } = props;
   const {
     meetingSettingList,
-    openAddDialog,
     showPassword,
     radioDisabled,
-    addDialogType,
-    setAddDialog,
     setIsOption,
     handleChange,
     handleClickShowPassword,
     handleMouseDownPassword,
     setMembershipPassword,
-    setAppintRadio,
-    getSelectListData,
-  } = useAction();
-
+    selectHost,
+    setAppint,
+  } = useAction({ setOpenAddDialog, setClickName, appointList, openAddDialog });
   return (
     <>
       <Dialog
@@ -59,9 +62,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
               <Fragment key={index}>
                 <div
                   className={style.settingsList}
-                  onClick={() =>
-                    item.optionType === "dailog" && setAddDialog(true)
-                  }
+                  onClick={() => item.optionType === "dailog" && selectHost()}
                 >
                   <div className="title">{item.title}</div>
                   <div>
@@ -72,9 +73,28 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                         onChange={(event) => setIsOption(event, index)}
                       />
                     ) : item.icon ? (
-                      <ArrowForwardIosIcon
-                        sx={{ color: "#ccc", fontSize: "1rem" }}
-                      />
+                      hostList ? (
+                        <div className={style.appointName}>
+                          {hostList.map((aItem, index) => {
+                            return (
+                              index <= 1 && (
+                                <span key={index}>
+                                  {aItem.name}
+                                  {index === 0 && "、"}
+                                </span>
+                              )
+                            );
+                          })}
+                          {hostList.length > 1 && `等${hostList.length}人`}
+                          <ArrowForwardIosIcon
+                            sx={{ fontSize: "0.6rem", marginLeft: "0.3rem" }}
+                          />
+                        </div>
+                      ) : (
+                        <ArrowForwardIosIcon
+                          sx={{ color: "#ccc", fontSize: "1rem" }}
+                        />
+                      )
                     ) : (
                       ""
                     )}
@@ -110,6 +130,33 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                     })}
                   </RadioGroup>
                 )}
+                {item.title === "会议开始时来电提醒" &&
+                  item.optionData === MeetingCallReminder.Appoint &&
+                  appointList &&
+                  appointList.length >= 1 && (
+                    <div
+                      className={style.appointListCentent}
+                      onClick={() => setAppint()}
+                    >
+                      <div>指定成员</div>
+                      <div className={style.appointName}>
+                        {appointList.map((aItem, index) => {
+                          return (
+                            index <= 1 && (
+                              <span key={index}>
+                                {aItem.name}
+                                {index === 0 && "、"}
+                              </span>
+                            )
+                          );
+                        })}
+                        {appointList.length > 1 && `等${appointList.length}人`}
+                        <ArrowForwardIosIcon
+                          sx={{ fontSize: "0.6rem", marginLeft: "0.3rem" }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 {item.optionType === "input" && item.isOption && (
                   <OutlinedInput
                     id="outlined-adornment-password"

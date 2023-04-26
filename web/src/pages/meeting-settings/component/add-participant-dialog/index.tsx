@@ -78,6 +78,7 @@ const SelectTargetDialog = memo(
       sendType,
       outerTagsValue,
       isUpdatedDeptUser,
+      loadSelectData,
       setSendType,
       setIsRefresh,
       setChatId,
@@ -85,6 +86,7 @@ const SelectTargetDialog = memo(
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
+      getSelectData,
     } = props;
 
     const {
@@ -124,6 +126,7 @@ const SelectTargetDialog = memo(
       isUpdatedDeptUser,
       sendType,
       CorpId,
+      loadSelectData,
       setSendType,
       setChatId,
       setIsRefresh,
@@ -131,10 +134,17 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       setGroupList,
+      getSelectData,
     });
 
     const center = () =>
-      (clickName === "选择发送目标" ? !departmentKeyValue : !groupDeptUserList)
+      (
+        clickName === "选择参会人" ||
+        clickName === "选择指定提醒人员" ||
+        clickName === "选择指定主持人"
+          ? !departmentKeyValue
+          : !groupDeptUserList
+      )
         ? {
             display: "flex",
             alignItems: "center",
@@ -222,11 +232,6 @@ const SelectTargetDialog = memo(
             }}
           >
             <>{clickName}</>
-            {clickName === "选择发送目标" && (
-              <Button variant="outlined" onClick={() => setIsShowDialog(true)}>
-                创建群组
-              </Button>
-            )}
           </DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             {!isLoading ? (
@@ -240,10 +245,14 @@ const SelectTargetDialog = memo(
                     ...center(),
                   }}
                 >
-                  {(clickName === "选择发送目标"
+                  {(clickName === "选择参会人" ||
+                  clickName === "选择指定提醒人员" ||
+                  clickName === "选择指定主持人"
                     ? !departmentKeyValue
                     : !groupDeptUserList) && <div>No Data</div>}
-                  {clickName === "选择发送目标"
+                  {clickName === "选择参会人" ||
+                  clickName === "选择指定提醒人员" ||
+                  clickName === "选择指定主持人"
                     ? departmentKeyValue?.data.length > 0 &&
                       recursiveRenderDeptList(departmentKeyValue.data, 0)
                     : groupDeptUserList &&
@@ -258,7 +267,9 @@ const SelectTargetDialog = memo(
                         );
                       })()}
                 </div>
-                {clickName === "选择发送目标" && (
+                {(clickName === "选择参会人" ||
+                  clickName === "选择指定提醒人员" ||
+                  clickName === "选择指定主持人") && (
                   <Autocomplete
                     disableClearable
                     fullWidth
@@ -283,7 +294,9 @@ const SelectTargetDialog = memo(
                   />
                 )}
 
-                {clickName === "选择发送目标" &&
+                {(clickName === "选择参会人" ||
+                  clickName === "选择指定提醒人员" ||
+                  clickName === "选择指定主持人") &&
                 sendType !== SendObjOrGroup.Object ? (
                   <></>
                 ) : (
@@ -297,7 +310,9 @@ const SelectTargetDialog = memo(
                       size="small"
                       sx={{
                         margin:
-                          clickName === "选择发送目标"
+                          clickName === "选择参会人" ||
+                          clickName === "选择指定提醒人员" ||
+                          clickName === "选择指定主持人"
                             ? "1rem 0 calc(1rem - 4px)"
                             : "",
                       }}
@@ -308,7 +323,9 @@ const SelectTargetDialog = memo(
                         },
                       }}
                       value={
-                        clickName === "选择发送目标"
+                        clickName === "选择参会人" ||
+                        clickName === "选择指定提醒人员" ||
+                        clickName === "选择指定主持人"
                           ? departmentSelectedList
                           : groupDeptUserSelectedList
                       }
@@ -322,7 +339,9 @@ const SelectTargetDialog = memo(
                         <TextField
                           {...params}
                           label={
-                            clickName === "选择发送目标"
+                            clickName === "选择参会人" ||
+                            clickName === "选择指定提醒人员" ||
+                            clickName === "选择指定主持人"
                               ? "部门与用户搜索"
                               : "用户搜索"
                           }
@@ -357,7 +376,9 @@ const SelectTargetDialog = memo(
                   )
                 )}
 
-                {clickName === "选择发送目标" ? (
+                {clickName === "选择参会人" ||
+                clickName === "选择指定提醒人员" ||
+                clickName === "选择指定主持人" ? (
                   <>
                     {sendType === SendObjOrGroup.Group && (
                       <Autocomplete
@@ -506,18 +527,24 @@ const SelectTargetDialog = memo(
               loadingIndicator="Loading…"
               variant="text"
               onClick={() => {
-                clickName !== "选择发送目标"
+                clickName !== "选择参会人" &&
+                clickName !== "选择指定提醒人员" &&
+                clickName !== "选择指定主持人"
                   ? handleCreateGroup()
                   : handleConfirm();
               }}
             >
-              {clickName === "选择发送目标" ? "确定" : "创建"}
+              {clickName === "选择参会人" ||
+              clickName === "选择指定提醒人员" ||
+              clickName === "选择指定主持人"
+                ? "确定"
+                : "创建"}
             </LoadingButton>
           </DialogActions>
         </Dialog>
 
         {/* ----- 创建群组 ----- */}
-        {clickName === "选择发送目标" && (
+        {clickName === "选择参会人" && (
           <SelectTargetDialog
             open={isShowDialog}
             AppId={AppId}

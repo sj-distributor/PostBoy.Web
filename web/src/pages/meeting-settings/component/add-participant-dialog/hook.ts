@@ -31,6 +31,7 @@ const useAction = (props: {
   isUpdatedDeptUser: boolean;
   sendType?: SendObjOrGroup;
   CorpId: string;
+  loadSelectData?: IDepartmentAndUserListValue[];
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>;
   setOpenFunction: (open: boolean) => void;
   setChatId?: React.Dispatch<React.SetStateAction<string>>;
@@ -40,6 +41,7 @@ const useAction = (props: {
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>;
+  getSelectData?: (data: IDepartmentAndUserListValue[]) => void;
 }) => {
   const {
     departmentAndUserList,
@@ -55,6 +57,7 @@ const useAction = (props: {
     lastTagsValue,
     sendType,
     CorpId,
+    loadSelectData,
     setSendType,
     setChatId,
     setIsRefresh,
@@ -62,6 +65,7 @@ const useAction = (props: {
     setDeptUserList,
     setOuterTagsValue,
     setGroupList,
+    getSelectData,
   } = props;
 
   const defaultGroupOwner = {
@@ -144,7 +148,9 @@ const useAction = (props: {
     type: ClickType,
     clickedItem: IDepartmentAndUserListValue
   ) => {
-    clickName === "选择发送目标"
+    clickName === "选择参会人" ||
+    clickName === "选择指定提醒人员" ||
+    clickName === "选择指定主持人"
       ? setDeptUserList((prev) => {
           const newValue = prev.filter((e) => !!e);
           const activeData = newValue.find(
@@ -274,6 +280,7 @@ const useAction = (props: {
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
+    getSelectData && getSelectData(departmentSelectedList);
   };
 
   const handleCancel = () => {
@@ -360,24 +367,40 @@ const useAction = (props: {
   }, [open, isUpdatedDeptUser]);
 
   useEffect(() => {
+    !loadSelectData && setSearchToDeptValue([]);
+
     const handleData = (
       prev: IDepartmentAndUserListValue[],
       listData: IDepartmentKeyControl[]
     ) => {
-      const newValue = prev.filter((x) => x);
+      const newValue = loadSelectData
+        ? loadSelectData.filter((x) => x)
+        : prev.filter((x) => x);
       const hasData = listData.find((x) => x.key === AppId);
-      hasData &&
-        recursiveSeachDeptOrUser(hasData.data, (e) => {
-          e.selected && newValue.push(e);
-        });
+      if (hasData) {
+        loadSelectData
+          ? loadSelectData.forEach((item) => {
+              recursiveSeachDeptOrUser(hasData.data, (user) => {
+                user.selected = !!loadSelectData.find((e) => e.id === user.id);
+              });
+            })
+          : recursiveSeachDeptOrUser(hasData.data, (user) => {
+              user.selected = false;
+            });
+      }
+
       return newValue;
     };
     // 打开时load上次选中的数据
     open
-      ? clickName === "选择发送目标"
-        ? setDepartmentSelectedList((prev) =>
-            handleData(prev, departmentAndUserList)
-          )
+      ? clickName === "选择参会人" ||
+        clickName === "选择指定提醒人员" ||
+        clickName === "选择指定主持人"
+        ? loadSelectData
+          ? setDepartmentSelectedList((prev) =>
+              handleData(prev, departmentAndUserList)
+            )
+          : setDepartmentSelectedList([])
         : setGroupDeptUserSelectedList((prev) =>
             handleData(prev, groupDeptUserList)
           )

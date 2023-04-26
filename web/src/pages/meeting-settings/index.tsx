@@ -33,7 +33,6 @@ import "@wangeditor/editor/dist/css/style.css";
 import style from "./index.module.scss";
 import AddParticipantDialog from "./component/add-participant-dialog";
 import SeetingsDialog from "./component/settingsDialog";
-
 import { DefaultDisplay } from "../../dtos/meeting-seetings";
 
 export default function SelectLabels() {
@@ -51,7 +50,6 @@ export default function SelectLabels() {
     open,
     anchorEl,
     corpsValue,
-    setCorpsValue,
     corpAppValue,
     corpsList,
     corpAppList,
@@ -65,19 +63,23 @@ export default function SelectLabels() {
     tagsList,
     groupList,
     DeptUserCanSelectStatus,
-    setGroupList,
-    setIsShowDialog,
-    setDepartmentAndUserList,
     tagsValue,
-    setTagsValue,
-    setIsRefresh,
     lastTimeTagsList,
     clickName,
     chatId,
-    setChatId,
     sendType,
-    setSendType,
     isUpdatedDeptUser,
+    loadSelectData,
+    appointList,
+    hostList,
+    setCorpsValue,
+    setGroupList,
+    setIsShowDialog,
+    setDepartmentAndUserList,
+    setTagsValue,
+    setIsRefresh,
+    setChatId,
+    setSendType,
     setIsShowMoreParticipantList,
     setCorpAppValue,
     handleClick,
@@ -95,6 +97,9 @@ export default function SelectLabels() {
     getStartTime,
     fileUpload,
     fileDelete,
+    getSelectData,
+    setParticipant,
+    setClickName,
   } = useAction();
 
   return (
@@ -123,10 +128,17 @@ export default function SelectLabels() {
         sendType={sendType}
         setSendType={setSendType}
         isUpdatedDeptUser={isUpdatedDeptUser}
+        getSelectData={getSelectData}
+        loadSelectData={loadSelectData}
       />
       <SeetingsDialog
         open={openSettingsDialog}
         setDialog={setOpenSettingsDialog}
+        openAddDialog={isShowDialog}
+        setOpenAddDialog={setIsShowDialog}
+        setClickName={setClickName}
+        appointList={appointList}
+        hostList={hostList}
       />
       <div className={style.container}>
         <div className={style.appointmentMeeting}>
@@ -228,23 +240,24 @@ export default function SelectLabels() {
           <div className={style.fromItem}>
             <div className={style.title}>参会人</div>
             <div className={style.participantDataBox}>
-              {participantList?.length &&
+              {participantList &&
+                participantList?.length >= 1 &&
                 participantList
                   .filter((item, index) =>
                     isShowMoreParticipantList
-                      ? index <= DefaultDisplay.Participant
+                      ? index < DefaultDisplay.Participant
                       : true
                   )
                   .map((item, index) => {
                     return (
                       <div className={style.participantData} key={index}>
-                        <Avatar variant="square" src={item.avatar}></Avatar>
+                        <Avatar variant="square" src=""></Avatar>
                         <div className={style.participantName}>{item.name}</div>
                       </div>
                     );
                   })}
               {participantList &&
-                participantList?.length >= DefaultDisplay.Participant && (
+                participantList?.length > DefaultDisplay.Participant && (
                   <div
                     className={style.showParticipantData}
                     onClick={() => setIsShowMoreParticipantList((val) => !val)}
@@ -259,7 +272,7 @@ export default function SelectLabels() {
                 )}
               <div
                 className={style.addParticipant}
-                onClick={() => setIsShowDialog(true)}
+                onClick={() => setParticipant()}
               >
                 <AddIcon className={style.addParticipantIcon} />
                 添加参会人

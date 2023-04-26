@@ -35,7 +35,7 @@
 
 .participantData {
   display: flex;
-  width: 45%;
+  flex-basis: calc(50% - 1.8rem);
   align-items: center;
   margin-right: 0.8rem;
   margin-bottom: 0.8rem;
@@ -49,7 +49,7 @@
 .showParticipantData {
   display: flex;
   align-items: center;
-  width: 45%;
+  flex-basis: calc(50% - 1.8rem);
   margin-right: 0.8rem;
   margin-bottom: 0.8rem;
   min-width: 12rem;
@@ -59,12 +59,16 @@
 }
 .participantName {
   margin-left: 1rem;
+  width: 6rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .addParticipant {
   padding: 0.5rem 0.6rem;
   min-width: 12rem;
-  width: 45%;
+  flex-basis: calc(50% - 1.8rem);
   border-radius: 0.3rem;
   border: 0.1rem solid #d8d9d9;
   margin-right: 0.8rem;
@@ -154,6 +158,11 @@
 .participantDataBox {
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
+}
+
+.participantDataBox div:nth-child(2n) {
+  margin-right: 0rem;
 }
 
 .enterpriseApplications {

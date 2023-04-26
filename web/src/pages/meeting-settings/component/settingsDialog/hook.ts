@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
 import {
   MeetingCallReminder,
   MeetingRecording,
@@ -6,10 +7,15 @@ import {
   MembershipRestrictions,
   MutewhenJoining,
   RecordWatermark,
-  SelectParticipantList,
 } from "../../../../dtos/meeting-seetings";
 
-const useAction = () => {
+const useAction = (props: {
+  setOpenAddDialog: (vlaue: boolean) => void;
+  openAddDialog: boolean;
+  setClickName?: Dispatch<SetStateAction<string>>;
+  appointList?: IDepartmentAndUserListValue[];
+}) => {
+  const { setOpenAddDialog, setClickName, appointList, openAddDialog } = props;
   const checkList: MeetingSettingList[] = [
     {
       title: "指定主持人",
@@ -135,10 +141,6 @@ const useAction = () => {
   ];
   const [meetingSettingList, setMeetingSettingList] =
     useState<MeetingSettingList[]>(checkList);
-  const [openAddDialog, setAddDialog] = useState<boolean>(false);
-  const [addDialogType, setAddDialogType] = useState<
-    "AddMembers" | "DesignatedHost" | "DesignatedMembers"
-  >("AddMembers");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [radioDisabled, setRadioDisabled] = useState<boolean>(false);
 
@@ -165,7 +167,18 @@ const useAction = () => {
   ) => {
     const newList = [...meetingSettingList];
     newList[index].optionData = event.target.value;
+    if (
+      newList[index].title === "会议开始时来电提醒" &&
+      newList[index].optionData === MeetingCallReminder.Appoint
+    ) {
+      setAppint();
+    }
     setMeetingSettingList([...newList]);
+  };
+
+  const setAppint = () => {
+    setOpenAddDialog(true);
+    setClickName && setClickName("选择指定提醒人员");
   };
 
   const setIsOption = (
@@ -191,7 +204,10 @@ const useAction = () => {
     setMeetingSettingList([...newList]);
   };
 
-  const getSelectListData = (data: SelectParticipantList[]) => [];
+  const selectHost = () => {
+    setClickName && setClickName("选择指定主持人");
+    setOpenAddDialog(true);
+  };
 
   useEffect(() => {
     const value = meetingSettingList.filter(
@@ -208,29 +224,21 @@ const useAction = () => {
   }, [radioDisabled]);
 
   useEffect(() => {
-    const isAppoint = meetingSettingList.filter(
-      (item, index) =>
-        item.title === "会议开始时来电提醒" &&
-        item.optionData === MeetingCallReminder.Appoint
-    );
-    isAppoint.length >= 1 && setAddDialog(true);
-    isAppoint.length >= 1 && setAddDialogType("DesignatedMembers");
-  }, [meetingSettingList]);
+    (!appointList || appointList.length < 1) &&
+      setAppintRadio(MeetingCallReminder.Host);
+  }, [appointList, openAddDialog]);
 
   return {
     meetingSettingList,
-    openAddDialog,
     showPassword,
     radioDisabled,
-    addDialogType,
-    setAddDialog,
     setIsOption,
     handleChange,
     handleClickShowPassword,
     handleMouseDownPassword,
     setMembershipPassword,
-    setAppintRadio,
-    getSelectListData,
+    selectHost,
+    setAppint,
   };
 };
 

@@ -5,16 +5,13 @@ import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
 import {
   CalendarSelectData,
-  DateTimeData,
   DefaultDisplay,
   ReminderTimeSelectData,
   RepeatSelectData,
   SelectGroupType,
-  SelectParticipantList,
 } from "../../dtos/meeting-seetings";
 import { ICorpAppData, ICorpData } from "../../dtos/enterprise";
 import { GetCorpAppList, GetCorpsList } from "../../api/enterprise";
-import SelectTargetDialog from "../enterprise/components/select-target-dialog";
 import {
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
@@ -29,7 +26,7 @@ import {
   SendObject,
   SendObjOrGroup,
 } from "../../dtos/enterprise";
-import { clone, divide, flatten } from "ramda";
+import { clone, flatten } from "ramda";
 import { GetDeptsAndUserList } from "../../api/enterprise";
 
 const useAction = () => {
@@ -54,7 +51,7 @@ const useAction = () => {
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
   const [isNewOrUpdate, setIsNewOrUpdate] = useState<string>("new");
   const [participantList, setParticipantList] =
-    useState<SelectParticipantList[]>();
+    useState<IDepartmentAndUserListValue[]>();
   const [isShowMoreParticipantList, setIsShowMoreParticipantList] =
     useState<boolean>(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState<boolean>(false);
@@ -166,72 +163,6 @@ const useAction = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const uploadAnnex = () => {
-    inputRef.current?.click();
-  };
-
-  const fileUpload = async (
-    files: FileList,
-    type: string,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const array = Array.from(files);
-    setAnnexFile(array);
-  };
-
-  const fileDelete = (name: string, index?: number) => {
-    const newFileList = annexFile.filter((item, i) => i !== index);
-    setAnnexFile(newFileList);
-  };
-  //获取选中成员
-  const getSelectListData = (data: SelectParticipantList[]) => {};
-
-  // 初始化企业数组
-  useEffect(() => {
-    GetCorpsList().then((data) => {
-      data && setCorpsList(data);
-    });
-  }, []);
-
-  // 默认选择第一个企业对象
-  useEffect(() => {
-    !corpsValue.corpId && corpsList.length > 0 && setCorpsValue(corpsList[0]);
-  }, [corpsList]);
-
-  // 初始化App数组
-  useEffect(() => {
-    !!corpsValue.corpId &&
-      GetCorpAppList({ CorpId: corpsValue.id }).then(
-        (corpAppResult: ICorpAppData[] | null | undefined) => {
-          if (corpAppResult) {
-            setCorpAppList(corpAppResult.filter((x) => x.display));
-          }
-        }
-      );
-  }, [corpsValue?.id]);
-
-  // 默认选择第一个App对象
-  useEffect(() => {
-    isNewOrUpdate === "new" &&
-      corpAppList.length > 0 &&
-      setCorpAppValue(corpAppList[0]);
-  }, [corpAppList, isNewOrUpdate]);
-
-  useEffect(() => {
-    participantList &&
-      participantList.length > DefaultDisplay.Participant &&
-      setIsShowMoreParticipantList(true);
-  }, [participantList]);
-
   //选择人员
   // 弹出选择对象框 boolean
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
@@ -257,13 +188,12 @@ const useAction = () => {
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([]);
   // 上次上传的tagsList
   const [lastTimeTagsList, setLastTimeTagsList] = useState<string[]>([]);
-  const [clickName, setClickName] = useState<string>("选择发送目标");
+  const [clickName, setClickName] = useState<string>("选择参会人");
   const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false);
   //  拉取数据旋转
   const [isLoadStop, setIsLoadStop] = useState<boolean>(false);
   const [updateMessageJobInformation, setUpdateMessageJobInformation] =
     useState<ILastShowTableData>();
-  // 发送人员
   const [sendObject, setSendObject] = useState<SendObject>({
     toUsers: [],
     toParties: [],
@@ -398,6 +328,98 @@ const useAction = () => {
       }
     }
   };
+  //指定提醒人员
+  const [appointList, setAppointList] =
+    useState<IDepartmentAndUserListValue[]>();
+  //指定主持人
+  const [hostList, setHostList] = useState<IDepartmentAndUserListValue[]>();
+
+  const loadSelectData = useMemo(() => {
+    const result =
+      clickName === "选择参会人"
+        ? participantList
+        : clickName === "选择指定提醒人员"
+        ? appointList
+        : clickName === "选择指定主持人"
+        ? hostList
+        : undefined;
+
+    return result as IDepartmentAndUserListValue[];
+  }, [participantList, appointList, hostList, clickName]);
+  //获取选择人员
+  const getSelectData = (data: IDepartmentAndUserListValue[]) => {
+    clickName === "选择参会人" && setParticipantList([...data]);
+    clickName === "选择指定提醒人员" && setAppointList([...data]);
+    clickName === "选择指定主持人" && setHostList([...data]);
+  };
+
+  const setParticipant = () => {
+    setClickName("选择参会人");
+    setIsShowDialog(true);
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const uploadAnnex = () => {
+    inputRef.current?.click();
+  };
+
+  const fileUpload = async (
+    files: FileList,
+    type: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const array = Array.from(files);
+    setAnnexFile(array);
+  };
+
+  const fileDelete = (name: string, index?: number) => {
+    const newFileList = annexFile.filter((item, i) => i !== index);
+    setAnnexFile(newFileList);
+  };
+
+  // 初始化企业数组
+  useEffect(() => {
+    GetCorpsList().then((data) => {
+      data && setCorpsList(data);
+    });
+  }, []);
+
+  // 默认选择第一个企业对象
+  useEffect(() => {
+    !corpsValue.corpId && corpsList.length > 0 && setCorpsValue(corpsList[0]);
+  }, [corpsList]);
+
+  // 初始化App数组
+  useEffect(() => {
+    !!corpsValue.corpId &&
+      GetCorpAppList({ CorpId: corpsValue.id }).then(
+        (corpAppResult: ICorpAppData[] | null | undefined) => {
+          if (corpAppResult) {
+            setCorpAppList(corpAppResult.filter((x) => x.display));
+          }
+        }
+      );
+  }, [corpsValue?.id]);
+
+  // 默认选择第一个App对象
+  useEffect(() => {
+    isNewOrUpdate === "new" &&
+      corpAppList.length > 0 &&
+      setCorpAppValue(corpAppList[0]);
+  }, [corpAppList, isNewOrUpdate]);
+
+  useEffect(() => {
+    participantList &&
+      participantList.length > DefaultDisplay.Participant &&
+      setIsShowMoreParticipantList(true);
+  }, [participantList]);
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
@@ -438,6 +460,7 @@ const useAction = () => {
       loadDepartment(corpAppValue.appId);
     }
   }, [corpAppValue?.appId, isShowDialog]);
+
   return {
     editor,
     html,
@@ -452,11 +475,8 @@ const useAction = () => {
     open,
     anchorEl,
     corpsValue,
-    setCorpsValue,
     corpAppValue,
-    setCorpAppValue,
     corpsList,
-    setCorpsList,
     corpAppList,
     participantList,
     isShowMoreParticipantList,
@@ -468,37 +488,43 @@ const useAction = () => {
     tagsList,
     groupList,
     DeptUserCanSelectStatus,
-    setGroupList,
-    setIsShowDialog,
-    setDepartmentAndUserList,
     tagsValue,
-    setTagsValue,
-    setIsRefresh,
     lastTimeTagsList,
     clickName,
     chatId,
-    setChatId,
     sendType,
-    setSendType,
     isUpdatedDeptUser,
+    loadSelectData,
+    appointList,
+    hostList,
+    setCorpsValue,
+    setGroupList,
+    setIsShowDialog,
+    setDepartmentAndUserList,
+    setTagsValue,
+    setIsRefresh,
+    setChatId,
+    setSendType,
     setIsShowMoreParticipantList,
-    setCorpAppList,
+    setCorpAppValue,
     handleClick,
     handleCloseMenu,
     uploadAnnex,
     setOpenSettingsDialog,
     handleChange,
-    setEditor,
     setHtml,
-    handleClose,
+    setEditor,
     handleToggle,
+    handleClose,
     getEndDate,
     getStartDate,
     getEndTime,
     getStartTime,
     fileUpload,
     fileDelete,
-    getSelectListData,
+    getSelectData,
+    setParticipant,
+    setClickName,
   };
 };
 

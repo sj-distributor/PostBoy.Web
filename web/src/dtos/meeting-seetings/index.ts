@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
+import { IDepartmentAndUserListValue } from "../enterprise";
+
 export interface DateTimeProps {
   getDate: (data: string) => void;
   getTime: (data: string) => void;
@@ -72,7 +75,7 @@ export interface SelectGroupType {
 }
 
 export enum DefaultDisplay {
-  Participant = 5,
+  Participant = 6,
 }
 
 export interface AddDialogProps {
@@ -86,6 +89,11 @@ export interface AddDialogProps {
 export interface SettingDialogProps {
   open: boolean;
   setDialog: (value: boolean) => void;
+  openAddDialog: boolean;
+  setOpenAddDialog: (value: boolean) => void;
+  setClickName?: Dispatch<SetStateAction<string>>;
+  appointList?: IDepartmentAndUserListValue[];
+  hostList?: IDepartmentAndUserListValue[];
 }
 
 export interface SettingDialogType {
