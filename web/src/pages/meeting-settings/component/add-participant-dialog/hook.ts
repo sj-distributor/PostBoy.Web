@@ -35,7 +35,6 @@ const useAction = (props: {
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>;
   setOpenFunction: (open: boolean) => void;
   setChatId?: React.Dispatch<React.SetStateAction<string>>;
-  setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>;
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
   setDeptUserList: React.Dispatch<
     React.SetStateAction<IDepartmentKeyControl[]>
@@ -60,7 +59,6 @@ const useAction = (props: {
     loadSelectData,
     setSendType,
     setChatId,
-    setIsRefresh,
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
@@ -255,7 +253,6 @@ const useAction = (props: {
           PostWeChatWorkGroupCreate(requestData).then((data) => {
             if (data && data.errmsg === "ok") {
               setTipsObject({ msg: "创建成功", show: true });
-              setIsRefresh(true);
               setCreateLoading(false);
               // 清空数据
               setGroupDeptUserList((prev) => {

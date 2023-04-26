@@ -120,7 +120,6 @@ export default function SelectLabels() {
         setDeptUserList={setDepartmentAndUserList}
         outerTagsValue={tagsValue}
         setOuterTagsValue={setTagsValue}
-        setIsRefresh={setIsRefresh}
         lastTagsValue={lastTimeTagsList}
         clickName={clickName}
         chatId={chatId}
