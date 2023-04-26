@@ -1,7 +1,7 @@
 import {
   ILastShowTableData,
   ISendMessageCommand,
-  IUpdateMessageCommand
+  IUpdateMessageCommand,
 } from "../../../../dtos/enterprise"
 
 export interface SelectContentProps {

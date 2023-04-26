@@ -1,6 +1,8 @@
 import { memo } from "react"
 import {
+  Box,
   Button,
+  CircularProgress,
   FormControl,
   InputLabel,
   List,
@@ -8,6 +10,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Skeleton,
   TextField,
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
@@ -61,7 +64,6 @@ const SelectContent = memo(
       timeZoneValue,
       isShowDialog,
       setIsShowDialog,
-      setIsRefresh,
       departmentAndUserList,
       setDepartmentAndUserList,
       departmentKeyValue,
@@ -113,6 +115,8 @@ const SelectContent = memo(
       focusAction,
       mentionList,
       detectMentionToDelete,
+      appLoading,
+      groupLoading,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -260,7 +264,11 @@ const SelectContent = memo(
       ],
     }
 
-    return (
+    return (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
+      (isNewOrUpdate !== "new" &&
+        corpsList.length > 0 &&
+        !appLoading &&
+        !groupLoading) ? (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
           <Autocomplete
@@ -406,7 +414,6 @@ const SelectContent = memo(
             setDeptUserList={setDepartmentAndUserList}
             outerTagsValue={tagsValue}
             setOuterTagsValue={setTagsValue}
-            setIsRefresh={setIsRefresh}
             lastTagsValue={lastTimeTagsList}
             clickName={clickName}
             chatId={chatId}
@@ -678,6 +685,12 @@ const SelectContent = memo(
           )}
         </div>
       </div>
+    ) : (
+      <>
+        <Skeleton className={styles.selectWrap} width="100%" height="5rem" />
+        <Skeleton className={styles.selectWrap} width="100%" height="5rem" />
+        <Skeleton className={styles.rowBox} width="100%" height="12rem" />
+      </>
     )
   },
   (prevProps, nextProps) => {
