@@ -249,6 +249,7 @@ export const useAction = (props: SelectContentHookProps) => {
     updateMessageJobInformation?.workWeChatAppNotification,
     groupList,
     chatId,
+    corpAppValue,
   ])
 
   // 初始化企业数组
@@ -271,7 +272,6 @@ export const useAction = (props: SelectContentHookProps) => {
     if (!!corpsValue.id) {
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
         setAppLoading(false)
-        !updateMessageJobInformation?.app.id && setCorpAppValue(defaultAppValue)
         corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display))
       })
     }
@@ -304,10 +304,13 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个App对象
   useEffect(() => {
-    isNewOrUpdate === "new" &&
-      corpAppList.length > 0 &&
-      setCorpAppValue(corpAppList[0])
-  }, [corpAppList, isNewOrUpdate])
+    corpAppList.length > 0
+      ? setCorpAppValue(corpAppList[0])
+      : (() => {
+          setCorpAppValue(defaultAppValue)
+          setGroupList([])
+        })()
+  }, [corpAppList])
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(

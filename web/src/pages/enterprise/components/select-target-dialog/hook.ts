@@ -1,4 +1,4 @@
-import { clone } from "ramda"
+import { clone, uniq } from "ramda"
 import { useEffect, useState } from "react"
 import {
   GetWeChatWorkCorpAppGroups,
@@ -290,7 +290,7 @@ const useAction = (props: {
     CorpId &&
       GetWeChatWorkCorpAppGroups(CorpId, groupPage).then((data) => {
         data && data.length > 0
-          ? setGroupList((prev) => [...prev, ...data])
+          ? setGroupList((prev) => uniq([...prev, ...data]))
           : setGroupIsNoData(true)
       })
   }, [groupPage])
@@ -380,7 +380,6 @@ const useAction = (props: {
         (() => {
           setDepartmentSelectedList([])
           setGroupDeptUserSelectedList([])
-          setGroupPage(2)
           setGroupIsNoData(false)
         })()
   }, [open])
