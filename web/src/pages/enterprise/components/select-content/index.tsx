@@ -1,5 +1,6 @@
 import { memo } from "react"
 import {
+  Box,
   Button,
   CircularProgress,
   FormControl,
@@ -9,6 +10,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Skeleton,
   TextField,
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
@@ -262,59 +264,59 @@ const SelectContent = memo(
       ],
     }
 
-    return (
+    return (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
+      (isNewOrUpdate !== "new" &&
+        corpsList.length > 0 &&
+        !appLoading &&
+        groupList.length > 0) ? (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
-          {corpsList.length > 0 && !appLoading && (
-            <>
-              <Autocomplete
-                openOnFocus
-                disablePortal
-                disableClearable
-                value={corpsValue}
-                id="Autocomplete-corpsDataId"
-                options={corpsList}
-                className={styles.inputWrap}
-                style={{ marginRight: "1.6rem" }}
-                getOptionLabel={(option) => option.corpName}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.corpInput}
-                    type="button"
-                    label="选择企业"
-                  />
-                )}
-                onChange={(e, value) => {
-                  setCorpsValue(value)
-                }}
+          <Autocomplete
+            openOnFocus
+            disablePortal
+            disableClearable
+            value={corpsValue}
+            id="Autocomplete-corpsDataId"
+            options={corpsList}
+            className={styles.inputWrap}
+            style={{ marginRight: "1.6rem" }}
+            getOptionLabel={(option) => option.corpName}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                className={styles.corpInput}
+                type="button"
+                label="选择企业"
               />
-              <Autocomplete
-                openOnFocus
-                disablePortal
-                id="Autocomplete-corpAppListId"
-                value={corpAppValue}
-                options={corpAppList}
-                className={styles.inputWrap}
-                style={{ marginRight: "1.6rem" }}
-                disableClearable
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(e, value) => {
-                  setCorpAppValue(value)
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.corpInput}
-                    type="button"
-                    label="选择应用"
-                  />
-                )}
+            )}
+            onChange={(e, value) => {
+              setCorpsValue(value)
+            }}
+          />
+          <Autocomplete
+            openOnFocus
+            disablePortal
+            id="Autocomplete-corpAppListId"
+            value={corpAppValue}
+            options={corpAppList}
+            className={styles.inputWrap}
+            style={{ marginRight: "1.6rem" }}
+            disableClearable
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            onChange={(e, value) => {
+              setCorpAppValue(value)
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                className={styles.corpInput}
+                type="button"
+                label="选择应用"
               />
-            </>
-          )}
+            )}
+          />
 
           <Autocomplete
             openOnFocus
@@ -684,6 +686,12 @@ const SelectContent = memo(
           )}
         </div>
       </div>
+    ) : (
+      <>
+        <Skeleton className={styles.selectWrap} width="100%" height="5rem" />
+        <Skeleton className={styles.selectWrap} width="100%" height="5rem" />
+        <Skeleton className={styles.rowBox} width="100%" height="12rem" />
+      </>
     )
   },
   (prevProps, nextProps) => {
