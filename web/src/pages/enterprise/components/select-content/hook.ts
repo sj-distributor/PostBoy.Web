@@ -558,7 +558,7 @@ export const useAction = (props: SelectContentHookProps) => {
         })
       // 开始load数据
       setIsLoadStop(false)
-      loadDepartment(corpAppValue.appId)
+      corpAppValue.appId && loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue?.appId, isShowDialog])
 
