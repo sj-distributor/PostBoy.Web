@@ -158,7 +158,6 @@ export const useAction = (props: SelectContentHookProps) => {
   // 群组列表
   const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
   const [chatId, setChatId] = useState<string>("")
-  const [isRefresh, setIsRefresh] = useState(false)
   const [sendType, setSendType] = useState<SendObjOrGroup>(
     SendObjOrGroup.Object
   )
@@ -979,11 +978,17 @@ export const useAction = (props: SelectContentHookProps) => {
 
       setIsGetLastTimeData(true)
       // 回显群组名称
-      updateMessageJobInformation.groupId &&
-        setChatId(updateMessageJobInformation.groupId) === undefined &&
+      if (updateMessageJobInformation.groupId) {
+        console.log(1)
+        setChatId(updateMessageJobInformation.groupId)
         setSendType(SendObjOrGroup.Group)
+      }
     }
   }, [updateMessageJobInformation])
+
+  useEffect(() => {
+    console.log(chatId)
+  }, [chatId])
 
   // 返回最终的数据给外层
   useEffect(() => {
@@ -1138,14 +1143,6 @@ export const useAction = (props: SelectContentHookProps) => {
       setContent(value.match(beforePattern)?.[0] ?? "")
   }
 
-  useEffect(() => {
-    setSendObject({
-      toUsers: [],
-      toParties: [],
-    })
-    setChatId("")
-  }, [corpAppValue.id])
-
   return {
     corpsValue,
     setCorpsValue,
@@ -1180,7 +1177,6 @@ export const useAction = (props: SelectContentHookProps) => {
     fileUpload,
     groupList,
     setGroupList,
-    setIsRefresh,
     fileAccept,
     file,
     pictureText,

@@ -128,7 +128,6 @@ export interface ITargetDialogProps {
   outerTagsValue?: ITagsList[]
   isUpdatedDeptUser: boolean
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
-  setIsRefresh: React.Dispatch<React.SetStateAction<boolean>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setOpenFunction: (open: boolean) => void
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>

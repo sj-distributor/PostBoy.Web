@@ -64,7 +64,6 @@ const SelectContent = memo(
       timeZoneValue,
       isShowDialog,
       setIsShowDialog,
-      setIsRefresh,
       departmentAndUserList,
       setDepartmentAndUserList,
       departmentKeyValue,
@@ -415,7 +414,6 @@ const SelectContent = memo(
             setDeptUserList={setDepartmentAndUserList}
             outerTagsValue={tagsValue}
             setOuterTagsValue={setTagsValue}
-            setIsRefresh={setIsRefresh}
             lastTagsValue={lastTimeTagsList}
             clickName={clickName}
             chatId={chatId}
