@@ -54,21 +54,26 @@ export const useAction = (props: SelectContentHookProps) => {
     clearData,
   } = props
 
-  // 拿到的企业对象
-  const [corpsValue, setCorpsValue] = useState<ICorpData>({
+  const defaultCorpValue = {
     corpName: "",
     corpId: "",
     id: "",
-  })
-  // 拿到的App对象
-  const [corpAppValue, setCorpAppValue] = useState<ICorpAppData>({
+  }
+
+  const defaultAppValue = {
     appId: "",
     id: "",
     name: "",
     workWeChatCorpId: "",
     display: true,
     agentId: 0,
-  })
+  }
+
+  // 拿到的企业对象
+  const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
+  // 拿到的App对象
+  const [corpAppValue, setCorpAppValue] =
+    useState<ICorpAppData>(defaultAppValue)
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -153,7 +158,6 @@ export const useAction = (props: SelectContentHookProps) => {
   // 群组列表
   const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
   const [chatId, setChatId] = useState<string>("")
-  const [isRefresh, setIsRefresh] = useState(false)
   const [sendType, setSendType] = useState<SendObjOrGroup>(
     SendObjOrGroup.Object
   )
@@ -169,6 +173,10 @@ export const useAction = (props: SelectContentHookProps) => {
   const [isFocusing, focusAction] = useBoolean(false)
 
   const [mentionList, setMentionList] = useState<IMentionList[]>([])
+
+  const [appLoading, setAppLoading] = useState<boolean>(true)
+
+  const [groupLoading, setGroupLoading] = useState<boolean>(true)
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -227,18 +235,10 @@ export const useAction = (props: SelectContentHookProps) => {
         result.push(...workWeChatAppNotification.toUsers)
       tagsValue && result.push(...tagsValue.map((x) => x.tagName))
     } else {
-      let group: IWorkCorpAppGroup[] =
-        groupList.length > 0 && chatId
-          ? groupList.filter((x) => x.chatId === chatId)
-          : updateMessageJobInformation?.groupId &&
-            updateMessageJobInformation.groupName
-          ? [
-              {
-                chatId: updateMessageJobInformation.groupId,
-                chatName: updateMessageJobInformation.groupName,
-              },
-            ]
-          : []
+      const finalChatId = chatId || updateMessageJobInformation?.groupId
+      const group: IWorkCorpAppGroup[] = groupList.filter(
+        (x) => x.chatId === finalChatId
+      )
       result.push(...group)
     }
     return result
@@ -247,6 +247,9 @@ export const useAction = (props: SelectContentHookProps) => {
     sendObject,
     outerSendData?.workWeChatAppNotification,
     updateMessageJobInformation?.workWeChatAppNotification,
+    groupList,
+    chatId,
+    corpAppValue,
   ])
 
   // 初始化企业数组
@@ -258,19 +261,20 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个企业对象
   useEffect(() => {
-    !corpsValue.corpId && corpsList.length > 0 && setCorpsValue(corpsList[0])
+    isNewOrUpdate === "new" &&
+      !corpsValue.corpId &&
+      corpsList.length > 0 &&
+      setCorpsValue(corpsList[0])
   }, [corpsList])
 
   // 初始化App数组
   useEffect(() => {
-    !!corpsValue.corpId &&
-      GetCorpAppList({ CorpId: corpsValue.id }).then(
-        (corpAppResult: ICorpAppData[] | null | undefined) => {
-          if (corpAppResult) {
-            setCorpAppList(corpAppResult.filter((x) => x.display))
-          }
-        }
-      )
+    if (!!corpsValue.id) {
+      GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
+        setAppLoading(false)
+        corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display))
+      })
+    }
   }, [corpsValue?.id])
 
   // 获取Tags数组
@@ -283,6 +287,7 @@ export const useAction = (props: SelectContentHookProps) => {
       )
       corpAppValue.id &&
         GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+          setGroupLoading(false)
           data && setGroupList(data)
         })
       if (isNewOrUpdate === "new") {
@@ -297,22 +302,15 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [corpAppValue?.appId])
 
-  useEffect(() => {
-    isShowDialog &&
-      isRefresh &&
-      corpAppValue &&
-      GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
-        data && setGroupList(data)
-      }) === undefined &&
-      setIsRefresh(false)
-  }, [isShowDialog, isRefresh])
-
   // 默认选择第一个App对象
   useEffect(() => {
-    isNewOrUpdate === "new" &&
-      corpAppList.length > 0 &&
-      setCorpAppValue(corpAppList[0])
-  }, [corpAppList, isNewOrUpdate])
+    corpAppList.length > 0
+      ? setCorpAppValue(corpAppList[0])
+      : (() => {
+          setCorpAppValue(defaultAppValue)
+          setGroupList([])
+        })()
+  }, [corpAppList])
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
@@ -565,7 +563,7 @@ export const useAction = (props: SelectContentHookProps) => {
         })
       // 开始load数据
       setIsLoadStop(false)
-      loadDepartment(corpAppValue.appId)
+      corpAppValue.appId && loadDepartment(corpAppValue.appId)
     }
   }, [corpAppValue?.appId, isShowDialog])
 
@@ -865,12 +863,8 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     if (updateMessageJobInformation !== undefined) {
-      GetWeChatWorkCorpAppGroups(updateMessageJobInformation.app.id).then(
-        (data) => {
-          data && setGroupList(data)
-        }
-      )
       setCorpsValue(updateMessageJobInformation.enterprise)
+      setAppLoading(false)
       setCorpAppValue(updateMessageJobInformation.app)
       setSendTypeValue(updateMessageJobInformation.jobType)
 
@@ -987,9 +981,10 @@ export const useAction = (props: SelectContentHookProps) => {
 
       setIsGetLastTimeData(true)
       // 回显群组名称
-      updateMessageJobInformation.groupId &&
-        setChatId(updateMessageJobInformation.groupId) === undefined &&
+      if (updateMessageJobInformation.groupId) {
+        setChatId(updateMessageJobInformation.groupId)
         setSendType(SendObjOrGroup.Group)
+      }
     }
   }, [updateMessageJobInformation])
 
@@ -1038,7 +1033,8 @@ export const useAction = (props: SelectContentHookProps) => {
           value: messageTypeValue.title === "推文" ? htmlText : content,
         },
       ]
-      sendType === SendObjOrGroup.Group &&
+      !isShowDialog &&
+        sendType === SendObjOrGroup.Group &&
         chatId &&
         groupList.length > 0 &&
         metadata.push(
@@ -1096,6 +1092,7 @@ export const useAction = (props: SelectContentHookProps) => {
     sendType,
     chatId,
     messageTypeValue.title,
+    isShowDialog,
   ])
 
   useEffect(() => {
@@ -1178,7 +1175,6 @@ export const useAction = (props: SelectContentHookProps) => {
     fileUpload,
     groupList,
     setGroupList,
-    setIsRefresh,
     fileAccept,
     file,
     pictureText,
@@ -1212,5 +1208,7 @@ export const useAction = (props: SelectContentHookProps) => {
     isUpdatedDeptUser,
     mentionList,
     detectMentionToDelete,
+    appLoading,
+    groupLoading,
   }
 }

@@ -27,7 +27,6 @@ const CorpAppDialog = (props: {
   const {
     name,
     secret,
-    display,
     corpId,
     appId,
     agentId,
@@ -35,7 +34,6 @@ const CorpAppDialog = (props: {
     setAppId,
     setCorpId,
     setName,
-    setDisplay,
     setSecret,
     handleSubmit,
     validate,
@@ -104,20 +102,6 @@ const CorpAppDialog = (props: {
           onChange={(e) => setSecret(e.target.value)}
         />
 
-        {!isCorp && (
-          <div style={{ display: "inline-block" }}>
-            <FormControlLabel
-              label="Display"
-              control={
-                <Switch
-                  checked={display}
-                  onChange={(e) => setDisplay(e.target.checked)}
-                  inputProps={{ "aria-label": "controlled" }}
-                />
-              }
-            />
-          </div>
-        )}
         <Button
           fullWidth
           variant="contained"

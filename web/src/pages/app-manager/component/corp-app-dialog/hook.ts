@@ -28,7 +28,6 @@ const useAction = (props: {
   const [corpId, setCorpId] = useState<string>("")
   const [appId, setAppId] = useState<string>("")
   const [agentId, setAgentId] = useState<number>(0)
-  const [display, setDisplay] = useState<boolean>(true)
 
   const handleSubmit = async () => {
     if (rowData.key === RowDataType.Corporation) {
@@ -47,7 +46,7 @@ const useAction = (props: {
         appId,
         name,
         secret,
-        display,
+        display: true,
         agentId: Number(agentId),
         workWeChatCorpId: rowData.data.workWeChatCorpId,
       }
@@ -71,7 +70,6 @@ const useAction = (props: {
   const clearData = () => {
     setName("")
     setSecret("")
-    setDisplay(true)
   }
 
   const validate = () => {
@@ -94,7 +92,6 @@ const useAction = (props: {
         setAppId(rowData.data.appId)
         setAgentId(rowData.data.agentId)
         setSecret(rowData.data.secret)
-        setDisplay(rowData.data.display)
       }
     } else {
       clearData()
@@ -104,14 +101,12 @@ const useAction = (props: {
   return {
     name,
     secret,
-    display,
     corpId,
     appId,
     agentId,
     setAgentId,
     setAppId,
     setCorpId,
-    setDisplay,
     setSecret,
     setName,
     handleSubmit,

@@ -9,7 +9,7 @@ import {
   Box,
   CircularProgress,
   Alert,
-  AlertTitle
+  AlertTitle,
 } from "@mui/material"
 import ModalBox from "../../../../components/modal/modal"
 import SelectContent from "../select-content"
@@ -32,7 +32,7 @@ const SendMessage = () => {
     showErrorPrompt,
     success,
     failSend,
-    clearData
+    clearData,
   } = useAction()
 
   return (
@@ -42,14 +42,14 @@ const SendMessage = () => {
         open={openError}
         anchorOrigin={{
           vertical: "top",
-          horizontal: "center"
+          horizontal: "center",
         }}
       />
       <Snackbar
         open={success}
         anchorOrigin={{
           vertical: "top",
-          horizontal: "center"
+          horizontal: "center",
         }}
       >
         <Alert severity="success">
@@ -60,7 +60,7 @@ const SendMessage = () => {
         open={failSend}
         anchorOrigin={{
           vertical: "top",
-          horizontal: "center"
+          horizontal: "center",
         }}
       >
         <Alert severity="error">
@@ -76,12 +76,13 @@ const SendMessage = () => {
           clearData={clearData}
         />
       </div>
+
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignContent: "center",
-          padding: "0rem 8rem"
+          padding: "0rem 8rem",
         }}
       >
         <Box sx={{ position: "relative" }}>
@@ -90,7 +91,7 @@ const SendMessage = () => {
             style={{
               height: "3.5rem",
               width: "7rem",
-              fontSize: "1rem"
+              fontSize: "1rem",
             }}
             sx={buttonSx}
             disabled={loading}
@@ -107,7 +108,7 @@ const SendMessage = () => {
                 top: "50%",
                 left: "50%",
                 marginTop: "-0.8rem",
-                marginLeft: "-0.8rem"
+                marginLeft: "-0.8rem",
               }}
             />
           )}
