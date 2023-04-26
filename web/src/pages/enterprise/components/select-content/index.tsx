@@ -117,6 +117,7 @@ const SelectContent = memo(
       mentionList,
       detectMentionToDelete,
       appLoading,
+      groupLoading,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -268,7 +269,7 @@ const SelectContent = memo(
       (isNewOrUpdate !== "new" &&
         corpsList.length > 0 &&
         !appLoading &&
-        groupList.length > 0) ? (
+        !groupLoading) ? (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
           <Autocomplete

@@ -177,6 +177,8 @@ export const useAction = (props: SelectContentHookProps) => {
 
   const [appLoading, setAppLoading] = useState<boolean>(true)
 
+  const [groupLoading, setGroupLoading] = useState<boolean>(true)
+
   const editorConfig = {
     placeholder: "请输入内容...",
     autoFocus: false,
@@ -286,6 +288,7 @@ export const useAction = (props: SelectContentHookProps) => {
       )
       corpAppValue.id &&
         GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
+          setGroupLoading(false)
           data && setGroupList(data)
         })
       if (isNewOrUpdate === "new") {
@@ -1212,5 +1215,6 @@ export const useAction = (props: SelectContentHookProps) => {
     mentionList,
     detectMentionToDelete,
     appLoading,
+    groupLoading,
   }
 }
