@@ -78,14 +78,6 @@ export enum DefaultDisplay {
   Participant = 6,
 }
 
-export interface AddDialogProps {
-  open: boolean;
-  setDialog: (value: boolean) => void;
-  type: "AddMembers" | "DesignatedHost" | "DesignatedMembers";
-  resettingAppointRadio?: (value: string) => void;
-  getSelectListData: (data: SelectParticipantList[]) => void;
-}
-
 export interface SettingDialogProps {
   open: boolean;
   setDialog: (value: boolean) => void;
@@ -111,16 +103,4 @@ export interface MeetingSettingList {
   optionList?: SelectDataType[];
   icon?: boolean;
   password?: string;
-}
-
-export interface SelectParticipantList {
-  avatar: string;
-  name: string;
-}
-
-export interface ContactsDataType {
-  groupChat: {
-    groupName: string;
-    groupDataList: SelectParticipantList[];
-  };
 }
