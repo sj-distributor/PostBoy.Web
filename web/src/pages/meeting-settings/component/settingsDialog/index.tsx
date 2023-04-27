@@ -74,17 +74,19 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                       />
                     ) : item.icon ? (
                       hostList ? (
-                        <div className={style.appointName}>
-                          {hostList.map((aItem, index) => {
-                            return (
-                              index <= 1 && (
-                                <span key={index}>
-                                  {aItem.name}
-                                  {index === 0 && "、"}
-                                </span>
-                              )
-                            );
-                          })}
+                        <div className={style.appointProfile}>
+                          <div className={style.appointName}>
+                            {hostList.map((aItem, index) => {
+                              return (
+                                index <= 1 && (
+                                  <span key={index}>
+                                    {aItem.name}
+                                    {index === 0 && "、"}
+                                  </span>
+                                )
+                              );
+                            })}
+                          </div>
                           {hostList.length > 1 && `等${hostList.length}人`}
                           <ArrowForwardIosIcon
                             sx={{ fontSize: "0.6rem", marginLeft: "0.3rem" }}

@@ -24,10 +24,18 @@
   justify-content: space-between;
   cursor: pointer;
 }
-
-.appointName {
+.appointProfile {
   display: flex;
   align-items: center;
+  color: #757171;
+  white-space: nowrap;
+}
+
+.appointName {
+  max-width: 12rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: #757171;
   font-size: 0.6rem;
 }

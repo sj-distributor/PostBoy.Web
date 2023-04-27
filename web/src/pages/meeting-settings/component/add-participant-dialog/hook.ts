@@ -98,13 +98,9 @@ const useAction = (props: {
   ]);
 
   const [firstState, setFirstState] = useState<IFirstState>();
-
   const [createLoading, setCreateLoading] = useState(false);
-
   const [groupValue, setGroupValue] = useState<string>("");
-
   const [groupPage, setGroupPage] = useState<number>(2);
-
   const [groupIsNoData, setGroupIsNoData] = useState<boolean>(false);
 
   const recursiveSeachDeptOrUser = (
@@ -364,8 +360,7 @@ const useAction = (props: {
   }, [open, isUpdatedDeptUser]);
 
   useEffect(() => {
-    !loadSelectData && setSearchToDeptValue([]);
-
+    departmentAndUserList.length && setSearchToDeptValue([]);
     const handleData = (
       prev: IDepartmentAndUserListValue[],
       listData: IDepartmentKeyControl[]
@@ -433,6 +428,14 @@ const useAction = (props: {
       setTagsValue(selectTagsList);
     }
   }, [tagsList, lastTagsValue]);
+
+  useEffect(() => {
+    const hasData = departmentAndUserList.find((x) => x.key === AppId);
+    hasData &&
+      recursiveSeachDeptOrUser(hasData.data, (user) => {
+        user.selected = false;
+      });
+  }, [AppId, CorpId]);
 
   return {
     departmentSelectedList,

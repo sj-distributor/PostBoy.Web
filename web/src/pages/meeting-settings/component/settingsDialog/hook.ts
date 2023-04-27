@@ -224,7 +224,8 @@ const useAction = (props: {
   }, [radioDisabled]);
 
   useEffect(() => {
-    (!appointList || appointList.length < 1) &&
+    !openAddDialog &&
+      (!appointList || appointList.length === 0) &&
       setAppintRadio(MeetingCallReminder.Host);
   }, [appointList, openAddDialog]);
 

@@ -1,5 +1,4 @@
 import { SelectChangeEvent } from "@mui/material";
-import dayjs from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
@@ -346,11 +345,85 @@ const useAction = () => {
 
     return result as IDepartmentAndUserListValue[];
   }, [participantList, appointList, hostList, clickName]);
+
+  const getUserChildrenData = (
+    arr: IDepartmentAndUserListValue[],
+    newArr: IDepartmentAndUserListValue[]
+  ) => {
+    arr.map((item) => {
+      if (item.children.length < 1) {
+        newArr.push(item);
+      } else {
+        getUserChildrenData(item.children, newArr);
+      }
+    });
+    return newArr;
+  };
+
+  //显示全部人员
+  const participantLists = useMemo(() => {
+    let arr = participantList && getUserChildrenData(participantList, []);
+    return arr as IDepartmentAndUserListValue[];
+  }, [participantList]);
+
+  const appointLists = useMemo(() => {
+    let arr = appointList && getUserChildrenData(appointList, []);
+    return arr as IDepartmentAndUserListValue[];
+  }, [appointList]);
+
+  const [tipsObject, setTipsObject] = useState({
+    show: false,
+    msg: "",
+  });
+
+  useEffect(() => {
+    // 3s关闭提示
+    const number = setTimeout(() => {
+      if (tipsObject.show) {
+        setTipsObject({ msg: "", show: false });
+      }
+    }, 3000);
+    return () => {
+      clearTimeout(number);
+    };
+  }, [tipsObject.show]);
+
+  const hostLists = useMemo(() => {
+    let arr = hostList && getUserChildrenData(hostList, []);
+    if (arr && arr.length > 10) {
+      setTipsObject({
+        show: true,
+        msg: "Cannot select department and up to ten hosts",
+      });
+      setHostList([]);
+      return (arr = []);
+    }
+    return arr as IDepartmentAndUserListValue[];
+  }, [hostList]);
+
   //获取选择人员
   const getSelectData = (data: IDepartmentAndUserListValue[]) => {
-    clickName === "选择参会人" && setParticipantList([...data]);
-    clickName === "选择指定提醒人员" && setAppointList([...data]);
-    clickName === "选择指定主持人" && setHostList([...data]);
+    const arr = getUserChildrenList(departmentKeyValue?.data, data, []);
+    clickName === "选择参会人" && setParticipantList([...arr]);
+    clickName === "选择指定提醒人员" && setAppointList([...arr]);
+    clickName === "选择指定主持人" && setHostList([...arr]);
+  };
+
+  const getUserChildrenList = (
+    hasData: IDepartmentAndUserListValue[],
+    data: IDepartmentAndUserListValue[],
+    arr: IDepartmentAndUserListValue[]
+  ) => {
+    data.forEach((i) => {
+      for (const key in hasData) {
+        i.id === hasData[key].id &&
+          arr.findIndex((item) => item === hasData[key]) === -1 &&
+          arr.push(hasData[key]);
+        hasData[key].children.length > 0 &&
+          getUserChildrenList(hasData[key].children, data, arr);
+      }
+    });
+    return arr;
   };
 
   const setParticipant = () => {
@@ -416,10 +489,10 @@ const useAction = () => {
   }, [corpAppList, isNewOrUpdate]);
 
   useEffect(() => {
-    participantList &&
-      participantList.length > DefaultDisplay.Participant &&
+    participantLists &&
+      participantLists.length > DefaultDisplay.Participant &&
       setIsShowMoreParticipantList(true);
-  }, [participantList]);
+  }, [participantLists]);
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
@@ -461,6 +534,14 @@ const useAction = () => {
     }
   }, [corpAppValue?.appId, isShowDialog]);
 
+  //切换企业应用重置数据
+  useEffect(() => {
+    setAppointList([]);
+    setHostList([]);
+    setParticipantList([]);
+    setDepartmentAndUserList([]);
+  }, [corpsValue, corpAppValue]);
+
   return {
     editor,
     html,
@@ -478,7 +559,6 @@ const useAction = () => {
     corpAppValue,
     corpsList,
     corpAppList,
-    participantList,
     isShowMoreParticipantList,
     isShowDialog,
     departmentAndUserList,
@@ -495,8 +575,10 @@ const useAction = () => {
     sendType,
     isUpdatedDeptUser,
     loadSelectData,
-    appointList,
-    hostList,
+    appointLists,
+    hostLists,
+    participantLists,
+    tipsObject,
     setCorpsValue,
     setGroupList,
     setIsShowDialog,

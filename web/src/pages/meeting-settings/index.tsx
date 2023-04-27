@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import { Editor, Toolbar } from "@wangeditor/editor-for-react";
 import MenuItem from "@mui/material/MenuItem";
@@ -15,6 +14,7 @@ import {
   MenuList,
   Paper,
   Popper,
+  Snackbar,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -53,7 +53,6 @@ export default function SelectLabels() {
     corpAppValue,
     corpsList,
     corpAppList,
-    participantList,
     isShowMoreParticipantList,
     isShowDialog,
     departmentAndUserList,
@@ -70,14 +69,15 @@ export default function SelectLabels() {
     sendType,
     isUpdatedDeptUser,
     loadSelectData,
-    appointList,
-    hostList,
+    appointLists,
+    hostLists,
+    participantLists,
+    tipsObject,
     setCorpsValue,
     setGroupList,
     setIsShowDialog,
     setDepartmentAndUserList,
     setTagsValue,
-    setIsRefresh,
     setChatId,
     setSendType,
     setIsShowMoreParticipantList,
@@ -104,6 +104,15 @@ export default function SelectLabels() {
 
   return (
     <>
+      {/* 消息提示 */}
+      <Snackbar
+        message={tipsObject.msg}
+        open={tipsObject.show}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
       <AddParticipantDialog
         open={isShowDialog}
         AppId={corpAppValue ? corpAppValue.appId : ""}
@@ -136,8 +145,8 @@ export default function SelectLabels() {
         openAddDialog={isShowDialog}
         setOpenAddDialog={setIsShowDialog}
         setClickName={setClickName}
-        appointList={appointList}
-        hostList={hostList}
+        appointList={appointLists}
+        hostList={hostLists}
       />
       <div className={style.container}>
         <div className={style.appointmentMeeting}>
@@ -239,9 +248,9 @@ export default function SelectLabels() {
           <div className={style.fromItem}>
             <div className={style.title}>参会人</div>
             <div className={style.participantDataBox}>
-              {participantList &&
-                participantList?.length >= 1 &&
-                participantList
+              {participantLists &&
+                participantLists?.length >= 1 &&
+                participantLists
                   .filter((item, index) =>
                     isShowMoreParticipantList
                       ? index < DefaultDisplay.Participant
@@ -255,8 +264,8 @@ export default function SelectLabels() {
                       </div>
                     );
                   })}
-              {participantList &&
-                participantList?.length > DefaultDisplay.Participant && (
+              {participantLists &&
+                participantLists?.length > DefaultDisplay.Participant && (
                   <div
                     className={style.showParticipantData}
                     onClick={() => setIsShowMoreParticipantList((val) => !val)}
@@ -266,7 +275,7 @@ export default function SelectLabels() {
                     ) : (
                       <ExpandLessIcon />
                     )}{" "}
-                    共{participantList.length}人
+                    共{participantLists.length}人
                   </div>
                 )}
               <div
