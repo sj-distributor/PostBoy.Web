@@ -17,6 +17,7 @@ export interface SelectContentProps {
   showErrorPrompt: (text: string) => void
   clearData?: boolean
   isFromNoticeSetting?: boolean
+  setIsShowPage?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface SelectContentHookProps {
@@ -31,4 +32,5 @@ export interface SelectContentHookProps {
   isNewOrUpdate: string
   showErrorPrompt: (text: string) => void
   clearData?: boolean
+  setIsShowPage?: React.Dispatch<React.SetStateAction<boolean>>
 }
