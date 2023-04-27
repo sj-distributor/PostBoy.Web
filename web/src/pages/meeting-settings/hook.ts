@@ -351,7 +351,10 @@ const useAction = () => {
     newArr: IDepartmentAndUserListValue[]
   ) => {
     arr.map((item) => {
-      if (item.children.length < 1) {
+      if (
+        item.children.length < 1 &&
+        newArr.findIndex((i) => i.id === item.id) === -1
+      ) {
         newArr.push(item);
       } else {
         getUserChildrenData(item.children, newArr);
