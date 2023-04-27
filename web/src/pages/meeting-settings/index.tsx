@@ -195,7 +195,7 @@ export default function SelectLabels() {
             </div>
           </div>
           <div className={style.fromItem}>
-            <div className={style.title}></div>
+            <div className={style.title}>标题</div>
             <div className={style.widthFull}>
               <TextField
                 id="filled-start-adornment"
@@ -246,7 +246,9 @@ export default function SelectLabels() {
             </div>
           </div>
           <div className={style.fromItem}>
-            <div className={style.title}>参会人</div>
+            <div className={style.title} style={{ marginBottom: "0.8rem" }}>
+              参会人
+            </div>
             <div className={style.participantDataBox}>
               {participantLists &&
                 participantLists?.length >= 1 &&

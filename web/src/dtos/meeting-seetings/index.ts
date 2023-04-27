@@ -76,6 +76,8 @@ export interface SelectGroupType {
 
 export enum DefaultDisplay {
   Participant = 6,
+  hostList = 10,
+  DisplayName = 2,
 }
 
 export interface SettingDialogProps {

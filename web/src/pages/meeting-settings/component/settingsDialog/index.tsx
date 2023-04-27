@@ -17,6 +17,7 @@ import useAction from "./hook";
 import {
   SettingDialogProps,
   MeetingCallReminder,
+  DefaultDisplay,
 } from "../../../../dtos/meeting-seetings";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 const SeetingsDialog = (props: SettingDialogProps) => {
@@ -78,10 +79,10 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                           <div className={style.appointName}>
                             {hostList.map((aItem, index) => {
                               return (
-                                index <= 1 && (
+                                index < DefaultDisplay.DisplayName && (
                                   <span key={index}>
                                     {aItem.name}
-                                    {index === 0 && "、"}
+                                    {index === 0 && hostList.length > 1 && "、"}
                                   </span>
                                 )
                               );
@@ -144,10 +145,10 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                       <div className={style.appointName}>
                         {appointList.map((aItem, index) => {
                           return (
-                            index <= 1 && (
+                            index < DefaultDisplay.DisplayName && (
                               <span key={index}>
                                 {aItem.name}
-                                {index === 0 && "、"}
+                                {index === 0 && appointList.length > 1 && "、"}
                               </span>
                             )
                           );
