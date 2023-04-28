@@ -12,9 +12,11 @@ const useAction = (props: DateTimeProps) => {
   useEffect(() => {
     getDate(date);
   }, [date]);
+
   useEffect(() => {
     getTime(time);
   }, [time]);
+
   return {
     time,
     handleChangeDate,

@@ -59,7 +59,7 @@
 }
 .participantName {
   margin-left: 1rem;
-  width: 6rem;
+  min-width: 6rem;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;

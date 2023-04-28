@@ -1,3 +1,4 @@
+import { clone } from "ramda";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
 import {
@@ -10,13 +11,13 @@ import {
 } from "../../../../dtos/meeting-seetings";
 
 const useAction = (props: {
-  setOpenAddDialog: (vlaue: boolean) => void;
+  setOpenAddDialog: (value: boolean) => void;
   openAddDialog: boolean;
   setClickName?: Dispatch<SetStateAction<string>>;
   appointList?: IDepartmentAndUserListValue[];
 }) => {
   const { setOpenAddDialog, setClickName, appointList, openAddDialog } = props;
-  const checkList: MeetingSettingList[] = [
+  const settingList: MeetingSettingList[] = [
     {
       title: "指定主持人",
       icon: true,
@@ -140,7 +141,7 @@ const useAction = (props: {
     },
   ];
   const [meetingSettingList, setMeetingSettingList] =
-    useState<MeetingSettingList[]>(checkList);
+    useState<MeetingSettingList[]>(settingList);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [radioDisabled, setRadioDisabled] = useState<boolean>(false);
 
@@ -152,50 +153,41 @@ const useAction = (props: {
     event.preventDefault();
   };
 
-  const setMembershipPassword = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
-  ) => {
-    const newList = meetingSettingList;
-    newList.map((item, i) => i === index && (item.password = e.target.value));
+  const onMembershipPassword = (value: string, index: number) => {
+    const newList = clone(meetingSettingList);
+    newList.map((item, i) => i === index && (item.password = value));
     setMeetingSettingList([...newList]);
   };
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const newList = [...meetingSettingList];
-    newList[index].optionData = event.target.value;
+  const handleChange = (value: string, index: number) => {
+    const newList = clone(meetingSettingList);
+    newList[index].optionData = value;
     if (
       newList[index].title === "会议开始时来电提醒" &&
       newList[index].optionData === MeetingCallReminder.Appoint
     ) {
-      setAppint();
+      onAppint();
     }
     setMeetingSettingList([...newList]);
   };
 
-  const setAppint = () => {
+  const onAppint = () => {
     setOpenAddDialog(true);
     setClickName && setClickName("选择指定提醒人员");
   };
 
-  const setIsOption = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const newList = [...meetingSettingList];
-    newList[index].isOption = event.target.checked;
+  const onIsOption = (checked: boolean, index: number) => {
+    const newList = clone(meetingSettingList);
+    newList[index].isOption = checked;
 
     if (newList[index].title === "允许成员在主持人进会前加入") {
-      setRadioDisabled(event.target.checked);
+      setRadioDisabled(checked);
     }
     setMeetingSettingList([...newList]);
   };
 
-  const setAppintRadio = (MeetingCallReminderValue: string) => {
-    const newList = [...meetingSettingList];
+  const onAppintRadio = (MeetingCallReminderValue: string) => {
+    const newList = clone(meetingSettingList);
     newList.forEach(
       (item, index) =>
         item.title === "会议开始时来电提醒" &&
@@ -204,7 +196,7 @@ const useAction = (props: {
     setMeetingSettingList([...newList]);
   };
 
-  const selectHost = () => {
+  const onSelectHost = () => {
     setClickName && setClickName("选择指定主持人");
     setOpenAddDialog(true);
   };
@@ -217,7 +209,7 @@ const useAction = (props: {
       (item, index) => item.title === "会议开始时来电提醒"
     );
     if (value === MeetingCallReminder.All) {
-      const newList = [...meetingSettingList];
+      const newList = clone(meetingSettingList);
       newList[index].optionData = MeetingCallReminder.Host;
       setMeetingSettingList([...newList]);
     }
@@ -226,20 +218,20 @@ const useAction = (props: {
   useEffect(() => {
     !openAddDialog &&
       (!appointList || appointList.length === 0) &&
-      setAppintRadio(MeetingCallReminder.Host);
+      onAppintRadio(MeetingCallReminder.Host);
   }, [appointList, openAddDialog]);
 
   return {
     meetingSettingList,
     showPassword,
     radioDisabled,
-    setIsOption,
+    onIsOption,
     handleChange,
     handleClickShowPassword,
     handleMouseDownPassword,
-    setMembershipPassword,
-    selectHost,
-    setAppint,
+    onMembershipPassword,
+    onSelectHost,
+    onAppint,
   };
 };
 

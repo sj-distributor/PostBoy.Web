@@ -374,6 +374,19 @@ const useAction = () => {
     return arr as IDepartmentAndUserListValue[];
   }, [appointList]);
 
+  const hostLists = useMemo(() => {
+    let arr = hostList && getUserChildrenData(hostList, []);
+    if (arr && arr.length > 10) {
+      setTipsObject({
+        show: true,
+        msg: "Cannot select department and up to ten hosts",
+      });
+      setHostList([]);
+      return (arr = []);
+    }
+    return arr as IDepartmentAndUserListValue[];
+  }, [hostList]);
+
   const [tipsObject, setTipsObject] = useState({
     show: false,
     msg: "",
@@ -391,21 +404,8 @@ const useAction = () => {
     };
   }, [tipsObject.show]);
 
-  const hostLists = useMemo(() => {
-    let arr = hostList && getUserChildrenData(hostList, []);
-    if (arr && arr.length > 10) {
-      setTipsObject({
-        show: true,
-        msg: "Cannot select department and up to ten hosts",
-      });
-      setHostList([]);
-      return (arr = []);
-    }
-    return arr as IDepartmentAndUserListValue[];
-  }, [hostList]);
-
   //获取选择人员
-  const getSelectData = (data: IDepartmentAndUserListValue[]) => {
+  const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
     const arr = getUserChildrenList(departmentKeyValue?.data, data, []);
     clickName === "选择参会人" && setParticipantList([...arr]);
     clickName === "选择指定提醒人员" && setAppointList([...arr]);
@@ -429,7 +429,7 @@ const useAction = () => {
     return arr;
   };
 
-  const setParticipant = () => {
+  const onSetParticipant = () => {
     setClickName("选择参会人");
     setIsShowDialog(true);
   };
@@ -607,8 +607,8 @@ const useAction = () => {
     getStartTime,
     fileUpload,
     fileDelete,
-    getSelectData,
-    setParticipant,
+    handleGetSelectData,
+    onSetParticipant,
     setClickName,
   };
 };

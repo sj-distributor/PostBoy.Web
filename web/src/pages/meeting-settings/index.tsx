@@ -97,8 +97,8 @@ export default function SelectLabels() {
     getStartTime,
     fileUpload,
     fileDelete,
-    getSelectData,
-    setParticipant,
+    handleGetSelectData,
+    onSetParticipant,
     setClickName,
   } = useAction();
 
@@ -136,7 +136,7 @@ export default function SelectLabels() {
         sendType={sendType}
         setSendType={setSendType}
         isUpdatedDeptUser={isUpdatedDeptUser}
-        getSelectData={getSelectData}
+        handleGetSelectData={handleGetSelectData}
         loadSelectData={loadSelectData}
       />
       <SeetingsDialog
@@ -282,7 +282,7 @@ export default function SelectLabels() {
                 )}
               <div
                 className={style.addParticipant}
-                onClick={() => setParticipant()}
+                onClick={() => onSetParticipant()}
               >
                 <AddIcon className={style.addParticipantIcon} />
                 添加参会人

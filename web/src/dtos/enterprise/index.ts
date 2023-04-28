@@ -135,7 +135,7 @@ export interface ITargetDialogProps {
   setDeptUserList: React.Dispatch<
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
-  getSelectData?: (data: IDepartmentAndUserListValue[]) => void;
+  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
   loadSelectData?: IDepartmentAndUserListValue[];
 }
 

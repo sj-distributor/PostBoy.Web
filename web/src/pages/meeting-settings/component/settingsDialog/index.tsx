@@ -34,13 +34,13 @@ const SeetingsDialog = (props: SettingDialogProps) => {
     meetingSettingList,
     showPassword,
     radioDisabled,
-    setIsOption,
+    onIsOption,
     handleChange,
     handleClickShowPassword,
     handleMouseDownPassword,
-    setMembershipPassword,
-    selectHost,
-    setAppint,
+    onMembershipPassword,
+    onSelectHost,
+    onAppint,
   } = useAction({ setOpenAddDialog, setClickName, appointList, openAddDialog });
   return (
     <>
@@ -63,7 +63,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
               <Fragment key={index}>
                 <div
                   className={style.settingsList}
-                  onClick={() => item.optionType === "dailog" && selectHost()}
+                  onClick={() => item.optionType === "dailog" && onSelectHost()}
                 >
                   <div className="title">{item.title}</div>
                   <div>
@@ -71,7 +71,9 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                     item.optionType === "input" ? (
                       <input
                         type="checkbox"
-                        onChange={(event) => setIsOption(event, index)}
+                        onChange={(event) =>
+                          onIsOption(event.target.checked, index)
+                        }
                       />
                     ) : item.icon ? (
                       hostList ? (
@@ -107,19 +109,19 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                   <RadioGroup
                     aria-labelledby="demo-controlled-radio-buttons-group"
                     name="controlled-radio-buttons-group"
-                    onChange={(e) => handleChange(e, index)}
+                    onChange={(e) => handleChange(e.target.value, index)}
                     row
                     value={item.optionData}
                   >
-                    {item.optionList.map((oItem, index) => {
+                    {item.optionList.map((optionItem, index) => {
                       return (
                         <FormControlLabel
-                          value={oItem.value}
+                          value={optionItem.value}
                           control={<Radio size="small" />}
-                          label={oItem.lable}
+                          label={optionItem.lable}
                           key={index}
                           disabled={
-                            oItem.value === MeetingCallReminder.All &&
+                            optionItem.value === MeetingCallReminder.All &&
                             item.title === "会议开始时来电提醒" &&
                             !radioDisabled
                           }
@@ -139,15 +141,15 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                   appointList.length >= 1 && (
                     <div
                       className={style.appointListCentent}
-                      onClick={() => setAppint()}
+                      onClick={() => onAppint()}
                     >
                       <div>指定成员</div>
                       <div className={style.appointName}>
-                        {appointList.map((aItem, index) => {
+                        {appointList.map((appointItem, index) => {
                           return (
                             index < DefaultDisplay.DisplayName && (
                               <span key={index}>
-                                {aItem.name}
+                                {appointItem.name}
                                 {index === 0 && appointList.length > 1 && "、"}
                               </span>
                             )
@@ -166,7 +168,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                     type={showPassword ? "text" : "password"}
                     size="small"
                     sx={{ width: "100%" }}
-                    onBlur={(e) => setMembershipPassword(e, index)}
+                    onBlur={(e) => onMembershipPassword(e.target.value, index)}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton

@@ -40,7 +40,7 @@ const useAction = (props: {
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>;
-  getSelectData?: (data: IDepartmentAndUserListValue[]) => void;
+  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
 }) => {
   const {
     departmentAndUserList,
@@ -63,7 +63,7 @@ const useAction = (props: {
     setDeptUserList,
     setOuterTagsValue,
     setGroupList,
-    getSelectData,
+    handleGetSelectData,
   } = props;
 
   const defaultGroupOwner = {
@@ -273,7 +273,7 @@ const useAction = (props: {
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
-    getSelectData && getSelectData(departmentSelectedList);
+    handleGetSelectData && handleGetSelectData(departmentSelectedList);
   };
 
   const handleCancel = () => {

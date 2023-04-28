@@ -85,7 +85,7 @@ const SelectTargetDialog = memo(
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
-      getSelectData,
+      handleGetSelectData,
     } = props;
 
     const {
@@ -132,7 +132,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       setGroupList,
-      getSelectData,
+      handleGetSelectData,
     });
 
     const center = () =>
