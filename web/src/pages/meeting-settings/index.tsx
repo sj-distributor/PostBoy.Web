@@ -199,6 +199,7 @@ export default function SelectLabels() {
             <div className={style.widthFull}>
               <TextField
                 id="filled-start-adornment"
+                placeholder="会议主题"
                 sx={{ width: "100%" }}
                 className={style.appointmentPersonData}
                 InputProps={{
@@ -210,7 +211,6 @@ export default function SelectLabels() {
                         aria-controls={open ? "basic-menu" : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? "true" : undefined}
-                        onClick={handleClick}
                       >
                         <VideocamIcon />
                         <span>会议</span>

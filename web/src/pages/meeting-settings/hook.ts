@@ -169,6 +169,8 @@ const useAction = () => {
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
     IDepartmentKeyControl[]
   >([]);
+  const [departmentAndUserListBackups, setDepartmentAndUserListBackups] =
+    useState<IDepartmentKeyControl[]>([]);
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     ISearchList[]
   >([]);
@@ -285,6 +287,7 @@ const useAction = () => {
             ))
           : newValue.push({ key: AppId, data: [defaultChild] });
         idList.length === 0 && hasData?.data.push(defaultChild);
+        setDepartmentAndUserListBackups(newValue);
         return newValue;
       });
 
@@ -376,7 +379,7 @@ const useAction = () => {
 
   const hostLists = useMemo(() => {
     let arr = hostList && getUserChildrenData(hostList, []);
-    if (arr && arr.length > 10) {
+    if (arr && arr.length > DefaultDisplay.hostList) {
       setTipsObject({
         show: true,
         msg: "Cannot select department and up to ten hosts",
@@ -408,6 +411,8 @@ const useAction = () => {
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
     const arr = getUserChildrenList(departmentKeyValue?.data, data, []);
     clickName === "选择参会人" && setParticipantList([...arr]);
+    clickName === "选择参会人" &&
+      setDepartmentAndUserList([{ data: arr, key: departmentKeyValue.key }]);
     clickName === "选择指定提醒人员" && setAppointList([...arr]);
     clickName === "选择指定主持人" && setHostList([...arr]);
   };
@@ -432,6 +437,7 @@ const useAction = () => {
   const onSetParticipant = () => {
     setClickName("选择参会人");
     setIsShowDialog(true);
+    setDepartmentAndUserList(departmentAndUserListBackups);
   };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

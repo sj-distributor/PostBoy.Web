@@ -77,8 +77,8 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                       />
                     ) : item.icon ? (
                       hostList ? (
-                        <div className={style.appointProfile}>
-                          <div className={style.appointName}>
+                        <div className={style.memberPreview}>
+                          <div className={style.memberName}>
                             {hostList.map((aItem, index) => {
                               return (
                                 index < DefaultDisplay.DisplayName && (
@@ -144,17 +144,21 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                       onClick={() => onAppint()}
                     >
                       <div>指定成员</div>
-                      <div className={style.appointName}>
-                        {appointList.map((appointItem, index) => {
-                          return (
-                            index < DefaultDisplay.DisplayName && (
-                              <span key={index}>
-                                {appointItem.name}
-                                {index === 0 && appointList.length > 1 && "、"}
-                              </span>
-                            )
-                          );
-                        })}
+                      <div className={style.memberPreview}>
+                        <div className={style.memberName}>
+                          {appointList.map((appointItem, index) => {
+                            return (
+                              index < DefaultDisplay.DisplayName && (
+                                <span key={index}>
+                                  {appointItem.name}
+                                  {index === 0 &&
+                                    appointList.length > 1 &&
+                                    "、"}
+                                </span>
+                              )
+                            );
+                          })}
+                        </div>
                         {appointList.length > 1 && `等${appointList.length}人`}
                         <ArrowForwardIosIcon
                           sx={{ fontSize: "0.6rem", marginLeft: "0.3rem" }}

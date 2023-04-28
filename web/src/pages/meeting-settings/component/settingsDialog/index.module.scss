@@ -25,14 +25,14 @@
   cursor: pointer;
 }
 
-.appointProfile {
+.memberPreview {
   display: flex;
   align-items: center;
   color: #757171;
   white-space: nowrap;
 }
 
-.appointName {
+.memberName {
   max-width: 12rem;
   text-overflow: ellipsis;
   overflow: hidden;
