@@ -167,25 +167,31 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                     </div>
                   )}
                 {item.optionType === "input" && item.isOption && (
-                  <OutlinedInput
-                    id="outlined-adornment-password"
-                    type={showPassword ? "text" : "password"}
-                    size="small"
-                    sx={{ width: "100%" }}
-                    onBlur={(e) => onMembershipPassword(e.target.value, index)}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
+                  <form action="">
+                    <OutlinedInput
+                      autoComplete="true"
+                      id="outlined-adornment-password"
+                      type={showPassword ? "text" : "password"}
+                      size="small"
+                      sx={{ width: "100%" }}
+                      value={item.password}
+                      onChange={(e) =>
+                        onMembershipPassword(e.target.value, index)
+                      }
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                    />
+                  </form>
                 )}
               </Fragment>
             );
