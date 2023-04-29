@@ -411,9 +411,13 @@ const useAction = () => {
   //获取选择人员
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
     const arr = getUserChildrenList(departmentKeyValue?.data, data, []);
-    clickName === "选择参会人" && setParticipantList([...arr]);
-    clickName === "选择参会人" &&
+    if (clickName === "选择参会人") {
+      setParticipantList([...arr]);
       setDepartmentAndUserList([{ data: arr, key: departmentKeyValue.key }]);
+      setAppointList([]);
+      setHostList([]);
+    }
+
     clickName === "选择指定提醒人员" && setAppointList([...arr]);
     clickName === "选择指定主持人" && setHostList([...arr]);
   };
@@ -548,7 +552,7 @@ const useAction = () => {
         });
       // 开始load数据
       setIsLoadStop(false);
-      loadDepartment(corpAppValue.appId);
+      corpAppValue?.appId && loadDepartment(corpAppValue.appId);
     }
   }, [corpAppValue?.appId, isShowDialog]);
 
