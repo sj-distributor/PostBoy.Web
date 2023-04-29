@@ -39,7 +39,6 @@
   align-items: center;
   margin-right: 0.8rem;
   margin-bottom: 0.8rem;
-  min-width: 12rem;
   padding: 0.5rem 0.6rem;
   border: 0.1rem solid #d8d9d9;
   border-radius: 0.3rem;
@@ -50,16 +49,16 @@
   display: flex;
   align-items: center;
   flex-basis: 30%;
+  min-width: 9.5rem;
   margin-right: 0.8rem;
   margin-bottom: 0.8rem;
-  min-width: 12rem;
   padding: 0.5rem 0.6rem;
   border: 0.1rem solid #d8d9d9;
   border-radius: 0.3rem;
 }
 .participantName {
   margin-left: 1rem;
-  min-width: 6rem;
+  max-width: 6rem;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -67,8 +66,8 @@
 
 .addParticipant {
   padding: 0.5rem 0.6rem;
-  min-width: 12rem;
   flex-basis: 30%;
+  min-width: 9.5rem;
   border-radius: 0.3rem;
   border: 0.1rem solid #d8d9d9;
   margin-right: 0.8rem;
@@ -161,6 +160,7 @@
   flex-wrap: wrap;
   width: 100%;
   max-height: 17rem;
+  min-width: 13rem;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;

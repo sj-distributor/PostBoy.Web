@@ -169,6 +169,7 @@ const useAction = () => {
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
     IDepartmentKeyControl[]
   >([]);
+  const [appLoading, setAppLoading] = useState<boolean>(true);
   const [departmentAndUserListBackups, setDepartmentAndUserListBackups] =
     useState<IDepartmentKeyControl[]>([]);
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
@@ -335,6 +336,10 @@ const useAction = () => {
     useState<IDepartmentAndUserListValue[]>();
   //指定主持人
   const [hostList, setHostList] = useState<IDepartmentAndUserListValue[]>();
+  const [tipsObject, setTipsObject] = useState({
+    show: false,
+    msg: "",
+  });
 
   const loadSelectData = useMemo(() => {
     const result =
@@ -380,20 +385,16 @@ const useAction = () => {
   const hostLists = useMemo(() => {
     let arr = hostList && getUserChildrenData(hostList, []);
     if (arr && arr.length > DefaultDisplay.hostList) {
-      setTipsObject({
-        show: true,
-        msg: "Cannot select department and up to ten hosts",
-      });
+      tipsObject &&
+        setTipsObject({
+          show: true,
+          msg: "Cannot select department and up to ten hosts",
+        });
       setHostList([]);
       return (arr = []);
     }
     return arr as IDepartmentAndUserListValue[];
   }, [hostList]);
-
-  const [tipsObject, setTipsObject] = useState({
-    show: false,
-    msg: "",
-  });
 
   useEffect(() => {
     // 3s关闭提示
@@ -480,21 +481,29 @@ const useAction = () => {
 
   // 初始化App数组
   useEffect(() => {
-    !!corpsValue.corpId &&
-      GetCorpAppList({ CorpId: corpsValue.id }).then(
-        (corpAppResult: ICorpAppData[] | null | undefined) => {
-          if (corpAppResult) {
-            setCorpAppList(corpAppResult.filter((x) => x.display));
-          }
-        }
-      );
+    if (!!corpsValue.id) {
+      GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
+        setAppLoading(false);
+        corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display));
+      });
+    }
   }, [corpsValue?.id]);
 
   // 默认选择第一个App对象
   useEffect(() => {
     isNewOrUpdate === "new" &&
-      corpAppList.length > 0 &&
-      setCorpAppValue(corpAppList[0]);
+      setCorpAppValue(
+        corpAppList.length > 0
+          ? corpAppList[0]
+          : {
+              appId: "",
+              id: "",
+              name: "",
+              workWeChatCorpId: "",
+              display: true,
+              agentId: 0,
+            }
+      );
   }, [corpAppList, isNewOrUpdate]);
 
   useEffect(() => {
@@ -549,6 +558,7 @@ const useAction = () => {
     setHostList([]);
     setParticipantList([]);
     setDepartmentAndUserList([]);
+    setDepartmentAndUserListBackups([]);
   }, [corpsValue, corpAppValue]);
 
   return {
@@ -588,6 +598,8 @@ const useAction = () => {
     hostLists,
     participantLists,
     tipsObject,
+    isNewOrUpdate,
+    appLoading,
     setCorpsValue,
     setGroupList,
     setIsShowDialog,
