@@ -48,6 +48,7 @@ const SelectContent = memo(
       showErrorPrompt,
       clearData,
       isFromNoticeSetting = false,
+      setIsShowPage,
     } = props
 
     const {
@@ -125,6 +126,7 @@ const SelectContent = memo(
       updateMessageJobInformation,
       showErrorPrompt,
       clearData,
+      setIsShowPage,
     })
 
     const fileOrImage = (file: FileObject, state: string) => {
@@ -265,10 +267,7 @@ const SelectContent = memo(
     }
 
     return (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
-      (isNewOrUpdate !== "new" &&
-        corpsList.length > 0 &&
-        !appLoading &&
-        !groupLoading) ? (
+      isNewOrUpdate !== "new" ? (
       <div className={styles.box}>
         <div className={styles.selectWrap}>
           <Autocomplete
@@ -686,11 +685,7 @@ const SelectContent = memo(
         </div>
       </div>
     ) : (
-      <>
-        <Skeleton className={styles.selectWrap} width="100%" height="5rem" />
-        <Skeleton className={styles.selectWrap} width="100%" height="5rem" />
-        <Skeleton className={styles.rowBox} width="100%" height="12rem" />
-      </>
+      <></>
     )
   },
   (prevProps, nextProps) => {

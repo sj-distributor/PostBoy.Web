@@ -52,6 +52,7 @@ export const useAction = (props: SelectContentHookProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
+    setIsShowPage,
   } = props
 
   const defaultCorpValue = {
@@ -1140,6 +1141,14 @@ export const useAction = (props: SelectContentHookProps) => {
       ) &&
       setContent(value.match(beforePattern)?.[0] ?? "")
   }
+
+  useEffect(() => {
+    setIsShowPage &&
+      setIsShowPage(
+        (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
+          isNewOrUpdate !== "new"
+      )
+  }, [isNewOrUpdate, appLoading, corpsList])
 
   return {
     corpsValue,

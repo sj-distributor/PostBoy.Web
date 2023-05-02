@@ -24,6 +24,8 @@ const useAction = () => {
   const [failSend, failSendAction] = useBoolean(false)
   const [clearData, setClearData] = useBoolean(false)
 
+  const [isShowPage, setIsShowPage] = useState<boolean>(false)
+
   const clickSendRecord = (operation: string) => {
     operation === "open"
       ? sendRecordRef.current?.open()
@@ -153,6 +155,8 @@ const useAction = () => {
     success,
     failSend,
     clearData,
+    isShowPage,
+    setIsShowPage,
   }
 }
 
