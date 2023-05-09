@@ -1,5 +1,7 @@
 import {
+  Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   FormControlLabel,
@@ -29,6 +31,9 @@ const SeetingsDialog = (props: SettingDialogProps) => {
     appointList,
     hostList,
     setClickName,
+    handleGetSettingData,
+    settings,
+    setSettings,
   } = props;
   const {
     meetingSettingList,
@@ -41,7 +46,18 @@ const SeetingsDialog = (props: SettingDialogProps) => {
     onMembershipPassword,
     onSelectHost,
     onAppint,
-  } = useAction({ setOpenAddDialog, setClickName, appointList, openAddDialog });
+    onUpdateSettings,
+  } = useAction({
+    setOpenAddDialog,
+    setClickName,
+    appointList,
+    hostList,
+    openAddDialog,
+    handleGetSettingData,
+    setDialog,
+    settings,
+    setSettings,
+  });
   return (
     <>
       <Dialog
@@ -71,6 +87,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                     item.optionType === "input" ? (
                       <input
                         type="checkbox"
+                        checked={item.isOption}
                         onChange={(event) =>
                           onIsOption(event.target.checked, index)
                         }
@@ -174,10 +191,11 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                       type={showPassword ? "text" : "password"}
                       size="small"
                       sx={{ width: "100%" }}
-                      value={item.password}
+                      value={item.password ? item.password : ""}
                       onChange={(e) =>
                         onMembershipPassword(e.target.value, index)
                       }
+                      placeholder="请输入4-6位数字密码"
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -197,6 +215,11 @@ const SeetingsDialog = (props: SettingDialogProps) => {
             );
           })}
         </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={() => onUpdateSettings()}>
+            确定
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

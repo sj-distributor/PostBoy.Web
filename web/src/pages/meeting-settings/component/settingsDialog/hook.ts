@@ -1,5 +1,12 @@
+import { useUpdateEffect } from "ahooks";
 import { clone } from "ramda";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
 import {
   MeetingCallReminder,
@@ -8,15 +15,34 @@ import {
   MembershipRestrictions,
   MutewhenJoining,
   RecordWatermark,
+  WorkWeChatMeetingSettingDto,
+  WorkWeChatMeetingUserDto,
 } from "../../../../dtos/meeting-seetings";
 
 const useAction = (props: {
   setOpenAddDialog: (value: boolean) => void;
+  setDialog: (value: boolean) => void;
   openAddDialog: boolean;
   setClickName?: Dispatch<SetStateAction<string>>;
   appointList?: IDepartmentAndUserListValue[];
+  hostList?: IDepartmentAndUserListValue[];
+  handleGetSettingData?: (data: WorkWeChatMeetingSettingDto) => void;
+  settings: WorkWeChatMeetingSettingDto;
+  setSettings: React.Dispatch<
+    React.SetStateAction<WorkWeChatMeetingSettingDto>
+  >;
 }) => {
-  const { setOpenAddDialog, setClickName, appointList, openAddDialog } = props;
+  const {
+    setOpenAddDialog,
+    setClickName,
+    appointList,
+    hostList,
+    openAddDialog,
+    handleGetSettingData,
+    setDialog,
+    settings,
+    setSettings,
+  } = props;
   const settingList: MeetingSettingList[] = [
     {
       title: "指定主持人",
@@ -30,7 +56,6 @@ const useAction = (props: {
       optionType: "input",
       border: true,
       isOption: false,
-      password: "",
     },
     {
       title: "自动开启会议录制",
@@ -51,6 +76,7 @@ const useAction = (props: {
     },
     {
       title: "开启等候室",
+      key: "enable_waiting_room",
       optionType: "checkbox",
       border: true,
       isOption: false,
@@ -58,31 +84,24 @@ const useAction = (props: {
     {
       title: "允许成员在主持人进会前加入",
       optionType: "checkbox",
+      key: "allow_enter_before_host",
       border: true,
-      isOption: false,
+      isOption: true,
     },
     {
       title: "开启屏幕共享水印",
       optionType: "checkbox",
+      key: "enable_screen_watermark",
       border: true,
       isOption: false,
-      optionData: RecordWatermark.SingleRowWatermark,
-      optionList: [
-        {
-          lable: "单排水印",
-          value: RecordWatermark.SingleRowWatermark,
-        },
-        {
-          lable: "双排水印",
-          value: RecordWatermark.DoubleRowWatermark,
-        },
-      ],
+      optionData: RecordWatermark.Off,
     },
 
     {
       title: "会议开始时来电提醒",
       border: true,
       isOption: true,
+      key: "remind_scope",
       optionData: MeetingCallReminder.Host,
       optionList: [
         {
@@ -107,6 +126,7 @@ const useAction = (props: {
       title: "成员入会时静音",
       border: true,
       isOption: true,
+      key: "enable_enter_mute",
       optionData: MutewhenJoining.On,
       optionList: [
         {
@@ -127,6 +147,7 @@ const useAction = (props: {
       title: "入会成员限制",
       border: true,
       isOption: true,
+      key: "allow_external_user",
       optionData: MembershipRestrictions.All,
       optionList: [
         {
@@ -143,7 +164,7 @@ const useAction = (props: {
   const [meetingSettingList, setMeetingSettingList] =
     useState<MeetingSettingList[]>(settingList);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [radioDisabled, setRadioDisabled] = useState<boolean>(false);
+  const [radioDisabled, setRadioDisabled] = useState<boolean>(true);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -155,13 +176,13 @@ const useAction = (props: {
 
   const onMembershipPassword = (value: string, index: number) => {
     const newList = clone(meetingSettingList);
-    newList.map((item, i) => i === index && (item.password = value));
+    newList.map((item, i) => i === index && (item.password = +value));
     setMeetingSettingList([...newList]);
   };
 
   const handleChange = (value: string, index: number) => {
     const newList = clone(meetingSettingList);
-    newList[index].optionData = value;
+    newList[index].optionData = +value;
     if (
       newList[index].title === "会议开始时来电提醒" &&
       newList[index].optionData === MeetingCallReminder.Appoint
@@ -186,7 +207,7 @@ const useAction = (props: {
     setMeetingSettingList([...newList]);
   };
 
-  const onAppintRadio = (MeetingCallReminderValue: string) => {
+  const onAppintRadio = (MeetingCallReminderValue: number) => {
     const newList = clone(meetingSettingList);
     newList.forEach(
       (item, index) =>
@@ -221,6 +242,93 @@ const useAction = (props: {
       onAppintRadio(MeetingCallReminder.Host);
   }, [appointList, openAddDialog]);
 
+  useEffect(() => {
+    if (settings) {
+      let settingsData = clone(meetingSettingList);
+      settingsData.map((item) => {
+        item.optionType === "input" &&
+          settings.password &&
+          (item.password = settings.password);
+        item.password && (item.isOption = true);
+        item.key === "enable_waiting_room" &&
+          (item.isOption = settings.enable_waiting_room);
+        item.key === "allow_enter_before_host" &&
+          (item.isOption = settings.allow_enter_before_host);
+        item.key === "remind_scope" &&
+          (item.optionData = settings.remind_scope);
+        item.key === "enable_enter_mute" &&
+          (item.optionData = settings.enable_enter_mute);
+        item.key === "allow_external_user" &&
+          (item.optionData = +settings.allow_external_user);
+        item.key === "enable_screen_watermark" &&
+          (item.isOption = settings.enable_screen_watermark);
+      });
+      setMeetingSettingList(settingsData);
+    }
+  }, [settings]);
+
+  const onUpdateSettings = () => {
+    const intPassword = meetingSettingList.filter(
+      (item) => item.optionType === "input"
+    )[0];
+    if (intPassword.isOption && !intPassword.password) {
+      return;
+    }
+    let settingData: WorkWeChatMeetingSettingDto = {
+      password: null,
+      enable_waiting_room: false,
+      allow_enter_before_host: false,
+      remind_scope: 1,
+      enable_enter_mute: 0,
+      allow_external_user: true,
+      enable_screen_watermark: false,
+      hosts: undefined,
+      ring_users: undefined,
+    };
+
+    meetingSettingList.map((item) => {
+      if (item.optionType === "input") {
+        if (item.isOption) {
+          settingData.password = item.password ? item.password : null;
+        } else {
+          settingData.password = null;
+        }
+      }
+
+      item.key === "enable_waiting_room" &&
+        (settingData.enable_waiting_room = item.isOption);
+      item.key === "allow_enter_before_host" &&
+        (settingData.allow_enter_before_host = item.isOption);
+      item.key === "remind_scope" &&
+        (settingData.remind_scope = item.optionData ? item.optionData : 1);
+      item.key === "enable_enter_mute" &&
+        (settingData.enable_enter_mute = item.optionData ? item.optionData : 0);
+      item.key === "allow_external_user" &&
+        (settingData.allow_external_user = !!item.optionData);
+
+      item.key === "enable_screen_watermark" &&
+        (settingData.enable_screen_watermark = !!item.isOption);
+    });
+    let hosts: WorkWeChatMeetingUserDto = {
+      userid: [],
+    };
+    let ring_user: WorkWeChatMeetingUserDto = {
+      userid: [],
+    };
+    appointList &&
+      appointList?.length > 0 &&
+      appointList?.map((item) => ring_user.userid.push(item.id + ""));
+    hostList &&
+      hostList?.length > 0 &&
+      hostList?.map((item) => hosts.userid.push(item.id + ""));
+    settingData.hosts = hosts.userid.length > 0 ? hosts : undefined;
+    settingData.ring_users =
+      ring_user.userid.length > 0 ? ring_user : undefined;
+    handleGetSettingData && handleGetSettingData(settingData);
+    setDialog(false);
+    setMeetingSettingList(settingList);
+  };
+
   return {
     meetingSettingList,
     showPassword,
@@ -232,6 +340,7 @@ const useAction = (props: {
     onMembershipPassword,
     onSelectHost,
     onAppint,
+    onUpdateSettings,
   };
 };
 

@@ -5,7 +5,7 @@ import Manager from "../pages/app-manager";
 import User from "../pages/user";
 import { RouteItem } from "../dtos/route-type";
 import "../fonts/iconfont/iconfont.css";
-import MeetingSettings from "../pages/meeting-settings";
+import MeetingList from "../pages/meeting-list";
 
 export const routerArray: RouteItem[] = [
   {
@@ -39,9 +39,9 @@ export const routerArray: RouteItem[] = [
     element: <Manager />,
   },
   {
-    path: "/meetingSettings",
+    path: "/meeting",
     head: "",
     icons: "",
-    element: <MeetingSettings />,
+    element: <MeetingList />,
   },
 ];

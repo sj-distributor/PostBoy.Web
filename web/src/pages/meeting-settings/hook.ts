@@ -1,13 +1,17 @@
-import { SelectChangeEvent } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
+import dayjs from "dayjs";
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
 import {
-  CalendarSelectData,
+  CreateOrUpdateWorkWeChatMeetingDto,
   DefaultDisplay,
+  GetWorkWeChatMeeting,
+  MeetingIdCorpIdAndAppId,
   ReminderTimeSelectData,
   RepeatSelectData,
   SelectGroupType,
+  WorkWeChatMeetingReminderDto,
+  WorkWeChatMeetingSettingDto,
 } from "../../dtos/meeting-seetings";
 import { ICorpAppData, ICorpData } from "../../dtos/enterprise";
 import { GetCorpAppList, GetCorpsList } from "../../api/enterprise";
@@ -18,17 +22,35 @@ import {
   IDepartmentData,
   IDepartmentKeyControl,
   IDeptAndUserList,
-  ILastShowTableData,
   ISearchList,
   ITagsList,
   IWorkCorpAppGroup,
-  SendObject,
   SendObjOrGroup,
 } from "../../dtos/enterprise";
 import { clone, flatten } from "ramda";
 import { GetDeptsAndUserList } from "../../api/enterprise";
+import {
+  createMeeting,
+  getMeetingData,
+  updateMeeting,
+} from "../../api/meeting-seetings";
+import { useBoolean } from "ahooks";
 
-const useAction = () => {
+const useAction = (props: {
+  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>;
+  meetingIdCorpIdAndAppId?: MeetingIdCorpIdAndAppId | null;
+  isOpenMeetingSettings: boolean;
+  getMeetingList: () => void;
+  meetingState: string;
+}) => {
+  const {
+    setIsOpenMeetingSettings,
+    meetingIdCorpIdAndAppId,
+    isOpenMeetingSettings,
+    getMeetingList,
+    meetingState,
+  } = props;
+
   // 拿到的企业对象
   const [corpsValue, setCorpsValue] = useState<ICorpData>({
     corpName: "",
@@ -54,58 +76,59 @@ const useAction = () => {
   const [isShowMoreParticipantList, setIsShowMoreParticipantList] =
     useState<boolean>(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState<boolean>(false);
+  const [adminUser, setAdminUser] = useState<IDepartmentAndUserListValue[]>([]);
   const [selectGroup, setSelectGroup] = useState<SelectGroupType[]>([
     {
       title: "提醒",
       key: "reminderTime",
-      value: "",
+      value: ReminderTimeSelectData.MeetingBegins,
       data: [
-        {
-          value: ReminderTimeSelectData.FifteenMinutesAgo,
-          lable: "十五分钟前",
-        },
         {
           value: ReminderTimeSelectData.MeetingBegins,
           lable: "会议开始时",
         },
         {
+          value: ReminderTimeSelectData.FiveMinutesAgo,
+          lable: "五分钟前",
+        },
+        {
+          value: ReminderTimeSelectData.FifteenMinutesAgo,
+          lable: "十五分钟前",
+        },
+        {
           value: ReminderTimeSelectData.AnHourAgo,
           lable: "一小时前",
+        },
+        {
+          value: ReminderTimeSelectData.TheDayBefore,
+          lable: "一天前",
         },
       ],
     },
     {
       title: "重复",
       key: "repeat",
-      value: "",
+      value: RepeatSelectData.Repeat,
       data: [
         {
           value: RepeatSelectData.Repeat,
           lable: "不重复",
         },
         {
-          value: RepeatSelectData.NoRepeat,
-          lable: "重复",
-        },
-      ],
-    },
-    {
-      title: "日历",
-      key: "calendar",
-      value: "",
-      isIcon: true,
-      data: [
-        {
-          value: CalendarSelectData.CalendarForMARS,
-          lable: "MARS.PENG的日历",
+          value: RepeatSelectData.EveryDay,
+          lable: "每天重复",
         },
         {
-          value: CalendarSelectData.CalendarForELK,
-          lable: "ELK的日历",
+          value: RepeatSelectData.Weekly,
+          lable: "每周重复",
         },
         {
-          value: CalendarSelectData.CalendarForJKL,
-          lable: "JKL的日历",
+          value: RepeatSelectData.Monthly,
+          lable: "每月重复",
+        },
+        {
+          value: RepeatSelectData.EveryWorkingDay,
+          lable: "每个工作日重复",
         },
       ],
     },
@@ -128,10 +151,6 @@ const useAction = () => {
     setOpenAnnexList(false);
   };
 
-  const getEndDate = (data: string) => {};
-  const getStartDate = (data: string) => {};
-  const getEndTime = (data: string) => {};
-  const getStartTime = (data: string) => {};
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null);
   const [html, setHtml] = useState<string>("");
   const editorConfig: Partial<IEditorConfig> = {
@@ -148,15 +167,34 @@ const useAction = () => {
     ],
   };
 
-  const handleChange = (event: SelectChangeEvent, type: string) => {
+  const handleChange = (value: string | number, type: string) => {
     const newList = selectGroup;
-
-    newList.forEach(
-      (item) => item.key === type && (item.value = event.target.value)
-    );
-
+    newList.forEach((item) => item.key === type && (item.value = value));
     setSelectGroup(newList);
+    if (type === "repeat") {
+      //周期时间预设三个月
+      const repeat_until = Math.ceil(
+        dayjs(new Date().setMonth(new Date().getMonth() + 3)).valueOf() / 1000
+      );
+
+      setMeetingReminders((reminders) => {
+        let data = clone(reminders);
+        data.is_repeat = value !== RepeatSelectData.Repeat ? 1 : 0;
+        data.repeat_type = +value;
+        data.repeat_until = repeat_until;
+        return data;
+      });
+    }
+
+    if (type === "reminderTime") {
+      setMeetingReminders((reminders) => {
+        let data = clone(reminders);
+        data.remind_before = [+value];
+        return data;
+      });
+    }
   };
+
   // 文件上传
   const [annexFile, setAnnexFile] = useState<File[] | []>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -175,6 +213,8 @@ const useAction = () => {
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     ISearchList[]
   >([]);
+  const [flattenDepartmentListBackups, setFlattenDepartmentListBackups] =
+    useState<ISearchList[]>([]);
   // TreeView显示展开
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
   // 获取的Tags数组
@@ -182,7 +222,6 @@ const useAction = () => {
   // 群组列表
   const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([]);
   const [chatId, setChatId] = useState<string>("");
-  const [isRefresh, setIsRefresh] = useState(false);
   const [sendType, setSendType] = useState<SendObjOrGroup>(
     SendObjOrGroup.Object
   );
@@ -194,12 +233,6 @@ const useAction = () => {
   const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false);
   //  拉取数据旋转
   const [isLoadStop, setIsLoadStop] = useState<boolean>(false);
-  const [updateMessageJobInformation, setUpdateMessageJobInformation] =
-    useState<ILastShowTableData>();
-  const [sendObject, setSendObject] = useState<SendObject>({
-    toUsers: [],
-    toParties: [],
-  });
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
       (e) => e.key === corpAppValue?.appId
@@ -322,6 +355,7 @@ const useAction = () => {
               key: AppId,
               data: insertData,
             });
+        setFlattenDepartmentListBackups(newValue);
         return newValue;
       });
 
@@ -349,10 +383,12 @@ const useAction = () => {
         ? appointList
         : clickName === "选择指定主持人"
         ? hostList
+        : clickName === "指定会议管理员"
+        ? adminUser
         : undefined;
 
     return result as IDepartmentAndUserListValue[];
-  }, [participantList, appointList, hostList, clickName]);
+  }, [participantList, appointList, hostList, clickName, adminUser]);
 
   const getUserChildrenData = (
     arr: IDepartmentAndUserListValue[],
@@ -413,13 +449,14 @@ const useAction = () => {
     const arr = getUserChildrenList(departmentKeyValue?.data, data, []);
     if (clickName === "选择参会人") {
       setParticipantList([...arr]);
-      setDepartmentAndUserList([{ data: arr, key: departmentKeyValue.key }]);
-      setAppointList([]);
-      setHostList([]);
     }
 
     clickName === "选择指定提醒人员" && setAppointList([...arr]);
     clickName === "选择指定主持人" && setHostList([...arr]);
+    if (clickName === "指定会议管理员") {
+      setAdminUser([...arr]);
+      setParticipantList([...arr]);
+    }
   };
 
   const getUserChildrenList = (
@@ -441,12 +478,16 @@ const useAction = () => {
 
   const onSetParticipant = () => {
     setClickName("选择参会人");
-    setIsShowDialog(true);
     setDepartmentAndUserList(departmentAndUserListBackups);
+    setFlattenDepartmentList(flattenDepartmentListBackups);
+    setIsShowDialog(true);
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const onSetAdminUser = () => {
+    setClickName("指定会议管理员");
+    setDepartmentAndUserList(departmentAndUserListBackups);
+    setFlattenDepartmentList(flattenDepartmentListBackups);
+    setIsShowDialog(true);
   };
 
   const handleCloseMenu = () => {
@@ -478,10 +519,19 @@ const useAction = () => {
     });
   }, []);
 
-  // 默认选择第一个企业对象
+  // 默认选择企业对象
   useEffect(() => {
     !corpsValue.corpId && corpsList.length > 0 && setCorpsValue(corpsList[0]);
   }, [corpsList]);
+
+  useEffect(() => {
+    meetingIdCorpIdAndAppId &&
+      setCorpsValue(
+        corpsList.filter(
+          (item) => item.id === meetingIdCorpIdAndAppId.corpId
+        )[0]
+      );
+  }, [meetingIdCorpIdAndAppId]);
 
   // 初始化App数组
   useEffect(() => {
@@ -493,12 +543,16 @@ const useAction = () => {
     }
   }, [corpsValue?.id]);
 
-  // 默认选择第一个App对象
+  // 默认选择App对象
   useEffect(() => {
     isNewOrUpdate === "new" &&
       setCorpAppValue(
         corpAppList.length > 0
-          ? corpAppList[0]
+          ? meetingIdCorpIdAndAppId
+            ? corpAppList.filter(
+                (item) => item.id === meetingIdCorpIdAndAppId.appId
+              )[0]
+            : corpAppList[0]
           : {
               appId: "",
               id: "",
@@ -527,7 +581,7 @@ const useAction = () => {
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
     };
     if (
-      isShowDialog &&
+      isOpenMeetingSettings &&
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
@@ -545,25 +599,427 @@ const useAction = () => {
         return newValue;
       });
 
-      !updateMessageJobInformation?.workWeChatAppNotification &&
-        setSendObject({
-          toUsers: [],
-          toParties: [],
-        });
       // 开始load数据
       setIsLoadStop(false);
       corpAppValue?.appId && loadDepartment(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId, isShowDialog]);
+  }, [corpAppValue?.appId, isOpenMeetingSettings]);
 
-  //切换企业应用重置数据
-  useEffect(() => {
+  const clearData = () => {
     setAppointList([]);
     setHostList([]);
     setParticipantList([]);
     setDepartmentAndUserList([]);
     setDepartmentAndUserListBackups([]);
-  }, [corpsValue, corpAppValue]);
+    setMeetingLocation("");
+    setMeetingTitle("");
+    setHtml("");
+    setAdminUser([]);
+    setSettings({
+      password: null,
+      enable_waiting_room: false,
+      allow_enter_before_host: true,
+      remind_scope: 3,
+      enable_enter_mute: 0,
+      allow_external_user: true,
+      enable_screen_watermark: false,
+      hosts: undefined,
+      ring_users: undefined,
+    });
+  };
+
+  const [loading, loadingAction] = useBoolean(false);
+  const [success, successAction] = useBoolean(false);
+  const [failSend, failSendAction] = useBoolean(false);
+  const [meetingReminders, setMeetingReminders] = useState<
+    Partial<WorkWeChatMeetingReminderDto>
+  >({});
+  const [meetingTitle, setMeetingTitle] = useState<string>(" ");
+  const [meetingStartDate, setMeetingStartDate] = useState<string>(
+    dayjs().format("YYYY-MM-DD")
+  );
+  const [meetingStartTime, setMeetingStartTime] = useState<string>("12:00");
+  const [meetingEndDate, setMeetingEndDate] = useState<string>(
+    dayjs().format("YYYY-MM-DD")
+  );
+  const [meetingEndTime, setMeetingEndTime] = useState<string>("13:00");
+  const [meetingLocation, setMeetingLocation] = useState<string>("");
+  const [settings, setSettings] = useState<WorkWeChatMeetingSettingDto>({
+    password: null,
+    enable_waiting_room: false,
+    allow_enter_before_host: true,
+    remind_scope: 1,
+    enable_enter_mute: 0,
+    allow_external_user: true,
+    enable_screen_watermark: false,
+    hosts: undefined,
+    ring_users: undefined,
+  });
+
+  const onCreateUpdateMeeting = async () => {
+    if (!loading) {
+      loadingAction.setTrue();
+      const meeting_start = Math.ceil(
+        dayjs(meetingStartDate + " " + meetingStartTime).valueOf() / 1000
+      );
+      const meeting_end = Math.ceil(
+        dayjs(meetingEndDate + " " + meetingEndTime).valueOf() / 1000
+      );
+      const meeting_duration = meeting_end - meeting_start;
+
+      let attendeesList: string[] = [];
+
+      participantLists.map((item) => attendeesList.push(item.id + ""));
+      const admin_userid = adminUser
+        ? adminUser.length > 0
+          ? adminUser[0].id
+          : ""
+        : "";
+
+      let settingsData = clone(settings);
+      if (!settingsData.hosts) {
+        delete settingsData.hosts;
+      }
+      if (!settingsData.ring_users) {
+        delete settingsData.ring_users;
+      }
+      const createOrUpdateMeetingData: CreateOrUpdateWorkWeChatMeetingDto = {
+        appId: corpAppValue.appId,
+        admin_userid: admin_userid + "",
+        title: meetingTitle,
+        meeting_start,
+        meeting_duration,
+        description: editor?.getText(),
+        location: meetingLocation,
+        settings: settingsData,
+        attendees: {
+          userid: attendeesList,
+        },
+        reminders: meetingReminders,
+      };
+
+      attendeesList.findIndex(
+        (item) => item === createOrUpdateMeetingData.admin_userid
+      ) === -1 &&
+        setTipsObject({
+          show: true,
+          msg: "Administrators must attend the meeting",
+        });
+      !createOrUpdateMeetingData.appId &&
+        setTipsObject({
+          show: true,
+          msg: "No application selected",
+        });
+      !createOrUpdateMeetingData.admin_userid &&
+        setTipsObject({
+          show: true,
+          msg: "Failed to obtain account information",
+        });
+      !createOrUpdateMeetingData.title &&
+        setTipsObject({
+          show: true,
+          msg: "Not filled in title",
+        });
+      !createOrUpdateMeetingData.meeting_start &&
+        setTipsObject({
+          show: true,
+          msg: "Meeting start time not set",
+        });
+      createOrUpdateMeetingData.meeting_duration < 300 &&
+        setTipsObject({
+          show: true,
+          msg: "The meeting duration cannot be less than 5 minutes",
+        });
+      dayjs.unix(createOrUpdateMeetingData.meeting_start) <
+        dayjs().set("minute", dayjs().get("minute") + 15) &&
+        setTipsObject({
+          show: true,
+          msg: "The start time of the meeting must be greater than the current fifteen minutes",
+        });
+
+      if (
+        createOrUpdateMeetingData.appId &&
+        createOrUpdateMeetingData.title &&
+        createOrUpdateMeetingData.meeting_start &&
+        createOrUpdateMeetingData.meeting_duration > 300 &&
+        dayjs.unix(createOrUpdateMeetingData.meeting_start) >
+          dayjs().set("minute", dayjs().get("minute") + 15) &&
+        attendeesList.findIndex(
+          (item) => item === createOrUpdateMeetingData.admin_userid
+        ) !== -1
+      ) {
+        if (meetingState === "create") {
+          const data = {
+            createWorkWeChatMeeting: createOrUpdateMeetingData,
+          };
+
+          await createMeeting(data)
+            .then((data) => {
+              if (data?.meetingid) {
+                const meetingId = data.meetingid;
+                if (meetingId !== null) {
+                  successAction.setTrue();
+                  setIsOpenMeetingSettings(false);
+                  getMeetingList();
+                } else {
+                  failSendAction.setTrue();
+                }
+                loadingAction.setFalse();
+              } else {
+                loadingAction.setFalse();
+                failSendAction.setTrue();
+              }
+            })
+            .catch((err) => {
+              loadingAction.setFalse();
+              failSendAction.setTrue();
+              setTipsObject({
+                show: true,
+                msg: "Meeting created failed",
+              });
+            });
+        } else if (meetingState === "update") {
+          createOrUpdateMeetingData.meetingid =
+            meetingIdCorpIdAndAppId?.meetingId;
+          const data = {
+            updateWorkWeChatMeeting: createOrUpdateMeetingData,
+          };
+
+          await updateMeeting(data)
+            .then((data) => {
+              if (data && data.errmsg === "ok") {
+                successAction.setTrue();
+                loadingAction.setFalse();
+                setIsOpenMeetingSettings(false);
+                getMeetingList();
+              } else {
+                loadingAction.setFalse();
+                failSendAction.setTrue();
+              }
+            })
+            .catch((err) => {
+              loadingAction.setFalse();
+              failSendAction.setTrue();
+              setTipsObject({
+                show: true,
+                msg: "Meeting created failed",
+              });
+            });
+        }
+      } else {
+        loadingAction.setFalse();
+      }
+    } else {
+      loadingAction.setFalse();
+    }
+  };
+
+  //获取会议设置数据
+  const handleGetSettingData = (data: WorkWeChatMeetingSettingDto) => {
+    setSettings(data);
+  };
+
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (failSend) {
+      setTimeout(() => {
+        failSendAction.setFalse();
+      }, 3000);
+    } else if (success) {
+      setTimeout(() => {
+        successAction.setFalse();
+      }, 3000);
+    }
+  }, [failSend, success]);
+
+  useEffect(() => {
+    // 组件销毁时，销毁 editor
+    return () => {
+      if (editor == null) return;
+      editor.destroy();
+      setEditor(null);
+    };
+  }, [editor]);
+
+  const onGetMeetingData = (data: GetWorkWeChatMeeting) => {
+    getMeetingData(data)
+      .then((res) => {
+        if (res && res.errmsg === "ok") {
+          const {
+            title,
+            admin_userid,
+            attendees,
+            description,
+            location,
+            meeting_duration,
+            meeting_start,
+            reminders,
+            settings,
+          } = res;
+
+          setMeetingTitle(title);
+          setMeetingStartDate(dayjs.unix(meeting_start).format("YYYY-MM-DD"));
+          setMeetingStartTime(dayjs.unix(meeting_start).format("HH:mm"));
+          setMeetingEndDate(
+            dayjs.unix(meeting_start + meeting_duration).format("YYYY-MM-DD")
+          );
+          setMeetingEndTime(
+            dayjs.unix(meeting_start + meeting_duration).format("HH:mm")
+          );
+          setMeetingLocation(location);
+          setHtml(description);
+          setMeetingReminders(reminders ? reminders : {});
+          setSettings(settings);
+
+          if (settings) {
+            setHostList((host) => {
+              let hostData: IDepartmentAndUserListValue[] = [];
+              settings.hosts?.userid.map((item) =>
+                hostData.push({
+                  id: item,
+                  name: item,
+                  type: 1,
+                  parentid: "1",
+                  selected: false,
+                  isCollapsed: false,
+                  children: [],
+                })
+              );
+              return hostData;
+            });
+
+            setAppointList((apponint) => {
+              let apponintData: IDepartmentAndUserListValue[] = [];
+              settings.ring_users?.userid.map((item) =>
+                apponintData.push({
+                  id: item,
+                  name: item,
+                  type: 1,
+                  parentid: "1",
+                  selected: false,
+                  isCollapsed: false,
+                  children: [],
+                })
+              );
+              return apponintData;
+            });
+          }
+
+          if (reminders) {
+            setSelectGroup((selectData) => {
+              let arr = clone(selectData);
+              arr.forEach((item) => {
+                item.key === "reminderTime" &&
+                  (item.value = reminders.remind_before
+                    ? reminders.remind_before.length > 0
+                      ? reminders.remind_before[0]
+                      : 0
+                    : 0);
+                item.key === "repeat" && (item.value = reminders.repeat_type);
+              });
+              return arr;
+            });
+          }
+
+          setParticipantList((participant) => {
+            let attendeesData: IDepartmentAndUserListValue[] = [];
+
+            attendees.member.length > 0 &&
+              attendees.member.map((item) =>
+                attendeesData.push({
+                  id: item.userid,
+                  name: item.userid,
+                  type: 1,
+                  parentid: "1",
+                  selected: false,
+                  isCollapsed: false,
+                  children: [],
+                })
+              );
+
+            return attendeesData;
+          });
+
+          setAdminUser([
+            {
+              id: admin_userid,
+              name: admin_userid,
+              type: 1,
+              parentid: "1",
+              selected: false,
+              isCollapsed: false,
+              children: [],
+            },
+          ]);
+          setAppLoading(false);
+        } else {
+          setTipsObject({
+            show: true,
+            msg: res?.errmsg
+              ? res.errmsg
+              : "Failed to obtain meeting information",
+          });
+          setAppLoading(false);
+        }
+      })
+      .catch((err) => {
+        setTipsObject({
+          show: true,
+          msg: "Failed to obtain meeting information",
+        });
+      });
+  };
+
+  //初始化会议数据
+  useEffect(() => {
+    if (isOpenMeetingSettings && meetingIdCorpIdAndAppId) {
+      //获取appId
+      GetCorpAppList({ CorpId: meetingIdCorpIdAndAppId.corpId })
+        .then((res) => {
+          if (res && res.length > 0) {
+            res?.map((item) => {
+              if (item.id === meetingIdCorpIdAndAppId.appId) {
+                const data: GetWorkWeChatMeeting = {
+                  AppId: item.appId,
+                  MeetingId: meetingIdCorpIdAndAppId.meetingId,
+                };
+                onGetMeetingData(data);
+              }
+            });
+          } else {
+            setTipsObject({
+              show: true,
+              msg: "Failed to obtain application information",
+            });
+          }
+        })
+        .catch((err) => {
+          setTipsObject({
+            show: true,
+            msg: "Failed to obtain application information",
+          });
+        });
+      setAppLoading(true);
+    } else {
+      clearData();
+    }
+  }, [isOpenMeetingSettings, meetingIdCorpIdAndAppId]);
+
+  useEffect(() => {
+    if (clickName === "选择指定主持人" || clickName === "选择指定提醒人员") {
+      if (participantList && participantList?.length > 0) {
+        setDepartmentAndUserList([
+          { data: participantList, key: departmentKeyValue.key },
+        ]);
+        setFlattenDepartmentList([
+          { data: participantList, key: departmentKeyValue.key },
+        ]);
+      } else {
+        setDepartmentAndUserList([]);
+        setFlattenDepartmentList([]);
+      }
+    }
+  }, [isShowDialog]);
 
   return {
     editor,
@@ -609,12 +1065,10 @@ const useAction = () => {
     setIsShowDialog,
     setDepartmentAndUserList,
     setTagsValue,
-    setIsRefresh,
     setChatId,
     setSendType,
     setIsShowMoreParticipantList,
     setCorpAppValue,
-    handleClick,
     handleCloseMenu,
     uploadAnnex,
     setOpenSettingsDialog,
@@ -623,15 +1077,34 @@ const useAction = () => {
     setEditor,
     handleToggle,
     handleClose,
-    getEndDate,
-    getStartDate,
-    getEndTime,
-    getStartTime,
     fileUpload,
     fileDelete,
     handleGetSelectData,
     onSetParticipant,
     setClickName,
+    onCreateUpdateMeeting,
+    meetingTitle,
+    setMeetingTitle,
+    meetingLocation,
+    setMeetingLocation,
+    handleGetSettingData,
+    meetingReminders,
+    setMeetingReminders,
+    loading,
+    success,
+    failSend,
+    meetingStartDate,
+    meetingStartTime,
+    meetingEndDate,
+    meetingEndTime,
+    settings,
+    setSettings,
+    setMeetingStartDate,
+    setMeetingStartTime,
+    setMeetingEndDate,
+    setMeetingEndTime,
+    onSetAdminUser,
+    adminUser,
   };
 };
 

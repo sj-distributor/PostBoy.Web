@@ -92,10 +92,7 @@ const useAction = (props: {
   const [groupDeptUserList, setGroupDeptUserList] = useState<
     IDepartmentKeyControl[]
   >([]);
-  const [sendList, setSendList] = useState([
-    SendObjOrGroup.Object,
-    SendObjOrGroup.Group,
-  ]);
+  const [sendList, setSendList] = useState([SendObjOrGroup.Object]);
 
   const [firstState, setFirstState] = useState<IFirstState>();
   const [createLoading, setCreateLoading] = useState(false);
@@ -142,37 +139,18 @@ const useAction = (props: {
     type: ClickType,
     clickedItem: IDepartmentAndUserListValue
   ) => {
-    clickName === "选择参会人" ||
-    clickName === "选择指定提醒人员" ||
-    clickName === "选择指定主持人"
-      ? setDeptUserList((prev) => {
-          const newValue = prev.filter((e) => !!e);
-          const activeData = newValue.find(
-            (e) => e.key === departmentKeyValue.key
-          );
-          activeData &&
-            recursiveSeachDeptOrUser(activeData.data, (e) => {
-              e.id === clickedItem.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected));
-            });
-          return newValue;
-        })
-      : setGroupDeptUserList((prev) => {
-          const newValue = prev.filter((e) => !!e);
-          const activeData = newValue.find(
-            (e) => e.key === departmentKeyValue.key
-          );
-          activeData &&
-            recursiveSeachDeptOrUser(activeData.data, (e) => {
-              e.id === clickedItem.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected));
-            });
-          return newValue;
+    setDeptUserList((prev) => {
+      const newValue = prev.filter((e) => !!e);
+      const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
+      activeData &&
+        recursiveSeachDeptOrUser(activeData.data, (e) => {
+          e.id === clickedItem.id &&
+            (type === ClickType.Collapse
+              ? (e.isCollapsed = !e.isCollapsed)
+              : (e.selected = !e.selected));
         });
+      return newValue;
+    });
   };
 
   // 搜索框变化时同步到部门列表
@@ -194,20 +172,8 @@ const useAction = (props: {
       }
       return newValue;
     };
-    if (clickName === "创建群组") {
-      setGroupDeptUserSelectedList(valueArr);
-      // 如果选择的department User list没有当前的用户之后置空群主选择
-      setGroupOwner((prev) => {
-        if (valueArr.some((item) => item.id === prev.id)) {
-          return prev;
-        }
-        return defaultGroupOwner;
-      });
-      setGroupDeptUserList(handleDataUpdate);
-    } else {
-      setDepartmentSelectedList(valueArr);
-      setDeptUserList(handleDataUpdate);
-    }
+    setDepartmentSelectedList(valueArr);
+    setDeptUserList(handleDataUpdate);
   };
 
   // 处理部门列表能否被选择
@@ -221,7 +187,7 @@ const useAction = (props: {
       : canSelect === DeptUserCanSelectStatus.User;
   };
 
-  // 处理点击创建群组
+  // 处理点击选择参会人
   const handleCreateGroup = () => {
     let requestData: IWorkGroupCreate;
     !groupName
@@ -270,6 +236,25 @@ const useAction = (props: {
   };
 
   const handleConfirm = () => {
+    if (clickName === "指定会议管理员") {
+      const isUserArr = departmentSelectedList.filter(
+        (item) => typeof item.id !== "string"
+      );
+      if (isUserArr.length) {
+        setTipsObject({
+          show: true,
+          msg: "Administrators cannot select departments",
+        });
+        return;
+      }
+      if (departmentSelectedList.length > 1) {
+        setTipsObject({
+          show: true,
+          msg: "Administrators can only select one person",
+        });
+        return;
+      }
+    }
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
@@ -385,17 +370,11 @@ const useAction = (props: {
     };
     // 打开时load上次选中的数据
     open
-      ? clickName === "选择参会人" ||
-        clickName === "选择指定提醒人员" ||
-        clickName === "选择指定主持人"
-        ? loadSelectData
-          ? setDepartmentSelectedList((prev) =>
-              handleData(prev, departmentAndUserList)
-            )
-          : setDepartmentSelectedList([])
-        : setGroupDeptUserSelectedList((prev) =>
-            handleData(prev, groupDeptUserList)
+      ? loadSelectData
+        ? setDepartmentSelectedList((prev) =>
+            handleData(prev, departmentAndUserList)
           )
+        : setDepartmentSelectedList([])
       : // 关闭时清空上次选中数据
         (() => {
           setDepartmentSelectedList([]);
