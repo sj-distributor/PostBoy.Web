@@ -16,10 +16,12 @@ const useAction = () => {
   const [successText, setSuccessText] = useState<string>("");
   const [failSend, failSendAction] = useBoolean(false);
   const [failSendText, setFailSendText] = useState<string>("");
-  const [pageIndex, setPageIndex] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [rowCount, setRowCount] = useState<number>(0);
-  const [ketWord, setKeyWord] = useState<string>("");
+  const [dto, setDto] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+    rowCount: 0,
+    ketWord: "",
+  });
   const [rows, setRows] = useState<GetAllMeetingsData[]>([]);
   const [isOpenMeetingSettings, setIsOpenMeetingSettings] =
     useState<boolean>(false);
@@ -70,6 +72,7 @@ const useAction = () => {
   //取消会议
   const meetingCancel = (data: GetAllMeetingsData) => {
     const { meetingId, workWeChatCorpApplicationId, workWeChatCorpId } = data;
+
     getAppId(workWeChatCorpId, workWeChatCorpApplicationId).then(
       (appId: string) => {
         if (appId) {
@@ -84,7 +87,7 @@ const useAction = () => {
 
           cancelMeeting(cancelData)
             .then((res) => {
-              if (res && res.errmsg === "ok") {
+              if (res && res.errcode === 0) {
                 successAction.setTrue();
                 setSuccessText("Successfully cancelled the meeting");
                 getMeetingList();
@@ -107,9 +110,9 @@ const useAction = () => {
 
   const getMeetingList = () => {
     const data = {
-      PageIndex: pageIndex + 1,
-      PageSize: pageSize,
-      KeyWord: ketWord,
+      PageIndex: dto.pageIndex + 1,
+      PageSize: dto.pageSize,
+      KeyWord: dto.ketWord,
     };
     loadingAction.setTrue();
 
@@ -117,7 +120,7 @@ const useAction = () => {
       .then((res) => {
         if (res && res.meetings.length >= 0) {
           setRows([...res?.meetings]);
-          setRowCount(res.rowCount);
+          setDto((prev) => ({ ...prev, rowCount: res.rowCount }));
           loadingAction.setFalse();
         } else {
           failSendAction.setTrue();
@@ -135,13 +138,13 @@ const useAction = () => {
   };
 
   const searchMeeting = () => {
-    setPageIndex(0);
+    setDto((prev) => ({ ...prev, pageIndex: 0 }));
     getMeetingList();
   };
 
   useEffect(() => {
     getMeetingList();
-  }, [pageIndex, pageSize]);
+  }, [dto.pageIndex, dto.pageSize]);
 
   // 延迟关闭警告提示
   useEffect(() => {
@@ -157,8 +160,6 @@ const useAction = () => {
   }, [failSend, success]);
 
   return {
-    pageIndex,
-    pageSize,
     rows,
     isOpenMeetingSettings,
     setIsOpenMeetingSettings,
@@ -170,13 +171,11 @@ const useAction = () => {
     meetingCancel,
     meetingCreate,
     getMeetingList,
-    setKeyWord,
     meetingState,
     failSendText,
     successText,
-    rowCount,
-    setPageIndex,
-    setPageSize,
+    dto,
+    setDto,
     searchMeeting,
   };
 };

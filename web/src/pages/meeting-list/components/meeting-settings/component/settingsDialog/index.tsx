@@ -20,7 +20,7 @@ import {
   SettingDialogProps,
   MeetingCallReminder,
   DefaultDisplay,
-} from "../../../../dtos/meeting-seetings";
+} from "../../../../../../dtos/meeting-seetings";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 const SeetingsDialog = (props: SettingDialogProps) => {
   const {
@@ -56,6 +56,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
     handleGetSettingData,
     setDialog,
     settings,
+    open,
     setSettings,
   });
   return (

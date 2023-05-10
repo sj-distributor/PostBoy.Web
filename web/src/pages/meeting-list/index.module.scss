@@ -1,7 +1,22 @@
 .tableTitleFunction {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 1rem;
+}
+
+.searchMeeting {
+  display: flex;
+  align-items: center;
+}
+
+.tooltip {
+  text-align: center;
+  width: 100%;
+  padding: 0 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tableBoxWrap {

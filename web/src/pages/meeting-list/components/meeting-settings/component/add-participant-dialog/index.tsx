@@ -21,9 +21,8 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  DeptUserCanSelectStatus,
   SendObjOrGroup,
-} from "../../../../dtos/enterprise";
+} from "../../../../../../dtos/enterprise";
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
@@ -245,7 +244,7 @@ const SelectTargetDialog = memo(
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        className={styles.InputButton}
+                        className={styles.inputButton}
                         margin="dense"
                         type="button"
                       />
@@ -333,7 +332,7 @@ const SelectTargetDialog = memo(
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          className={styles.InputButton}
+                          className={styles.inputButton}
                           margin="dense"
                           type="button"
                           label="标签列表"

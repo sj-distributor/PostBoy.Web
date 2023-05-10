@@ -1,13 +1,6 @@
-import { useUpdateEffect } from "ahooks";
 import { clone } from "ramda";
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
-import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { IDepartmentAndUserListValue } from "../../../../../../dtos/enterprise";
 import {
   MeetingCallReminder,
   MeetingRecording,
@@ -17,7 +10,7 @@ import {
   RecordWatermark,
   WorkWeChatMeetingSettingDto,
   WorkWeChatMeetingUserDto,
-} from "../../../../dtos/meeting-seetings";
+} from "../../../../../../dtos/meeting-seetings";
 
 const useAction = (props: {
   setOpenAddDialog: (value: boolean) => void;
@@ -31,6 +24,7 @@ const useAction = (props: {
   setSettings: React.Dispatch<
     React.SetStateAction<WorkWeChatMeetingSettingDto>
   >;
+  open: boolean;
 }) => {
   const {
     setOpenAddDialog,
@@ -42,38 +36,39 @@ const useAction = (props: {
     setDialog,
     settings,
     setSettings,
+    open,
   } = props;
   const settingList: MeetingSettingList[] = [
-    {
-      title: "指定主持人",
-      icon: true,
-      optionType: "dailog",
-      border: true,
-      isOption: false,
-    },
+    // {
+    //   title: "指定主持人",
+    //   icon: true,
+    //   optionType: "dailog",
+    //   border: true,
+    //   isOption: false,
+    // },
     {
       title: "入会密码",
       optionType: "input",
       border: true,
       isOption: false,
     },
-    {
-      title: "自动开启会议录制",
-      optionType: "checkbox",
-      border: true,
-      isOption: false,
-      optionData: MeetingRecording.Soundcloud,
-      optionList: [
-        {
-          lable: "主持人入会后开启云录制",
-          value: MeetingRecording.Soundcloud,
-        },
-        {
-          lable: "主持人入会后开启本地录制",
-          value: MeetingRecording.LocalRecording,
-        },
-      ],
-    },
+    // {
+    //   title: "自动开启会议录制",
+    //   optionType: "checkbox",
+    //   border: true,
+    //   isOption: false,
+    //   optionData: MeetingRecording.Soundcloud,
+    //   optionList: [
+    //     {
+    //       lable: "主持人入会后开启云录制",
+    //       value: MeetingRecording.Soundcloud,
+    //     },
+    //     {
+    //       lable: "主持人入会后开启本地录制",
+    //       value: MeetingRecording.LocalRecording,
+    //     },
+    //   ],
+    // },
     {
       title: "开启等候室",
       key: "enable_waiting_room",
@@ -176,7 +171,8 @@ const useAction = (props: {
 
   const onMembershipPassword = (value: string, index: number) => {
     const newList = clone(meetingSettingList);
-    newList.map((item, i) => i === index && (item.password = +value));
+    const password = value.slice(0, 6);
+    newList.map((item, i) => i === index && (item.password = +password));
     setMeetingSettingList([...newList]);
   };
 
@@ -243,7 +239,7 @@ const useAction = (props: {
   }, [appointList, openAddDialog]);
 
   useEffect(() => {
-    if (settings) {
+    if (settings && open) {
       let settingsData = clone(meetingSettingList);
       settingsData.map((item) => {
         item.optionType === "input" &&
@@ -265,7 +261,7 @@ const useAction = (props: {
       });
       setMeetingSettingList(settingsData);
     }
-  }, [settings]);
+  }, [settings, open]);
 
   const onUpdateSettings = () => {
     const intPassword = meetingSettingList.filter(

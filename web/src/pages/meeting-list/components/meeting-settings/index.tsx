@@ -45,7 +45,7 @@ import SeetingsDialog from "./component/settingsDialog";
 import {
   DefaultDisplay,
   MeetingSettingsProps,
-} from "../../dtos/meeting-seetings";
+} from "../../../../dtos/meeting-seetings";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -140,6 +140,9 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     setMeetingEndTime,
     onSetAdminUser,
     adminUser,
+    customEndTime,
+    meetingDuration,
+    setMeetingDuration,
   } = useAction({
     setIsOpenMeetingSettings,
     meetingIdCorpIdAndAppId,
@@ -185,7 +188,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
           <AlertTitle>
             {meetingState === "create"
               ? "Meeting creation failed"
-              : "Meeting update failed"}
+              : "Meeting update failed,meeting is starting or end"}
           </AlertTitle>
         </Alert>
       </Snackbar>
@@ -454,17 +457,45 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       />
                     </div>
                   </div>
-                  <div className={style.fromItem}>
-                    <div className={style.title}>结束</div>
-                    <div className={style.widthFull}>
-                      <DateTime
-                        time={meetingEndTime}
-                        date={meetingEndDate}
-                        setDate={setMeetingEndDate}
-                        setTime={setMeetingEndTime}
-                      />
+                  {customEndTime ? (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>结束</div>
+                      <div className={style.widthFull}>
+                        <DateTime
+                          time={meetingEndTime}
+                          date={meetingEndDate}
+                          setDate={setMeetingEndDate}
+                          setTime={setMeetingEndTime}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>时长</div>
+                      <div className={style.widthFull}>
+                        <Select
+                          value={meetingDuration.value}
+                          displayEmpty
+                          inputProps={{ "aria-label": "Without label" }}
+                          className={style.fromDataItem}
+                          onChange={(e) =>
+                            setMeetingDuration((prve) => ({
+                              ...prve,
+                              value: +e.target.value,
+                            }))
+                          }
+                        >
+                          {meetingDuration.menuItemList.map((item, index) => {
+                            return (
+                              <MenuItem value={item.value} key={index}>
+                                {item.lable}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </div>
+                    </div>
+                  )}
                   <div className={style.fromItem}>
                     <div className={style.title}>地址</div>
                     <div className={style.widthFull}>
@@ -481,87 +512,93 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       />
                     </div>
                   </div>
-                  <div className={style.fromItem}>
-                    <div className={style.title}>附件</div>
-                    <div className={style.widthFull}>
-                      <ButtonGroup
-                        variant="contained"
-                        aria-label="split button"
-                        ref={anchorRef}
-                      >
-                        <Button onClick={() => uploadAnnex()}>添加附件</Button>
-                        <input
-                          ref={inputRef}
-                          hidden
-                          type="file"
-                          onChange={(e) =>
-                            !!e.target.files &&
-                            fileUpload(e.target.files, "会议附件", e)
-                          }
-                          multiple
-                        />
-                        <Button
-                          size="small"
-                          aria-controls={
-                            openAnnexList ? "split-button-menu" : undefined
-                          }
-                          aria-expanded={openAnnexList ? "true" : undefined}
-                          aria-label="select merge strategy"
-                          aria-haspopup="menu"
-                          onClick={handleToggle}
+                  {false && (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>附件</div>
+                      <div className={style.widthFull}>
+                        <ButtonGroup
+                          variant="contained"
+                          aria-label="split button"
+                          ref={anchorRef}
                         >
-                          <KeyboardArrowDownIcon />
-                        </Button>
-                      </ButtonGroup>
-                      <Popper
-                        sx={{
-                          zIndex: 1,
-                        }}
-                        open={openAnnexList}
-                        anchorEl={anchorRef.current}
-                        role={undefined}
-                        transition
-                        disablePortal
-                      >
-                        {({ TransitionProps, placement }) => (
-                          <Grow
-                            {...TransitionProps}
-                            style={{
-                              transformOrigin:
-                                placement === "bottom"
-                                  ? "center top"
-                                  : "center bottom",
-                            }}
+                          <Button onClick={() => uploadAnnex()}>
+                            添加附件
+                          </Button>
+                          <input
+                            ref={inputRef}
+                            hidden
+                            type="file"
+                            onChange={(e) =>
+                              !!e.target.files &&
+                              fileUpload(e.target.files, "会议附件", e)
+                            }
+                            multiple
+                          />
+                          <Button
+                            size="small"
+                            aria-controls={
+                              openAnnexList ? "split-button-menu" : undefined
+                            }
+                            aria-expanded={openAnnexList ? "true" : undefined}
+                            aria-label="select merge strategy"
+                            aria-haspopup="menu"
+                            onClick={handleToggle}
                           >
-                            <Paper>
-                              <ClickAwayListener onClickAway={handleClose}>
-                                <MenuList id="split-button-menu" autoFocusItem>
-                                  {annexFile.map((item, index) => {
-                                    return (
-                                      <MenuItem key={index}>
-                                        <Tooltip title={item.name}>
-                                          <div className={style.fileName}>
-                                            {item.name}
-                                          </div>
-                                        </Tooltip>
-                                        <ClearIcon
-                                          className={style.delFileIcon}
-                                          onClick={() =>
-                                            fileDelete("annex", index)
-                                          }
-                                        />
-                                      </MenuItem>
-                                    );
-                                  })}
-                                </MenuList>
-                              </ClickAwayListener>
-                            </Paper>
-                          </Grow>
-                        )}
-                      </Popper>
+                            <KeyboardArrowDownIcon />
+                          </Button>
+                        </ButtonGroup>
+                        <Popper
+                          sx={{
+                            zIndex: 1,
+                          }}
+                          open={openAnnexList}
+                          anchorEl={anchorRef.current}
+                          role={undefined}
+                          transition
+                          disablePortal
+                        >
+                          {({ TransitionProps, placement }) => (
+                            <Grow
+                              {...TransitionProps}
+                              style={{
+                                transformOrigin:
+                                  placement === "bottom"
+                                    ? "center top"
+                                    : "center bottom",
+                              }}
+                            >
+                              <Paper>
+                                <ClickAwayListener onClickAway={handleClose}>
+                                  <MenuList
+                                    id="split-button-menu"
+                                    autoFocusItem
+                                  >
+                                    {annexFile.map((item, index) => {
+                                      return (
+                                        <MenuItem key={index}>
+                                          <Tooltip title={item.name}>
+                                            <div className={style.fileName}>
+                                              {item.name}
+                                            </div>
+                                          </Tooltip>
+                                          <ClearIcon
+                                            className={style.delFileIcon}
+                                            onClick={() =>
+                                              fileDelete("annex", index)
+                                            }
+                                          />
+                                        </MenuItem>
+                                      );
+                                    })}
+                                  </MenuList>
+                                </ClickAwayListener>
+                              </Paper>
+                            </Grow>
+                          )}
+                        </Popper>
+                      </div>
                     </div>
-                  </div>
-
+                  )}
                   <div className={style.fromItem}>
                     <div className={style.title}>描述</div>
                     <div className={style.widthFull}>
@@ -680,7 +717,13 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
             </div>
           </div>
         </DialogContent>
-        <DialogActions sx={{ backgroundColor: "#f2f3f4" }}>
+        <DialogActions
+          sx={{
+            backgroundColor: "#f2f3f4",
+            justifyContent: "space-between",
+            padding: "1rem",
+          }}
+        >
           <Button
             onClick={() => setIsOpenMeetingSettings(false)}
             variant="contained"

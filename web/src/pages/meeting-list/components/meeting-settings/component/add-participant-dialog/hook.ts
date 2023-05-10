@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   GetWeChatWorkCorpAppGroups,
   PostWeChatWorkGroupCreate,
-} from "../../../../api/enterprise";
+} from "../../../../../../api/enterprise";
 import {
   IDepartmentAndUserListValue,
   DepartmentAndUserType,
@@ -15,7 +15,7 @@ import {
   SendObjOrGroup,
   IFirstState,
   IWorkCorpAppGroup,
-} from "../../../../dtos/enterprise";
+} from "../../../../../../dtos/enterprise";
 
 const useAction = (props: {
   departmentAndUserList: IDepartmentKeyControl[];

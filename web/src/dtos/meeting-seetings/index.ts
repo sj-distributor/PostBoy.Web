@@ -14,8 +14,8 @@ export interface DateTimeData {
 }
 
 export enum SelectType {
-  startTime = 0,
-  endTime = 1,
+  startTime = 0, //开始时间
+  endTime = 1, //结束时间
 }
 
 export interface SelectDataType {
@@ -24,49 +24,52 @@ export interface SelectDataType {
 }
 
 export enum CalendarSelectData {
-  CalendarForMARS = 1,
-  CalendarForELK = 2,
-  CalendarForJKL = 3,
+  CalendarForMARS = 1, //mars的日历
+  CalendarForELK = 2, //elk的日历
+  CalendarForJKL = 3, //jkl的日历
 }
 
+//会议开始提醒时间
 export enum ReminderTimeSelectData {
-  FiveMinutesAgo = 300,
-  FifteenMinutesAgo = 900,
-  MeetingBegins = 0,
-  AnHourAgo = 3600,
-  TheDayBefore = 86400,
+  FiveMinutesAgo = 300, //五分钟前提醒
+  FifteenMinutesAgo = 900, //十五分钟前提醒
+  MeetingBegins = 0, //会议开始时提醒
+  AnHourAgo = 3600, //一小时前提醒
+  TheDayBefore = 86400, //一天前提醒
 }
 
 export enum RepeatSelectData {
-  EveryDay = 0,
-  Weekly = 1,
-  Monthly = 2,
-  EveryWorkingDay = 7,
-  Repeat = 9,
-  Custom = 10,
+  EveryDay = 0, //0：每天重复会议；
+  Weekly = 1, //1：每周重复会议；
+  Monthly = 2, //2：每月重复会议；
+  EveryWorkingDay = 7, //7：每个工作日重复会议
+  NoRepeat = 9, //不重复会议
+  Custom = 10, //自定义会议重复
 }
 
+//自动开启会议录制
 export enum MeetingRecording {
-  Soundcloud = 1,
-  LocalRecording = 2,
+  Soundcloud = 1, //主持人入会后开启云录制
+  LocalRecording = 2, //主持人入会后开启本地录制
 }
 
 export enum RecordWatermark {
-  On,
-  Off,
+  On, //开启屏幕共享水印
+  Off, //关闭屏幕共享水印
 }
 
+//会议开始时来电提醒
 export enum MeetingCallReminder {
-  All = 3,
-  Appoint = 4,
-  NoRemind = 1,
-  Host = 2,
+  All = 3, //所有成员
+  Appoint = 4, //指定成员
+  NoRemind = 1, //不提醒
+  Host = 2, //仅主持人
 }
 
 export enum MutewhenJoining {
-  On = 0,
-  Off = 1,
-  MoreThanSixOn = 2,
+  On = 0, //开启成员入会时静音
+  Off = 1, //关闭成员入会时静音
+  MoreThanSixOn = 2, //超过6人自动开启静音
 }
 
 export enum MembershipRestrictions {
@@ -83,9 +86,23 @@ export interface SelectGroupType {
 }
 
 export enum DefaultDisplay {
-  Participant = 6,
-  hostList = 10,
-  DisplayName = 2,
+  Participant = 6, //大于六人隐藏多余参会人
+  hostList = 10, //最大选择十位会议主持人
+  DisplayName = 2, //主持人于提醒人ui默认显示2个名字
+}
+
+export enum IsRepeat {
+  NonRecurringMeetings, //0：非周期性会议。默认为0
+  PeriodicMeetings, //1：周期性会议
+}
+
+//会议时长
+export enum MeetingDuration {
+  Minutes = 1800, //三十分钟
+  OneHour = 3600, //一小时
+  TwoHours = 7200, //两小时
+  ThreeHours = 10800, //三小时
+  CustomEndTime, //自定义时长
 }
 
 export interface SettingDialogProps {
@@ -111,16 +128,10 @@ export interface MeetingSettingsProps {
   meetingState: string;
 }
 
-export interface SettingDialogType {
-  open: boolean;
-  setDialog: (value: boolean) => void;
-  type: "AddMembers" | "DesignatedHost" | "DesignatedMembers";
-}
-
 export interface MeetingSettingList {
   title: string;
   border: boolean;
-  optionType?: "checkbox" | "input" | "dailog";
+  optionType?: "checkbox" | "input" | "dailog"; //checkbox:会议设置列表右边显示复选框，input：显示密码输入框，dailog：点击打开弹出
   isOption: boolean;
   optionData?: number;
   optionList?: SelectDataType[];
@@ -134,36 +145,36 @@ export interface WorkWeChatMeetingUserDto {
 }
 
 export interface WorkWeChatMeetingReminderDto {
-  is_repeat: number; //是否是周期性会议，1：周期性会议 0：非周期性会议。默认为0
-  repeat_type: number; //0：每天；1：每周；2：每月；7：每个工作日
-  repeat_until: number; //重复结束时刻，默认设置为最大结束时间
-  repeat_interval: number; //重复间隔。目前仅当repeat_type为2时，即周期为周时，支持设置该字段，且值不能大于2。
+  is_repeat: number;
+  repeat_type: number;
+  repeat_until: number;
+  repeat_interval: number;
   remind_before: [number] | null;
 }
 
 export interface WorkWeChatMeetingSettingDto {
-  password: number | null; //入会密码，仅可输入4-6位纯数字
-  enable_waiting_room: boolean; //是否开启等候室。true:开启等候室；false:不开启等候室；默认不开
-  allow_enter_before_host: boolean; //是否允许成员在主持人进会前加入。true:允许；false:不允许。默认允许
-  remind_scope: number; //WorkWeChatMeetingRemindScopeinteger($int32)1：不提醒；2：仅提醒主持人；3：提醒所有成员入；4：指定部份人响铃
-  enable_enter_mute: number; //0：关闭；1：开启；2：超过6人后自动开启静音
-  allow_external_user: boolean; //true:所有成员可入会；false:仅企业内部成员可入会 。默认所有成员可入会
-  enable_screen_watermark: boolean; //是否开启屏幕水印，true:开启；false:不开启。默认不开启
+  password: number | null;
+  enable_waiting_room: boolean;
+  allow_enter_before_host: boolean;
+  remind_scope: number;
+  enable_enter_mute: number;
+  allow_external_user: boolean;
+  enable_screen_watermark: boolean;
   hosts?: WorkWeChatMeetingUserDto;
   ring_users?: WorkWeChatMeetingUserDto;
 }
 
 export interface CreateOrUpdateWorkWeChatMeetingDto {
   appId: string;
-  admin_userid: string; //会议创建人id
-  title: string; //会议标题
-  meeting_start: number; //integer($int64),会议开始时间
-  meeting_duration: number; //	integer($int64),会议时长
-  description?: string; //会议描述
-  location?: string; //会议地点
+  admin_userid: string;
+  title: string;
+  meeting_start: number;
+  meeting_duration: number;
+  description?: string;
+  location?: string;
   attendees?: WorkWeChatMeetingUserDto;
-  meetingid?: string; //会议id，修改才必传
-  cal_id?: string; //日程
+  meetingid?: string;
+  cal_id?: string;
   settings?: Partial<WorkWeChatMeetingSettingDto>;
   reminders?: Partial<WorkWeChatMeetingReminderDto>;
 }
@@ -173,8 +184,8 @@ export interface CreateWorkWeChatMeeting {
 }
 
 export interface CreateMeetingResponse {
-  errCode: number;
-  errorMsg: string;
+  errcode: number;
+  errormsg: string;
   meetingid: string;
   excessUsers: string[];
 }
@@ -182,6 +193,20 @@ export interface CreateMeetingResponse {
 export interface GetWorkWeChatMeeting {
   AppId: string;
   MeetingId: string;
+}
+
+export interface MeetingAttendeesUserData {
+  userid: string;
+  status: number;
+  firstJoinTime: number;
+  lastQuitTime: number;
+  totalJoinCount: number;
+  cumulativeTime: number;
+}
+
+export interface MeetingAttendees {
+  member: MeetingAttendeesUserData[];
+  tmpExternalUser: MeetingAttendeesUserData[];
 }
 
 export interface GetMeetingResponse {
@@ -196,24 +221,7 @@ export interface GetMeetingResponse {
   main_department: number;
   status: number;
   agentid: number;
-  attendees: {
-    member: {
-      userid: string;
-      status: number;
-      firstJoinTime: number;
-      lastQuitTime: number;
-      totalJoinCount: number;
-      cumulativeTime: number;
-    }[];
-    tmpExternalUser: {
-      userid: string;
-      status: number;
-      firstJoinTime: number;
-      lastQuitTime: number;
-      totalJoinCount: number;
-      cumulativeTime: number;
-    }[];
-  };
+  attendees: MeetingAttendees;
   settings: WorkWeChatMeetingSettingDto;
   cal_id: string;
   reminders: WorkWeChatMeetingReminderDto;
@@ -269,12 +277,13 @@ export interface GetAllMeetingResponse {
   rowCount: 13;
 }
 
+//会议状态
 export enum MeetingStatus {
-  待开始 = 1,
-  会议中,
-  已结束,
-  已取消,
-  已过期,
+  待开始 = 1, //1会议待开始
+  会议中, //2会议中
+  已结束, //3已结束
+  已取消, //4已取消
+  已过期, //已过期
 }
 
 export interface CancelWorkWeChatMeetingDto {

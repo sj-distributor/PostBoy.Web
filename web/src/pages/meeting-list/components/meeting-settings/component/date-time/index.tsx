@@ -3,7 +3,7 @@ import { Input } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import "dayjs/locale/zh-cn";
-import { DateTimeProps } from "../../../../dtos/meeting-seetings";
+import { DateTimeProps } from "../../../../../../dtos/meeting-seetings";
 import style from "./index.module.scss";
 
 const DateTime = (props: DateTimeProps) => {

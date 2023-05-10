@@ -6,15 +6,18 @@ import {
   CreateOrUpdateWorkWeChatMeetingDto,
   DefaultDisplay,
   GetWorkWeChatMeeting,
+  IsRepeat,
+  MeetingDuration,
   MeetingSettingsProps,
   ReminderTimeSelectData,
   RepeatSelectData,
+  SelectDataType,
   SelectGroupType,
   WorkWeChatMeetingReminderDto,
   WorkWeChatMeetingSettingDto,
-} from "../../dtos/meeting-seetings";
-import { ICorpAppData, ICorpData } from "../../dtos/enterprise";
-import { GetCorpAppList, GetCorpsList } from "../../api/enterprise";
+} from "../../../../dtos/meeting-seetings";
+import { ICorpAppData, ICorpData } from "../../../../dtos/enterprise";
+import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import {
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
@@ -26,19 +29,18 @@ import {
   ITagsList,
   IWorkCorpAppGroup,
   SendObjOrGroup,
-} from "../../dtos/enterprise";
+} from "../../../../dtos/enterprise";
 import { clone, flatten } from "ramda";
-import { GetDeptsAndUserList } from "../../api/enterprise";
+import { GetDeptsAndUserList } from "../../../../api/enterprise";
 import {
   createMeeting,
   getMeetingData,
   updateMeeting,
-} from "../../api/meeting-seetings";
+} from "../../../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
 
 const useAction = (props: MeetingSettingsProps) => {
   const {
-    setIsOpenMeetingSettings,
     meetingIdCorpIdAndAppId,
     isOpenMeetingSettings,
     getMeetingList,
@@ -104,7 +106,7 @@ const useAction = (props: MeetingSettingsProps) => {
       value: RepeatSelectData.EveryDay,
       data: [
         {
-          value: RepeatSelectData.Repeat,
+          value: RepeatSelectData.NoRepeat,
           lable: "不重复",
         },
         {
@@ -126,6 +128,34 @@ const useAction = (props: MeetingSettingsProps) => {
       ],
     },
   ]);
+  const [meetingDuration, setMeetingDuration] = useState<{
+    value: number;
+    menuItemList: SelectDataType[];
+  }>({
+    value: MeetingDuration.Minutes,
+    menuItemList: [
+      {
+        value: MeetingDuration.Minutes,
+        lable: "三十分钟",
+      },
+      {
+        value: MeetingDuration.OneHour,
+        lable: "一小时",
+      },
+      {
+        value: MeetingDuration.TwoHours,
+        lable: "两小时",
+      },
+      {
+        value: MeetingDuration.ThreeHours,
+        lable: "三小时",
+      },
+      {
+        value: MeetingDuration.CustomEndTime,
+        lable: "自定义会议时长",
+      },
+    ],
+  });
   const [openAnnexList, setOpenAnnexList] = useState<boolean>(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -172,8 +202,14 @@ const useAction = (props: MeetingSettingsProps) => {
 
       setMeetingReminders((reminders) => {
         let data = clone(reminders);
-        data.is_repeat = value !== RepeatSelectData.Repeat ? 1 : 0;
-        data.repeat_type = value === RepeatSelectData.Repeat ? 0 : +value;
+        data.is_repeat =
+          value !== RepeatSelectData.NoRepeat
+            ? IsRepeat.PeriodicMeetings
+            : IsRepeat.NonRecurringMeetings;
+        data.repeat_type =
+          value === RepeatSelectData.NoRepeat
+            ? RepeatSelectData.EveryDay
+            : +value;
         data.repeat_until = repeat_until;
         return data;
       });
@@ -635,11 +671,21 @@ const useAction = (props: MeetingSettingsProps) => {
   const [meetingStartDate, setMeetingStartDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
   );
-  const [meetingStartTime, setMeetingStartTime] = useState<string>("12:00");
+  const [customEndTime, customEndTimeAction] = useBoolean(false);
+  const [meetingStartTime, setMeetingStartTime] = useState<string>(
+    dayjs()
+      .set("minutes", dayjs().get("minutes") + 5)
+      .format("HH:mm")
+  );
   const [meetingEndDate, setMeetingEndDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
   );
-  const [meetingEndTime, setMeetingEndTime] = useState<string>("13:00");
+  const [meetingEndTime, setMeetingEndTime] = useState<string>(
+    dayjs()
+      .set("hours", dayjs().get("hours") + 1)
+      .set("minutes", dayjs().get("minutes") + 5)
+      .format("HH:mm")
+  );
   const [meetingLocation, setMeetingLocation] = useState<string>("");
   const [settings, setSettings] = useState<WorkWeChatMeetingSettingDto>({
     password: null,
@@ -659,10 +705,16 @@ const useAction = (props: MeetingSettingsProps) => {
       const meeting_start = Math.ceil(
         dayjs(meetingStartDate + " " + meetingStartTime).valueOf() / 1000
       );
-      const meeting_end = Math.ceil(
-        dayjs(meetingEndDate + " " + meetingEndTime).valueOf() / 1000
-      );
-      const meeting_duration = meeting_end - meeting_start;
+      let meeting_duration;
+
+      if (customEndTime) {
+        const meeting_end = Math.ceil(
+          dayjs(meetingEndDate + " " + meetingEndTime).valueOf() / 1000
+        );
+        meeting_duration = meeting_end - meeting_start;
+      } else {
+        meeting_duration = meetingDuration.value;
+      }
 
       let attendeesList: string[] = [];
 
@@ -727,11 +779,10 @@ const useAction = (props: MeetingSettingsProps) => {
           show: true,
           msg: "The meeting duration cannot be less than 5 minutes",
         });
-      dayjs.unix(createOrUpdateMeetingData.meeting_start) <
-        dayjs().set("minute", dayjs().get("minute") + 15) &&
+      dayjs.unix(createOrUpdateMeetingData.meeting_start) < dayjs() &&
         setTipsObject({
           show: true,
-          msg: "The start time of the meeting must be greater than the current fifteen minutes",
+          msg: "The meeting start time cannot be earlier than the current time, please reselect",
         });
 
       if (
@@ -739,8 +790,7 @@ const useAction = (props: MeetingSettingsProps) => {
         createOrUpdateMeetingData.title &&
         createOrUpdateMeetingData.meeting_start &&
         createOrUpdateMeetingData.meeting_duration > 300 &&
-        dayjs.unix(createOrUpdateMeetingData.meeting_start) >
-          dayjs().set("minute", dayjs().get("minute") + 15) &&
+        dayjs.unix(createOrUpdateMeetingData.meeting_start) > dayjs() &&
         attendeesList.findIndex(
           (item) => item === createOrUpdateMeetingData.admin_userid
         ) !== -1
@@ -751,21 +801,19 @@ const useAction = (props: MeetingSettingsProps) => {
           };
 
           await createMeeting(data)
-            .then((data) => {
-              if (data?.meetingid) {
-                const meetingId = data.meetingid;
+            .then((res) => {
+              if (res && res.errcode === 0) {
+                const meetingId = res.meetingid;
                 if (meetingId !== null) {
                   successAction.setTrue();
-                  setIsOpenMeetingSettings(false);
                   getMeetingList();
                 } else {
                   failSendAction.setTrue();
                 }
-                loadingAction.setFalse();
               } else {
-                loadingAction.setFalse();
                 failSendAction.setTrue();
               }
+              loadingAction.setFalse();
             })
             .catch((err) => {
               loadingAction.setFalse();
@@ -783,11 +831,10 @@ const useAction = (props: MeetingSettingsProps) => {
           };
 
           await updateMeeting(data)
-            .then((data) => {
-              if (data && data.errmsg === "ok") {
+            .then((res) => {
+              if (res && res.errcode === 0) {
                 successAction.setTrue();
                 loadingAction.setFalse();
-                setIsOpenMeetingSettings(false);
                 getMeetingList();
               } else {
                 loadingAction.setFalse();
@@ -841,7 +888,7 @@ const useAction = (props: MeetingSettingsProps) => {
   const onGetMeetingData = (data: GetWorkWeChatMeeting) => {
     getMeetingData(data)
       .then((res) => {
-        if (res && res.errmsg === "ok") {
+        if (res && res.errcode === 0) {
           const {
             title,
             admin_userid,
@@ -1018,6 +1065,11 @@ const useAction = (props: MeetingSettingsProps) => {
     }
   }, [isShowDialog]);
 
+  useEffect(() => {
+    meetingDuration.value === MeetingDuration.CustomEndTime &&
+      customEndTimeAction.setTrue();
+  }, [meetingDuration.value]);
+
   return {
     editor,
     html,
@@ -1101,6 +1153,9 @@ const useAction = (props: MeetingSettingsProps) => {
     setMeetingEndTime,
     onSetAdminUser,
     adminUser,
+    customEndTime,
+    meetingDuration,
+    setMeetingDuration,
   };
 };
 
