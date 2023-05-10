@@ -44,20 +44,12 @@ import AddParticipantDialog from "./component/add-participant-dialog";
 import SeetingsDialog from "./component/settingsDialog";
 import {
   DefaultDisplay,
-  GetAllMeetingsData,
-  MeetingIdCorpIdAndAppId,
-  RepeatSelectData,
+  MeetingSettingsProps,
 } from "../../dtos/meeting-seetings";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-export default function SelectLabels(props: {
-  isOpenMeetingSettings: boolean;
-  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>;
-  meetingIdCorpIdAndAppId?: MeetingIdCorpIdAndAppId | null;
-  getMeetingList: () => void;
-  meetingState: string;
-}) {
+export default function MeetingSetting(props: MeetingSettingsProps) {
   const {
     isOpenMeetingSettings,
     setIsOpenMeetingSettings,
@@ -102,7 +94,6 @@ export default function SelectLabels(props: {
     hostLists,
     participantLists,
     tipsObject,
-    isNewOrUpdate,
     appLoading,
     setCorpsValue,
     setGroupList,
@@ -252,9 +243,7 @@ export default function SelectLabels(props: {
         <DialogContent sx={{ backgroundColor: "#f2f3f4" }}>
           <div className={style.container}>
             <div className={style.appointmentMeeting}>
-              {isNewOrUpdate === "new" &&
-              corpsList.length > 0 &&
-              !appLoading ? (
+              {corpsList.length > 0 && !appLoading ? (
                 <>
                   <div className={style.fromItem}>
                     <div className={style.title}>企业</div>

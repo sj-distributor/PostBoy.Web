@@ -70,7 +70,6 @@ const SelectTargetDialog = memo(
       tagsList,
       flattenDepartmentList,
       departmentKeyValue,
-      groupList,
       canSelect,
       lastTagsValue,
       clickName,
@@ -91,26 +90,15 @@ const SelectTargetDialog = memo(
     const {
       departmentSelectedList,
       tagsValue,
-      isShowDialog,
-      groupOwner,
-      groupName,
       tipsObject,
-      groupDeptUserSelectedList,
-      defaultGroupOwner,
-      groupDeptUserList,
       createLoading,
       sendList,
-      setGroupName,
-      setGroupOwner,
-      setIsShowDialog,
       handleDeptOrUserClick,
       setSearchToDeptValue,
       setTagsValue,
       handleTypeIsCanSelect,
-      handleCreateGroup,
       handleConfirm,
       handleCancel,
-      onListBoxScrolling,
     } = useAction({
       open,
       AppId,
@@ -324,55 +312,6 @@ const SelectTargetDialog = memo(
                 )}
 
                 <>
-                  {sendType === SendObjOrGroup.Group && (
-                    <Autocomplete
-                      id="group-list"
-                      disablePortal
-                      openOnFocus
-                      size="small"
-                      sx={{ margin: "1rem 0 0" }}
-                      componentsProps={{
-                        paper: { elevation: 3 },
-                        popper: { placement: "top" },
-                      }}
-                      value={
-                        chatId
-                          ? groupList.filter((x) => x.chatId === chatId)[0]
-                          : null
-                      }
-                      options={groupList}
-                      getOptionLabel={(option) => option.chatName}
-                      isOptionEqualToValue={(option, value) =>
-                        option.chatId === value.chatId
-                      }
-                      renderOption={(props, option, state) => (
-                        <li {...props} key={option.chatId}>
-                          {option.chatName}
-                        </li>
-                      )}
-                      ListboxProps={{
-                        onScroll: (e) => {
-                          onListBoxScrolling(
-                            (e.target as HTMLElement).scrollHeight,
-                            (e.target as HTMLElement).scrollTop,
-                            (e.target as HTMLElement).clientHeight
-                          );
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          className={styles.InputButton}
-                          margin="dense"
-                          type="text"
-                          label="群组列表"
-                        />
-                      )}
-                      onChange={(e, value) => {
-                        setChatId && setChatId(value ? value.chatId : "");
-                      }}
-                    />
-                  )}
                   {sendType === SendObjOrGroup.Object && (
                     <Autocomplete
                       id="tags-list"
@@ -432,31 +371,6 @@ const SelectTargetDialog = memo(
             </LoadingButton>
           </DialogActions>
         </Dialog>
-
-        {/* ----- 创建群组 ----- */}
-        {clickName === "选择参会人" && (
-          <SelectTargetDialog
-            open={isShowDialog}
-            AppId={AppId}
-            CorpId={CorpId}
-            departmentAndUserList={departmentAndUserList}
-            departmentKeyValue={departmentKeyValue}
-            flattenDepartmentList={flattenDepartmentList}
-            isLoading={isLoading}
-            tagsList={tagsList}
-            canSelect={DeptUserCanSelectStatus.User}
-            setOpenFunction={setIsShowDialog}
-            setDeptUserList={setDeptUserList}
-            setOuterTagsValue={setTagsValue}
-            lastTagsValue={lastTagsValue}
-            setGroupList={setGroupList}
-            groupList={groupList}
-            chatId={chatId}
-            clickName={"创建群组"}
-            groupDeptUserSelectedList={groupDeptUserSelectedList}
-            isUpdatedDeptUser={isUpdatedDeptUser}
-          />
-        )}
 
         {/* 消息提示 */}
         <Snackbar

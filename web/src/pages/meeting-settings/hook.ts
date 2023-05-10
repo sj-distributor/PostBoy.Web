@@ -6,7 +6,7 @@ import {
   CreateOrUpdateWorkWeChatMeetingDto,
   DefaultDisplay,
   GetWorkWeChatMeeting,
-  MeetingIdCorpIdAndAppId,
+  MeetingSettingsProps,
   ReminderTimeSelectData,
   RepeatSelectData,
   SelectGroupType,
@@ -36,13 +36,7 @@ import {
 } from "../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
 
-const useAction = (props: {
-  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>;
-  meetingIdCorpIdAndAppId?: MeetingIdCorpIdAndAppId | null;
-  isOpenMeetingSettings: boolean;
-  getMeetingList: () => void;
-  meetingState: string;
-}) => {
+const useAction = (props: MeetingSettingsProps) => {
   const {
     setIsOpenMeetingSettings,
     meetingIdCorpIdAndAppId,
@@ -70,7 +64,6 @@ const useAction = (props: {
   const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
   // 获取的App数组
   const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
-  const [isNewOrUpdate, setIsNewOrUpdate] = useState<string>("new");
   const [participantList, setParticipantList] =
     useState<IDepartmentAndUserListValue[]>();
   const [isShowMoreParticipantList, setIsShowMoreParticipantList] =
@@ -446,34 +439,39 @@ const useAction = (props: {
 
   //获取选择人员
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
-    const arr = getUserChildrenList(departmentKeyValue?.data, data, []);
+    const personnelData = getUserChildrenList(
+      departmentKeyValue?.data,
+      data,
+      []
+    );
     if (clickName === "选择参会人") {
-      setParticipantList([...arr]);
+      setParticipantList([...personnelData]);
     }
 
-    clickName === "选择指定提醒人员" && setAppointList([...arr]);
-    clickName === "选择指定主持人" && setHostList([...arr]);
+    clickName === "选择指定提醒人员" && setAppointList([...personnelData]);
+    clickName === "选择指定主持人" && setHostList([...personnelData]);
+
     if (clickName === "指定会议管理员") {
-      setAdminUser([...arr]);
-      setParticipantList([...arr]);
+      setAdminUser([...personnelData]);
+      setParticipantList([...personnelData]);
     }
   };
 
   const getUserChildrenList = (
     hasData: IDepartmentAndUserListValue[],
     data: IDepartmentAndUserListValue[],
-    arr: IDepartmentAndUserListValue[]
+    personnelData: IDepartmentAndUserListValue[]
   ) => {
     data.forEach((i) => {
       for (const key in hasData) {
         i.id === hasData[key].id &&
-          arr.findIndex((item) => item === hasData[key]) === -1 &&
-          arr.push(hasData[key]);
+          personnelData.findIndex((item) => item === hasData[key]) === -1 &&
+          personnelData.push(hasData[key]);
         hasData[key].children.length > 0 &&
-          getUserChildrenList(hasData[key].children, data, arr);
+          getUserChildrenList(hasData[key].children, data, personnelData);
       }
     });
-    return arr;
+    return personnelData;
   };
 
   const onSetParticipant = () => {
@@ -545,24 +543,23 @@ const useAction = (props: {
 
   // 默认选择App对象
   useEffect(() => {
-    isNewOrUpdate === "new" &&
-      setCorpAppValue(
-        corpAppList.length > 0
-          ? meetingIdCorpIdAndAppId
-            ? corpAppList.filter(
-                (item) => item.id === meetingIdCorpIdAndAppId.appId
-              )[0]
-            : corpAppList[0]
-          : {
-              appId: "",
-              id: "",
-              name: "",
-              workWeChatCorpId: "",
-              display: true,
-              agentId: 0,
-            }
-      );
-  }, [corpAppList, isNewOrUpdate]);
+    setCorpAppValue(
+      corpAppList.length > 0
+        ? meetingIdCorpIdAndAppId
+          ? corpAppList.filter(
+              (item) => item.id === meetingIdCorpIdAndAppId.appId
+            )[0]
+          : corpAppList[0]
+        : {
+            appId: "",
+            id: "",
+            name: "",
+            workWeChatCorpId: "",
+            display: true,
+            agentId: 0,
+          }
+    );
+  }, [corpAppList]);
 
   useEffect(() => {
     participantLists &&
@@ -1058,7 +1055,6 @@ const useAction = (props: {
     hostLists,
     participantLists,
     tipsObject,
-    isNewOrUpdate,
     appLoading,
     setCorpsValue,
     setGroupList,
