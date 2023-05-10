@@ -108,7 +108,7 @@ const useAction = (props: {
     {
       title: "重复",
       key: "repeat",
-      value: RepeatSelectData.Repeat,
+      value: RepeatSelectData.EveryDay,
       data: [
         {
           value: RepeatSelectData.Repeat,
@@ -180,7 +180,7 @@ const useAction = (props: {
       setMeetingReminders((reminders) => {
         let data = clone(reminders);
         data.is_repeat = value !== RepeatSelectData.Repeat ? 1 : 0;
-        data.repeat_type = +value;
+        data.repeat_type = value === RepeatSelectData.Repeat ? 0 : +value;
         data.repeat_until = repeat_until;
         return data;
       });

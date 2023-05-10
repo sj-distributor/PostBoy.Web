@@ -37,6 +37,7 @@ const MeetingList = () => {
     rowCount,
     setPageIndex,
     setPageSize,
+    searchMeeting,
   } = useAction();
   const columns: GridColDef[] = [
     { field: "adminUserId", headerName: "会议管理员", width: 130 },
@@ -178,7 +179,7 @@ const MeetingList = () => {
             variant="contained"
             component="label"
             sx={{ marginLeft: "0.5rem" }}
-            onClick={() => getMeetingList()}
+            onClick={() => searchMeeting()}
           >
             搜索会议
           </Button>

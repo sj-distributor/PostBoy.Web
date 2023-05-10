@@ -51,7 +51,6 @@ const useAction = () => {
     //获取appId
     await GetCorpAppList({ CorpId: workWeChatCorpId })
       .then((res) => {
-        console.log(res);
         if (res && res.length > 0) {
           res?.map((item) => {
             item.id === workWeChatCorpApplicationId && (appid = item.appId);
@@ -90,10 +89,11 @@ const useAction = () => {
                 setSuccessText("Successfully cancelled the meeting");
                 getMeetingList();
                 loadingAction.setFalse();
+              } else {
+                setFailSendText("Cancel meeting failed");
+                failSendAction.setTrue();
               }
               loadingAction.setFalse();
-              failSendAction.setTrue();
-              setFailSendText("Cancel meeting failed");
             })
             .catch((err) => {
               failSendAction.setTrue();
@@ -115,7 +115,7 @@ const useAction = () => {
 
     getAllMeetingData(data)
       .then((res) => {
-        if (res && res.meetings.length > 0) {
+        if (res && res.meetings.length >= 0) {
           setRows([...res?.meetings]);
           setRowCount(res.rowCount);
           loadingAction.setFalse();
@@ -132,6 +132,11 @@ const useAction = () => {
         setFailSendText("Table data update failed");
         loadingAction.setFalse();
       });
+  };
+
+  const searchMeeting = () => {
+    setPageIndex(0);
+    getMeetingList();
   };
 
   useEffect(() => {
@@ -172,6 +177,7 @@ const useAction = () => {
     rowCount,
     setPageIndex,
     setPageSize,
+    searchMeeting,
   };
 };
 
