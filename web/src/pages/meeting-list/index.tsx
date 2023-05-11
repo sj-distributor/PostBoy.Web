@@ -139,7 +139,6 @@ const MeetingList = () => {
     {
       field: "title",
       headerName: "会议标题",
-      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -148,7 +147,6 @@ const MeetingList = () => {
     {
       field: "description",
       headerName: "会议描述",
-      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -157,7 +155,6 @@ const MeetingList = () => {
     {
       field: "location",
       headerName: "会议地点",
-      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -166,7 +163,6 @@ const MeetingList = () => {
     {
       field: "presentMember",
       headerName: "参会人员",
-      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -179,7 +175,6 @@ const MeetingList = () => {
     {
       field: "absentMember",
       headerName: "缺席人员（会议没开始都是缺席人员）",
-      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
