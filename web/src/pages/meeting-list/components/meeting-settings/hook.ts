@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
+import timezone from "dayjs/plugin/timezone";
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
 import {

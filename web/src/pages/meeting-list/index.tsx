@@ -124,12 +124,11 @@ const MeetingList = () => {
     {
       field: "meetingLink",
       headerName: "入会链接",
-      width: 420,
+      width: 100,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
         <>
-          <span>{params.row.meetingLink}</span>
           <ContentCopyIcon
             onClick={() => handleCopyMeetingLink(params.row.meetingLink)}
             sx={{ fontSize: "1rem", marginLeft: "0.5rem", cursor: "pointer" }}
@@ -140,7 +139,7 @@ const MeetingList = () => {
     {
       field: "title",
       headerName: "会议标题",
-      width: 400,
+      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -149,7 +148,7 @@ const MeetingList = () => {
     {
       field: "description",
       headerName: "会议描述",
-      width: 400,
+      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -158,7 +157,7 @@ const MeetingList = () => {
     {
       field: "location",
       headerName: "会议地点",
-      width: 400,
+      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -167,7 +166,7 @@ const MeetingList = () => {
     {
       field: "presentMember",
       headerName: "参会人员",
-      width: 400,
+      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -180,7 +179,7 @@ const MeetingList = () => {
     {
       field: "absentMember",
       headerName: "缺席人员（会议没开始都是缺席人员）",
-      width: 400,
+      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -191,7 +190,7 @@ const MeetingList = () => {
     {
       field: "fun",
       headerName: "操作",
-      width: 150,
+      width: 160,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
@@ -295,7 +294,7 @@ const MeetingList = () => {
               pagination
               paginationMode="server"
               rowHeight={56}
-              style={{ height: 675, width: "95%" }}
+              style={{ height: 700, width: "95%" }}
               rowCount={dto.rowCount}
               onPageChange={(value) =>
                 setDto((prve) => ({ ...prve, pageIndex: value }))

@@ -33,7 +33,7 @@
 
 .participantData {
   display: flex;
-  flex-basis: 30%;
+  flex-basis: 35%;
   align-items: center;
   margin-right: 0.8rem;
   margin-bottom: 0.8rem;
@@ -46,7 +46,7 @@
 .showParticipantData {
   display: flex;
   align-items: center;
-  flex-basis: 30%;
+  flex-basis: 35%;
   min-width: 9.5rem;
   margin-right: 0.8rem;
   margin-bottom: 0.8rem;
@@ -64,7 +64,7 @@
 
 .addParticipant {
   padding: 0.5rem 0.6rem;
-  flex-basis: 30%;
+  flex-basis: 35%;
   min-width: 9.5rem;
   border-radius: 0.3rem;
   border: 0.1rem solid #d8d9d9;
@@ -198,4 +198,10 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+.adminAndParticipantItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.2rem;
 }

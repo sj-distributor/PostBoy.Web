@@ -362,7 +362,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       />
                     </div>
                   </div>
-                  <div className={style.fromItem}>
+                  <div className={style.adminAndParticipantItem}>
                     <div
                       className={style.title}
                       style={{ marginBottom: "0.8rem" }}
@@ -390,7 +390,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       )}
                     </div>
                   </div>
-                  <div className={style.fromItem}>
+                  <div className={style.adminAndParticipantItem}>
                     <div
                       className={style.title}
                       style={{ marginBottom: "0.8rem" }}
