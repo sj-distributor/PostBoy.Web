@@ -145,12 +145,8 @@ const useAction = () => {
 
   const handleCopyMeetingLink = (link: string) => {
     if (link) {
-      const el = document.createElement("textarea");
-      el.value = link;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
+      const clipboardObj = navigator.clipboard;
+      clipboardObj.writeText(link);
       successAction.setTrue();
       setSuccessText("Successfully copied link");
     }
