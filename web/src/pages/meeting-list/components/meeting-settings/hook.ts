@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import * as wangEditor from "@wangeditor/editor";
 import { IEditorConfig } from "@wangeditor/editor";
 import {
@@ -38,6 +40,9 @@ import {
   updateMeeting,
 } from "../../../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const useAction = (props: MeetingSettingsProps) => {
   const {
@@ -103,7 +108,7 @@ const useAction = (props: MeetingSettingsProps) => {
     {
       title: "重复",
       key: "repeat",
-      value: RepeatSelectData.EveryDay,
+      value: RepeatSelectData.NoRepeat,
       data: [
         {
           value: RepeatSelectData.NoRepeat,
@@ -779,18 +784,23 @@ const useAction = (props: MeetingSettingsProps) => {
           show: true,
           msg: "The meeting duration cannot be less than 5 minutes",
         });
-      dayjs.unix(createOrUpdateMeetingData.meeting_start) < dayjs() &&
+      dayjs.tz(
+        dayjs.unix(createOrUpdateMeetingData.meeting_start),
+        "Asia/Shanghai"
+      ) < dayjs.tz(dayjs(), "Asia/Shanghai") &&
         setTipsObject({
           show: true,
           msg: "The meeting start time cannot be earlier than the current time, please reselect",
         });
-
       if (
         createOrUpdateMeetingData.appId &&
         createOrUpdateMeetingData.title &&
         createOrUpdateMeetingData.meeting_start &&
         createOrUpdateMeetingData.meeting_duration > 300 &&
-        dayjs.unix(createOrUpdateMeetingData.meeting_start) > dayjs() &&
+        dayjs.tz(
+          dayjs.unix(createOrUpdateMeetingData.meeting_start),
+          "Asia/Shanghai"
+        ) > dayjs.tz(dayjs(), "Asia/Shanghai") &&
         attendeesList.findIndex(
           (item) => item === createOrUpdateMeetingData.admin_userid
         ) !== -1
@@ -904,6 +914,12 @@ const useAction = (props: MeetingSettingsProps) => {
           setMeetingTitle(title);
           setMeetingStartDate(dayjs.unix(meeting_start).format("YYYY-MM-DD"));
           setMeetingStartTime(dayjs.unix(meeting_start).format("HH:mm"));
+          meetingDuration.menuItemList.filter(
+            (item) => meeting_duration === item.value
+          ).length > 0
+            ? customEndTimeAction.setFalse()
+            : customEndTimeAction.setTrue();
+          setMeetingDuration((prev) => ({ ...prev, value: meeting_duration }));
           setMeetingEndDate(
             dayjs.unix(meeting_start + meeting_duration).format("YYYY-MM-DD")
           );

@@ -39,36 +39,36 @@ const useAction = (props: {
     open,
   } = props;
   const settingList: MeetingSettingList[] = [
-    // {
-    //   title: "指定主持人",
-    //   icon: true,
-    //   optionType: "dailog",
-    //   border: true,
-    //   isOption: false,
-    // },
+    {
+      title: "指定主持人",
+      icon: true,
+      optionType: "dailog",
+      border: true,
+      isOption: false,
+    },
     {
       title: "入会密码",
       optionType: "input",
       border: true,
       isOption: false,
     },
-    // {
-    //   title: "自动开启会议录制",
-    //   optionType: "checkbox",
-    //   border: true,
-    //   isOption: false,
-    //   optionData: MeetingRecording.Soundcloud,
-    //   optionList: [
-    //     {
-    //       lable: "主持人入会后开启云录制",
-    //       value: MeetingRecording.Soundcloud,
-    //     },
-    //     {
-    //       lable: "主持人入会后开启本地录制",
-    //       value: MeetingRecording.LocalRecording,
-    //     },
-    //   ],
-    // },
+    {
+      title: "自动开启会议录制",
+      optionType: "checkbox",
+      border: true,
+      isOption: false,
+      optionData: MeetingRecording.Soundcloud,
+      optionList: [
+        {
+          lable: "主持人入会后开启云录制",
+          value: MeetingRecording.Soundcloud,
+        },
+        {
+          lable: "主持人入会后开启本地录制",
+          value: MeetingRecording.LocalRecording,
+        },
+      ],
+    },
     {
       title: "开启等候室",
       key: "enable_waiting_room",
