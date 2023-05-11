@@ -60,7 +60,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
-        asyncTootip(params.row.absentMember + "", style.tooltip),
+        asyncTootip(params.row.adminUserId + "", style.tooltip),
     },
     {
       field: "mainDepartment",
