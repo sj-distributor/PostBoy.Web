@@ -59,6 +59,8 @@ const MeetingList = () => {
       width: 130,
       align: "center",
       headerAlign: "center",
+      renderCell: (params: GridCellParams) =>
+        asyncTootip(params.row.absentMember + "", style.tooltip),
     },
     {
       field: "mainDepartment",
@@ -179,7 +181,7 @@ const MeetingList = () => {
     {
       field: "absentMember",
       headerName: "缺席人员（会议没开始都是缺席人员）",
-      width: 160,
+      width: 260,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
