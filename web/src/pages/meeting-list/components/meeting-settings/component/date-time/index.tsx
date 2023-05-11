@@ -35,7 +35,7 @@ const DateTime = (props: DateTimeProps) => {
           }}
           value={time}
           onChange={(e) => setTime(e.target.value)}
-        ></Input>
+        />
       </div>
     </div>
   );

@@ -14,12 +14,14 @@ import {
   GridCellParams,
   GridColDef,
   GridValueGetterParams,
+  MuiEvent,
 } from "@mui/x-data-grid";
 import MeetingSettings from "./components/meeting-settings";
 import useAction from "./hook";
 import { MeetingStatus } from "../../dtos/meeting-seetings";
 import style from "./index.module.scss";
 import { Search } from "@mui/icons-material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const asyncTootip = (title: string, style: string) => {
   return (
@@ -48,6 +50,7 @@ const MeetingList = () => {
     dto,
     setDto,
     searchMeeting,
+    handleCopyMeetingLink,
   } = useAction();
   const columns: GridColDef[] = [
     {
@@ -64,15 +67,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
     },
-    {
-      field: "title",
-      headerName: "会议标题",
-      width: 130,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: GridCellParams) =>
-        asyncTootip(params.row.title, style.tooltip),
-    },
+
     {
       field: "status",
       headerName: "会议状态",
@@ -129,16 +124,32 @@ const MeetingList = () => {
     {
       field: "meetingLink",
       headerName: "入会链接",
-      width: 130,
+      width: 420,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <>
+          <span>{params.row.meetingLink}</span>
+          <ContentCopyIcon
+            onClick={() => handleCopyMeetingLink(params.row.meetingLink)}
+            sx={{ fontSize: "1rem", marginLeft: "0.5rem", cursor: "pointer" }}
+          />
+        </>
+      ),
+    },
+    {
+      field: "title",
+      headerName: "会议标题",
+      width: 400,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
-        asyncTootip(params.row.meetingLink, style.tooltip),
+        asyncTootip(params.row.title, style.tooltip),
     },
     {
       field: "description",
       headerName: "会议描述",
-      width: 160,
+      width: 400,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -147,7 +158,7 @@ const MeetingList = () => {
     {
       field: "location",
       headerName: "会议地点",
-      width: 160,
+      width: 400,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -156,7 +167,7 @@ const MeetingList = () => {
     {
       field: "presentMember",
       headerName: "参会人员",
-      width: 160,
+      width: 400,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -169,7 +180,7 @@ const MeetingList = () => {
     {
       field: "absentMember",
       headerName: "缺席人员（会议没开始都是缺席人员）",
-      width: 260,
+      width: 400,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -180,7 +191,7 @@ const MeetingList = () => {
     {
       field: "fun",
       headerName: "操作",
-      width: 160,
+      width: 150,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (

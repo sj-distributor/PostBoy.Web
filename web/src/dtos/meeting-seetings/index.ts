@@ -105,6 +105,12 @@ export enum MeetingDuration {
   CustomEndTime, //自定义时长
 }
 
+//会议密码限制
+export enum MeetingPasswordLimitation {
+  Min = 4, //最小密码位数
+  Max = 6, //最大密码位数
+}
+
 export interface SettingDialogProps {
   open: boolean;
   setDialog: (value: boolean) => void;

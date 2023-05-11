@@ -1,5 +1,6 @@
+import { GridCellParams, MuiEvent } from "@mui/x-data-grid";
 import { useBoolean } from "ahooks";
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { GetCorpAppList } from "../../api/enterprise";
 import { cancelMeeting, getAllMeetingData } from "../../api/meeting-seetings";
 import {
@@ -142,6 +143,19 @@ const useAction = () => {
     getMeetingList();
   };
 
+  const handleCopyMeetingLink = (link: string) => {
+    if (link) {
+      const el = document.createElement("textarea");
+      el.value = link;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      successAction.setTrue();
+      setSuccessText("Successfully copied link");
+    }
+  };
+
   useEffect(() => {
     getMeetingList();
   }, [dto.pageIndex, dto.pageSize]);
@@ -177,6 +191,7 @@ const useAction = () => {
     dto,
     setDto,
     searchMeeting,
+    handleCopyMeetingLink,
   };
 };
 

@@ -10,6 +10,7 @@ import {
   OutlinedInput,
   Radio,
   RadioGroup,
+  Snackbar,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -39,10 +40,10 @@ const SeetingsDialog = (props: SettingDialogProps) => {
     meetingSettingList,
     showPassword,
     radioDisabled,
+    tipsObject,
     onIsOption,
     handleChange,
     handleClickShowPassword,
-    handleMouseDownPassword,
     onMembershipPassword,
     onSelectHost,
     onAppint,
@@ -61,6 +62,14 @@ const SeetingsDialog = (props: SettingDialogProps) => {
   });
   return (
     <>
+      <Snackbar
+        message={tipsObject.msg}
+        open={tipsObject.show}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
       <Dialog
         open={open}
         onClose={() => setDialog(false)}
@@ -202,7 +211,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                           <IconButton
                             aria-label="toggle password visibility"
                             onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
+                            onMouseDown={(event) => event.preventDefault()}
                             edge="end"
                           >
                             {showPassword ? <VisibilityOff /> : <Visibility />}
