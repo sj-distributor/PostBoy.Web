@@ -238,18 +238,29 @@ const useAction = (props: SettingDialogProps) => {
           settingData.password = null;
         }
       }
-      item.key === "enable_waiting_room" &&
-        (settingData.enable_waiting_room = item.isOption);
-      item.key === "allow_enter_before_host" &&
-        (settingData.allow_enter_before_host = item.isOption);
-      item.key === "remind_scope" &&
-        (settingData.remind_scope = item.optionData ? item.optionData : 1);
-      item.key === "enable_enter_mute" &&
-        (settingData.enable_enter_mute = item.optionData ? item.optionData : 0);
-      item.key === "allow_external_user" &&
-        (settingData.allow_external_user = !!item.optionData);
-      item.key === "enable_screen_watermark" &&
-        (settingData.enable_screen_watermark = !!item.isOption);
+
+      switch (item.key) {
+        case "enable_waiting_room":
+          settingData.enable_waiting_room = item.isOption;
+          break;
+        case "allow_enter_before_host":
+          settingData.allow_enter_before_host = item.isOption;
+          break;
+        case "remind_scope":
+          settingData.remind_scope = item.optionData ? item.optionData : 1;
+          break;
+        case "enable_enter_mute":
+          settingData.enable_enter_mute = item.optionData ? item.optionData : 0;
+          break;
+        case "allow_external_user":
+          settingData.allow_external_user = !!item.optionData;
+          break;
+        case "enable_screen_watermark":
+          settingData.enable_screen_watermark = !!item.isOption;
+          break;
+        default:
+          break;
+      }
     });
 
     let hosts: WorkWeChatMeetingUserDto = {

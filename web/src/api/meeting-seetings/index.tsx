@@ -31,21 +31,13 @@ export const updateMeeting = async (data: {
 
 export const getMeetingData = async (data: GetWorkWeChatMeeting) => {
   return await Get<GetMeetingResponse>(
-    "/api/WeChat/work/meeting?AppId=" +
-      data.AppId +
-      "&MeetingId=" +
-      data.MeetingId
+    `/api/WeChat/work/meeting?AppId=${data.AppId}&MeetingId=${data.MeetingId}`
   );
 };
 
 export const getAllMeetingData = async (data: GetAllMeetingDto) => {
   return await Get<GetAllMeetingResponse>(
-    "/api/WeChat/work/meetings?PageIndex=" +
-      data.PageIndex +
-      "&PageSize=" +
-      data.PageSize +
-      "&KeyWord=" +
-      data.KeyWord
+    `/api/WeChat/work/meetings?PageIndex=${data.PageIndex}&PageSize=${data.PageSize}&KeyWord=${data.KeyWord}`
   );
 };
 

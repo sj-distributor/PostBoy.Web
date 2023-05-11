@@ -17,9 +17,7 @@ const DateTime = (props: DateTimeProps) => {
             value={dayjs(date)}
             format="M月D日 ddd"
             sx={{ width: "100%" }}
-            onChange={(newDate) =>
-              setDate((date) => (date = dayjs(newDate).format("YYYY-MM-DD")))
-            }
+            onChange={(newDate) => setDate(dayjs(newDate).format("YYYY-MM-DD"))}
           />
         </LocalizationProvider>
       </div>
