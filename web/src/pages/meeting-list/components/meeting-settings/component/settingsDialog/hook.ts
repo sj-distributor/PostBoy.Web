@@ -248,10 +248,10 @@ const useAction = (props: SettingDialogProps) => {
         (settingData.enable_enter_mute = item.optionData ? item.optionData : 0);
       item.key === "allow_external_user" &&
         (settingData.allow_external_user = !!item.optionData);
-
       item.key === "enable_screen_watermark" &&
         (settingData.enable_screen_watermark = !!item.isOption);
     });
+
     let hosts: WorkWeChatMeetingUserDto = {
       userid: [],
     };
@@ -281,25 +281,32 @@ const useAction = (props: SettingDialogProps) => {
   useEffect(() => {
     if (settings && open) {
       let settingsData = clone(meetingSettingList);
-      settingsData.map((item) => {
-        item.optionType === "input" &&
-          settings.password &&
-          (item.password = settings.password);
-        item.password && (item.isOption = true);
+      const {
+        password,
+        enable_waiting_room,
+        allow_enter_before_host,
+        remind_scope,
+        enable_enter_mute,
+        allow_external_user,
+        enable_screen_watermark,
+      } = settings;
 
+      settingsData.map((item) => {
+        item.optionType === "input" && password && (item.password = password);
+        item.password && (item.isOption = true);
         item.key === "enable_waiting_room" &&
-          (item.isOption = settings.enable_waiting_room);
+          (item.isOption = enable_waiting_room);
         item.key === "allow_enter_before_host" &&
-          (item.isOption = settings.allow_enter_before_host);
-        item.key === "remind_scope" &&
-          (item.optionData = settings.remind_scope);
+          (item.isOption = allow_enter_before_host);
+        item.key === "remind_scope" && (item.optionData = remind_scope);
         item.key === "enable_enter_mute" &&
-          (item.optionData = settings.enable_enter_mute);
+          (item.optionData = enable_enter_mute);
         item.key === "allow_external_user" &&
-          (item.optionData = +settings.allow_external_user);
+          (item.optionData = +allow_external_user);
         item.key === "enable_screen_watermark" &&
-          (item.isOption = settings.enable_screen_watermark);
+          (item.isOption = enable_screen_watermark);
       });
+
       setMeetingSettingList(settingsData);
     }
   }, [settings, open]);
