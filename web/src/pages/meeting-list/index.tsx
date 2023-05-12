@@ -56,7 +56,8 @@ const MeetingList = () => {
     {
       field: "adminUserId",
       headerName: "会议管理员",
-      width: 130,
+      flex: 1,
+      minWidth: 130,
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridCellParams) =>
@@ -65,7 +66,8 @@ const MeetingList = () => {
     {
       field: "mainDepartment",
       headerName: "发起人所在部门",
-      width: 130,
+      flex: 1,
+      minWidth: 130,
       align: "center",
       headerAlign: "center",
     },
@@ -73,7 +75,8 @@ const MeetingList = () => {
     {
       field: "status",
       headerName: "会议状态",
-      width: 100,
+      flex: 1,
+      minWidth: 100,
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
@@ -82,7 +85,8 @@ const MeetingList = () => {
     {
       field: "isDelete",
       headerName: "是否取消",
-      width: 100,
+      flex: 1,
+      minWidth: 100,
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
@@ -91,7 +95,8 @@ const MeetingList = () => {
     {
       field: "meetingStart",
       headerName: "会议开始时间",
-      width: 150,
+      flex: 1,
+      minWidth: 150,
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
@@ -101,7 +106,8 @@ const MeetingList = () => {
       field: "meetingDuration",
       headerName: "会议时长",
       type: "number",
-      width: 90,
+      flex: 1,
+      minWidth: 90,
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
@@ -110,7 +116,8 @@ const MeetingList = () => {
     {
       field: "password",
       headerName: "入会密码",
-      width: 100,
+      flex: 1,
+      minWidth: 100,
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
@@ -119,14 +126,16 @@ const MeetingList = () => {
     {
       field: "meetingCode",
       headerName: "会议号",
-      width: 130,
+      flex: 1,
+      minWidth: 130,
       align: "center",
       headerAlign: "center",
     },
     {
       field: "meetingLink",
       headerName: "入会链接",
-      width: 100,
+      flex: 1,
+      minWidth: 100,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
