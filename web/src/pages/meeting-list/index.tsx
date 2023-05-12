@@ -141,36 +141,41 @@ const MeetingList = () => {
     {
       field: "title",
       headerName: "会议标题",
-      width: 160,
       align: "center",
       headerAlign: "center",
-      renderCell: (params: GridCellParams) =>
-        asyncTootip(params.row.title, style.tooltip),
+      flex: 1,
+      minWidth: 160,
+      renderCell: (params: GridCellParams) => {
+        return asyncTootip(params.row.title, style.tooltip);
+      },
     },
     {
       field: "description",
       headerName: "会议描述",
-      width: 160,
       align: "center",
       headerAlign: "center",
+      flex: 1,
+      minWidth: 160,
       renderCell: (params: GridCellParams) =>
         asyncTootip(params.row.description, style.tooltip),
     },
     {
       field: "location",
       headerName: "会议地点",
-      width: 160,
       align: "center",
       headerAlign: "center",
+      flex: 1,
+      minWidth: 160,
       renderCell: (params: GridCellParams) =>
         asyncTootip(params.row.location, style.tooltip),
     },
     {
       field: "presentMember",
       headerName: "参会人员",
-      width: 160,
       align: "center",
       headerAlign: "center",
+      flex: 1,
+      minWidth: 160,
       renderCell: (params: GridCellParams) =>
         asyncTootip(params.row.presentMember + "", style.tooltip),
       valueGetter: (params: GridValueGetterParams) =>
@@ -181,9 +186,10 @@ const MeetingList = () => {
     {
       field: "absentMember",
       headerName: "缺席人员（会议没开始都是缺席人员）",
-      width: 260,
       align: "center",
       headerAlign: "center",
+      flex: 1,
+      minWidth: 160,
       renderCell: (params: GridCellParams) =>
         asyncTootip(params.row.absentMember + "", style.tooltip),
       valueGetter: (params: GridValueGetterParams) =>
@@ -192,8 +198,8 @@ const MeetingList = () => {
     {
       field: "fun",
       headerName: "操作",
-      width: 160,
       align: "center",
+      width: 160,
       headerAlign: "center",
       renderCell: (params) => (
         <>
