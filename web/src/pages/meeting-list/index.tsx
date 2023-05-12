@@ -189,7 +189,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
       flex: 1,
-      minWidth: 160,
+      minWidth: 260,
       renderCell: (params: GridCellParams) =>
         asyncTootip(params.row.absentMember + "", style.tooltip),
       valueGetter: (params: GridValueGetterParams) =>
