@@ -17,10 +17,8 @@ import {
   SelectGroupType,
   WorkWeChatMeetingReminderDto,
   WorkWeChatMeetingSettingDto,
-} from "../../../../dtos/meeting-seetings";
-import { ICorpAppData, ICorpData } from "../../../../dtos/enterprise";
-import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
-import {
+  ICorpAppData,
+  ICorpData,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
@@ -31,7 +29,8 @@ import {
   ITagsList,
   IWorkCorpAppGroup,
   SendObjOrGroup,
-} from "../../../../dtos/enterprise";
+} from "../../../../dtos/meeting-seetings";
+import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
 import { GetDeptsAndUserList } from "../../../../api/enterprise";
 import {
@@ -976,6 +975,17 @@ const useAction = (props: MeetingSettingsProps) => {
                       : 0
                     : 0);
                 item.key === "repeat" && (item.value = reminders.repeat_type);
+              });
+              return arr;
+            });
+          } else {
+            setSelectGroup((selectData) => {
+              let arr = clone(selectData);
+              arr.forEach((item) => {
+                item.key === "reminderTime" &&
+                  (item.value = ReminderTimeSelectData.MeetingBegins);
+                item.key === "repeat" &&
+                  (item.value = RepeatSelectData.NoRepeat);
               });
               return arr;
             });

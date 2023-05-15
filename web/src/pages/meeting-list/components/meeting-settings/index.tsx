@@ -201,9 +201,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         flattenDepartmentList={searchKeyValue}
         isLoading={isTreeViewLoading}
         tagsList={tagsList}
-        groupList={groupList}
         canSelect={DeptUserCanSelectStatus.Both}
-        setGroupList={setGroupList}
         setOpenFunction={setIsShowDialog}
         setDeptUserList={setDepartmentAndUserList}
         outerTagsValue={tagsValue}
@@ -212,9 +210,6 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         clickName={clickName}
         chatId={chatId}
         setChatId={setChatId}
-        sendType={sendType}
-        setSendType={setSendType}
-        isUpdatedDeptUser={isUpdatedDeptUser}
         handleGetSelectData={handleGetSelectData}
         loadSelectData={loadSelectData}
       />

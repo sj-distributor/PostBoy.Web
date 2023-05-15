@@ -15,14 +15,12 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Checkbox from "@mui/material/Checkbox";
 import useAction from "./hook";
 import styles from "./index.module.scss";
-
 import {
   ClickType,
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
-  SendObjOrGroup,
-} from "../../../../../../dtos/enterprise";
+} from "../../../../../../dtos/meeting-seetings";
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
@@ -73,13 +71,9 @@ const SelectTargetDialog = memo(
       lastTagsValue,
       clickName,
       chatId,
-      sendType,
       outerTagsValue,
-      isUpdatedDeptUser,
       loadSelectData,
-      setSendType,
       setChatId,
-      setGroupList,
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
@@ -91,7 +85,6 @@ const SelectTargetDialog = memo(
       tagsValue,
       tipsObject,
       createLoading,
-      sendList,
       handleDeptOrUserClick,
       setSearchToDeptValue,
       setTagsValue,
@@ -109,16 +102,12 @@ const SelectTargetDialog = memo(
       clickName,
       chatId,
       outerTagsValue,
-      isUpdatedDeptUser,
-      sendType,
       CorpId,
       loadSelectData,
-      setSendType,
       setChatId,
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
-      setGroupList,
       handleGetSelectData,
     });
     const center = () =>
@@ -232,15 +221,9 @@ const SelectTargetDialog = memo(
                     disableClearable
                     fullWidth
                     id="type-simple-select"
-                    value={sendType}
+                    defaultValue={"对象"}
                     size="small"
-                    options={sendList}
-                    getOptionLabel={(x) =>
-                      x === SendObjOrGroup.Group ? "群组" : "对象"
-                    }
-                    onChange={(e, value) => {
-                      setSendType && setSendType(value);
-                    }}
+                    options={[]}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -251,96 +234,90 @@ const SelectTargetDialog = memo(
                     )}
                   />
                 }
-                {sendType !== SendObjOrGroup.Object ? (
-                  <></>
-                ) : (
-                  flattenDepartmentList && (
-                    <Autocomplete
-                      id={"sreach-input" + clickName}
-                      disablePortal
-                      openOnFocus
-                      multiple
-                      disableCloseOnSelect
-                      size="small"
-                      sx={{
-                        margin: "1rem 0 calc(1rem - 4px)",
-                      }}
-                      componentsProps={{
-                        paper: { elevation: 3 },
-                        popper: {
-                          placement: "top",
-                        },
-                      }}
-                      value={departmentSelectedList}
-                      options={flattenDepartmentList}
-                      getOptionLabel={(option) => option.name}
-                      isOptionEqualToValue={(option, value) =>
-                        option.id === value.id
-                      }
-                      groupBy={(option) => option.parentid as string}
-                      renderInput={(params) => (
-                        <TextField {...params} label={"部门与用户搜索"} />
-                      )}
-                      filterOptions={(options, state) =>
-                        fiteringDeptAndUsers(options, state)
-                      }
-                      onChange={(e, value) =>
-                        value && setSearchToDeptValue(value)
-                      }
-                      renderGroup={(params) => {
-                        const { key, group, children } = params;
-                        return <div key={key}>{children}</div>;
-                      }}
-                      renderOption={(props, option, state) => {
-                        let style = Object.assign(
-                          option.type === DepartmentAndUserType.Department
-                            ? { color: "#666" }
-                            : { paddingLeft: "2rem" },
-                          { fontSize: "0.9rem" }
-                        );
-                        !handleTypeIsCanSelect(canSelect, option.type) &&
-                          (props.onClick = () => {});
-                        return (
-                          <li {...props} style={style}>
-                            {option.name}
-                          </li>
-                        );
-                      }}
-                    />
-                  )
+                {flattenDepartmentList && (
+                  <Autocomplete
+                    id={"sreach-input" + clickName}
+                    disablePortal
+                    openOnFocus
+                    multiple
+                    disableCloseOnSelect
+                    size="small"
+                    sx={{
+                      margin: "1rem 0 calc(1rem - 4px)",
+                    }}
+                    componentsProps={{
+                      paper: { elevation: 3 },
+                      popper: {
+                        placement: "top",
+                      },
+                    }}
+                    value={departmentSelectedList}
+                    options={flattenDepartmentList}
+                    getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(option, value) =>
+                      option.id === value.id
+                    }
+                    groupBy={(option) => option.parentid as string}
+                    renderInput={(params) => (
+                      <TextField {...params} label={"部门与用户搜索"} />
+                    )}
+                    filterOptions={(options, state) =>
+                      fiteringDeptAndUsers(options, state)
+                    }
+                    onChange={(e, value) =>
+                      value && setSearchToDeptValue(value)
+                    }
+                    renderGroup={(params) => {
+                      const { key, group, children } = params;
+                      return <div key={key}>{children}</div>;
+                    }}
+                    renderOption={(props, option, state) => {
+                      let style = Object.assign(
+                        option.type === DepartmentAndUserType.Department
+                          ? { color: "#666" }
+                          : { paddingLeft: "2rem" },
+                        { fontSize: "0.9rem" }
+                      );
+                      !handleTypeIsCanSelect(canSelect, option.type) &&
+                        (props.onClick = () => {});
+                      return (
+                        <li {...props} style={style}>
+                          {option.name}
+                        </li>
+                      );
+                    }}
+                  />
                 )}
 
                 <>
-                  {sendType === SendObjOrGroup.Object && (
-                    <Autocomplete
-                      id="tags-list"
-                      disablePortal
-                      openOnFocus
-                      multiple
-                      disableCloseOnSelect
-                      disableClearable
-                      limitTags={2}
-                      size="small"
-                      sx={{ display: "none" }}
-                      value={tagsValue}
-                      options={tagsList}
-                      componentsProps={{ paper: { elevation: 3 } }}
-                      getOptionLabel={(option) => option.tagName}
-                      isOptionEqualToValue={(option, value) =>
-                        option.tagId === value.tagId
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          className={styles.inputButton}
-                          margin="dense"
-                          type="button"
-                          label="标签列表"
-                        />
-                      )}
-                      onChange={(e, value) => setTagsValue(value)}
-                    />
-                  )}
+                  <Autocomplete
+                    id="tags-list"
+                    disablePortal
+                    openOnFocus
+                    multiple
+                    disableCloseOnSelect
+                    disableClearable
+                    limitTags={2}
+                    size="small"
+                    sx={{ display: "none" }}
+                    value={tagsValue}
+                    options={tagsList}
+                    componentsProps={{ paper: { elevation: 3 } }}
+                    getOptionLabel={(option) => option.tagName}
+                    isOptionEqualToValue={(option, value) =>
+                      option.tagId === value.tagId
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        className={styles.inputButton}
+                        margin="dense"
+                        type="button"
+                        label="标签列表"
+                      />
+                    )}
+                    onChange={(e, value) => setTagsValue(value)}
+                  />
                 </>
               </>
             ) : (
@@ -389,10 +366,8 @@ const SelectTargetDialog = memo(
       prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
       prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
       prevProps.AppId === nextProps.AppId &&
-      prevProps.groupList === nextProps.groupList &&
       prevProps.chatId === nextProps.chatId &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.sendType === nextProps.sendType
+      prevProps.isLoading === nextProps.isLoading
     );
   }
 );

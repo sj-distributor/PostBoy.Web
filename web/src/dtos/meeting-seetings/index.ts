@@ -1,5 +1,133 @@
 import { Dispatch, SetStateAction } from "react";
-import { IDepartmentAndUserListValue } from "../enterprise";
+
+export interface ICorpData {
+  corpName: string;
+  corpId: string;
+  id: string;
+}
+
+export interface ICorpAppData {
+  appId: string;
+  id: string;
+  name: string;
+  workWeChatCorpId: string;
+  display: boolean;
+  agentId: number;
+}
+
+export enum DepartmentAndUserType {
+  Department,
+  User,
+}
+
+export enum DeptUserCanSelectStatus {
+  Department,
+  User,
+  Both,
+}
+
+export interface IDepartmentAndUserListValue {
+  id: number | string;
+  name: string;
+  type: DepartmentAndUserType;
+  parentid: string | number[];
+  selected: boolean;
+  isCollapsed?: boolean;
+  children: IDepartmentAndUserListValue[];
+}
+
+export interface IDepartmentData {
+  department_leader: [];
+  id: number;
+  name: string;
+  name_en: null;
+  order: number;
+  parentid: number;
+  departmentUserList: IDepartmentUsersData[];
+  selected: boolean;
+}
+
+export interface IDepartmentKeyControl {
+  data: IDepartmentAndUserListValue[];
+  key: string;
+}
+
+export interface IDeptAndUserList {
+  department: IDepartmentData;
+  users: IDepartmentUsersData[];
+}
+
+export interface ISearchList {
+  key: string;
+  data: IDepartmentAndUserListValue[];
+}
+
+export interface ITagsList {
+  tagId: number;
+  tagName: string;
+}
+
+export interface IWorkCorpAppGroup {
+  chatId: string;
+  chatName: string;
+}
+
+export enum SendObjOrGroup {
+  Object,
+  Group,
+}
+
+export interface IDepartmentUsersData {
+  name: string;
+  userid: string;
+  department: number[];
+  open_userid: string;
+  selected: boolean;
+}
+
+export enum ClickType {
+  Collapse,
+  Select,
+}
+
+export interface IWorkGroupCreate {
+  appId: string;
+  name: string;
+  owner?: string;
+  chatId?: string;
+  userList: string[];
+}
+
+export interface IFirstState {
+  chatId: string;
+  deptUserList: IDepartmentKeyControl[];
+  tagsValue: ITagsList[];
+  sendType: SendObjOrGroup;
+}
+
+export interface ITargetDialogProps {
+  open: boolean;
+  departmentAndUserList: IDepartmentKeyControl[];
+  departmentKeyValue: IDepartmentKeyControl;
+  flattenDepartmentList: IDepartmentAndUserListValue[];
+  AppId: string;
+  CorpId: string;
+  isLoading: boolean;
+  tagsList: ITagsList[];
+  lastTagsValue?: string[] | undefined;
+  clickName: string;
+  canSelect: DeptUserCanSelectStatus;
+  chatId: string;
+  outerTagsValue?: ITagsList[];
+  setChatId?: React.Dispatch<React.SetStateAction<string>>;
+  setOpenFunction: (open: boolean) => void;
+  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
+  setDeptUserList: React.Dispatch<
+    React.SetStateAction<IDepartmentKeyControl[]>
+  >;
+  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
+  loadSelectData?: IDepartmentAndUserListValue[];
+}
 
 export interface DateTimeProps {
   date: string;
