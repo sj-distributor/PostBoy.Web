@@ -358,7 +358,7 @@ const MeetingList = () => {
             id="alert-dialog-title-cancel"
             sx={{ backgroundColor: "#f2f3f4" }}
           >
-            ⚠️警告
+            ⚠️提示
           </DialogTitle>
           <DialogContent sx={{ backgroundColor: "#f2f3f4" }}>
             <DialogContentText id="alert-dialog-description-cancel">
