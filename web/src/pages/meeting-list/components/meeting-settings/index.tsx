@@ -231,6 +231,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         onClose={() => setIsOpenMeetingSettings(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        onClick={() => {}}
       >
         <DialogTitle
           id="alert-dialog-title"

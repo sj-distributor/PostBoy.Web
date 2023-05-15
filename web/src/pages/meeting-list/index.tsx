@@ -2,6 +2,11 @@ import {
   Alert,
   AlertTitle,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   InputAdornment,
   OutlinedInput,
@@ -51,6 +56,11 @@ const MeetingList = () => {
     setDto,
     searchMeeting,
     handleCopyMeetingLink,
+    isConfirmDialog,
+    confirmDialogAction,
+    confirmDelete,
+    isConfirmDelete,
+    cancelBtnRef,
   } = useAction();
   const columns: GridColDef[] = [
     {
@@ -225,7 +235,12 @@ const MeetingList = () => {
             variant="contained"
             size="small"
             disabled={params.row.isDelete}
-            onClick={() => meetingCancel(params.row)}
+            ref={cancelBtnRef}
+            onClick={() =>
+              isConfirmDelete
+                ? meetingCancel(params.row)
+                : confirmDialogAction.setTrue()
+            }
           >
             取消会议
           </Button>
@@ -330,6 +345,47 @@ const MeetingList = () => {
           getMeetingList={getMeetingList}
           meetingState={meetingState}
         />
+        <Dialog
+          open={isConfirmDialog}
+          onClick={() => {}}
+          onClose={() => confirmDialogAction.setFalse()}
+          hideBackdrop
+          keepMounted={true}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle
+            id="alert-dialog-title-cancel"
+            sx={{ backgroundColor: "#f2f3f4" }}
+          >
+            ⚠️警告
+          </DialogTitle>
+          <DialogContent sx={{ backgroundColor: "#f2f3f4" }}>
+            <DialogContentText id="alert-dialog-description-cancel">
+              您正在取消预定会议，是否继续操作
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions
+            sx={{ backgroundColor: "#f2f3f4", justifyContent: "space-between" }}
+          >
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => confirmDialogAction.setFalse()}
+            >
+              取消
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => {
+                confirmDelete();
+              }}
+            >
+              确认
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </>
   );

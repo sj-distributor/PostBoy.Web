@@ -49,6 +49,7 @@ const useAction = (props: MeetingSettingsProps) => {
     isOpenMeetingSettings,
     getMeetingList,
     meetingState,
+    setIsOpenMeetingSettings,
   } = props;
 
   // 拿到的企业对象
@@ -795,7 +796,7 @@ const useAction = (props: MeetingSettingsProps) => {
         createOrUpdateMeetingData.appId &&
         createOrUpdateMeetingData.title &&
         createOrUpdateMeetingData.meeting_start &&
-        createOrUpdateMeetingData.meeting_duration > 300 &&
+        createOrUpdateMeetingData.meeting_duration >= 300 &&
         dayjs.tz(
           dayjs.unix(createOrUpdateMeetingData.meeting_start),
           "Asia/Shanghai"
@@ -815,6 +816,7 @@ const useAction = (props: MeetingSettingsProps) => {
                 const meetingId = res.meetingid;
                 if (meetingId !== null) {
                   successAction.setTrue();
+                  setIsOpenMeetingSettings(false);
                   getMeetingList();
                 } else {
                   failSendAction.setTrue();
@@ -844,6 +846,7 @@ const useAction = (props: MeetingSettingsProps) => {
               if (res && res.errcode === 0) {
                 successAction.setTrue();
                 loadingAction.setFalse();
+                setIsOpenMeetingSettings(false);
                 getMeetingList();
               } else {
                 loadingAction.setFalse();
