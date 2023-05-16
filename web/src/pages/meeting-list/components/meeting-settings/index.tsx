@@ -369,10 +369,15 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                     <div className={style.participantDataBox}>
                       {adminUser && adminUser.length > 0 && (
                         <div className={style.participantData}>
-                          <Avatar variant="square" src=""></Avatar>
-                          <div className={style.participantName}>
-                            {adminUser[0].id}
-                          </div>
+                          <Avatar
+                            variant="square"
+                            sx={{ width: 30, height: 30 }}
+                          ></Avatar>
+                          <Tooltip title={adminUser[0].id}>
+                            <div className={style.participantName}>
+                              {adminUser[0].id}
+                            </div>
+                          </Tooltip>
                         </div>
                       )}
                       {meetingState === "create" && (
@@ -408,10 +413,15 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                                 className={style.participantData}
                                 key={index}
                               >
-                                <Avatar variant="square" src=""></Avatar>
-                                <div className={style.participantName}>
-                                  {item.name}
-                                </div>
+                                <Avatar
+                                  variant="square"
+                                  sx={{ width: 30, height: 30 }}
+                                ></Avatar>
+                                <Tooltip title={item.name}>
+                                  <div className={style.participantName}>
+                                    {item.name}
+                                  </div>
+                                </Tooltip>
                               </div>
                             );
                           })}
