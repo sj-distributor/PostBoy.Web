@@ -73,6 +73,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
       <Dialog
         open={open}
         onClose={() => setDialog(false)}
+        onClick={() => {}}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
