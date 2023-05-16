@@ -17,7 +17,7 @@ const useAction = () => {
   const [failSend, failSendAction] = useBoolean(false);
   const [failSendText, setFailSendText] = useState<string>("");
   const [isConfirmDialog, confirmDialogAction] = useBoolean(false);
-  const [isConfirmDelete, confirmDeleteAction] = useBoolean(false);
+  const [candelDto, setCandelDto] = useState<GetAllMeetingsData>();
   const cancelBtnRef = useRef<HTMLButtonElement>(null);
   const [dto, setDto] = useState({
     pageIndex: 0,
@@ -74,47 +74,8 @@ const useAction = () => {
 
   //取消会议
   const meetingCancel = (data: GetAllMeetingsData) => {
-    if (isConfirmDelete) {
-      const { meetingId, workWeChatCorpApplicationId, workWeChatCorpId } = data;
-
-      getAppId(workWeChatCorpId, workWeChatCorpApplicationId).then(
-        (appId: string) => {
-          if (appId) {
-            const cancelData: CancelWorkWeChatMeetingDto = {
-              cancelWorkWeChatMeeting: {
-                appId,
-                meetingid: meetingId,
-              },
-            };
-
-            loadingAction.setTrue();
-
-            cancelMeeting(cancelData)
-              .then((res) => {
-                if (res && res.errcode === 0) {
-                  successAction.setTrue();
-                  setSuccessText("Successfully cancelled the meeting");
-                  getMeetingList();
-                  loadingAction.setFalse();
-                } else {
-                  setFailSendText("Cancel meeting failed");
-                  failSendAction.setTrue();
-                }
-                loadingAction.setFalse();
-                confirmDeleteAction.setFalse();
-              })
-              .catch((err) => {
-                failSendAction.setTrue();
-                setFailSendText("Cancel meeting failed");
-                loadingAction.setFalse();
-                confirmDeleteAction.setFalse();
-              });
-          }
-        }
-      );
-    } else {
-      confirmDialogAction.setTrue();
-    }
+    confirmDialogAction.setTrue();
+    setCandelDto(data);
   };
 
   const getMeetingList = () => {
@@ -160,10 +121,46 @@ const useAction = () => {
     }
   };
 
-  const confirmDelete = async () => {
-    await confirmDeleteAction.setTrue();
-    await confirmDialogAction.setFalse();
-    await cancelBtnRef.current?.click();
+  const confirmDelete = () => {
+    confirmDialogAction.setFalse();
+    if (candelDto) {
+      const { meetingId, workWeChatCorpApplicationId, workWeChatCorpId } =
+        candelDto;
+
+      getAppId(workWeChatCorpId, workWeChatCorpApplicationId).then(
+        (appId: string) => {
+          if (appId) {
+            const cancelData: CancelWorkWeChatMeetingDto = {
+              cancelWorkWeChatMeeting: {
+                appId,
+                meetingid: meetingId,
+              },
+            };
+
+            loadingAction.setTrue();
+
+            cancelMeeting(cancelData)
+              .then((res) => {
+                if (res && res.errcode === 0) {
+                  successAction.setTrue();
+                  setSuccessText("Successfully cancelled the meeting");
+                  getMeetingList();
+                  loadingAction.setFalse();
+                } else {
+                  setFailSendText("Cancel meeting failed");
+                  failSendAction.setTrue();
+                }
+                loadingAction.setFalse();
+              })
+              .catch((err) => {
+                failSendAction.setTrue();
+                setFailSendText("Cancel meeting failed");
+                loadingAction.setFalse();
+              });
+          }
+        }
+      );
+    }
   };
 
   useEffect(() => {
@@ -203,7 +200,6 @@ const useAction = () => {
     searchMeeting,
     handleCopyMeetingLink,
     isConfirmDialog,
-    isConfirmDelete,
     confirmDialogAction,
     confirmDelete,
     cancelBtnRef,

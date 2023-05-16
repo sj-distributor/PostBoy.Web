@@ -19,7 +19,6 @@ import {
   GridCellParams,
   GridColDef,
   GridValueGetterParams,
-  MuiEvent,
 } from "@mui/x-data-grid";
 import MeetingSettings from "./components/meeting-settings";
 import useAction from "./hook";
@@ -59,8 +58,6 @@ const MeetingList = () => {
     isConfirmDialog,
     confirmDialogAction,
     confirmDelete,
-    isConfirmDelete,
-    cancelBtnRef,
   } = useAction();
   const columns: GridColDef[] = [
     {
@@ -235,12 +232,7 @@ const MeetingList = () => {
             variant="contained"
             size="small"
             disabled={params.row.isDelete}
-            ref={cancelBtnRef}
-            onClick={() =>
-              isConfirmDelete
-                ? meetingCancel(params.row)
-                : confirmDialogAction.setTrue()
-            }
+            onClick={() => meetingCancel(params.row)}
           >
             取消会议
           </Button>
