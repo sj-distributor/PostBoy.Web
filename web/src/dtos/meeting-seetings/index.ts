@@ -443,3 +443,9 @@ export interface MeetingIdCorpIdAndAppId {
   corpId: string;
   appId: string;
 }
+
+export interface CandelDto {
+  meetingId: string;
+  workWeChatCorpApplicationId: string;
+  workWeChatCorpId: string;
+}
