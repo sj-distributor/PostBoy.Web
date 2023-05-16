@@ -33,6 +33,8 @@ const SendMessage = () => {
     success,
     failSend,
     clearData,
+    isShowPage,
+    setIsShowPage,
   } = useAction()
 
   return (
@@ -74,61 +76,64 @@ const SendMessage = () => {
           isNewOrUpdate={"new"}
           showErrorPrompt={showErrorPrompt}
           clearData={clearData}
+          setIsShowPage={setIsShowPage}
         />
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignContent: "center",
-          padding: "0rem 8rem",
-        }}
-      >
-        <Box sx={{ position: "relative" }}>
-          <Button
-            variant="contained"
-            style={{
-              height: "3.5rem",
-              width: "7rem",
-              fontSize: "1rem",
-            }}
-            sx={buttonSx}
-            disabled={loading}
-            onClick={handleSubmit}
-          >
-            发 送
-          </Button>
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                color: green[500],
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-0.8rem",
-                marginLeft: "-0.8rem",
+      {isShowPage && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+            padding: "0rem 8rem",
+          }}
+        >
+          <Box sx={{ position: "relative" }}>
+            <Button
+              variant="contained"
+              style={{
+                height: "3.5rem",
+                width: "7rem",
+                fontSize: "1rem",
+              }}
+              sx={buttonSx}
+              disabled={loading}
+              onClick={handleSubmit}
+            >
+              发 送
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: green[500],
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-0.8rem",
+                  marginLeft: "-0.8rem",
+                }}
+              />
+            )}
+          </Box>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Switch
+              sx={{ display: "none" }}
+              value={isShowMessageParams}
+              onChange={(e) => {
+                setIsShowMessageParams((e.target as HTMLInputElement).checked)
               }}
             />
-          )}
-        </Box>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Switch
-            sx={{ display: "none" }}
-            value={isShowMessageParams}
-            onChange={(e) => {
-              setIsShowMessageParams((e.target as HTMLInputElement).checked)
-            }}
-          />
-          <Button
-            style={{ display: "flex" }}
-            onClick={() => clickSendRecord("open")}
-          >
-            发送记录
-          </Button>
+            <Button
+              style={{ display: "flex" }}
+              onClick={() => clickSendRecord("open")}
+            >
+              发送记录
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       {isShowMessageParams && (
         <div className={styles.textarea}>

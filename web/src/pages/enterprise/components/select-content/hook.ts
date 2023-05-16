@@ -18,6 +18,7 @@ import {
   IDepartmentAndUserListValue,
   IDepartmentData,
   IDepartmentKeyControl,
+  IDepartmentUsersData,
   IDeptAndUserList,
   IJobSettingDto,
   IMentionList,
@@ -52,6 +53,7 @@ export const useAction = (props: SelectContentHookProps) => {
     updateMessageJobInformation,
     showErrorPrompt,
     clearData,
+    setIsShowPage,
   } = props
 
   const defaultCorpValue = {
@@ -355,6 +357,63 @@ export const useAction = (props: SelectContentHookProps) => {
     return parentRouteId
   }
 
+  const updateDeptUserList = (
+    AppId: string,
+    department: IDepartmentData,
+    users: IDepartmentUsersData[],
+    defaultChild: IDepartmentAndUserListValue
+  ) => {
+    setDepartmentAndUserList((prev) => {
+      const newValue = clone(prev)
+      const hasData = newValue.find((e) => e.key === AppId)
+      let idList = []
+      // 是否现有key的数据
+      hasData && hasData.data.length > 0
+        ? (idList = recursiveDeptList(
+            hasData.data,
+            defaultChild,
+            department,
+            []
+          ))
+        : newValue.push({ key: AppId, data: [defaultChild] })
+      idList.length === 0 && hasData?.data.push(defaultChild)
+      return newValue
+    })
+
+    setFlattenDepartmentList((prev) => {
+      const newValue = clone(prev)
+      let hasData = newValue.find((e) => e.key === AppId)
+      const insertData = [
+        {
+          id: department.id,
+          name: department.name,
+          parentid: department.name,
+          type: DepartmentAndUserType.Department,
+          selected: false,
+          children: [],
+        },
+        ...flatten(
+          users.map((item) => ({
+            id: item.userid,
+            name: item.userid,
+            parentid: department.name,
+            type: DepartmentAndUserType.User,
+            selected: false,
+            canSelect: true,
+            children: [],
+          }))
+        ),
+      ]
+      hasData
+        ? (hasData.data = [...hasData.data, ...insertData])
+        : newValue.push({
+            key: AppId,
+            data: insertData,
+          })
+      return newValue
+    })
+  }
+
   const loadDeptUsers = async (
     AppId: string,
     deptListResponse: IDeptAndUserList[]
@@ -362,12 +421,12 @@ export const useAction = (props: SelectContentHookProps) => {
     const copyDeptListResponse = deptListResponse.sort(
       (a, b) => a.department.id - b.department.id
     )
+    const waitList = new Map()
     for (let index = 0; index < copyDeptListResponse.length; index++) {
       // 当前的部门
       const department = copyDeptListResponse[index].department
       // 当前的用户列表
       const users = copyDeptListResponse[index].users
-
       // 需要插入的数据
       const defaultChild: IDepartmentAndUserListValue = {
         id: department.id,
@@ -387,61 +446,23 @@ export const useAction = (props: SelectContentHookProps) => {
         })),
       }
 
-      setDepartmentAndUserList((prev) => {
-        const newValue = clone(prev)
-        const hasData = newValue.find((e) => e.key === AppId)
-        let idList = []
-        // 是否现有key的数据
-        hasData && hasData.data.length > 0
-          ? (idList = recursiveDeptList(
-              hasData.data,
-              defaultChild,
-              department,
-              []
-            ))
-          : newValue.push({ key: AppId, data: [defaultChild] })
-        idList.length === 0 && hasData?.data.push(defaultChild)
-        return newValue
-      })
-
-      setFlattenDepartmentList((prev) => {
-        const newValue = clone(prev)
-        let hasData = newValue.find((e) => e.key === AppId)
-        const insertData = [
-          {
-            id: department.id,
-            name: department.name,
-            parentid: department.name,
-            type: DepartmentAndUserType.Department,
-            selected: false,
-            children: [],
-          },
-          ...flatten(
-            users.map((item) => ({
-              id: item.userid,
-              name: item.userid,
-              parentid: department.name,
-              type: DepartmentAndUserType.User,
-              selected: false,
-              canSelect: true,
-              children: [],
-            }))
-          ),
-        ]
-        hasData
-          ? (hasData.data = [...hasData.data, ...insertData])
-          : newValue.push({
-              key: AppId,
-              data: insertData,
-            })
-        return newValue
-      })
-
-      if (index === copyDeptListResponse.length - 1) {
-        setIsTreeViewLoading(false)
-        setIsLoadStop(true)
+      if (waitList.size > 0) {
+        for (let [key, value] of waitList)
+          value.department.parentid === department.id &&
+            defaultChild.children.push(value.defaultChild) &&
+            waitList.delete(key)
       }
+
+      if (department.parentid > department.id) {
+        waitList.set(department.parentid, { defaultChild, department, users })
+        continue
+      }
+
+      updateDeptUserList(AppId, department, users, defaultChild)
     }
+
+    setIsTreeViewLoading(false)
+    setIsLoadStop(true)
   }
 
   const recursiveSeachDeptOrUser = (
@@ -1140,6 +1161,14 @@ export const useAction = (props: SelectContentHookProps) => {
       ) &&
       setContent(value.match(beforePattern)?.[0] ?? "")
   }
+
+  useEffect(() => {
+    setIsShowPage &&
+      setIsShowPage(
+        (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
+          isNewOrUpdate !== "new"
+      )
+  }, [isNewOrUpdate, appLoading, corpsList])
 
   return {
     corpsValue,
