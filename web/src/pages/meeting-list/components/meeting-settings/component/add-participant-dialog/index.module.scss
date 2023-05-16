@@ -1,0 +1,6 @@
+.inputButton {
+  :global(input[type="button" i]) {
+    text-align: left;
+    cursor: pointer;
+  }
+}

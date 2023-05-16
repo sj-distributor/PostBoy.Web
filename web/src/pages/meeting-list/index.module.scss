@@ -1,0 +1,75 @@
+.tableTitleFunction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem;
+}
+
+.searchMeeting {
+  display: flex;
+  align-items: center;
+}
+
+.tooltip {
+  text-align: center;
+  width: 100%;
+  padding: 0 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableBoxWrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+
+  .tableBox {
+    padding: 1rem 1rem 0 1rem;
+    width: 100%;
+    display: flex;
+
+    .createNoticeWrap {
+      display: flex;
+      justify-content: end;
+      margin: 1rem 0rem;
+      font-size: 0.9rem;
+
+      .createNotice:hover {
+        cursor: pointer;
+      }
+    }
+
+    .title {
+      text-align: center;
+      width: 100%;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .tooltip {
+      text-align: center;
+      width: 100%;
+      padding: 0 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .operate {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+
+      .text:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.meetingLink {
+  width: 4rem;
+  text-overflow: clip;
+}

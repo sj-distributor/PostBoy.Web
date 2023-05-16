@@ -1,0 +1,42 @@
+.dialogTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settingsList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.closeIcon {
+  color: #ccc;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.appointListCentent {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.memberPreview {
+  display: flex;
+  align-items: center;
+  color: #757171;
+  white-space: nowrap;
+}
+
+.memberName {
+  max-width: 12rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #757171;
+  font-size: 0.6rem;
+}

@@ -1,10 +1,11 @@
-import Home from "../pages/home"
-import Enterprise from "../pages/enterprise"
-import SendEmail from "../pages/email"
-import Manager from "../pages/app-manager"
-import User from "../pages/user"
-import { RouteItem } from "../dtos/route-type"
-import "../fonts/iconfont/iconfont.css"
+import Home from "../pages/home";
+import Enterprise from "../pages/enterprise";
+import SendEmail from "../pages/email";
+import Manager from "../pages/app-manager";
+import User from "../pages/user";
+import { RouteItem } from "../dtos/route-type";
+import "../fonts/iconfont/iconfont.css";
+import MeetingList from "../pages/meeting-list";
 
 export const routerArray: RouteItem[] = [
   {
@@ -37,4 +38,10 @@ export const routerArray: RouteItem[] = [
     icons: "iconfont iconic_settings_24px",
     element: <Manager />,
   },
-]
+  {
+    path: "/meeting",
+    head: "",
+    icons: "",
+    element: <MeetingList />,
+  },
+];

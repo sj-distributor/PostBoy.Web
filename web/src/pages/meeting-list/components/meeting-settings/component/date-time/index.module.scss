@@ -1,0 +1,17 @@
+.timeInt {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+.dateTimeCentent {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.date,
+.time {
+  flex: 1 1;
+  min-width: 12rem;
+  margin-right: 0.8rem;
+}
