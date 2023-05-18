@@ -29,6 +29,7 @@ import {
   ITagsList,
   IWorkCorpAppGroup,
   SendObjOrGroup,
+  IDepartmentUsersData,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -309,6 +310,65 @@ const useAction = (props: MeetingSettingsProps) => {
     return parentRouteId;
   };
 
+  const updateDeptUserList = (
+    AppId: string,
+    department: IDepartmentData,
+    users: IDepartmentUsersData[],
+    defaultChild: IDepartmentAndUserListValue
+  ) => {
+    setDepartmentAndUserList((prev) => {
+      const newValue = clone(prev);
+      const hasData = newValue.find((e) => e.key === AppId);
+      let idList = [];
+      // 是否现有key的数据
+      hasData && hasData.data.length > 0
+        ? (idList = recursiveDeptList(
+            hasData.data,
+            defaultChild,
+            department,
+            []
+          ))
+        : newValue.push({ key: AppId, data: [defaultChild] });
+      idList.length === 0 && hasData?.data.push(defaultChild);
+      setDepartmentAndUserListBackups(newValue);
+      return newValue;
+    });
+
+    setFlattenDepartmentList((prev) => {
+      const newValue = clone(prev);
+      let hasData = newValue.find((e) => e.key === AppId);
+      const insertData = [
+        {
+          id: department.id,
+          name: department.name,
+          parentid: department.name,
+          type: DepartmentAndUserType.Department,
+          selected: false,
+          children: [],
+        },
+        ...flatten(
+          users.map((item) => ({
+            id: item.userid,
+            name: item.userid,
+            parentid: department.name,
+            type: DepartmentAndUserType.User,
+            selected: false,
+            canSelect: true,
+            children: [],
+          }))
+        ),
+      ];
+      hasData
+        ? (hasData.data = [...hasData.data, ...insertData])
+        : newValue.push({
+            key: AppId,
+            data: insertData,
+          });
+      setFlattenDepartmentListBackups(newValue);
+      return newValue;
+    });
+  };
+
   const loadDeptUsers = async (
     AppId: string,
     deptListResponse: IDeptAndUserList[]
@@ -316,6 +376,8 @@ const useAction = (props: MeetingSettingsProps) => {
     const copyDeptListResponse = deptListResponse.sort(
       (a, b) => a.department.id - b.department.id
     );
+    const waitList = new Map();
+
     for (let index = 0; index < copyDeptListResponse.length; index++) {
       // 当前的部门
       const department = copyDeptListResponse[index].department;
@@ -341,63 +403,44 @@ const useAction = (props: MeetingSettingsProps) => {
         })),
       };
 
-      setDepartmentAndUserList((prev) => {
-        const newValue = clone(prev);
-        const hasData = newValue.find((e) => e.key === AppId);
-        let idList = [];
-        // 是否现有key的数据
-        hasData && hasData.data.length > 0
-          ? (idList = recursiveDeptList(
-              hasData.data,
-              defaultChild,
-              department,
-              []
-            ))
-          : newValue.push({ key: AppId, data: [defaultChild] });
-        idList.length === 0 && hasData?.data.push(defaultChild);
-        setDepartmentAndUserListBackups(newValue);
-        return newValue;
-      });
+      let isContinue: boolean = false;
 
-      setFlattenDepartmentList((prev) => {
-        const newValue = clone(prev);
-        let hasData = newValue.find((e) => e.key === AppId);
-        const insertData = [
-          {
-            id: department.id,
-            name: department.name,
-            parentid: department.name,
-            type: DepartmentAndUserType.Department,
-            selected: false,
-            children: [],
-          },
-          ...flatten(
-            users.map((item) => ({
-              id: item.userid,
-              name: item.userid,
-              parentid: department.name,
-              type: DepartmentAndUserType.User,
-              selected: false,
-              canSelect: true,
-              children: [],
-            }))
-          ),
-        ];
-        hasData
-          ? (hasData.data = [...hasData.data, ...insertData])
-          : newValue.push({
-              key: AppId,
-              data: insertData,
-            });
-        setFlattenDepartmentListBackups(newValue);
-        return newValue;
-      });
-
-      if (index === copyDeptListResponse.length - 1) {
-        setIsTreeViewLoading(false);
-        setIsLoadStop(true);
+      if (waitList.size > 0) {
+        for (let [key, value] of waitList) {
+          value.department.parentid === department.id &&
+            defaultChild.children.push(value.defaultChild) &&
+            waitList.delete(key);
+          if (key === department.parentid) {
+            value.defaultChild.children.push(defaultChild);
+            isContinue = true;
+            break;
+          }
+        }
       }
+
+      if (isContinue) continue;
+
+      if (department.parentid > department.id) {
+        waitList.set(department.id, { defaultChild, department, users });
+        if (index !== copyDeptListResponse.length - 1) continue;
+      }
+
+      if (waitList.size > 0 && index === copyDeptListResponse.length - 1) {
+        for (let [key, value] of waitList) {
+          updateDeptUserList(
+            AppId,
+            value.department,
+            value.users,
+            value.defaultChild
+          );
+        }
+        continue;
+      }
+
+      updateDeptUserList(AppId, department, users, defaultChild);
     }
+    setIsTreeViewLoading(false);
+    setIsLoadStop(true);
   };
   //指定提醒人员
   const [appointList, setAppointList] =
