@@ -446,15 +446,37 @@ export const useAction = (props: SelectContentHookProps) => {
         })),
       }
 
+      let isContinue: boolean = false
+
       if (waitList.size > 0) {
-        for (let [key, value] of waitList)
+        for (let [key, value] of waitList) {
           value.department.parentid === department.id &&
             defaultChild.children.push(value.defaultChild) &&
             waitList.delete(key)
+          if (key === department.parentid) {
+            value.defaultChild.children.push(defaultChild)
+            isContinue = true
+            break
+          }
+        }
       }
 
+      if (isContinue) continue
+
       if (department.parentid > department.id) {
-        waitList.set(department.parentid, { defaultChild, department, users })
+        waitList.set(department.id, { defaultChild, department, users })
+        if (index !== copyDeptListResponse.length - 1) continue
+      }
+
+      if (waitList.size > 0 && index === copyDeptListResponse.length - 1) {
+        for (let [key, value] of waitList) {
+          updateDeptUserList(
+            AppId,
+            value.department,
+            value.users,
+            value.defaultChild
+          )
+        }
         continue
       }
 
