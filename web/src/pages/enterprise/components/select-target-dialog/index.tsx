@@ -142,11 +142,12 @@ const SelectTargetDialog = memo(
 
     const recursiveRenderDeptList = (
       data: IDepartmentAndUserListValue[],
-      pl: number
+      pl: number,
+      isDivider: boolean
     ) => {
       const result = (
         <List key={AppId} dense>
-          {data.map((deptUserData) => {
+          {data.map((deptUserData, index) => {
             const insertData: IDepartmentAndUserListValue = {
               id: deptUserData.id,
               name: deptUserData.name,
@@ -196,13 +197,17 @@ const SelectTargetDialog = memo(
                     timeout={0}
                     unmountOnExit
                   >
-                    {recursiveRenderDeptList(deptUserData.children, pl + 2)}
+                    {recursiveRenderDeptList(
+                      deptUserData.children,
+                      pl + 2,
+                      index !== data.length - 1
+                    )}
                   </Collapse>
                 )}
               </div>
             )
           })}
-          <Divider />
+          {isDivider && <Divider />}
         </List>
       )
       return result
@@ -243,7 +248,7 @@ const SelectTargetDialog = memo(
                     : !groupDeptUserList) && <div>No Data</div>}
                   {clickName === "选择发送目标"
                     ? departmentKeyValue?.data.length > 0 &&
-                      recursiveRenderDeptList(departmentKeyValue.data, 0)
+                      recursiveRenderDeptList(departmentKeyValue.data, 0, true)
                     : groupDeptUserList &&
                       groupDeptUserList.length > 0 &&
                       (() => {
@@ -252,7 +257,7 @@ const SelectTargetDialog = memo(
                         )
                         return (
                           activeData &&
-                          recursiveRenderDeptList(activeData.data, 0)
+                          recursiveRenderDeptList(activeData.data, 0, true)
                         )
                       })()}
                 </div>
