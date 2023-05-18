@@ -24,7 +24,12 @@ import {
   DeptUserCanSelectStatus,
   SendObjOrGroup,
 } from "../../../../dtos/enterprise"
-import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
+import {
+  CircularProgress,
+  Snackbar,
+  FilterOptionsState,
+  debounce,
+} from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { memo } from "react"
 
@@ -98,6 +103,8 @@ const SelectTargetDialog = memo(
       groupDeptUserList,
       createLoading,
       sendList,
+      keyword,
+      setKeyword,
       setGroupName,
       setGroupOwner,
       setIsShowDialog,
@@ -321,16 +328,22 @@ const SelectTargetDialog = memo(
                         option.id === value.id
                       }
                       groupBy={(option) => option.parentid as string}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={
-                            clickName === "选择发送目标"
-                              ? "部门与用户搜索"
-                              : "用户搜索"
-                          }
-                        />
-                      )}
+                      renderInput={(params) => {
+                        params.inputProps.onChange = ({ target: { value } }) =>
+                          setKeyword(value)
+
+                        return (
+                          <TextField
+                            {...params}
+                            value={keyword}
+                            label={
+                              clickName === "选择发送目标"
+                                ? "部门与用户搜索"
+                                : "用户搜索"
+                            }
+                          />
+                        )
+                      }}
                       filterOptions={(options, state) =>
                         fiteringDeptAndUsers(options, state)
                       }

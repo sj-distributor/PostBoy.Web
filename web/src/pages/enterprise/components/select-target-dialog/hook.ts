@@ -101,6 +101,8 @@ const useAction = (props: {
 
   const [groupIsNoData, setGroupIsNoData] = useState<boolean>(false)
 
+  const [keyword, setKeyword] = useState<string>("")
+
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
     callback: (e: IDepartmentAndUserListValue) => void
@@ -288,12 +290,14 @@ const useAction = (props: {
 
   useEffect(() => {
     CorpId &&
-      GetWeChatWorkCorpAppGroups(CorpId, groupPage).then((data) => {
-        data && data.length > 0
-          ? setGroupList((prev) => uniq([...prev, ...data]))
-          : setGroupIsNoData(true)
-      })
-  }, [groupPage])
+      GetWeChatWorkCorpAppGroups(CorpId, groupPage, 15, keyword).then(
+        (data) => {
+          data && data.length > 0
+            ? setGroupList((prev) => uniq([...prev, ...data]))
+            : setGroupIsNoData(true)
+        }
+      )
+  }, [groupPage, keyword])
 
   useEffect(() => {
     // 限制条件下群组部门列表变化同步到群组搜索选择列表
@@ -408,6 +412,10 @@ const useAction = (props: {
     }
   }, [tagsList, lastTagsValue])
 
+  useEffect(() => {
+    console.log(keyword)
+  }, [keyword])
+
   return {
     departmentSelectedList,
     tagsValue,
@@ -421,6 +429,8 @@ const useAction = (props: {
     createLoading,
     groupValue,
     sendList,
+    keyword,
+    setKeyword,
     setGroupValue,
     setCreateLoading,
     setGroupDeptUserList,
