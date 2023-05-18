@@ -468,7 +468,7 @@ export const useAction = (props: SelectContentHookProps) => {
         if (index !== copyDeptListResponse.length - 1) continue
       }
 
-      if (index === copyDeptListResponse.length - 1) {
+      if (waitList.size > 0 && index === copyDeptListResponse.length - 1) {
         for (let [key, value] of waitList) {
           updateDeptUserList(
             AppId,
