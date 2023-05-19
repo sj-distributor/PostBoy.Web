@@ -85,7 +85,7 @@ export const RequestBody = (props: RequestBodyProps) => {
   });
 
   return (
-    <div className={styles.box}>
+    <div className={styles.body_box}>
       <Snackbar
         message={promptText}
         open={openError}

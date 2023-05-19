@@ -18,7 +18,7 @@ export const SendRequest = () => {
   } = useAction();
 
   return (
-    <div className={styles.box}>
+    <div className={styles.request_box}>
       <Snackbar
         open={openError}
         anchorOrigin={{
