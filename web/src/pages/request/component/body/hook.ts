@@ -151,9 +151,11 @@ export const useAction = ({
       }
 
       const jobSetting = JSON.parse(jobSettingJson);
+
       const oldTimeZone = timeZone.find(
         (item) => item.title === JSON.parse(jobSettingJson).Timezone
       )?.value;
+
       oldTimeZone !== undefined && setTimeZoneValue(oldTimeZone);
 
       if (jobSetting.DelayedJob !== null) {
@@ -173,6 +175,7 @@ export const useAction = ({
     const jobSetting: IJobSettingDto = {
       timezone: timeZone[timeZoneValue].convertTimeZone,
     };
+
     switch (sendTypeValue) {
       case MessageJobSendType.Fire: {
         break;

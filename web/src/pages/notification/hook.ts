@@ -204,6 +204,7 @@ export const useAction = (recordType: MessageJobDestination) => {
       setAlertShow.setTrue()
       return
     }
+
     setUpdateMessageJobInformation(item)
     setShowRequest(true)
   }

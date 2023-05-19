@@ -28,6 +28,7 @@ export const judgeDataIsCorrect = (
       return;
     }
   }
+
   if (jobSetting) {
     const { delayedJob, recurringJob } = jobSetting;
 
@@ -63,6 +64,7 @@ export const judgeDataIsCorrect = (
       }
     }
   }
+
   if (metadata) {
     const title = metadata.filter((item) => item.key === "title");
 
