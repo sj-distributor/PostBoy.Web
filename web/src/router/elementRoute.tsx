@@ -6,6 +6,7 @@ import User from "../pages/user";
 import { RouteItem } from "../dtos/route-type";
 import "../fonts/iconfont/iconfont.css";
 import MeetingList from "../pages/meeting-list";
+import { SendRequest } from "../pages/request";
 
 export const routerArray: RouteItem[] = [
   {
@@ -23,6 +24,11 @@ export const routerArray: RouteItem[] = [
         path: "/home/email",
         title: "邮件发送",
         elementChild: <SendEmail />,
+      },
+      {
+        path: "/home/request",
+        title: "请求发送",
+        elementChild: <SendRequest />,
       },
     ],
   },

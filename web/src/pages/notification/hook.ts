@@ -23,6 +23,7 @@ import {
 import { ModalBoxRef } from "../../dtos/modal"
 import { convertType } from "../../uilts/convert-type"
 import { parameterJudgment } from "../../uilts/parameter-judgment"
+import { judgeDataIsCorrect } from "../request/hook"
 
 const judgeContent = (
   workWeChatAppNotification: IWorkWeChatAppNotificationDto,
@@ -47,7 +48,8 @@ const messageJobConvertType = (
   arr: IMessageJob[],
   recordType: MessageJobDestination
 ) => {
-  const isRecordTypeWechat = recordType === MessageJobDestination.WorkWeChat
+  const isRecordTypeEmail = recordType === MessageJobDestination.Email
+
   const array: ILastShowTableData[] = []
   if (arr.length > 0) {
     arr.forEach((item) => {
@@ -69,20 +71,20 @@ const messageJobConvertType = (
           (item) => item.key === "cleanContent"
         )[0]?.value,
         hasException: item.hasException,
-        content: isRecordTypeWechat
-          ? judgeContent(
+        content: isRecordTypeEmail
+          ? item.metadata.filter((item) => item.key === "cleanContent")[0]
+              ?.value ?? item.emailNotification?.body.replace(/<.*?>/g, "")
+          : judgeContent(
               item.workWeChatAppNotification,
               item.metadata.filter((item) => item.key === "cleanContent")[0]
                 ?.value
-            )
-          : item.metadata.filter((item) => item.key === "cleanContent")[0]
-              ?.value ?? item.emailNotification?.body.replace(/<.*?>/g, ""),
+            ),
         emailNotification: item?.emailNotification,
-        title: isRecordTypeWechat
-          ? item.metadata.filter((item) => item.key === "title")[0]?.value
-          : item.emailNotification
-          ? item.emailNotification.subject
-          : "",
+        title: isRecordTypeEmail
+          ? item.emailNotification
+            ? item.emailNotification.subject
+            : ""
+          : item.metadata.filter((item) => item.key === "title")[0]?.value,
         groupName: item.metadata.filter((item) => item.key === "groupName")[0]
           ?.value,
         groupId: item.metadata.filter((item) => item.key === "groupId")[0]
@@ -113,12 +115,17 @@ const messageJobConvertType = (
             item.metadata.filter((item) => item.key === "display")[0]?.value
           ),
         },
+        sendHttpRequest: item.sendHttpRequest
+          ? item.sendHttpRequest
+          : undefined,
       }
-      isRecordTypeWechat
-        ? array.push(data)
-        : item.emailNotification && array.push(data)
+
+      isRecordTypeEmail
+        ? item.emailNotification && array.push(data)
+        : array.push(data)
     })
   }
+
   return array
 }
 
@@ -157,6 +164,11 @@ export const useAction = (recordType: MessageJobDestination) => {
 
   const [recordRowLoading, setRecordRowLoading] = useState(false)
 
+  const [showRequest, setShowRequest] = useState<boolean>(false)
+
+  const [requestUpdateData, setRequestUpdateData] =
+    useState<IUpdateMessageCommand>()
+
   const onNoticeCancel = () => {
     noticeSettingRef.current?.close()
   }
@@ -187,6 +199,15 @@ export const useAction = (recordType: MessageJobDestination) => {
     setShowEmail(true)
   }
 
+  const onRequestSetting = (item: ILastShowTableData) => {
+    if (item.jobType === MessageJobSendType.Fire) {
+      setAlertShow.setTrue()
+      return
+    }
+    setUpdateMessageJobInformation(item)
+    setShowRequest(true)
+  }
+
   const outterGetUpdateData = (
     callback: () => IUpdateMessageCommand | undefined
   ) => {
@@ -206,8 +227,29 @@ export const useAction = (recordType: MessageJobDestination) => {
     data && handleEmailCancel()
   }
 
+  const handleRequestConfirm = () => {
+    if (requestUpdateData) {
+      const data = judgeDataIsCorrect(requestUpdateData, showErrorPrompt)
+
+      if (data) {
+        PostMessageJobUpdate(data as IUpdateMessageCommand)
+          .then((res) => {
+            getMessageJob()
+            handleRequestState(false)
+          })
+          .catch((err) => {
+            showErrorPrompt("Update request error!")
+          })
+      }
+    }
+  }
+
   const handleEmailCancel = () => {
     setShowEmail(false)
+  }
+
+  const handleRequestState = (state: boolean) => {
+    setShowRequest(state)
   }
 
   // 弹出警告
@@ -402,5 +444,10 @@ export const useAction = (recordType: MessageJobDestination) => {
     handleEmailCancel,
     outterGetUpdateData,
     recordRowLoading,
+    showRequest,
+    handleRequestState,
+    onRequestSetting,
+    handleRequestConfirm,
+    setRequestUpdateData,
   }
 }
