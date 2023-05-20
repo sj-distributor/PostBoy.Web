@@ -27,9 +27,9 @@ export const judgeDataIsCorrect = (
 
       return;
     } else {
-      const pattern =
-        /^(http[s]?|ftp):\/\/[^:/\s]+(:[^/]*)(\/\w+)*\/[\w\-\.]+[^#?\s]+(\?([^#]*))?(#(.*))?$/;
+      const pattern = /^(ftp|http|https):\/\/[^ "]+$/;
       const isValid = pattern.test(url);
+
       if (!isValid) {
         showErrorPrompt("URL format is incorrect!");
         setAlertType && setAlertType("error");
