@@ -208,7 +208,7 @@ export const useAction = ({
       headers: headers.filter((item) => !!item.key && !!item.value),
     };
 
-    if (method === "Post") sendHttpRequest["jsonBody"] = jsonBody;
+    if (method === "POST") sendHttpRequest["jsonBody"] = jsonBody;
 
     setSendHttpRequestData(sendHttpRequest);
   }, [method, url, jsonBody, headers]);
