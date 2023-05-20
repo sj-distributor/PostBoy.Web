@@ -70,6 +70,7 @@ const SendNotice = React.memo(
       onRequestSetting,
       handleRequestConfirm,
       setRequestUpdateData,
+      updateRequestData,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -367,7 +368,7 @@ const SendNotice = React.memo(
             <RequestBody
               addOrUpdate={"Update"}
               updateMessageJobInformation={updateMessageJobInformation}
-              setRequestUpdateData={setRequestUpdateData}
+              updateRequestData={updateRequestData}
             />
           </DialogContent>
           <DialogActions>

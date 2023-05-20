@@ -167,7 +167,7 @@ export const useAction = (recordType: MessageJobDestination) => {
   const [showRequest, setShowRequest] = useState<boolean>(false)
 
   const [requestUpdateData, setRequestUpdateData] =
-    useState<IUpdateMessageCommand>()
+    useState<() => IUpdateMessageCommand | undefined>()
 
   const onNoticeCancel = () => {
     noticeSettingRef.current?.close()
@@ -228,20 +228,19 @@ export const useAction = (recordType: MessageJobDestination) => {
     data && handleEmailCancel()
   }
 
-  const handleRequestConfirm = () => {
-    if (requestUpdateData) {
-      const data = judgeDataIsCorrect(requestUpdateData, showErrorPrompt)
+  const updateRequestData = (
+    callback: () => IUpdateMessageCommand | undefined
+  ) => {
+    setRequestUpdateData(() => callback)
+  }
 
-      if (data) {
-        PostMessageJobUpdate(data as IUpdateMessageCommand)
-          .then((res) => {
-            getMessageJob()
-            handleRequestState(false)
-          })
-          .catch((err) => {
-            showErrorPrompt("Update request error!")
-          })
-      }
+  const handleRequestConfirm = () => {
+    const data = requestUpdateData && requestUpdateData()
+    if (data) {
+      PostMessageJobUpdate(data as IUpdateMessageCommand).then((res) => {
+        getMessageJob()
+        handleRequestState(false)
+      })
     }
   }
 
@@ -450,5 +449,6 @@ export const useAction = (recordType: MessageJobDestination) => {
     onRequestSetting,
     handleRequestConfirm,
     setRequestUpdateData,
+    updateRequestData,
   }
 }

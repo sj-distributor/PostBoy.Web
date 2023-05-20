@@ -50,7 +50,7 @@ export const RequestBody = (props: RequestBodyProps) => {
     whetherClear,
     updateMessageJobInformation,
     addOrUpdate,
-    setRequestUpdateData,
+    updateRequestData,
   } = props;
 
   const {
@@ -84,7 +84,7 @@ export const RequestBody = (props: RequestBodyProps) => {
     setSendData,
     whetherClear,
     updateMessageJobInformation,
-    setRequestUpdateData,
+    updateRequestData,
   });
 
   return (

@@ -11,6 +11,7 @@ import {
   SendHttpRequestHeaderDto,
 } from "../../../../dtos/enterprise";
 import { timeZone } from "../../../../dtos/send-message-job";
+import { judgeDataIsCorrect } from "../../hook";
 
 export enum ChangeHeaderStatus {
   Add,
@@ -23,15 +24,15 @@ export const useAction = ({
   setSendData,
   whetherClear,
   updateMessageJobInformation,
-  setRequestUpdateData,
+  updateRequestData,
 }: {
   addOrUpdate: string;
   setSendData?: React.Dispatch<React.SetStateAction<ISendMessageCommand>>;
   whetherClear?: boolean;
   updateMessageJobInformation?: ILastShowTableData;
-  setRequestUpdateData?: React.Dispatch<
-    React.SetStateAction<IUpdateMessageCommand | undefined>
-  >;
+  updateRequestData?: (
+    callback: () => IUpdateMessageCommand | undefined
+  ) => void;
 }) => {
   const [title, setTitle] = useState<string>("");
 
@@ -235,14 +236,24 @@ export const useAction = ({
           metadata: metadata,
         });
     } else {
-      setRequestUpdateData &&
-        setRequestUpdateData({
-          messageJobId: !!updateMessageJobInformation?.id
-            ? updateMessageJobInformation?.id
-            : "",
-          jobSetting: jobSettingData,
-          metadata: metadata,
-          sendHttpRequest: sendHttpRequestData,
+      updateRequestData &&
+        updateRequestData(() => {
+          const data = judgeDataIsCorrect(
+            {
+              messageJobId: !!updateMessageJobInformation?.id
+                ? updateMessageJobInformation?.id
+                : "",
+              jobSetting: jobSettingData,
+              metadata: metadata,
+              sendHttpRequest: sendHttpRequestData,
+            },
+            showErrorPrompt
+          );
+          if (data) {
+            return data as IUpdateMessageCommand;
+          } else {
+            return undefined;
+          }
         });
     }
   }, [sendHttpRequestData, jobSettingData, metadata, addOrUpdate]);
