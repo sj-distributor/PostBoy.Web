@@ -35,7 +35,7 @@ export const useAction = ({
 }) => {
   const [title, setTitle] = useState<string>("");
 
-  const [method, setMethod] = useState<string>("Get");
+  const [method, setMethod] = useState<string>("GET");
 
   const [url, setUrl] = useState<string>("");
 

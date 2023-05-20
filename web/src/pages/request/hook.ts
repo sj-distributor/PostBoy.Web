@@ -26,6 +26,17 @@ export const judgeDataIsCorrect = (
       isCorrect = false;
 
       return;
+    } else {
+      const pattern =
+        /^(http[s]?|ftp):\/\/[^:/\s]+(:[^/]*)(\/\w+)*\/[\w\-\.]+[^#?\s]+(\?([^#]*))?(#(.*))?$/;
+      const isValid = pattern.test(url);
+      if (!isValid) {
+        showErrorPrompt("URL format is incorrect!");
+        setAlertType && setAlertType("error");
+        isCorrect = false;
+
+        return;
+      }
     }
   }
 

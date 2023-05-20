@@ -4,7 +4,8 @@
   box-sizing: content-box;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   display: grid;
-  gap: 0.5rem;
+  gap: 1.5rem;
+  padding: 0.5rem 0 0;
 }
 
 .display_flex {
@@ -28,10 +29,10 @@
 }
 
 .title_front {
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 500;
-  color: #374151;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .grid_1 {
@@ -64,13 +65,41 @@
 
 .header_box {
   display: grid;
-  row-gap: 1rem;
+  border: 1px solid #a1a1aa;
+  padding: 0.8rem 0.2rem;
+  border-radius: 0.3rem;
+  row-gap: 0.8rem;
+  position: relative;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+  top: -12px;
+  left: 10px;
 }
 
 .header_title {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.request_add_bg {
+  background-color: #f3f4f6;
+}
+
+.request_update_bg {
+  background-color: white;
+}
+
+.json_title {
+  position: absolute;
+  top: -8px;
+  left: 10px;
 }
 
 .icon_pointer {

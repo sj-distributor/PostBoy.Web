@@ -1,7 +1,10 @@
 import {
+  FilledInput,
   FormControl,
+  Input,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   Snackbar,
   TextareaAutosize,
@@ -95,36 +98,43 @@ export const RequestBody = (props: RequestBodyProps) => {
         }}
       />
       <div className={`${styles.grid_6} ${styles.display_flex_column}`}>
-        <span className={styles.title_front}>Title</span>
         <TextField
+          label="标题"
+          variant="outlined"
           size="small"
-          id="outlined-start-adornment"
           value={title}
           onChange={(e) => setTitle(e.target.value as string)}
         />
       </div>
 
       <div className={`${styles.grid_2} ${styles.display_flex_column}`}>
-        <span className={styles.title_front}>Method</span>
-        <Select
-          size="small"
-          value={method}
-          onChange={(e) => handleChangeMethod(e.target.value as string)}
-        >
-          {["Get", "Post"].map((item, index) => (
-            <MenuItem key={index} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </Select>
+        <FormControl>
+          <InputLabel id="demo-simple-select-autowidth-label">
+            请求方式
+          </InputLabel>
+          <Select
+            size="small"
+            labelId="demo-simple-select-autowidth-label"
+            id="demo-simple-select"
+            value={method}
+            label="发送类型"
+            onChange={(e) => handleChangeMethod(e.target.value as string)}
+          >
+            {["GET", "POST"].map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </div>
 
       <div className={`${styles.grid_4} ${styles.display_flex_column}`}>
-        <span className={styles.title_front}>Target HTTP URL</span>
         <TextField
           size="small"
           id="outlined-start-adornment"
           value={url}
+          label="链接"
           onChange={(e) => handleChangeUrl(e.target.value as string)}
           InputProps={{
             startAdornment: <LinkSvg />,
@@ -133,23 +143,28 @@ export const RequestBody = (props: RequestBodyProps) => {
       </div>
 
       <div className={styles.grid_6}>
-        <div className={styles.header_title}>
-          <span className={styles.title_front}>Header</span>
-          <AddIcon
-            className={styles.icon_pointer}
-            onClick={() => {
-              handleChangeHeaders(ChangeHeaderStatus.Add);
-            }}
-          />
-        </div>
-
         <div className={styles.header_box}>
+          <div
+            className={`${styles.header_title} ${styles.absolute} ${
+              addOrUpdate === "Add"
+                ? styles.request_add_bg
+                : styles.request_update_bg
+            }`}
+          >
+            <span className={styles.title_front}>Header</span>
+            <AddIcon
+              className={styles.icon_pointer}
+              onClick={() => {
+                handleChangeHeaders(ChangeHeaderStatus.Add);
+              }}
+            />
+          </div>
           {headers.map((item, index) => (
             <div key={index} className={styles.display_grid_col_6}>
               <div className={styles.grid_2}>
                 <TextField
-                  id="outlined-basic"
-                  variant="outlined"
+                  id="standard-basic"
+                  variant="standard"
                   size="small"
                   fullWidth
                   placeholder="key"
@@ -166,8 +181,8 @@ export const RequestBody = (props: RequestBodyProps) => {
               </div>
               <div className={styles.grid_3}>
                 <TextField
-                  id="outlined-basic"
-                  variant="outlined"
+                  id="standard-basic"
+                  variant="standard"
                   size="small"
                   fullWidth
                   placeholder="value"
@@ -199,11 +214,22 @@ export const RequestBody = (props: RequestBodyProps) => {
         </div>
       </div>
 
-      {method === "Post" && (
-        <div className={`${styles.grid_6} ${styles.display_flex_column}`}>
-          <span className={styles.title_front}>Body</span>
+      {method === "POST" && (
+        <div
+          className={`${styles.grid_6} ${styles.display_flex_column} ${styles.relative}`}
+        >
+          <div
+            className={`${styles.json_title}  ${
+              addOrUpdate === "Add"
+                ? styles.request_add_bg
+                : styles.request_update_bg
+            }`}
+          >
+            <span className={styles.title_front}>Body</span>
+          </div>
+
           <TextareaAutosize
-            style={{ resize: "vertical" }}
+            style={{ resize: "vertical", padding: "0.8rem 0" }}
             aria-label="textarea"
             minRows={5}
             value={jsonBody}
@@ -214,7 +240,7 @@ export const RequestBody = (props: RequestBodyProps) => {
         </div>
       )}
 
-      <div className={`${styles.grid_6} ${styles.margin_top}`}>
+      <div className={styles.grid_6}>
         <FormControl>
           <InputLabel id="demo-simple-select-autowidth-label">
             发送类型
