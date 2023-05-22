@@ -24,12 +24,7 @@ import {
   DeptUserCanSelectStatus,
   SendObjOrGroup,
 } from "../../../../dtos/enterprise"
-import {
-  CircularProgress,
-  Snackbar,
-  FilterOptionsState,
-  debounce,
-} from "@mui/material"
+import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { memo } from "react"
 
@@ -104,6 +99,9 @@ const SelectTargetDialog = memo(
       createLoading,
       sendList,
       keyword,
+      searchValue,
+      setSearchValue,
+      setGroupPage,
       setKeyword,
       setGroupName,
       setGroupOwner,
@@ -328,22 +326,16 @@ const SelectTargetDialog = memo(
                         option.id === value.id
                       }
                       groupBy={(option) => option.parentid as string}
-                      renderInput={(params) => {
-                        params.inputProps.onChange = ({ target: { value } }) =>
-                          setKeyword(value)
-
-                        return (
-                          <TextField
-                            {...params}
-                            value={keyword}
-                            label={
-                              clickName === "选择发送目标"
-                                ? "部门与用户搜索"
-                                : "用户搜索"
-                            }
-                          />
-                        )
-                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={
+                            clickName === "选择发送目标"
+                              ? "部门与用户搜索"
+                              : "用户搜索"
+                          }
+                        />
+                      )}
                       filterOptions={(options, state) =>
                         fiteringDeptAndUsers(options, state)
                       }
@@ -386,12 +378,9 @@ const SelectTargetDialog = memo(
                           paper: { elevation: 3 },
                           popper: { placement: "top" },
                         }}
-                        value={
-                          chatId
-                            ? groupList.filter((x) => x.chatId === chatId)[0]
-                            : null
-                        }
+                        value={searchValue}
                         options={groupList}
+                        filterOptions={(x) => x}
                         getOptionLabel={(option) => option.chatName}
                         isOptionEqualToValue={(option, value) =>
                           option.chatId === value.chatId
@@ -410,9 +399,15 @@ const SelectTargetDialog = memo(
                             )
                           },
                         }}
+                        clearOnBlur={false}
+                        onInputChange={(_, value) => {
+                          setKeyword(value)
+                          setGroupPage(1)
+                        }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
+                            value={keyword}
                             className={styles.InputButton}
                             margin="dense"
                             type="text"
@@ -421,6 +416,7 @@ const SelectTargetDialog = memo(
                         )}
                         onChange={(e, value) => {
                           setChatId && setChatId(value ? value.chatId : "")
+                          setSearchValue(value)
                         }}
                       />
                     )}
