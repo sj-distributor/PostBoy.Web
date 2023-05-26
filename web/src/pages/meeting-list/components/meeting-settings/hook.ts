@@ -27,8 +27,6 @@ import {
   IDeptAndUserList,
   ISearchList,
   ITagsList,
-  IWorkCorpAppGroup,
-  SendObjOrGroup,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -254,17 +252,12 @@ const useAction = (props: MeetingSettingsProps) => {
   // 获取的Tags数组
   const [tagsList, setTagsList] = useState<ITagsList[]>([]);
   // 群组列表
-  const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([]);
   const [chatId, setChatId] = useState<string>("");
-  const [sendType, setSendType] = useState<SendObjOrGroup>(
-    SendObjOrGroup.Object
-  );
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([]);
   // 上次上传的tagsList
   const [lastTimeTagsList, setLastTimeTagsList] = useState<string[]>([]);
   const [clickName, setClickName] = useState<string>("选择参会人");
-  const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false);
   //  拉取数据旋转
   const [isLoadStop, setIsLoadStop] = useState<boolean>(false);
   const departmentKeyValue = useMemo(() => {
@@ -1122,14 +1115,11 @@ const useAction = (props: MeetingSettingsProps) => {
     searchKeyValue,
     isTreeViewLoading,
     tagsList,
-    groupList,
     DeptUserCanSelectStatus,
     tagsValue,
     lastTimeTagsList,
     clickName,
     chatId,
-    sendType,
-    isUpdatedDeptUser,
     loadSelectData,
     appointLists,
     hostLists,
@@ -1137,12 +1127,10 @@ const useAction = (props: MeetingSettingsProps) => {
     tipsObject,
     appLoading,
     setCorpsValue,
-    setGroupList,
     setIsShowDialog,
     setDepartmentAndUserList,
     setTagsValue,
     setChatId,
-    setSendType,
     setIsShowMoreParticipantList,
     setCorpAppValue,
     handleCloseMenu,
