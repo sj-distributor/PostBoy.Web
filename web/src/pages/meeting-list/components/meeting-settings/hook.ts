@@ -746,7 +746,7 @@ const useAction = (props: MeetingSettingsProps) => {
         description: editor?.getText(),
         location: meetingLocation,
         settings: settingsData,
-        attendees: {
+        invitees: {
           userid: attendeesList,
         },
         reminders: meetingReminders,
@@ -912,7 +912,6 @@ const useAction = (props: MeetingSettingsProps) => {
             reminders,
             settings,
           } = res;
-
           setMeetingTitle(title);
           setMeetingStartDate(dayjs.unix(meeting_start).format("YYYY-MM-DD"));
           setMeetingStartTime(dayjs.unix(meeting_start).format("HH:mm"));

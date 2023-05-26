@@ -306,7 +306,7 @@ export interface CreateOrUpdateWorkWeChatMeetingDto {
   meeting_duration: number;
   description?: string;
   location?: string;
-  attendees?: WorkWeChatMeetingUserDto;
+  invitees?: WorkWeChatMeetingUserDto;
   meetingid?: string;
   cal_id?: string;
   settings?: Partial<WorkWeChatMeetingSettingDto>;
