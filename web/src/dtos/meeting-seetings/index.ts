@@ -413,11 +413,11 @@ export interface GetAllMeetingResponse {
 
 //会议状态
 export enum MeetingStatus {
-  待开始 = 1, //1会议待开始
-  会议中, //2会议中
-  已结束, //3已结束
-  已取消, //4已取消
-  已过期, //已过期
+  ToBeStarted = 1, //1会议待开始
+  MeetingInProgress, //2会议中
+  Ended, //3已结束
+  Canceled, //4已取消
+  Expired, //已过期
 }
 
 export interface CancelWorkWeChatMeetingDto {
