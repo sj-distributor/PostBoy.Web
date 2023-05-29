@@ -213,7 +213,7 @@ const MeetingList = () => {
             variant="contained"
             size="small"
             style={{ marginRight: 16 }}
-            disabled={params.row.status !== 1}
+            disabled={params.row.status !== MeetingStatus.待开始}
             onClick={() => meetingSetting(params.row)}
           >
             会议编辑
@@ -221,7 +221,7 @@ const MeetingList = () => {
           <Button
             variant="contained"
             size="small"
-            disabled={params.row.status !== 1}
+            disabled={params.row.status !== MeetingStatus.待开始}
             onClick={() => meetingCancel(params.row)}
           >
             取消会议
