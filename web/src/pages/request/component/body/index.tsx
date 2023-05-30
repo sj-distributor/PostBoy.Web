@@ -1,10 +1,7 @@
 import {
-  FilledInput,
   FormControl,
-  Input,
   InputLabel,
   MenuItem,
-  OutlinedInput,
   Select,
   Snackbar,
   TextareaAutosize,
@@ -88,7 +85,13 @@ export const RequestBody = (props: RequestBodyProps) => {
   });
 
   return (
-    <div className={styles.body_box}>
+    <div
+      className={`${styles.body_box} ${
+        addOrUpdate === "Add"
+          ? styles.addContentWidth
+          : styles.updateContentWidth
+      }`}
+    >
       <Snackbar
         message={promptText}
         open={openError}
@@ -101,7 +104,6 @@ export const RequestBody = (props: RequestBodyProps) => {
         <TextField
           label="标题"
           variant="outlined"
-          size="small"
           value={title}
           onChange={(e) => setTitle(e.target.value as string)}
         />
@@ -113,7 +115,6 @@ export const RequestBody = (props: RequestBodyProps) => {
             请求方式
           </InputLabel>
           <Select
-            size="small"
             labelId="demo-simple-select-autowidth-label"
             id="demo-simple-select"
             value={method}
@@ -131,7 +132,6 @@ export const RequestBody = (props: RequestBodyProps) => {
 
       <div className={`${styles.grid_4} ${styles.display_flex_column}`}>
         <TextField
-          size="small"
           id="outlined-start-adornment"
           value={url}
           label="链接"
@@ -164,7 +164,6 @@ export const RequestBody = (props: RequestBodyProps) => {
               <div className={styles.grid_2}>
                 <TextField
                   id="standard-basic"
-                  variant="standard"
                   size="small"
                   fullWidth
                   placeholder="key"
@@ -182,7 +181,6 @@ export const RequestBody = (props: RequestBodyProps) => {
               <div className={styles.grid_3}>
                 <TextField
                   id="standard-basic"
-                  variant="standard"
                   size="small"
                   fullWidth
                   placeholder="value"
@@ -229,7 +227,13 @@ export const RequestBody = (props: RequestBodyProps) => {
           </div>
 
           <TextareaAutosize
-            style={{ resize: "vertical", padding: "0.8rem 0" }}
+            style={{
+              resize: "vertical",
+              padding: "0.8rem",
+              backgroundColor: addOrUpdate === "Add" ? "#f3f4f6" : "white",
+              borderColor: "#a1a1aa",
+              borderRadius: "0.3rem",
+            }}
             aria-label="textarea"
             minRows={5}
             value={jsonBody}
@@ -246,7 +250,6 @@ export const RequestBody = (props: RequestBodyProps) => {
             发送类型
           </InputLabel>
           <Select
-            size="small"
             labelId="demo-simple-select-autowidth-label"
             id="demo-simple-select"
             value={sendTypeValue}

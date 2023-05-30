@@ -1,11 +1,17 @@
 .body_box {
-  width: 90%;
   margin: 0 auto;
   box-sizing: content-box;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   display: grid;
   gap: 1.5rem;
-  padding: 0.5rem 0 0;
+  padding: 0.5rem 0;
+}
+
+.addContentWidth {
+  width: 65%;
+}
+.updateContentWidth {
+  width: 90%;
 }
 
 .display_flex {
@@ -20,12 +26,23 @@
 .display_flex_h_center {
   display: flex;
   align-items: center;
+
+  .icon_pointer {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    border: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6);
+    border-radius: 100%;
+  }
 }
 
 .display_grid_col_6 {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   column-gap: 0.5rem;
+  padding: 0 1rem;
 }
 
 .title_front {
@@ -33,6 +50,7 @@
   line-height: 1rem;
   font-weight: 500;
   color: rgba(0, 0, 0, 0.6);
+  padding: 0 0.3rem;
 }
 
 .grid_1 {
@@ -86,6 +104,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  .icon_pointer {
+    cursor: pointer;
+    margin-right: 0.3rem;
+    font-size: 1rem;
+    border: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6);
+    border-radius: 100%;
+  }
 }
 
 .request_add_bg {
@@ -100,8 +128,4 @@
   position: absolute;
   top: -8px;
   left: 10px;
-}
-
-.icon_pointer {
-  cursor: pointer;
 }
