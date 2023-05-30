@@ -1,3 +1,4 @@
+import { green } from "@mui/material/colors";
 import { useBoolean } from "ahooks";
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
@@ -107,6 +108,8 @@ export const useAction = () => {
 
   const [alertType, setAlertType] = useState<"error" | "success">("error");
 
+  const [success, successAction] = useBoolean(false);
+
   const showErrorPrompt = (text: string) => {
     setPromptText(text);
     openErrorAction.setTrue();
@@ -121,12 +124,23 @@ export const useAction = () => {
           setWhetherClear(true);
           setAlertType("success");
           showErrorPrompt("This request save success!");
+          successAction.setTrue();
         })
         .catch(() => {
           setAlertType("error");
           showErrorPrompt("This request save error!");
+          successAction.setFalse();
         });
     }
+  };
+
+  const buttonSx = {
+    ...(success && {
+      bgcolor: green[500],
+      "&:hover": {
+        bgcolor: green[700],
+      },
+    }),
   };
 
   useEffect(() => {
@@ -145,6 +159,14 @@ export const useAction = () => {
     }
   }, [whetherClear]);
 
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        successAction.setFalse();
+      }, 3000);
+    }
+  }, [success]);
+
   return {
     promptText,
     openError,
@@ -153,5 +175,6 @@ export const useAction = () => {
     setSendData,
     whetherClear,
     alertType,
+    buttonSx,
   };
 };

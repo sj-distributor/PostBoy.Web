@@ -15,6 +15,7 @@ export const SendRequest = () => {
     setSendData,
     whetherClear,
     alertType,
+    buttonSx,
   } = useAction();
 
   return (
@@ -34,10 +35,24 @@ export const SendRequest = () => {
         addOrUpdate={"Add"}
       />
       <div className={styles.btn}>
-        <div className={`${styles.grid_6} ${styles.btn_left}`}>
-          <Button onClick={RequestSend}>发送</Button>
-        </div>
-        <div className={`${styles.grid_6} ${styles.btn_left}`}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={RequestSend}
+            style={{
+              height: "3.5rem",
+              width: "7rem",
+              fontSize: "1rem",
+            }}
+            sx={buttonSx}
+          >
+            发送
+          </Button>
           <Button onClick={() => openHistoryRef?.current?.open()}>
             发送列表
           </Button>
