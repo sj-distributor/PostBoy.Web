@@ -100,7 +100,7 @@ export const RequestBody = (props: RequestBodyProps) => {
           horizontal: "center",
         }}
       />
-      <div className={`${styles.grid_5} ${styles.display_flex_column}`}>
+      <div className={`${styles.grid_4} ${styles.display_flex_column}`}>
         <TextField
           label="标题"
           variant="outlined"
@@ -108,7 +108,7 @@ export const RequestBody = (props: RequestBodyProps) => {
           onChange={(e) => setTitle(e.target.value as string)}
         />
       </div>
-      <div className={`${styles.grid_1} ${styles.display_flex_column}`}>
+      <div className={`${styles.grid_2} ${styles.display_flex_column}`}>
         <FormControl>
           <InputLabel id="demo-simple-select-autowidth-label">
             发送类型
