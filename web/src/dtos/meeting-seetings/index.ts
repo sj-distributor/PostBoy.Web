@@ -451,11 +451,6 @@ export interface CandelDto {
 }
 
 export interface MeetingGroup {
-  isCreateGroup: IsCreateGroup;
+  isCreateGroup: boolean;
   content: string;
-}
-
-export enum IsCreateGroup {
-  false,
-  true,
 }

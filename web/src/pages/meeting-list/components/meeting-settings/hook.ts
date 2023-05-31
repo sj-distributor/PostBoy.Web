@@ -28,7 +28,6 @@ import {
   ISearchList,
   ITagsList,
   MeetingGroup,
-  IsCreateGroup,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -661,7 +660,7 @@ const useAction = (props: MeetingSettingsProps) => {
     });
     setMeetingGroup((prev) => ({
       ...prev,
-      isCreateGroup: IsCreateGroup.false,
+      isCreateGroup: false,
       content: "",
     }));
   };
@@ -706,7 +705,7 @@ const useAction = (props: MeetingSettingsProps) => {
 
   //拉群并通知
   const [meetingGroup, setMeetingGroup] = useState<MeetingGroup>({
-    isCreateGroup: 0,
+    isCreateGroup: false,
     content: "",
   });
 
@@ -818,10 +817,7 @@ const useAction = (props: MeetingSettingsProps) => {
         ) !== -1
       ) {
         if (meetingState === "create") {
-          if (
-            meetingGroup.isCreateGroup === IsCreateGroup.true &&
-            !meetingGroup.content
-          ) {
+          if (meetingGroup.isCreateGroup && !meetingGroup.content) {
             setTipsObject({
               show: true,
               msg: "The content of the group pull notification was not filled in",
@@ -833,9 +829,7 @@ const useAction = (props: MeetingSettingsProps) => {
             createWorkWeChatMeeting: createOrUpdateMeetingData,
             meetingGroup: {
               isCreateGroup: !!meetingGroup.isCreateGroup,
-              content:
-                meetingGroup.content +
-                "\n #会议号：#{meeting_code}\n会议链接：#{meeting_link}",
+              content: meetingGroup.content,
             },
           };
 

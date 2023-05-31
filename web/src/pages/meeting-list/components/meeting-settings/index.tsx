@@ -44,7 +44,6 @@ import AddParticipantDialog from "./component/add-participant-dialog";
 import SeetingsDialog from "./component/settingsDialog";
 import {
   DefaultDisplay,
-  IsCreateGroup,
   MeetingSettingsProps,
 } from "../../../../dtos/meeting-seetings";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -694,54 +693,71 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       <div className={style.title}>发起群聊</div>
                       <div className={style.selectGroupData}>
                         <Select
-                          value={meetingGroup.isCreateGroup}
+                          value={+meetingGroup.isCreateGroup}
                           displayEmpty
                           inputProps={{ "aria-label": "Without label" }}
                           className={style.fromDataItem}
                           onChange={(e) =>
                             setMeetingGroup((prev) => ({
                               ...prev,
-                              isCreateGroup: +e.target.value,
+                              isCreateGroup: !!e.target.value,
                             }))
                           }
                         >
-                          <MenuItem value={IsCreateGroup.false}>
-                            不拉群
-                          </MenuItem>
-                          <MenuItem value={IsCreateGroup.true}>
+                          <MenuItem value={0}>不拉群</MenuItem>
+                          <MenuItem value={1}>
                             拉群并通知(参会人大于1人生效)
                           </MenuItem>
                         </Select>
                       </div>
                     </div>
                   )}
-                  {meetingState === "create" &&
-                    meetingGroup.isCreateGroup === IsCreateGroup.true && (
-                      <div className={style.fromItem}>
-                        <div className={style.title}>群发内容</div>
-                        <div className={style.widthFull}>
-                          <TextField
-                            id="multilineGroupContent"
-                            placeholder="输入群发内容"
-                            className={style.fromDataItem}
-                            multiline={true}
-                            minRows={5}
-                            maxRows={10}
-                            variant="outlined"
-                            autoComplete="off"
-                            value={
-                              meetingGroup.content ? meetingGroup.content : ""
-                            }
-                            onChange={(e) =>
-                              setMeetingGroup((prev) => ({
-                                ...prev,
-                                content: e.target.value,
-                              }))
-                            }
-                          />
-                        </div>
+                  {meetingState === "create" && meetingGroup.isCreateGroup && (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>群发内容</div>
+                      <div className={style.widthFull}>
+                        <Button
+                          onClick={() =>
+                            setMeetingGroup((prev) => ({
+                              ...prev,
+                              content: prev.content + "#{meeting_code}",
+                            }))
+                          }
+                        >
+                          插入会议号
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            setMeetingGroup((prev) => ({
+                              ...prev,
+                              content: prev.content + "#{meeting_link}",
+                            }))
+                          }
+                        >
+                          插入会议链接
+                        </Button>
+                        <TextField
+                          id="multilineGroupContent"
+                          placeholder="输入群发内容"
+                          className={style.fromDataItem}
+                          multiline={true}
+                          minRows={5}
+                          maxRows={10}
+                          variant="outlined"
+                          autoComplete="off"
+                          value={
+                            meetingGroup.content ? meetingGroup.content : ""
+                          }
+                          onChange={(e) =>
+                            setMeetingGroup((prev) => ({
+                              ...prev,
+                              content: e.target.value,
+                            }))
+                          }
+                        />
                       </div>
-                    )}
+                    </div>
+                  )}
                   <div className={style.fromItem}>
                     <div className={style.title}>设置</div>
                     <div className={style.seetingBtn}>
