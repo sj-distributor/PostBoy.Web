@@ -35,6 +35,23 @@ const asyncTootip = (title: string, style: string) => {
   );
 };
 
+const getMeetingStatus = (key: number | undefined) => {
+  switch (key) {
+    case 1:
+      return "待开始";
+    case 2:
+      return "会议中";
+    case 3:
+      return "已结束";
+    case 4:
+      return "已取消";
+    case 5:
+      return "已过期";
+    default:
+      return key ? key : "";
+  }
+};
+
 const MeetingList = () => {
   const {
     rows,
@@ -87,7 +104,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
-        MeetingStatus[params.row.status],
+        getMeetingStatus(params.row.status),
     },
     {
       field: "meetingStart",
