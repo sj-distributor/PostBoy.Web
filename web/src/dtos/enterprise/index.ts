@@ -181,6 +181,7 @@ export interface IMessageJob extends IMessageJobBase {
     to: string[];
     cc: string[];
   };
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface IMessageJobBase {
@@ -214,6 +215,7 @@ export enum MessageJobSendType {
 export enum MessageJobDestination {
   Email,
   WorkWeChat,
+  HttpRequest,
 }
 
 export interface IMessageJobRecord extends IMessageJobRecordSame {
@@ -240,7 +242,6 @@ export const messageSendResultType = {
 };
 
 export interface ISendMessageCommand {
-  correlationId?: string;
   jobSetting?: IJobSettingDto;
   metadata?: { key: string; value: string }[];
   emailNotification?: {
@@ -257,6 +258,7 @@ export interface ISendMessageCommand {
     }[];
   };
   workWeChatAppNotification?: IWorkWeChatAppNotificationDto;
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface IUpdateMessageCommand {
@@ -271,6 +273,7 @@ export interface IUpdateMessageCommand {
     cc: string[];
   };
   workWeChatAppNotification?: IWorkWeChatAppNotificationDto;
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface IJobSettingDto {
@@ -330,6 +333,7 @@ export interface ILastShowTableData extends IMessageJob {
   groupId?: string;
   enterprise: ICorpData;
   app: ICorpAppData;
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface ILastShowTableEmailData {
@@ -461,4 +465,16 @@ export interface IGroupUserResponse {
 export interface IMentionList {
   id: string;
   display: string;
+}
+
+export interface SendHttpRequestDto {
+  headers?: SendHttpRequestHeaderDto[];
+  jsonBody?: string;
+  method?: string;
+  url?: string;
+}
+
+export interface SendHttpRequestHeaderDto {
+  key: string;
+  value: string;
 }
