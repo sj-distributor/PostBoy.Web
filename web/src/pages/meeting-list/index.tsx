@@ -90,16 +90,6 @@ const MeetingList = () => {
         MeetingStatus[params.row.status],
     },
     {
-      field: "isDelete",
-      headerName: "是否取消",
-      flex: 1,
-      minWidth: 100,
-      align: "center",
-      headerAlign: "center",
-      valueGetter: (params: GridValueGetterParams) =>
-        params.row.isDelete ? "已取消" : "未取消",
-    },
-    {
       field: "meetingStart",
       headerName: "会议开始时间",
       flex: 1,
@@ -223,7 +213,7 @@ const MeetingList = () => {
             variant="contained"
             size="small"
             style={{ marginRight: 16 }}
-            disabled={params.row.isDelete}
+            disabled={params.row.status !== MeetingStatus.ToBeStarted}
             onClick={() => meetingSetting(params.row)}
           >
             会议编辑
@@ -231,7 +221,7 @@ const MeetingList = () => {
           <Button
             variant="contained"
             size="small"
-            disabled={params.row.isDelete}
+            disabled={params.row.status !== MeetingStatus.ToBeStarted}
             onClick={() => meetingCancel(params.row)}
           >
             取消会议
