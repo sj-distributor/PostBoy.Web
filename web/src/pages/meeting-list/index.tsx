@@ -35,7 +35,7 @@ const asyncTootip = (title: string, style: string) => {
   );
 };
 
-const getMeetingStatus = (key: number | undefined) => {
+const convertMeetingStatus = (key: number | undefined) => {
   switch (key) {
     case 1:
       return "待开始";
@@ -104,7 +104,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
-        getMeetingStatus(params.row.status),
+        convertMeetingStatus(params.row.status),
     },
     {
       field: "meetingStart",
