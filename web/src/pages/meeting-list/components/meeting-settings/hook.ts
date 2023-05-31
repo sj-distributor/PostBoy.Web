@@ -29,6 +29,8 @@ import {
   ITagsList,
   IWorkCorpAppGroup,
   SendObjOrGroup,
+  MeetingGroup,
+  IsCreateGroup,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -664,6 +666,11 @@ const useAction = (props: MeetingSettingsProps) => {
       hosts: undefined,
       ring_users: undefined,
     });
+    setMeetingGroup((prev) => ({
+      ...prev,
+      isCreateGroup: IsCreateGroup.false,
+      content: "",
+    }));
   };
 
   const [loading, loadingAction] = useBoolean(false);
@@ -702,6 +709,12 @@ const useAction = (props: MeetingSettingsProps) => {
     enable_screen_watermark: false,
     hosts: undefined,
     ring_users: undefined,
+  });
+
+  //拉群并通知
+  const [meetingGroup, setMeetingGroup] = useState<MeetingGroup>({
+    isCreateGroup: 0,
+    content: "",
   });
 
   const onCreateUpdateMeeting = async () => {
@@ -746,7 +759,7 @@ const useAction = (props: MeetingSettingsProps) => {
         description: editor?.getText(),
         location: meetingLocation,
         settings: settingsData,
-        attendees: {
+        invitees: {
           userid: attendeesList,
         },
         reminders: meetingReminders,
@@ -759,26 +772,31 @@ const useAction = (props: MeetingSettingsProps) => {
           show: true,
           msg: "Administrators must attend the meeting",
         });
+
       !createOrUpdateMeetingData.appId &&
         setTipsObject({
           show: true,
           msg: "No application selected",
         });
+
       !createOrUpdateMeetingData.admin_userid &&
         setTipsObject({
           show: true,
           msg: "Failed to obtain account information",
         });
+
       !createOrUpdateMeetingData.title &&
         setTipsObject({
           show: true,
           msg: "Not filled in title",
         });
+
       !createOrUpdateMeetingData.meeting_start &&
         setTipsObject({
           show: true,
           msg: "Meeting start time not set",
         });
+
       createOrUpdateMeetingData.meeting_duration < 300 &&
         setTipsObject({
           show: true,
@@ -792,6 +810,7 @@ const useAction = (props: MeetingSettingsProps) => {
           show: true,
           msg: "The meeting start time cannot be earlier than the current time, please reselect",
         });
+
       if (
         createOrUpdateMeetingData.appId &&
         createOrUpdateMeetingData.title &&
@@ -806,8 +825,25 @@ const useAction = (props: MeetingSettingsProps) => {
         ) !== -1
       ) {
         if (meetingState === "create") {
+          if (
+            meetingGroup.isCreateGroup === IsCreateGroup.true &&
+            !meetingGroup.content
+          ) {
+            setTipsObject({
+              show: true,
+              msg: "The content of the group pull notification was not filled in",
+            });
+            return;
+          }
+
           const data = {
             createWorkWeChatMeeting: createOrUpdateMeetingData,
+            meetingGroup: {
+              isCreateGroup: !!meetingGroup.isCreateGroup,
+              content:
+                meetingGroup.content +
+                "\n #会议号：#{meeting_code}\n会议链接：#{meeting_link}",
+            },
           };
 
           await createMeeting(data)
@@ -1185,6 +1221,8 @@ const useAction = (props: MeetingSettingsProps) => {
     customEndTime,
     meetingDuration,
     setMeetingDuration,
+    meetingGroup,
+    setMeetingGroup,
   };
 };
 

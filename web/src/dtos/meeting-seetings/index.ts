@@ -306,7 +306,7 @@ export interface CreateOrUpdateWorkWeChatMeetingDto {
   meeting_duration: number;
   description?: string;
   location?: string;
-  attendees?: WorkWeChatMeetingUserDto;
+  invitees?: WorkWeChatMeetingUserDto;
   meetingid?: string;
   cal_id?: string;
   settings?: Partial<WorkWeChatMeetingSettingDto>;
@@ -448,4 +448,14 @@ export interface CandelDto {
   meetingId: string;
   workWeChatCorpApplicationId: string;
   workWeChatCorpId: string;
+}
+
+export interface MeetingGroup {
+  isCreateGroup: IsCreateGroup;
+  content: string;
+}
+
+export enum IsCreateGroup {
+  false,
+  true,
 }

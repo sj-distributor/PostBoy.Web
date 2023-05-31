@@ -44,6 +44,7 @@ import AddParticipantDialog from "./component/add-participant-dialog";
 import SeetingsDialog from "./component/settingsDialog";
 import {
   DefaultDisplay,
+  IsCreateGroup,
   MeetingSettingsProps,
 } from "../../../../dtos/meeting-seetings";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -81,14 +82,11 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     searchKeyValue,
     isTreeViewLoading,
     tagsList,
-    groupList,
     DeptUserCanSelectStatus,
     tagsValue,
     lastTimeTagsList,
     clickName,
     chatId,
-    sendType,
-    isUpdatedDeptUser,
     loadSelectData,
     appointLists,
     hostLists,
@@ -96,12 +94,10 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     tipsObject,
     appLoading,
     setCorpsValue,
-    setGroupList,
     setIsShowDialog,
     setDepartmentAndUserList,
     setTagsValue,
     setChatId,
-    setSendType,
     setIsShowMoreParticipantList,
     setCorpAppValue,
     handleCloseMenu,
@@ -143,6 +139,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     customEndTime,
     meetingDuration,
     setMeetingDuration,
+    meetingGroup,
+    setMeetingGroup,
   } = useAction({
     setIsOpenMeetingSettings,
     meetingIdCorpIdAndAppId,
@@ -691,6 +689,59 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       </div>
                     );
                   })}
+                  {meetingState === "create" && (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>发起群聊</div>
+                      <div className={style.selectGroupData}>
+                        <Select
+                          value={meetingGroup.isCreateGroup}
+                          displayEmpty
+                          inputProps={{ "aria-label": "Without label" }}
+                          className={style.fromDataItem}
+                          onChange={(e) =>
+                            setMeetingGroup((prev) => ({
+                              ...prev,
+                              isCreateGroup: +e.target.value,
+                            }))
+                          }
+                        >
+                          <MenuItem value={IsCreateGroup.false}>
+                            不拉群
+                          </MenuItem>
+                          <MenuItem value={IsCreateGroup.true}>
+                            拉群并通知(参会人大于1人生效)
+                          </MenuItem>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
+                  {meetingState === "create" &&
+                    meetingGroup.isCreateGroup === IsCreateGroup.true && (
+                      <div className={style.fromItem}>
+                        <div className={style.title}>群发内容</div>
+                        <div className={style.widthFull}>
+                          <TextField
+                            id="multilineGroupContent"
+                            placeholder="输入群发内容"
+                            className={style.fromDataItem}
+                            multiline={true}
+                            minRows={5}
+                            maxRows={10}
+                            variant="outlined"
+                            autoComplete="off"
+                            value={
+                              meetingGroup.content ? meetingGroup.content : ""
+                            }
+                            onChange={(e) =>
+                              setMeetingGroup((prev) => ({
+                                ...prev,
+                                content: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
                   <div className={style.fromItem}>
                     <div className={style.title}>设置</div>
                     <div className={style.seetingBtn}>
