@@ -29,6 +29,7 @@ const useAction = (props: {
   const [appId, setAppId] = useState<string>("")
   const [agentId, setAgentId] = useState<number>(0)
   const [order, setOrder] = useState<number>(0)
+  const [display, setDisplay] = useState<boolean>(true)
 
   const handleSubmit = async () => {
     if (rowData.key === RowDataType.Corporation) {
@@ -39,31 +40,47 @@ const useAction = (props: {
         order,
       }
       rowDataType === AddOrModify.Add
-        ? AddCorp([requestCorpData]).then(success)
-        : ModifyCorp([{ ...requestCorpData, id: rowData.data.id }]).then(
-            success
-          )
+        ? AddCorp([requestCorpData])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
+        : ModifyCorp([{ ...requestCorpData, id: rowData.data.id }])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
     } else {
       const requestAppData: IRequestAppAdd = {
         appId,
         name,
         secret,
-        display: true,
+        display,
         agentId: Number(agentId),
         workWeChatCorpId: rowData.data.workWeChatCorpId,
       }
       rowDataType === AddOrModify.Add
-        ? AddApplication([requestAppData]).then(success)
-        : ModifyApplication([{ ...requestAppData, id: rowData.data.id }]).then(
-            success
-          )
+        ? AddApplication([requestAppData])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
+        : ModifyApplication([{ ...requestAppData, id: rowData.data.id }])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
     }
-    onAddApikeyCancel()
-    clearData()
+  }
+
+  const showErrorTip = (text: string) => {
+    setTipsText(text)
   }
 
   const success = () => {
     setTipsText(`${rowDataType} success`)
+    onAddApikeyCancel()
+    clearData()
     rowData.key === RowDataType.Corporation
       ? reload()
       : reload(rowData.data.workWeChatCorpId)
@@ -95,6 +112,7 @@ const useAction = (props: {
         setAppId(rowData.data.appId)
         setAgentId(rowData.data.agentId)
         setSecret(rowData.data.secret)
+        setDisplay(rowData.data.display)
       }
     } else {
       clearData()
@@ -116,6 +134,8 @@ const useAction = (props: {
     validate,
     order,
     setOrder,
+    display,
+    setDisplay,
   }
 }
 

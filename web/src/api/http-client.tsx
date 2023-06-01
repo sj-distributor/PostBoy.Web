@@ -46,16 +46,8 @@ export async function base<T>(
     .then((res: IResponse<T>) => {
       if (res.code === ResponseCode.Ok) {
         return res.data
-      } else if (res.code === ResponseCode.Unauthorized) {
-        return null
-      } else if (res.code === ResponseCode.InternalServerError) {
-        return null
       } else {
-        console.log("todo")
+        throw new Error(res.msg)
       }
-    })
-    .catch((err) => {
-      console.log("request error:", err)
-      throw new Error(err)
     })
 }
