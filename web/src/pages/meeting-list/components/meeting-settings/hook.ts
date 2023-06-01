@@ -864,15 +864,6 @@ const useAction = (props: MeetingSettingsProps) => {
         ) !== -1
       ) {
         if (meetingState === "create") {
-          if (meetingGroup.isCreateGroup && !meetingGroup.content) {
-            setTipsObject({
-              show: true,
-              msg: "The content of the group pull notification was not filled in",
-            });
-            loadingAction.setFalse();
-            return;
-          }
-
           const content = `${meetingGroup.content}${
             meetingGroup.isMeetingCode ? "\n #会议号：#{meeting_code}" : ""
           }${
