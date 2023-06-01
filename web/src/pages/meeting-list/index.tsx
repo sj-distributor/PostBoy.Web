@@ -72,15 +72,6 @@ const MeetingList = () => {
         asyncTootip(params.row.adminUserId + "", style.tooltip),
     },
     {
-      field: "mainDepartment",
-      headerName: "发起人所在部门",
-      flex: 1,
-      minWidth: 130,
-      align: "center",
-      headerAlign: "center",
-    },
-
-    {
       field: "status",
       headerName: "会议状态",
       flex: 1,
