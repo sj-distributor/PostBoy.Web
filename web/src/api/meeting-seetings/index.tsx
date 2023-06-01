@@ -37,7 +37,9 @@ export const getMeetingData = async (data: GetWorkWeChatMeeting) => {
 
 export const getAllMeetingData = async (data: GetAllMeetingDto) => {
   return await Get<GetAllMeetingResponse>(
-    `/api/WeChat/work/meetings?PageIndex=${data.PageIndex}&PageSize=${data.PageSize}&KeyWord=${data.KeyWord}`
+    `/api/WeChat/work/meetings?PageIndex=${data.PageIndex}&PageSize=${
+      data.PageSize
+    }${data.KeyWord ? "&KeyWord=" + data.KeyWord : ""}`
   );
 };
 
