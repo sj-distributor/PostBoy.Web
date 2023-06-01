@@ -19,6 +19,7 @@ const useAction = () => {
       corpId: "",
       corpName: "",
       contactSecret: "",
+      order: 0,
     },
     key: RowDataType.Corporation,
   }
@@ -72,6 +73,7 @@ const useAction = () => {
             setCorpsList(
               corpData.map((item) => ({
                 ...item,
+                order: item.order ?? 0,
                 contactSecret:
                   secretData.find((secret) => secret.id === item.id)?.secret ??
                   "",
