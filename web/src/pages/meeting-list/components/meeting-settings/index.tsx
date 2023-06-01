@@ -728,7 +728,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                                 }))
                               }
                             />
-                            在内容后加入会议号
+                            是否在内容后加入会议号
                           </label>
                           <label className={style.meetingLinkCheck}>
                             <input
@@ -741,7 +741,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                                 }))
                               }
                             />
-                            在内容后加入会议链接
+                            是否在内容后加入会议链接
                           </label>
                         </div>
                         <TextField
