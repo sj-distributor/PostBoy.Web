@@ -14,6 +14,7 @@ export interface IOriginAppData {
 }
 export interface IManagerCorpData extends IOriginCorpData {
   id: string
+  order: number
 }
 
 export interface IManagerCorpKeyData {
@@ -37,6 +38,7 @@ export interface ISecretData {
 
 export interface IRequestCorpAdd extends IOriginCorpData {
   id?: string
+  order: number
 }
 
 export interface IRequestAppAdd extends IOriginAppData {

@@ -7,6 +7,7 @@ export interface ICorpData {
   corpName: string;
   corpId: string;
   id: string;
+  order?: number;
 }
 
 export interface ICorpAppData {
