@@ -22,7 +22,7 @@ import {
 } from "@mui/x-data-grid";
 import MeetingSettings from "./components/meeting-settings";
 import useAction from "./hook";
-import { MeetingStatus } from "../../dtos/meeting-seetings";
+import { MeetingStatus, MeetingType } from "../../dtos/meeting-seetings";
 import style from "./index.module.scss";
 import { Search } from "@mui/icons-material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -35,21 +35,8 @@ const asyncTootip = (title: string, style: string) => {
   );
 };
 
-const convertMeetingStatus = (key: number | undefined) => {
-  switch (key) {
-    case 1:
-      return "待开始";
-    case 2:
-      return "会议中";
-    case 3:
-      return "已结束";
-    case 4:
-      return "已取消";
-    case 5:
-      return "已过期";
-    default:
-      return key ? key : "";
-  }
+const convertMeetingStatus = (type: MeetingStatus) => {
+  return type ? MeetingType[type] : "";
 };
 
 const MeetingList = () => {

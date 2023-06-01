@@ -420,6 +420,14 @@ export enum MeetingStatus {
   Expired, //已过期
 }
 
+export const MeetingType = {
+  [MeetingStatus.ToBeStarted]: "待开始",
+  [MeetingStatus.MeetingInProgress]: "会议中",
+  [MeetingStatus.Ended]: "已结束",
+  [MeetingStatus.Canceled]: "已取消",
+  [MeetingStatus.Expired]: "已过期",
+};
+
 export interface CancelWorkWeChatMeetingDto {
   cancelWorkWeChatMeeting: {
     appId: string;
