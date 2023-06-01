@@ -24,9 +24,8 @@ import MeetingSettings from "./components/meeting-settings";
 import useAction from "./hook";
 import { MeetingStatus, MeetingType } from "../../dtos/meeting-seetings";
 import style from "./index.module.scss";
-import { KeyOff, Search } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { type } from "os";
 
 const asyncTootip = (title: string, style: string) => {
   return (
