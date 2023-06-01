@@ -37,6 +37,8 @@ const CorpAppDialog = (props: {
     setSecret,
     handleSubmit,
     validate,
+    order,
+    setOrder,
   } = useAction({
     rowData,
     rowDataType,
@@ -101,6 +103,17 @@ const CorpAppDialog = (props: {
           rows={5}
           onChange={(e) => setSecret(e.target.value)}
         />
+
+        {isCorp && (
+          <TextField
+            fullWidth
+            type="number"
+            label="Order"
+            className={styles.TextField}
+            value={order}
+            onChange={(e) => setOrder(Number(e.target.value))}
+          />
+        )}
 
         <Button
           fullWidth
