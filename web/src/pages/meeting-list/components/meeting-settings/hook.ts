@@ -701,13 +701,12 @@ const useAction = (props: MeetingSettingsProps) => {
       hosts: undefined,
       ring_users: undefined,
     });
-    setMeetingGroup((prev) => ({
-      ...prev,
+    setMeetingGroup({
       isCreateGroup: false,
       content: "",
       isMeetingCode: true,
       isMeetingLink: true,
-    }));
+    });
   };
 
   const [loading, loadingAction] = useBoolean(false);
