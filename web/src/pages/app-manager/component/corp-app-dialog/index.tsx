@@ -39,6 +39,8 @@ const CorpAppDialog = (props: {
     validate,
     order,
     setOrder,
+    display,
+    setDisplay,
   } = useAction({
     rowData,
     rowDataType,
@@ -104,7 +106,7 @@ const CorpAppDialog = (props: {
           onChange={(e) => setSecret(e.target.value)}
         />
 
-        {isCorp && (
+        {isCorp ? (
           <TextField
             fullWidth
             type="number"
@@ -113,6 +115,21 @@ const CorpAppDialog = (props: {
             value={order}
             onChange={(e) => setOrder(Number(e.target.value))}
           />
+        ) : (
+          <div style={{ display: "flex" }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={display}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    rowDataType !== AddOrModify.Add &&
+                    setDisplay(event.target.checked as boolean)
+                  }
+                />
+              }
+              label="Display"
+            />
+          </div>
         )}
 
         <Button
