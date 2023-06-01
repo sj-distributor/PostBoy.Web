@@ -22,7 +22,7 @@ import {
 } from "@mui/x-data-grid";
 import MeetingSettings from "./components/meeting-settings";
 import useAction from "./hook";
-import { MeetingStatus } from "../../dtos/meeting-seetings";
+import { MeetingStatus, MeetingType } from "../../dtos/meeting-seetings";
 import style from "./index.module.scss";
 import { Search } from "@mui/icons-material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -71,15 +71,6 @@ const MeetingList = () => {
         asyncTootip(params.row.adminUserId + "", style.tooltip),
     },
     {
-      field: "mainDepartment",
-      headerName: "发起人所在部门",
-      flex: 1,
-      minWidth: 130,
-      align: "center",
-      headerAlign: "center",
-    },
-
-    {
       field: "status",
       headerName: "会议状态",
       flex: 1,
@@ -87,7 +78,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
-        MeetingStatus[params.row.status],
+        MeetingType[params.row.status as MeetingStatus],
     },
     {
       field: "meetingStart",

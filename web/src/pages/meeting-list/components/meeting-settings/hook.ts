@@ -27,6 +27,7 @@ import {
   IDeptAndUserList,
   ISearchList,
   ITagsList,
+  MeetingGroup,
   IDepartmentUsersData,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
@@ -690,7 +691,7 @@ const useAction = (props: MeetingSettingsProps) => {
     setHtml("");
     setAdminUser([]);
     setSettings({
-      password: null,
+      password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
       remind_scope: 3,
@@ -699,6 +700,12 @@ const useAction = (props: MeetingSettingsProps) => {
       enable_screen_watermark: false,
       hosts: undefined,
       ring_users: undefined,
+    });
+    setMeetingGroup({
+      isCreateGroup: false,
+      content: "",
+      isMeetingCode: true,
+      isMeetingLink: true,
     });
   };
 
@@ -729,7 +736,7 @@ const useAction = (props: MeetingSettingsProps) => {
   );
   const [meetingLocation, setMeetingLocation] = useState<string>("");
   const [settings, setSettings] = useState<WorkWeChatMeetingSettingDto>({
-    password: null,
+    password: "",
     enable_waiting_room: false,
     allow_enter_before_host: true,
     remind_scope: 1,
@@ -738,6 +745,14 @@ const useAction = (props: MeetingSettingsProps) => {
     enable_screen_watermark: false,
     hosts: undefined,
     ring_users: undefined,
+  });
+
+  //拉群并通知
+  const [meetingGroup, setMeetingGroup] = useState<MeetingGroup>({
+    isCreateGroup: false,
+    isMeetingCode: true,
+    isMeetingLink: true,
+    content: "",
   });
 
   const onCreateUpdateMeeting = async () => {
@@ -773,6 +788,9 @@ const useAction = (props: MeetingSettingsProps) => {
       if (!settingsData.ring_users) {
         delete settingsData.ring_users;
       }
+
+      !settingsData.password && (settingsData.password = "");
+
       const createOrUpdateMeetingData: CreateOrUpdateWorkWeChatMeetingDto = {
         appId: corpAppValue.appId,
         admin_userid: admin_userid + "",
@@ -795,26 +813,31 @@ const useAction = (props: MeetingSettingsProps) => {
           show: true,
           msg: "Administrators must attend the meeting",
         });
+
       !createOrUpdateMeetingData.appId &&
         setTipsObject({
           show: true,
           msg: "No application selected",
         });
+
       !createOrUpdateMeetingData.admin_userid &&
         setTipsObject({
           show: true,
           msg: "Failed to obtain account information",
         });
+
       !createOrUpdateMeetingData.title &&
         setTipsObject({
           show: true,
           msg: "Not filled in title",
         });
+
       !createOrUpdateMeetingData.meeting_start &&
         setTipsObject({
           show: true,
           msg: "Meeting start time not set",
         });
+
       createOrUpdateMeetingData.meeting_duration < 300 &&
         setTipsObject({
           show: true,
@@ -828,6 +851,7 @@ const useAction = (props: MeetingSettingsProps) => {
           show: true,
           msg: "The meeting start time cannot be earlier than the current time, please reselect",
         });
+
       if (
         createOrUpdateMeetingData.appId &&
         createOrUpdateMeetingData.title &&
@@ -842,8 +866,18 @@ const useAction = (props: MeetingSettingsProps) => {
         ) !== -1
       ) {
         if (meetingState === "create") {
+          const content = `${meetingGroup.content}${
+            meetingGroup.isMeetingCode ? "\n #会议号：#{meeting_code}" : ""
+          }${
+            meetingGroup.isMeetingLink ? "\n #会议链接：#{meeting_link}" : ""
+          }`;
+
           const data = {
             createWorkWeChatMeeting: createOrUpdateMeetingData,
+            meetingGroup: {
+              isCreateGroup: meetingGroup.isCreateGroup,
+              content,
+            },
           };
 
           await createMeeting(data)
@@ -1215,6 +1249,8 @@ const useAction = (props: MeetingSettingsProps) => {
     customEndTime,
     meetingDuration,
     setMeetingDuration,
+    meetingGroup,
+    setMeetingGroup,
   };
 };
 

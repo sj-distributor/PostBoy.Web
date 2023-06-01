@@ -121,7 +121,9 @@ const useAction = (props: {
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
       const newValue = prev.filter((e) => !!e);
-      const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
+      const activeData = newValue.find(
+        (e) => e.key === departmentKeyValue?.key
+      );
       if (activeData) {
         valueArr.length > 0
           ? valueArr.forEach((item) => {

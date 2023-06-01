@@ -219,7 +219,7 @@ const useAction = (props: SettingDialogProps) => {
       return;
     }
     let settingData: WorkWeChatMeetingSettingDto = {
-      password: null,
+      password: "",
       enable_waiting_room: false,
       allow_enter_before_host: false,
       remind_scope: 1,
@@ -233,9 +233,9 @@ const useAction = (props: SettingDialogProps) => {
     meetingSettingList.map((item) => {
       if (item.optionType === "input") {
         if (item.isOption) {
-          settingData.password = item.password ? item.password : null;
+          settingData.password = item.password ? item.password : "";
         } else {
-          settingData.password = null;
+          settingData.password = "";
         }
       }
 

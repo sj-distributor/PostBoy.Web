@@ -138,6 +138,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     customEndTime,
     meetingDuration,
     setMeetingDuration,
+    meetingGroup,
+    setMeetingGroup,
   } = useAction({
     setIsOpenMeetingSettings,
     meetingIdCorpIdAndAppId,
@@ -686,6 +688,84 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       </div>
                     );
                   })}
+                  {meetingState === "create" && (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>发起群聊</div>
+                      <div className={style.selectGroupData}>
+                        <Select
+                          value={+meetingGroup.isCreateGroup}
+                          displayEmpty
+                          inputProps={{ "aria-label": "Without label" }}
+                          className={style.fromDataItem}
+                          onChange={(e) =>
+                            setMeetingGroup((prev) => ({
+                              ...prev,
+                              isCreateGroup: !!e.target.value,
+                            }))
+                          }
+                        >
+                          <MenuItem value={0}>不拉群</MenuItem>
+                          <MenuItem value={1}>
+                            拉群并通知(参会人大于1人生效)
+                          </MenuItem>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
+                  {meetingState === "create" && meetingGroup.isCreateGroup && (
+                    <div className={style.fromItem}>
+                      <div className={style.title}>群发内容</div>
+                      <div className={style.widthFull}>
+                        <div className={style.meetingCheckBox}>
+                          <label className={style.meetingCodeCheck}>
+                            <input
+                              type="checkbox"
+                              checked={meetingGroup.isMeetingCode}
+                              onChange={(e) =>
+                                setMeetingGroup((prev) => ({
+                                  ...prev,
+                                  isMeetingCode: e.target.checked,
+                                }))
+                              }
+                            />
+                            在内容后加入会议号
+                          </label>
+                          <label className={style.meetingLinkCheck}>
+                            <input
+                              type="checkbox"
+                              checked={meetingGroup.isMeetingLink}
+                              onChange={(e) =>
+                                setMeetingGroup((prev) => ({
+                                  ...prev,
+                                  isMeetingLink: e.target.checked,
+                                }))
+                              }
+                            />
+                            在内容后加入会议链接
+                          </label>
+                        </div>
+                        <TextField
+                          id="multilineGroupContent"
+                          placeholder="输入群发内容"
+                          className={style.fromDataItem}
+                          multiline={true}
+                          minRows={5}
+                          maxRows={10}
+                          variant="outlined"
+                          autoComplete="off"
+                          value={
+                            meetingGroup.content ? meetingGroup.content : ""
+                          }
+                          onChange={(e) =>
+                            setMeetingGroup((prev) => ({
+                              ...prev,
+                              content: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className={style.fromItem}>
                     <div className={style.title}>设置</div>
                     <div className={style.seetingBtn}>

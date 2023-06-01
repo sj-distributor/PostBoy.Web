@@ -287,7 +287,7 @@ export interface WorkWeChatMeetingReminderDto {
 }
 
 export interface WorkWeChatMeetingSettingDto {
-  password: number | null;
+  password: number | "";
   enable_waiting_room: boolean;
   allow_enter_before_host: boolean;
   remind_scope: number;
@@ -379,7 +379,7 @@ export interface GetAllMeetingsData {
   presentMember: string[];
   absentMember: string[];
   mainDepartment: number;
-  status: number;
+  status: MeetingStatus;
   agentId: number;
   calId: string;
   password: number | null;
@@ -420,6 +420,14 @@ export enum MeetingStatus {
   Expired, //已过期
 }
 
+export const MeetingType = {
+  [MeetingStatus.ToBeStarted]: "待开始",
+  [MeetingStatus.MeetingInProgress]: "会议中",
+  [MeetingStatus.Ended]: "已结束",
+  [MeetingStatus.Canceled]: "已取消",
+  [MeetingStatus.Expired]: "已过期",
+};
+
 export interface CancelWorkWeChatMeetingDto {
   cancelWorkWeChatMeeting: {
     appId: string;
@@ -448,4 +456,11 @@ export interface CandelDto {
   meetingId: string;
   workWeChatCorpApplicationId: string;
   workWeChatCorpId: string;
+}
+
+export interface MeetingGroup {
+  isCreateGroup: boolean;
+  isMeetingCode: boolean;
+  isMeetingLink: boolean;
+  content: string;
 }
