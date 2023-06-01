@@ -691,7 +691,7 @@ const useAction = (props: MeetingSettingsProps) => {
     setHtml("");
     setAdminUser([]);
     setSettings({
-      password: null,
+      password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
       remind_scope: 3,
@@ -736,7 +736,7 @@ const useAction = (props: MeetingSettingsProps) => {
   );
   const [meetingLocation, setMeetingLocation] = useState<string>("");
   const [settings, setSettings] = useState<WorkWeChatMeetingSettingDto>({
-    password: null,
+    password: "",
     enable_waiting_room: false,
     allow_enter_before_host: true,
     remind_scope: 1,
@@ -788,6 +788,9 @@ const useAction = (props: MeetingSettingsProps) => {
       if (!settingsData.ring_users) {
         delete settingsData.ring_users;
       }
+
+      !settingsData.password && (settingsData.password = "");
+
       const createOrUpdateMeetingData: CreateOrUpdateWorkWeChatMeetingDto = {
         appId: corpAppValue.appId,
         admin_userid: admin_userid + "",

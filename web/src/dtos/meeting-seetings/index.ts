@@ -287,7 +287,7 @@ export interface WorkWeChatMeetingReminderDto {
 }
 
 export interface WorkWeChatMeetingSettingDto {
-  password: number | null;
+  password: number | "";
   enable_waiting_room: boolean;
   allow_enter_before_host: boolean;
   remind_scope: number;
