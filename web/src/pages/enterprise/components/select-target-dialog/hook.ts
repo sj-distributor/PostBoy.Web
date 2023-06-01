@@ -1,5 +1,7 @@
+import { debounce } from "@material-ui/core"
+import { useDebounceEffect, useDebounceFn } from "ahooks"
 import { clone, uniq } from "ramda"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
   GetWeChatWorkCorpAppGroups,
   PostWeChatWorkGroupCreate,
@@ -95,11 +97,13 @@ const useAction = (props: {
 
   const [createLoading, setCreateLoading] = useState(false)
 
-  const [groupValue, setGroupValue] = useState<string>("")
-
   const [groupPage, setGroupPage] = useState<number>(2)
 
   const [groupIsNoData, setGroupIsNoData] = useState<boolean>(false)
+
+  const [keyword, setKeyword] = useState<string>("")
+
+  const [searchValue, setSearchValue] = useState<IWorkCorpAppGroup | null>(null)
 
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
@@ -286,14 +290,22 @@ const useAction = (props: {
       setGroupPage((prev) => prev + 1)
   }
 
-  useEffect(() => {
-    CorpId &&
-      GetWeChatWorkCorpAppGroups(CorpId, groupPage).then((data) => {
-        data && data.length > 0
-          ? setGroupList((prev) => uniq([...prev, ...data]))
-          : setGroupIsNoData(true)
-      })
-  }, [groupPage])
+  useDebounceEffect(
+    () => {
+      if (CorpId && !groupIsNoData) {
+        GetWeChatWorkCorpAppGroups(CorpId, groupPage, 15, keyword).then(
+          (result) => {
+            result &&
+              setGroupList((prev) =>
+                groupPage === 1 ? result : uniq([...prev, ...result])
+              )
+          }
+        )
+      }
+    },
+    [groupPage, keyword],
+    { wait: 500 }
+  )
 
   useEffect(() => {
     // 限制条件下群组部门列表变化同步到群组搜索选择列表
@@ -419,9 +431,14 @@ const useAction = (props: {
     defaultGroupOwner,
     groupDeptUserList,
     createLoading,
-    groupValue,
     sendList,
-    setGroupValue,
+    keyword,
+    groupPage,
+    searchValue,
+    setSearchValue,
+    setGroupPage,
+    setKeyword,
+    setGroupIsNoData,
     setCreateLoading,
     setGroupDeptUserList,
     setGroupDeptUserSelectedList,

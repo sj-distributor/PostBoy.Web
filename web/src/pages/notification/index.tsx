@@ -21,6 +21,7 @@ import LoadingButton from "@mui/lab/LoadingButton"
 import RestartAltIcon from "@mui/icons-material/RestartAlt"
 import { MessageJobDestination } from "../../dtos/enterprise"
 import SendEmail from "../email"
+import { RequestBody } from "../request/component/body"
 
 const asyncTootip = (title: string, styles: string) => {
   return (
@@ -64,6 +65,12 @@ const SendNotice = React.memo(
       showEmail,
       outterGetUpdateData,
       recordRowLoading,
+      showRequest,
+      handleRequestState,
+      onRequestSetting,
+      handleRequestConfirm,
+      setRequestUpdateData,
+      updateRequestData,
     } = useAction(recordType)
 
     const handleClick = async () => {
@@ -156,7 +163,9 @@ const SendNotice = React.memo(
               onClick={() => {
                 recordType === MessageJobDestination.WorkWeChat
                   ? onSetting(params.row)
-                  : onEmailSetting(params.row)
+                  : recordType === MessageJobDestination.Email
+                  ? onEmailSetting(params.row)
+                  : onRequestSetting(params.row)
               }}
             >
               【设置】
@@ -343,6 +352,30 @@ const SendNotice = React.memo(
               提交
             </Button>
             <Button onClick={handleEmailCancel}>取消</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={showRequest}
+          PaperProps={{
+            sx: {
+              maxWidth: "50rem",
+            },
+          }}
+        >
+          <DialogTitle>请求设置</DialogTitle>
+          <DialogContent>
+            <RequestBody
+              addOrUpdate={"Update"}
+              updateMessageJobInformation={updateMessageJobInformation}
+              updateRequestData={updateRequestData}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button variant="contained" onClick={handleRequestConfirm}>
+              保存
+            </Button>
+            <Button onClick={() => handleRequestState(false)}>取消</Button>
           </DialogActions>
         </Dialog>
       </div>

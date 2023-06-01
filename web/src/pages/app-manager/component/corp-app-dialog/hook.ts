@@ -28,6 +28,7 @@ const useAction = (props: {
   const [corpId, setCorpId] = useState<string>("")
   const [appId, setAppId] = useState<string>("")
   const [agentId, setAgentId] = useState<number>(0)
+  const [order, setOrder] = useState<number>(0)
 
   const handleSubmit = async () => {
     if (rowData.key === RowDataType.Corporation) {
@@ -35,6 +36,7 @@ const useAction = (props: {
         corpName: name,
         corpId,
         contactSecret: secret,
+        order,
       }
       rowDataType === AddOrModify.Add
         ? AddCorp([requestCorpData]).then(success)
@@ -87,6 +89,7 @@ const useAction = (props: {
         setName(rowData.data.corpName)
         setCorpId(rowData.data.corpId)
         setSecret(rowData.data.contactSecret)
+        setOrder(rowData.data.order)
       } else {
         setName(rowData.data.name)
         setAppId(rowData.data.appId)
@@ -111,6 +114,8 @@ const useAction = (props: {
     setName,
     handleSubmit,
     validate,
+    order,
+    setOrder,
   }
 }
 

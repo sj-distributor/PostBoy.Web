@@ -27,8 +27,6 @@ import {
   IDeptAndUserList,
   ISearchList,
   ITagsList,
-  IWorkCorpAppGroup,
-  SendObjOrGroup,
   IDepartmentUsersData,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
@@ -255,17 +253,12 @@ const useAction = (props: MeetingSettingsProps) => {
   // 获取的Tags数组
   const [tagsList, setTagsList] = useState<ITagsList[]>([]);
   // 群组列表
-  const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([]);
   const [chatId, setChatId] = useState<string>("");
-  const [sendType, setSendType] = useState<SendObjOrGroup>(
-    SendObjOrGroup.Object
-  );
   // 发送标签
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([]);
   // 上次上传的tagsList
   const [lastTimeTagsList, setLastTimeTagsList] = useState<string[]>([]);
   const [clickName, setClickName] = useState<string>("选择参会人");
-  const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false);
   //  拉取数据旋转
   const [isLoadStop, setIsLoadStop] = useState<boolean>(false);
   const departmentKeyValue = useMemo(() => {
@@ -789,7 +782,7 @@ const useAction = (props: MeetingSettingsProps) => {
         description: editor?.getText(),
         location: meetingLocation,
         settings: settingsData,
-        attendees: {
+        invitees: {
           userid: attendeesList,
         },
         reminders: meetingReminders,
@@ -955,7 +948,6 @@ const useAction = (props: MeetingSettingsProps) => {
             reminders,
             settings,
           } = res;
-
           setMeetingTitle(title);
           setMeetingStartDate(dayjs.unix(meeting_start).format("YYYY-MM-DD"));
           setMeetingStartTime(dayjs.unix(meeting_start).format("HH:mm"));
@@ -1166,14 +1158,11 @@ const useAction = (props: MeetingSettingsProps) => {
     searchKeyValue,
     isTreeViewLoading,
     tagsList,
-    groupList,
     DeptUserCanSelectStatus,
     tagsValue,
     lastTimeTagsList,
     clickName,
     chatId,
-    sendType,
-    isUpdatedDeptUser,
     loadSelectData,
     appointLists,
     hostLists,
@@ -1181,12 +1170,10 @@ const useAction = (props: MeetingSettingsProps) => {
     tipsObject,
     appLoading,
     setCorpsValue,
-    setGroupList,
     setIsShowDialog,
     setDepartmentAndUserList,
     setTagsValue,
     setChatId,
-    setSendType,
     setIsShowMoreParticipantList,
     setCorpAppValue,
     handleCloseMenu,

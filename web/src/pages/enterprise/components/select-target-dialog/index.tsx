@@ -98,6 +98,11 @@ const SelectTargetDialog = memo(
       groupDeptUserList,
       createLoading,
       sendList,
+      keyword,
+      searchValue,
+      setSearchValue,
+      setGroupPage,
+      setKeyword,
       setGroupName,
       setGroupOwner,
       setIsShowDialog,
@@ -373,12 +378,9 @@ const SelectTargetDialog = memo(
                           paper: { elevation: 3 },
                           popper: { placement: "top" },
                         }}
-                        value={
-                          chatId
-                            ? groupList.filter((x) => x.chatId === chatId)[0]
-                            : null
-                        }
+                        value={searchValue}
                         options={groupList}
+                        filterOptions={(x) => x}
                         getOptionLabel={(option) => option.chatName}
                         isOptionEqualToValue={(option, value) =>
                           option.chatId === value.chatId
@@ -397,9 +399,15 @@ const SelectTargetDialog = memo(
                             )
                           },
                         }}
+                        clearOnBlur={false}
+                        onInputChange={(_, value) => {
+                          setKeyword(value)
+                          setGroupPage(1)
+                        }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
+                            value={keyword}
                             className={styles.InputButton}
                             margin="dense"
                             type="text"
@@ -408,6 +416,7 @@ const SelectTargetDialog = memo(
                         )}
                         onChange={(e, value) => {
                           setChatId && setChatId(value ? value.chatId : "")
+                          setSearchValue(value)
                         }}
                       />
                     )}

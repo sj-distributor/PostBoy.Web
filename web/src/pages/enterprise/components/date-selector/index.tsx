@@ -19,11 +19,16 @@ const DateSelector = (props: {
         }}
         onChange={(e) => {
           if (
-            moment((e.target as HTMLInputElement).value).format(
-              "DD.MM.YYYY HH:mm"
-            ) >= moment().format("DD.MM.YYYY HH:mm")
+            moment(
+              (e.target as HTMLInputElement).value,
+              "YYYY-MM-DDTHH:mm"
+            ).isSameOrAfter(moment(), "minute")
           ) {
-            setDateValue((e.target as HTMLInputElement).value.replace("T", " "))
+            setDateValue(
+              moment(e.target.value, "YYYY-MM-DDTHH:mm").format(
+                "YYYY-MM-DD HH:mm"
+              )
+            )
           } else {
             showErrorPrompt("Please select a time later than the current time")
           }

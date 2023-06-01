@@ -1,0 +1,136 @@
+.body_box {
+  margin: 0 auto;
+  box-sizing: content-box;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  display: grid;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.addContentWidth {
+  width: 65%;
+}
+
+.updateContentWidth {
+  width: 90%;
+}
+
+.display_flex {
+  display: flex;
+}
+
+.display_flex_column {
+  display: flex;
+  flex-direction: column;
+}
+
+.display_flex_h_center {
+  display: flex;
+  align-items: center;
+
+  .icon_pointer {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    border: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6);
+    border-radius: 100%;
+  }
+}
+
+.display_grid_col_6 {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.title_front {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0 0.3rem;
+}
+
+.grid_1 {
+  grid-column: span 1 / span 1;
+}
+
+.grid_2 {
+  grid-column: span 2 / span 2;
+}
+
+.grid_3 {
+  grid-column: span 3 / span 3;
+}
+
+.grid_4 {
+  grid-column: span 4 / span 4;
+}
+
+.grid_5 {
+  grid-column: span 5 / span 5;
+}
+
+.grid_6 {
+  grid-column: span 6 / span 6;
+}
+
+.grid_column_start_6 {
+  grid-column-start: 6;
+}
+
+.margin_top {
+  margin-top: 0.6rem;
+}
+
+.header_box {
+  display: grid;
+  border: 1px solid #a1a1aa;
+  padding: 0.8rem 0.2rem;
+  border-radius: 0.3rem;
+  row-gap: 0.8rem;
+  position: relative;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+  top: -12px;
+  left: 10px;
+}
+
+.header_title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .icon_pointer {
+    cursor: pointer;
+    margin-right: 0.3rem;
+    font-size: 1rem;
+    border: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6);
+    border-radius: 100%;
+  }
+}
+
+.request_add_bg {
+  background-color: #f3f4f6;
+}
+
+.request_update_bg {
+  background-color: white;
+}
+
+.json_title {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+}

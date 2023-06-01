@@ -1,0 +1,23 @@
+.request_box {
+  flex: 1;
+  margin: 0 auto;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.btn {
+  width: 65%;
+  margin: 0 auto 1rem;
+}
+
+.grid_6 {
+  grid-column: span 6 / span 6;
+}
+
+.btn_left {
+  display: flex;
+  justify-content: flex-end;
+}
