@@ -379,7 +379,7 @@ export interface GetAllMeetingsData {
   presentMember: string[];
   absentMember: string[];
   mainDepartment: number;
-  status: number;
+  status: MeetingStatus;
   agentId: number;
   calId: string;
   password: number | null;

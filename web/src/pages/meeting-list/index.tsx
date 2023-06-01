@@ -24,8 +24,9 @@ import MeetingSettings from "./components/meeting-settings";
 import useAction from "./hook";
 import { MeetingStatus, MeetingType } from "../../dtos/meeting-seetings";
 import style from "./index.module.scss";
-import { Search } from "@mui/icons-material";
+import { KeyOff, Search } from "@mui/icons-material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { type } from "os";
 
 const asyncTootip = (title: string, style: string) => {
   return (
@@ -33,10 +34,6 @@ const asyncTootip = (title: string, style: string) => {
       <span>{title}</span>
     </Tooltip>
   );
-};
-
-const convertMeetingStatus = (type: MeetingStatus) => {
-  return type ? MeetingType[type] : "";
 };
 
 const MeetingList = () => {
@@ -91,7 +88,7 @@ const MeetingList = () => {
       align: "center",
       headerAlign: "center",
       valueGetter: (params: GridValueGetterParams) =>
-        convertMeetingStatus(params.row.status),
+        MeetingType[params.row.status as MeetingStatus],
     },
     {
       field: "meetingStart",
