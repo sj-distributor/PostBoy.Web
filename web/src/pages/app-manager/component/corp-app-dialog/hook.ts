@@ -40,10 +40,16 @@ const useAction = (props: {
         order,
       }
       rowDataType === AddOrModify.Add
-        ? AddCorp([requestCorpData]).then(success)
-        : ModifyCorp([{ ...requestCorpData, id: rowData.data.id }]).then(
-            success
-          )
+        ? AddCorp([requestCorpData])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
+        : ModifyCorp([{ ...requestCorpData, id: rowData.data.id }])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
     } else {
       const requestAppData: IRequestAppAdd = {
         appId,
@@ -54,17 +60,27 @@ const useAction = (props: {
         workWeChatCorpId: rowData.data.workWeChatCorpId,
       }
       rowDataType === AddOrModify.Add
-        ? AddApplication([requestAppData]).then(success)
-        : ModifyApplication([{ ...requestAppData, id: rowData.data.id }]).then(
-            success
-          )
+        ? AddApplication([requestAppData])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
+        : ModifyApplication([{ ...requestAppData, id: rowData.data.id }])
+            .then(success)
+            .catch((err) => {
+              showErrorTip((err as Error).message)
+            })
     }
-    onAddApikeyCancel()
-    clearData()
+  }
+
+  const showErrorTip = (text: string) => {
+    setTipsText(text)
   }
 
   const success = () => {
     setTipsText(`${rowDataType} success`)
+    onAddApikeyCancel()
+    clearData()
     rowData.key === RowDataType.Corporation
       ? reload()
       : reload(rowData.data.workWeChatCorpId)

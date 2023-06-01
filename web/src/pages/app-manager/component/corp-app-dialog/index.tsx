@@ -122,7 +122,6 @@ const CorpAppDialog = (props: {
                 <Switch
                   checked={display}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                    rowDataType !== AddOrModify.Add &&
                     setDisplay(event.target.checked as boolean)
                   }
                 />
