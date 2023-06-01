@@ -716,26 +716,34 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                     <div className={style.fromItem}>
                       <div className={style.title}>群发内容</div>
                       <div className={style.widthFull}>
-                        <Button
-                          onClick={() =>
-                            setMeetingGroup((prev) => ({
-                              ...prev,
-                              content: prev.content + "#{meeting_code}",
-                            }))
-                          }
-                        >
-                          插入会议号
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            setMeetingGroup((prev) => ({
-                              ...prev,
-                              content: prev.content + "#{meeting_link}",
-                            }))
-                          }
-                        >
-                          插入会议链接
-                        </Button>
+                        <div className={style.meetingCheckBox}>
+                          <label className={style.meetingCodeCheck}>
+                            <input
+                              type="checkbox"
+                              checked={meetingGroup.isMeetingCode}
+                              onChange={(e) =>
+                                setMeetingGroup((prev) => ({
+                                  ...prev,
+                                  isMeetingCode: e.target.checked,
+                                }))
+                              }
+                            />
+                            在内容后发送会议号
+                          </label>
+                          <label className={style.meetingLinkCheck}>
+                            <input
+                              type="checkbox"
+                              checked={meetingGroup.isMeetingLink}
+                              onChange={(e) =>
+                                setMeetingGroup((prev) => ({
+                                  ...prev,
+                                  isMeetingLink: e.target.checked,
+                                }))
+                              }
+                            />
+                            在内容后发送会议链接
+                          </label>
+                        </div>
                         <TextField
                           id="multilineGroupContent"
                           placeholder="输入群发内容"

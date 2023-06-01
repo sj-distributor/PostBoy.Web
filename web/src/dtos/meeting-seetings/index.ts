@@ -452,5 +452,7 @@ export interface CandelDto {
 
 export interface MeetingGroup {
   isCreateGroup: boolean;
+  isMeetingCode: boolean;
+  isMeetingLink: boolean;
   content: string;
 }

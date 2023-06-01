@@ -662,6 +662,8 @@ const useAction = (props: MeetingSettingsProps) => {
       ...prev,
       isCreateGroup: false,
       content: "",
+      isMeetingCode: true,
+      isMeetingLink: true,
     }));
   };
 
@@ -706,6 +708,8 @@ const useAction = (props: MeetingSettingsProps) => {
   //拉群并通知
   const [meetingGroup, setMeetingGroup] = useState<MeetingGroup>({
     isCreateGroup: false,
+    isMeetingCode: true,
+    isMeetingLink: true,
     content: "",
   });
 
@@ -822,14 +826,21 @@ const useAction = (props: MeetingSettingsProps) => {
               show: true,
               msg: "The content of the group pull notification was not filled in",
             });
+            loadingAction.setFalse();
             return;
           }
+
+          const content = `${meetingGroup.content}${
+            meetingGroup.isMeetingCode ? "\n #会议号：#{meeting_code}" : ""
+          }${
+            meetingGroup.isMeetingLink ? "\n #会议链接：#{meeting_link}" : ""
+          }`;
 
           const data = {
             createWorkWeChatMeeting: createOrUpdateMeetingData,
             meetingGroup: {
-              isCreateGroup: !!meetingGroup.isCreateGroup,
-              content: meetingGroup.content,
+              isCreateGroup: meetingGroup.isCreateGroup,
+              content,
             },
           };
 
