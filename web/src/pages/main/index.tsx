@@ -4,6 +4,15 @@ import { routerArray } from "../../router/elementRoute"
 import useMainAction from "./hook"
 import UserInformation from "./components/user-information"
 import { RouteItem } from "../../dtos/route-type"
+import { createContext } from "react"
+
+interface AdministratorContextType {
+  haveAdministrator: boolean
+}
+
+export const AdministratorContext = createContext<AdministratorContextType>(
+  null!
+)
 
 const Main = () => {
   const { clickMainIndex, setMainClickIndex, haveAdministrator } =
@@ -45,7 +54,9 @@ const Main = () => {
           <UserInformation />
         </div>
         <div className={styles.contextLower}>
-          <Outlet />
+          <AdministratorContext.Provider value={{ haveAdministrator }}>
+            <Outlet />
+          </AdministratorContext.Provider>
         </div>
       </div>
     </div>

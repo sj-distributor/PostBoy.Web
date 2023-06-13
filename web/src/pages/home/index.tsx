@@ -1,19 +1,35 @@
-import { Link, Outlet } from "react-router-dom"
-import { RouteItem } from "../../dtos/route-type"
+import { Link, Outlet, useLocation } from "react-router-dom"
+import { ChildProps } from "../../dtos/route-type"
 import { routerArray } from "../../router/elementRoute"
 import useAction from "./hook"
 
 import styles from "./index.module.scss"
+import { useContext } from "react"
+import { AdministratorContext } from "../main"
 
 const Home = () => {
   const { click, setClick } = useAction()
 
-  const routerTabBarContent = (list: RouteItem[]) => {
-    return list.map((item, index) => {
-      return (
-        <div className={styles.nav} key={index}>
-          {item.children?.map((childItem, childIndex) => {
-            return (
+  const { haveAdministrator } = useContext(AdministratorContext)
+
+  const location = useLocation()
+
+  const parentPath = location.pathname
+    .split("/")
+    .filter((item) => !!item)
+    .map((item) => `/${item}`)[0]
+
+  const routerTabBarContent = () => {
+    const homeRouter = routerArray.find((item) => item.path === parentPath)
+
+    const verifyPermissions = (item: ChildProps) =>
+      ["/home/request"].includes(item.path) ? !!haveAdministrator : true
+
+    return (
+      <div className={styles.nav}>
+        {homeRouter?.children?.map((childItem, childIndex) => {
+          return (
+            verifyPermissions(childItem) && (
               <Link
                 key={childIndex}
                 to={childItem.path}
@@ -27,15 +43,15 @@ const Home = () => {
                 {childItem.title}
               </Link>
             )
-          })}
-        </div>
-      )
-    })
+          )
+        })}
+      </div>
+    )
   }
 
   return (
     <div className={styles.home}>
-      {routerTabBarContent(routerArray)}
+      {routerTabBarContent()}
       <div className={styles.outlet}>
         <Outlet />
       </div>
