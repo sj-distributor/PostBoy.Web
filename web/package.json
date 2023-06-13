@@ -25,6 +25,7 @@
     "@wangeditor/plugin-upload-attachment": "^1.1.0",
     "ahooks": "^3.7.4",
     "cronstrue": "^2.24.0",
+    "deep-equal": "^2.2.1",
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.4",
     "node-sass": "^8.0.0",
