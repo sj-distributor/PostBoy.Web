@@ -241,10 +241,6 @@ export const useAction = (props: SelectContentHookProps) => {
         result.push(...workWeChatAppNotification.toUsers)
       tagsValue && result.push(...tagsValue.map((x) => x.tagName))
     } else {
-      // const finalChatId = chatId || updateMessageJobInformation?.groupId
-      // const group: IWorkCorpAppGroup[] = groupList.filter(
-      //   (x) => x.chatId === finalChatId
-      // )
       !!chatId &&
         !!chatName &&
         result.push({
@@ -1096,9 +1092,7 @@ export const useAction = (props: SelectContentHookProps) => {
         metadata.push(
           {
             key: "groupName",
-            value:
-              // groupList.filter((x) => x.chatId === chatId)[0]?.chatName ?? "",
-              chatName,
+            value: chatName,
           },
           {
             key: "groupId",
