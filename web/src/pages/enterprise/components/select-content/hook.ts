@@ -245,10 +245,12 @@ export const useAction = (props: SelectContentHookProps) => {
       // const group: IWorkCorpAppGroup[] = groupList.filter(
       //   (x) => x.chatId === finalChatId
       // )
-      result.push({
-        chatId: chatId,
-        chatName: chatName,
-      })
+      !!chatId &&
+        !!chatName &&
+        result.push({
+          chatId: chatId,
+          chatName: chatName,
+        })
     }
     console.log(result, "selectUser")
     return result
