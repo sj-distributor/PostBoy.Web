@@ -247,6 +247,7 @@ export const useAction = (props: SelectContentHookProps) => {
       )
       result.push(...group)
     }
+    console.log(result, "selectUser")
     return result
   }, [
     sendObject,
