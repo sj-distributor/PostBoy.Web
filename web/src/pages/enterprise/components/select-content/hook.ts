@@ -252,7 +252,6 @@ export const useAction = (props: SelectContentHookProps) => {
           chatName: chatName,
         })
     }
-    console.log(result, "selectUser")
     return result
   }, [
     sendObject,
