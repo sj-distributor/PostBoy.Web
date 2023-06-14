@@ -364,6 +364,10 @@ const useAction = (props: {
   }, [AppId])
 
   useEffect(() => {
+    !!chatId && !!chatName && setSearchValue({ chatId, chatName })
+  }, [chatName, chatId])
+
+  useEffect(() => {
     open &&
       isUpdatedDeptUser &&
       setFirstState({
