@@ -364,7 +364,10 @@ const useAction = (props: {
   }, [AppId])
 
   useEffect(() => {
-    !!chatId && !!chatName && setSearchValue({ chatId, chatName })
+    if (!!chatId && !!chatName) {
+      setKeyword(chatName)
+      setSearchValue({ chatId, chatName })
+    }
   }, [chatName, chatId])
 
   useEffect(() => {
