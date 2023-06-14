@@ -1035,7 +1035,6 @@ export const useAction = (props: SelectContentHookProps) => {
         setChatId(updateMessageJobInformation.groupId)
         setChatName(updateMessageJobInformation.groupName)
         setSendType(SendObjOrGroup.Group)
-        console.log(updateMessageJobInformation.groupId)
       }
     }
   }, [updateMessageJobInformation])
