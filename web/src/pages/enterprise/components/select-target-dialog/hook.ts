@@ -29,6 +29,7 @@ const useAction = (props: {
   tagsList: ITagsList[]
   clickName: string
   chatId: string
+  chatName: string
   outerTagsValue?: ITagsList[]
   isUpdatedDeptUser: boolean
   sendType?: SendObjOrGroup
@@ -36,6 +37,7 @@ const useAction = (props: {
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setOpenFunction: (open: boolean) => void
   setChatId?: React.Dispatch<React.SetStateAction<string>>
+  setChatName?: React.Dispatch<React.SetStateAction<string>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
@@ -49,6 +51,7 @@ const useAction = (props: {
     tagsList,
     clickName,
     chatId,
+    chatName,
     outerTagsValue,
     isUpdatedDeptUser,
     lastTagsValue,
@@ -56,6 +59,7 @@ const useAction = (props: {
     CorpId,
     setSendType,
     setChatId,
+    setChatName,
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
@@ -262,6 +266,9 @@ const useAction = (props: {
               })
               setGroupOwner(defaultGroupOwner)
               setGroupName("")
+              GetWeChatWorkCorpAppGroups(CorpId).then((result) => {
+                result && setGroupList(result)
+              })
             } else {
               data && setTipsObject({ msg: data.errmsg, show: true })
             }
@@ -276,6 +283,7 @@ const useAction = (props: {
   }
 
   const handleCancel = () => {
+    console.log(123)
     setOpenFunction(false)
     clearSelected()
   }
@@ -346,6 +354,7 @@ const useAction = (props: {
       setTagsValue(firstState.tagsValue)
       setDeptUserList(firstState.deptUserList)
       setChatId && setChatId(firstState.chatId)
+      setChatName && setChatName(firstState.chatName)
       setSendType && setSendType(firstState.sendType)
       setFirstState(undefined)
     }
@@ -363,6 +372,7 @@ const useAction = (props: {
         chatId,
         deptUserList: clone(departmentAndUserList),
         sendType: sendType ?? SendObjOrGroup.Object,
+        chatName,
       })
   }, [open, isUpdatedDeptUser])
 

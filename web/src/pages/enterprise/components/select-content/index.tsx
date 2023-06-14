@@ -91,6 +91,8 @@ const SelectContent = memo(
       isLoadStop,
       chatId,
       setChatId,
+      chatName,
+      setChatName,
       groupList,
       setGroupList,
       lastTimeTagsList,
@@ -417,6 +419,8 @@ const SelectContent = memo(
             clickName={clickName}
             chatId={chatId}
             setChatId={setChatId}
+            chatName={chatName}
+            setChatName={setChatName}
             sendType={sendType}
             setSendType={setSendType}
             isUpdatedDeptUser={isUpdatedDeptUser}

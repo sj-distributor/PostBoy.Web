@@ -4,12 +4,13 @@
   padding: 0 10rem;
   padding-bottom: 1.5rem;
   display: flex;
+  flex: 1;
+  box-sizing: border-box;
 
   .selectInputBox {
     display: flex;
     flex-wrap: wrap;
     flex: 1;
-    padding: 0rem 8rem;
 
     .corpInput {
       margin-bottom: 1rem;

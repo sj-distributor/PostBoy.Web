@@ -125,11 +125,13 @@ export interface ITargetDialogProps {
   canSelect: DeptUserCanSelectStatus;
   groupDeptUserSelectedList?: IDepartmentAndUserListValue[];
   chatId: string;
+  chatName: string;
   sendType?: SendObjOrGroup;
   outerTagsValue?: ITagsList[];
   isUpdatedDeptUser: boolean;
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>;
   setChatId?: React.Dispatch<React.SetStateAction<string>>;
+  setChatName?: React.Dispatch<React.SetStateAction<string>>;
   setOpenFunction: (open: boolean) => void;
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>;
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
@@ -426,6 +428,7 @@ export interface UploadAttachmentResponseData {
 
 export interface IFirstState {
   chatId: string;
+  chatName: string;
   deptUserList: IDepartmentKeyControl[];
   tagsValue: ITagsList[];
   sendType: SendObjOrGroup;

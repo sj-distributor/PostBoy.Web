@@ -75,11 +75,13 @@ const SelectTargetDialog = memo(
       lastTagsValue,
       clickName,
       chatId,
+      chatName,
       sendType,
       outerTagsValue,
       isUpdatedDeptUser,
       setSendType,
       setChatId,
+      setChatName,
       setGroupList,
       setOpenFunction,
       setDeptUserList,
@@ -124,12 +126,14 @@ const SelectTargetDialog = memo(
       tagsList,
       clickName,
       chatId,
+      chatName,
       outerTagsValue,
       isUpdatedDeptUser,
       sendType,
       CorpId,
       setSendType,
       setChatId,
+      setChatName,
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
@@ -416,6 +420,8 @@ const SelectTargetDialog = memo(
                         )}
                         onChange={(e, value) => {
                           setChatId && setChatId(value ? value.chatId : "")
+                          setChatName &&
+                            setChatName(value ? value.chatName : "")
                           setSearchValue(value)
                         }}
                       />
@@ -547,6 +553,7 @@ const SelectTargetDialog = memo(
             setGroupList={setGroupList}
             groupList={groupList}
             chatId={chatId}
+            chatName={chatName}
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
             isUpdatedDeptUser={isUpdatedDeptUser}

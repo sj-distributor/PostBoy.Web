@@ -39,7 +39,7 @@ export const parameterJudgment = (
       } else if (
         workWeChatAppNotification.text !== undefined &&
         (workWeChatAppNotification.text.content === "" ||
-          workWeChatAppNotification.text.content.length - 4 ===
+          workWeChatAppNotification.text.content.replace("\r\n", "").length ===
             metadata?.find((x) => x.key === "title")?.value.length)
       ) {
         showErrorPrompt("Please fill in the sending text!")
