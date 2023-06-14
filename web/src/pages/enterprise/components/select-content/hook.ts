@@ -160,6 +160,8 @@ export const useAction = (props: SelectContentHookProps) => {
   // 群组列表
   const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
   const [chatId, setChatId] = useState<string>("")
+  const [chatName, setChatName] = useState<string>("")
+
   const [sendType, setSendType] = useState<SendObjOrGroup>(
     SendObjOrGroup.Object
   )
@@ -216,6 +218,7 @@ export const useAction = (props: SelectContentHookProps) => {
     const partiesSelected = flattenDepartmentList.find(
       (e) => e.key === corpAppValue?.appId
     )?.data
+
     const workWeChatAppNotification =
       sendObject ??
       outerSendData?.workWeChatAppNotification ??
@@ -233,19 +236,20 @@ export const useAction = (props: SelectContentHookProps) => {
             )
             .map((e) => e.name)
         )
+
       workWeChatAppNotification?.toUsers &&
         result.push(...workWeChatAppNotification.toUsers)
       tagsValue && result.push(...tagsValue.map((x) => x.tagName))
     } else {
-      const finalChatId = chatId || updateMessageJobInformation?.groupId
-      const group: IWorkCorpAppGroup[] = groupList.filter(
-        (x) => x.chatId === finalChatId
-      )
-      result.push(...group)
+      !!chatId &&
+        !!chatName &&
+        result.push({
+          chatId: chatId,
+          chatName: chatName,
+        })
     }
     return result
   }, [
-    isShowDialog,
     sendObject,
     outerSendData?.workWeChatAppNotification,
     updateMessageJobInformation?.workWeChatAppNotification,
@@ -295,6 +299,7 @@ export const useAction = (props: SelectContentHookProps) => {
       if (isNewOrUpdate === "new") {
         // 清空切换应用时的已选值
         setChatId("")
+        setChatName("")
         setTagsValue([])
         setSendObject({
           toUsers: [],
@@ -1024,8 +1029,12 @@ export const useAction = (props: SelectContentHookProps) => {
 
       setIsGetLastTimeData(true)
       // 回显群组名称
-      if (updateMessageJobInformation.groupId) {
+      if (
+        updateMessageJobInformation.groupId &&
+        updateMessageJobInformation.groupName
+      ) {
         setChatId(updateMessageJobInformation.groupId)
+        setChatName(updateMessageJobInformation.groupName)
         setSendType(SendObjOrGroup.Group)
       }
     }
@@ -1083,7 +1092,7 @@ export const useAction = (props: SelectContentHookProps) => {
         metadata.push(
           {
             key: "groupName",
-            value: groupList.filter((x) => x.chatId === chatId)[0].chatName,
+            value: chatName,
           },
           {
             key: "groupId",
@@ -1162,6 +1171,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setEndDateValue("")
       setCronExp("0 0 * * *")
       setChatId("")
+      setChatName("")
       setDepartmentAndUserList((prev) => {
         return prev.map((item) => {
           recursiveSeachDeptOrUser(item.data, (e) => (e.selected = false))
@@ -1214,10 +1224,12 @@ export const useAction = (props: SelectContentHookProps) => {
     isTreeViewLoading,
     tagsList,
     chatId,
+    chatName,
     sendType,
     selectedShowArr,
     setSendType,
     setChatId,
+    setChatName,
     setTagsValue,
     title,
     setTitle,

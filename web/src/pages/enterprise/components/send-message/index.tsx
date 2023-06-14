@@ -83,10 +83,10 @@ const SendMessage = () => {
       {isShowPage && (
         <div
           style={{
+            width: "100%",
             display: "flex",
             justifyContent: "space-between",
             alignContent: "center",
-            padding: "0rem 8rem",
           }}
         >
           <Box sx={{ position: "relative" }}>
