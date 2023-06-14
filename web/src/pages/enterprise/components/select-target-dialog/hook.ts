@@ -283,7 +283,6 @@ const useAction = (props: {
   }
 
   const handleCancel = () => {
-    console.log(123)
     setOpenFunction(false)
     clearSelected()
   }

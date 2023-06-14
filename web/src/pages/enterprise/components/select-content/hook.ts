@@ -241,11 +241,14 @@ export const useAction = (props: SelectContentHookProps) => {
         result.push(...workWeChatAppNotification.toUsers)
       tagsValue && result.push(...tagsValue.map((x) => x.tagName))
     } else {
-      const finalChatId = chatId || updateMessageJobInformation?.groupId
-      const group: IWorkCorpAppGroup[] = groupList.filter(
-        (x) => x.chatId === finalChatId
-      )
-      result.push(...group)
+      // const finalChatId = chatId || updateMessageJobInformation?.groupId
+      // const group: IWorkCorpAppGroup[] = groupList.filter(
+      //   (x) => x.chatId === finalChatId
+      // )
+      result.push({
+        chatId: chatId,
+        chatName: chatName,
+      })
     }
     console.log(result, "selectUser")
     return result
