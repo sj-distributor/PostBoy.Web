@@ -366,57 +366,61 @@ export const useAction = (props: SelectContentHookProps) => {
     AppId: string,
     department: IDepartmentData,
     users: IDepartmentUsersData[],
-    defaultChild: IDepartmentAndUserListValue
+    defaultChild: IDepartmentAndUserListValue,
+    type: "fold" | "flatten" | "all"
   ) => {
-    setDepartmentAndUserList((prev) => {
-      const newValue = clone(prev)
-      const hasData = newValue.find((e) => e.key === AppId)
-      let idList = []
-      // 是否现有key的数据
-      hasData && hasData.data.length > 0
-        ? (idList = recursiveDeptList(
-            hasData.data,
-            defaultChild,
-            department,
-            []
-          ))
-        : newValue.push({ key: AppId, data: [defaultChild] })
-      idList.length === 0 && hasData?.data.push(defaultChild)
-      return newValue
-    })
+    type !== "flatten" &&
+      setDepartmentAndUserList((prev) => {
+        const newValue = clone(prev)
+        const hasData = newValue.find((e) => e.key === AppId)
+        let idList = []
+        // 是否现有key的数据
+        hasData && hasData.data.length > 0
+          ? (idList = recursiveDeptList(
+              hasData.data,
+              defaultChild,
+              department,
+              []
+            ))
+          : newValue.push({ key: AppId, data: [defaultChild] })
+        idList.length === 0 && hasData?.data.push(defaultChild)
+        return newValue
+      })
 
-    setFlattenDepartmentList((prev) => {
-      const newValue = clone(prev)
-      let hasData = newValue.find((e) => e.key === AppId)
-      const insertData = [
-        {
-          id: department.id,
-          name: department.name,
-          parentid: department.name,
-          type: DepartmentAndUserType.Department,
-          selected: false,
-          children: [],
-        },
-        ...flatten(
-          users.map((item) => ({
-            id: item.userid,
-            name: item.userid,
+    type !== "fold" &&
+      setFlattenDepartmentList((prev) => {
+        const newValue = clone(prev)
+        let hasData = newValue.find((e) => e.key === AppId)
+        const insertData = [
+          {
+            id: department.id,
+            name: department.name,
             parentid: department.name,
-            type: DepartmentAndUserType.User,
+            type: DepartmentAndUserType.Department,
             selected: false,
-            canSelect: true,
             children: [],
-          }))
-        ),
-      ]
-      hasData
-        ? (hasData.data = [...hasData.data, ...insertData])
-        : newValue.push({
-            key: AppId,
-            data: insertData,
-          })
-      return newValue
-    })
+          },
+          ...flatten(
+            users.map((item) => ({
+              id: item.userid,
+              name: item.userid,
+              parentid: department.name,
+              type: DepartmentAndUserType.User,
+              selected: false,
+              canSelect: true,
+              children: [],
+            }))
+          ),
+        ]
+
+        hasData
+          ? (hasData.data = [...hasData.data, ...insertData])
+          : newValue.push({
+              key: AppId,
+              data: insertData,
+            })
+        return newValue
+      })
   }
 
   const loadDeptUsers = async (
@@ -440,7 +444,7 @@ export const useAction = (props: SelectContentHookProps) => {
         parentid: String(department.parentid),
         selected: false,
         children: users.map((item) => ({
-          id: item.userid,
+          id: `${department.id}_${item.userid}`,
           name: item.userid,
           type: DepartmentAndUserType.User,
           parentid: item.department,
@@ -450,6 +454,8 @@ export const useAction = (props: SelectContentHookProps) => {
           children: [],
         })),
       }
+
+      updateDeptUserList(AppId, department, users, defaultChild, "flatten")
 
       let isContinue: boolean = false
 
@@ -479,15 +485,15 @@ export const useAction = (props: SelectContentHookProps) => {
             AppId,
             value.department,
             value.users,
-            value.defaultChild
+            value.defaultChild,
+            "fold"
           )
         }
         continue
       }
 
-      updateDeptUserList(AppId, department, users, defaultChild)
+      updateDeptUserList(AppId, department, users, defaultChild, "fold")
     }
-
     setIsTreeViewLoading(false)
     setIsLoadStop(true)
   }
