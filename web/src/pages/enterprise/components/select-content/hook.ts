@@ -44,6 +44,12 @@ import { useBoolean } from "ahooks"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
 
+enum UpdateListType {
+  Fold,
+  Flatten,
+  All,
+}
+
 export const useAction = (props: SelectContentHookProps) => {
   const {
     outerSendData,
@@ -367,9 +373,9 @@ export const useAction = (props: SelectContentHookProps) => {
     department: IDepartmentData,
     users: IDepartmentUsersData[],
     defaultChild: IDepartmentAndUserListValue,
-    type: "fold" | "flatten" | "all"
+    type: UpdateListType
   ) => {
-    type !== "flatten" &&
+    type !== UpdateListType.Flatten &&
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev)
         const hasData = newValue.find((e) => e.key === AppId)
@@ -387,7 +393,7 @@ export const useAction = (props: SelectContentHookProps) => {
         return newValue
       })
 
-    type !== "fold" &&
+    type !== UpdateListType.Fold &&
       setFlattenDepartmentList((prev) => {
         const newValue = clone(prev)
         let hasData = newValue.find((e) => e.key === AppId)
@@ -455,7 +461,13 @@ export const useAction = (props: SelectContentHookProps) => {
         })),
       }
 
-      updateDeptUserList(AppId, department, users, defaultChild, "flatten")
+      updateDeptUserList(
+        AppId,
+        department,
+        users,
+        defaultChild,
+        UpdateListType.Flatten
+      )
 
       let isContinue: boolean = false
 
@@ -486,13 +498,19 @@ export const useAction = (props: SelectContentHookProps) => {
             value.department,
             value.users,
             value.defaultChild,
-            "fold"
+            UpdateListType.Fold
           )
         }
         continue
       }
 
-      updateDeptUserList(AppId, department, users, defaultChild, "fold")
+      updateDeptUserList(
+        AppId,
+        department,
+        users,
+        defaultChild,
+        UpdateListType.Fold
+      )
     }
     setIsTreeViewLoading(false)
     setIsLoadStop(true)
