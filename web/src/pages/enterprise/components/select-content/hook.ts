@@ -450,7 +450,7 @@ export const useAction = (props: SelectContentHookProps) => {
         parentid: String(department.parentid),
         selected: false,
         children: users.map((item) => ({
-          id: `${department.id}_${item.userid}`,
+          id: `${item.userid}`,
           name: item.userid,
           type: DepartmentAndUserType.User,
           parentid: item.department,
