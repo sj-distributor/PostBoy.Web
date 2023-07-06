@@ -177,8 +177,9 @@ export enum RepeatSelectData {
 
 //自动开启会议录制
 export enum MeetingRecording {
-  Soundcloud = 1, //主持人入会后开启云录制
-  LocalRecording = 2, //主持人入会后开启本地录制
+  Disable = 0, //禁用录制
+  LocalRecording = 1, //主持人入会后开启本地录制
+  Soundcloud = 2, //主持人入会后开启云录制
 }
 
 export enum RecordWatermark {
@@ -294,7 +295,11 @@ export interface WorkWeChatMeetingSettingDto {
   enable_enter_mute: number;
   allow_external_user: boolean;
   enable_screen_watermark: boolean;
+  meetingRecordType: MeetingRecording;
+  enableCloudRecordSummary: boolean;
+  meetingSummaryDistributionEnabled: boolean;
   hosts?: WorkWeChatMeetingUserDto;
+  auto_record_type?: string;
   ring_users?: WorkWeChatMeetingUserDto;
 }
 

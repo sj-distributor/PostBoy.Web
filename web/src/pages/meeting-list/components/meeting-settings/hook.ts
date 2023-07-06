@@ -29,6 +29,7 @@ import {
   ITagsList,
   MeetingGroup,
   IDepartmentUsersData,
+  MeetingRecording,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -700,6 +701,9 @@ const useAction = (props: MeetingSettingsProps) => {
       enable_screen_watermark: false,
       hosts: undefined,
       ring_users: undefined,
+      meetingRecordType: MeetingRecording.Disable,
+      enableCloudRecordSummary: false,
+      meetingSummaryDistributionEnabled: false,
     });
     setMeetingGroup({
       isCreateGroup: false,
@@ -745,6 +749,9 @@ const useAction = (props: MeetingSettingsProps) => {
     enable_screen_watermark: false,
     hosts: undefined,
     ring_users: undefined,
+    meetingRecordType: MeetingRecording.Disable,
+    enableCloudRecordSummary: false,
+    meetingSummaryDistributionEnabled: false,
   });
 
   //拉群并通知
@@ -1046,7 +1053,11 @@ const useAction = (props: MeetingSettingsProps) => {
                       ? reminders.remind_before[0]
                       : 0
                     : 0);
-                item.key === "repeat" && (item.value = reminders.repeat_type);
+                item.key === "repeat" &&
+                  (item.value =
+                    reminders.repeat_type === 0
+                      ? RepeatSelectData.NoRepeat
+                      : reminders.repeat_type);
               });
               return arr;
             });
@@ -1145,7 +1156,7 @@ const useAction = (props: MeetingSettingsProps) => {
     } else {
       clearData();
     }
-  }, [isOpenMeetingSettings, meetingIdCorpIdAndAppId]);
+  }, [isOpenMeetingSettings]);
 
   useEffect(() => {
     if (clickName === "选择指定主持人" || clickName === "选择指定提醒人员") {
