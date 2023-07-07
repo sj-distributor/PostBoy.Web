@@ -1,5 +1,6 @@
 import { useBoolean } from "ahooks";
 import { useEffect, useRef, useState } from "react";
+import { GetCorpAppList } from "../../api/enterprise";
 import { cancelMeeting, getAllMeetingData } from "../../api/meeting-seetings";
 import {
   CancelWorkWeChatMeetingDto,
@@ -39,6 +40,30 @@ const useAction = () => {
     setGetAllMeetingsData(null);
     setMeetingData(true);
     setMeetingState("create");
+  };
+
+  const getAppId = async (
+    workWeChatCorpId: string,
+    workWeChatCorpApplicationId: string
+  ) => {
+    let appid = "";
+    //获取appId
+    await GetCorpAppList({ CorpId: workWeChatCorpId })
+      .then((res) => {
+        if (res && res.length > 0) {
+          res?.map((item) => {
+            item.id === workWeChatCorpApplicationId && (appid = item.appId);
+          });
+        } else {
+          failSendAction.setTrue();
+          setFailSendText("Failed to obtain application information");
+        }
+      })
+      .catch((err) => {
+        failSendAction.setTrue();
+        setFailSendText("Failed to obtain application information");
+      });
+    return appid;
   };
 
   //取消会议
@@ -92,35 +117,43 @@ const useAction = () => {
   };
 
   const confirmDelete = () => {
+    confirmDialogAction.setFalse();
     if (candelDto) {
-      confirmDialogAction.setFalse();
-      const cancelData: CancelWorkWeChatMeetingDto = {
-        cancelWorkWeChatMeeting: {
-          appId: candelDto.workWeChatCorpApplicationId,
-          meetingid: candelDto.meetingId,
-        },
-      };
+      getAppId(
+        candelDto.workWeChatCorpId,
+        candelDto.workWeChatCorpApplicationId
+      ).then((appId: string) => {
+        if (appId) {
+          const cancelData: CancelWorkWeChatMeetingDto = {
+            cancelWorkWeChatMeeting: {
+              appId,
+              meetingid: candelDto.meetingId,
+            },
+          };
 
-      loadingAction.setTrue();
+          loadingAction.setTrue();
 
-      cancelMeeting(cancelData)
-        .then((res) => {
-          if (res && res.errcode === 0) {
-            successAction.setTrue();
-            setSuccessText("Successfully cancelled the meeting");
-            getMeetingList();
-            loadingAction.setFalse();
-          } else {
-            setFailSendText("Cancel meeting failed");
-            failSendAction.setTrue();
-          }
-          loadingAction.setFalse();
-        })
-        .catch((err) => {
-          failSendAction.setTrue();
-          setFailSendText("Cancel meeting failed");
-          loadingAction.setFalse();
-        });
+          cancelMeeting(cancelData)
+            .then((res) => {
+              console.log(res);
+              if (res && res.errcode === 0) {
+                successAction.setTrue();
+                setSuccessText("Successfully cancelled the meeting");
+                getMeetingList();
+                loadingAction.setFalse();
+              } else {
+                setFailSendText("Cancel meeting failed");
+                failSendAction.setTrue();
+              }
+              loadingAction.setFalse();
+            })
+            .catch((err) => {
+              failSendAction.setTrue();
+              setFailSendText("Cancel meeting failed");
+              loadingAction.setFalse();
+            });
+        }
+      });
     }
   };
 
