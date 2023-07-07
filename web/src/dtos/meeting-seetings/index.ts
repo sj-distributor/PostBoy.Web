@@ -284,7 +284,7 @@ export interface WorkWeChatMeetingReminderDto {
   repeat_type: number;
   repeat_until: number;
   repeat_interval: number;
-  remind_before: [number] | number;
+  remind_before: number[] | number;
 }
 
 export interface WorkWeChatMeetingSettingDto {
