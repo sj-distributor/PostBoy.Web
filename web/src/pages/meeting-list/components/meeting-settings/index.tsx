@@ -614,8 +614,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                         />
 
                         <Editor
-                          value={html}
                           onCreated={setEditor}
+                          defaultHtml={html}
                           defaultConfig={editorConfig}
                           onChange={(editor) => setHtml(editor.getHtml())}
                           mode="default"
