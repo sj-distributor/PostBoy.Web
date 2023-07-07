@@ -5,8 +5,6 @@ import {
   CreateOrUpdateWorkWeChatMeetingDto,
   GetAllMeetingDto,
   GetAllMeetingResponse,
-  GetMeetingResponse,
-  GetWorkWeChatMeeting,
   UpdateMeetingResponse,
 } from "../../dtos/meeting-seetings";
 import { Get, Post } from "../http-client";
@@ -26,12 +24,6 @@ export const updateMeeting = async (data: {
   return await Post<UpdateMeetingResponse>(
     "/api/WeChat/work/meeting/update",
     data
-  );
-};
-
-export const getMeetingData = async (data: GetWorkWeChatMeeting) => {
-  return await Get<GetMeetingResponse>(
-    `/api/WeChat/work/meeting?AppId=${data.AppId}&MeetingId=${data.MeetingId}`
   );
 };
 

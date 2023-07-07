@@ -25,6 +25,11 @@ const useAction = (props: SettingDialogProps) => {
     settings,
     open,
   } = props;
+  const [
+    meetingSummaryDistributionEnabled,
+    setMeetingSummaryDistributionEnabled,
+  ] = useState<boolean>(false);
+
   const settingList: MeetingSettingList[] = [
     {
       title: "指定主持人",
@@ -61,13 +66,6 @@ const useAction = (props: SettingDialogProps) => {
     {
       title: "是否开启会议总结",
       key: "enableCloudRecordSummary",
-      optionType: "checkbox",
-      border: true,
-      isOption: false,
-    },
-    {
-      title: "是否发送会议总结给参会人",
-      key: "meetingSummaryDistributionEnabled",
       optionType: "checkbox",
       border: true,
       isOption: false,
@@ -209,6 +207,12 @@ const useAction = (props: SettingDialogProps) => {
         : MeetingRecording.Disable;
     }
 
+    if (newList[index].key === "enableCloudRecordSummary") {
+      !checked &&
+        meetingSummaryDistributionEnabled &&
+        setMeetingSummaryDistributionEnabled(false);
+    }
+
     setMeetingSettingList([...newList]);
   };
 
@@ -254,7 +258,7 @@ const useAction = (props: SettingDialogProps) => {
       ring_users: undefined,
       meetingRecordType: MeetingRecording.Disable,
       enableCloudRecordSummary: false,
-      meetingSummaryDistributionEnabled: false,
+      meetingSummaryDistributionEnabled: meetingSummaryDistributionEnabled,
     };
 
     meetingSettingList.map((item) => {
@@ -292,9 +296,6 @@ const useAction = (props: SettingDialogProps) => {
           break;
         case "enableCloudRecordSummary":
           settingData.enableCloudRecordSummary = !!item.isOption;
-          break;
-        case "meetingSummaryDistributionEnabled":
-          settingData.meetingSummaryDistributionEnabled = !!item.isOption;
           break;
         default:
           break;
@@ -345,6 +346,8 @@ const useAction = (props: SettingDialogProps) => {
         meetingSummaryDistributionEnabled,
       } = settings;
 
+      setMeetingSummaryDistributionEnabled(meetingSummaryDistributionEnabled);
+
       settingsData.map((item) => {
         switch (item.key) {
           case "password":
@@ -380,9 +383,6 @@ const useAction = (props: SettingDialogProps) => {
             break;
           case "enableCloudRecordSummary":
             item.isOption = enableCloudRecordSummary;
-            break;
-          case "meetingSummaryDistributionEnabled":
-            item.isOption = meetingSummaryDistributionEnabled;
             break;
           default:
             break;
@@ -427,6 +427,8 @@ const useAction = (props: SettingDialogProps) => {
     showPassword,
     radioDisabled,
     tipsObject,
+    meetingSummaryDistributionEnabled,
+    setMeetingSummaryDistributionEnabled,
     onIsOption,
     handleChange,
     handleClickShowPassword,

@@ -7,7 +7,6 @@ import { IEditorConfig } from "@wangeditor/editor";
 import {
   CreateOrUpdateWorkWeChatMeetingDto,
   DefaultDisplay,
-  GetWorkWeChatMeeting,
   IsRepeat,
   MeetingDuration,
   MeetingSettingsProps,
@@ -30,15 +29,12 @@ import {
   MeetingGroup,
   IDepartmentUsersData,
   MeetingRecording,
+  GetAllMeetingsData,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
 import { GetDeptsAndUserList } from "../../../../api/enterprise";
-import {
-  createMeeting,
-  getMeetingData,
-  updateMeeting,
-} from "../../../../api/meeting-seetings";
+import { createMeeting, updateMeeting } from "../../../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
 
 dayjs.extend(utc);
@@ -46,11 +42,11 @@ dayjs.extend(timezone);
 
 const useAction = (props: MeetingSettingsProps) => {
   const {
-    meetingIdCorpIdAndAppId,
+    meetingData,
     isOpenMeetingSettings,
     getMeetingList,
     meetingState,
-    setIsOpenMeetingSettings,
+    setMeetingData,
   } = props;
 
   // 拿到的企业对象
@@ -602,13 +598,11 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [corpsList]);
 
   useEffect(() => {
-    meetingIdCorpIdAndAppId &&
+    meetingData &&
       setCorpsValue(
-        corpsList.filter(
-          (item) => item.id === meetingIdCorpIdAndAppId.corpId
-        )[0]
+        corpsList.filter((item) => item.id === meetingData.workWeChatCorpId)[0]
       );
-  }, [meetingIdCorpIdAndAppId]);
+  }, [meetingData]);
 
   // 初始化App数组
   useEffect(() => {
@@ -624,9 +618,9 @@ const useAction = (props: MeetingSettingsProps) => {
   useEffect(() => {
     setCorpAppValue(
       corpAppList.length > 0
-        ? meetingIdCorpIdAndAppId
+        ? meetingData
           ? corpAppList.filter(
-              (item) => item.id === meetingIdCorpIdAndAppId.appId
+              (item) => item.id === meetingData.workWeChatCorpApplicationId
             )[0]
           : corpAppList[0]
         : {
@@ -691,6 +685,21 @@ const useAction = (props: MeetingSettingsProps) => {
     setMeetingTitle("");
     setHtml("");
     setAdminUser([]);
+
+    setMeetingStartDate(dayjs().format("YYYY-MM-DD"));
+    setMeetingStartTime(
+      dayjs()
+        .set("minutes", dayjs().get("minutes") + 5)
+        .format("HH:mm")
+    );
+    setMeetingEndDate(dayjs().format("YYYY-MM-DD"));
+    setMeetingEndTime(
+      dayjs()
+        .set("hours", dayjs().get("hours") + 1)
+        .set("minutes", dayjs().get("minutes") + 5)
+        .format("HH:mm")
+    );
+
     setSettings({
       password: "",
       enable_waiting_room: false,
@@ -705,6 +714,7 @@ const useAction = (props: MeetingSettingsProps) => {
       enableCloudRecordSummary: false,
       meetingSummaryDistributionEnabled: false,
     });
+
     setMeetingGroup({
       isCreateGroup: false,
       content: "",
@@ -893,7 +903,7 @@ const useAction = (props: MeetingSettingsProps) => {
                 const meetingId = res.meetingid;
                 if (meetingId !== null) {
                   successAction.setTrue();
-                  setIsOpenMeetingSettings(false);
+                  setMeetingData(false);
                   getMeetingList();
                 } else {
                   failSendAction.setTrue();
@@ -912,18 +922,18 @@ const useAction = (props: MeetingSettingsProps) => {
               });
             });
         } else if (meetingState === "update") {
-          createOrUpdateMeetingData.meetingid =
-            meetingIdCorpIdAndAppId?.meetingId;
+          createOrUpdateMeetingData.meetingid = meetingData?.meetingId;
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
 
           await updateMeeting(data)
             .then((res) => {
+              console.log(res);
               if (res && res.errcode === 0) {
                 successAction.setTrue();
                 loadingAction.setFalse();
-                setIsOpenMeetingSettings(false);
+                setMeetingData(false);
                 getMeetingList();
               } else {
                 loadingAction.setFalse();
@@ -974,188 +984,176 @@ const useAction = (props: MeetingSettingsProps) => {
     };
   }, [editor]);
 
-  const onGetMeetingData = (data: GetWorkWeChatMeeting) => {
-    getMeetingData(data)
-      .then((res) => {
-        if (res && res.errcode === 0) {
-          const {
-            title,
-            admin_userid,
-            attendees,
-            description,
-            location,
-            meeting_duration,
-            meeting_start,
-            reminders,
-            settings,
-          } = res;
-          setMeetingTitle(title);
-          setMeetingStartDate(dayjs.unix(meeting_start).format("YYYY-MM-DD"));
-          setMeetingStartTime(dayjs.unix(meeting_start).format("HH:mm"));
-          meetingDuration.menuItemList.filter(
-            (item) => meeting_duration === item.value
-          ).length > 0
-            ? customEndTimeAction.setFalse()
-            : customEndTimeAction.setTrue();
-          setMeetingDuration((prev) => ({ ...prev, value: meeting_duration }));
-          setMeetingEndDate(
-            dayjs.unix(meeting_start + meeting_duration).format("YYYY-MM-DD")
-          );
-          setMeetingEndTime(
-            dayjs.unix(meeting_start + meeting_duration).format("HH:mm")
-          );
-          setMeetingLocation(location);
-          setHtml(description);
-          setMeetingReminders(reminders ? reminders : {});
-          setSettings(settings);
+  const onGetMeetingData = (data: GetAllMeetingsData) => {
+    if (data) {
+      const {
+        adminUserId,
+        title,
+        meetingStart,
+        meetingDuration,
+        description,
+        location,
+        absentMember,
+        password,
+        enableWaitingRoom,
+        allowEnterBeforeHost,
+        remindScope,
+        enableEnterMute,
+        allowExternalUser,
+        enableScreenWatermark,
+        hosts,
+        ringUsers,
+        isRepeat,
+        repeatType,
+        repeatUntil,
+        repeatInterval,
+        remindBefore,
+        meetingRecordType,
+        enableCloudRecordSummary,
+        meetingSummaryDistributionEnabled,
+      } = data;
 
-          if (settings) {
-            setHostList((host) => {
-              let hostData: IDepartmentAndUserListValue[] = [];
-              settings.hosts?.userid.map((item) =>
-                hostData.push({
-                  id: item,
-                  name: item,
-                  type: 1,
-                  parentid: "1",
-                  selected: false,
-                  isCollapsed: false,
-                  children: [],
-                })
-              );
-              return hostData;
-            });
+      setMeetingTitle(title);
 
-            setAppointList((apponint) => {
-              let apponintData: IDepartmentAndUserListValue[] = [];
-              settings.ring_users?.userid.map((item) =>
-                apponintData.push({
-                  id: item,
-                  name: item,
-                  type: 1,
-                  parentid: "1",
-                  selected: false,
-                  isCollapsed: false,
-                  children: [],
-                })
-              );
-              return apponintData;
-            });
-          }
+      setMeetingStartDate(dayjs.unix(meetingStart).format("YYYY-MM-DD"));
 
-          if (reminders) {
-            setSelectGroup((selectData) => {
-              let arr = clone(selectData);
-              arr.forEach((item) => {
-                item.key === "reminderTime" &&
-                  (item.value = reminders.remind_before
-                    ? reminders.remind_before.length > 0
-                      ? reminders.remind_before[0]
-                      : 0
-                    : 0);
-                item.key === "repeat" &&
-                  (item.value =
-                    reminders.repeat_type === 0
-                      ? RepeatSelectData.NoRepeat
-                      : reminders.repeat_type);
-              });
-              return arr;
-            });
-          } else {
-            setSelectGroup((selectData) => {
-              let arr = clone(selectData);
-              arr.forEach((item) => {
-                item.key === "reminderTime" &&
-                  (item.value = ReminderTimeSelectData.MeetingBegins);
-                item.key === "repeat" &&
-                  (item.value = RepeatSelectData.NoRepeat);
-              });
-              return arr;
-            });
-          }
+      setMeetingStartTime(dayjs.unix(meetingStart).format("HH:mm"));
 
-          setParticipantList((participant) => {
-            let attendeesData: IDepartmentAndUserListValue[] = [];
+      const meetingDurationValues = Object.values(MeetingDuration);
 
-            attendees.member.length > 0 &&
-              attendees.member.map((item) =>
-                attendeesData.push({
-                  id: item.userid,
-                  name: item.userid,
-                  type: 1,
-                  parentid: "1",
-                  selected: false,
-                  isCollapsed: false,
-                  children: [],
-                })
-              );
+      meetingDurationValues.includes(meetingDuration)
+        ? customEndTimeAction.setFalse()
+        : customEndTimeAction.setTrue();
 
-            return attendeesData;
-          });
+      setMeetingDuration((prev) => ({ ...prev, value: meetingDuration }));
 
-          setAdminUser([
-            {
-              id: admin_userid,
-              name: admin_userid,
+      setMeetingEndDate(
+        dayjs.unix(meetingStart + meetingDuration).format("YYYY-MM-DD")
+      );
+
+      setMeetingEndTime(
+        dayjs.unix(meetingStart + meetingDuration).format("HH:mm")
+      );
+
+      setMeetingLocation(location);
+
+      setHtml(description);
+
+      setMeetingReminders({
+        is_repeat: isRepeat,
+        repeat_type: repeatType,
+        repeat_until: repeatUntil,
+        repeat_interval: repeatInterval,
+        remind_before: [+remindBefore],
+      });
+
+      const ring_users = ringUsers ? ringUsers.split(",") : [""];
+
+      const hostsData = hosts ? hosts.split(",") : [""];
+
+      setSettings({
+        password: password ?? "",
+        enable_waiting_room: enableWaitingRoom,
+        allow_enter_before_host: allowEnterBeforeHost,
+        remind_scope: remindScope,
+        enable_enter_mute: enableEnterMute,
+        allow_external_user: allowExternalUser,
+        hosts: hosts ? { userid: hostsData } : undefined,
+        enable_screen_watermark: enableScreenWatermark,
+        ring_users: ringUsers ? { userid: ring_users } : undefined,
+        meetingRecordType: meetingRecordType,
+        enableCloudRecordSummary: enableCloudRecordSummary,
+        meetingSummaryDistributionEnabled: meetingSummaryDistributionEnabled,
+      });
+
+      hosts &&
+        setHostList((host) => {
+          let hostData: IDepartmentAndUserListValue[] = [];
+          hostsData.map((item) =>
+            hostData.push({
+              id: item,
+              name: item,
               type: 1,
               parentid: "1",
               selected: false,
               isCollapsed: false,
               children: [],
-            },
-          ]);
-          setAppLoading(false);
-        } else {
-          setTipsObject({
-            show: true,
-            msg: res?.errmsg
-              ? res.errmsg
-              : "Failed to obtain meeting information",
-          });
-          setAppLoading(false);
-        }
-      })
-      .catch((err) => {
-        setTipsObject({
-          show: true,
-          msg: "Failed to obtain meeting information",
+            })
+          );
+          return hostData;
         });
+
+      ringUsers &&
+        setAppointList((apponint) => {
+          let apponintData: IDepartmentAndUserListValue[] = [];
+          ringUsers.split(",").map((item) =>
+            apponintData.push({
+              id: item,
+              name: item,
+              type: 1,
+              parentid: "1",
+              selected: false,
+              isCollapsed: false,
+              children: [],
+            })
+          );
+          return apponintData;
+        });
+
+      setSelectGroup((selectData) => {
+        let arr = clone(selectData);
+        arr.forEach((item) => {
+          item.key === "reminderTime" &&
+            (item.value = remindBefore
+              ? +remindBefore
+              : ReminderTimeSelectData.MeetingBegins);
+
+          if (item.key === "repeat") {
+            item.value = isRepeat ? repeatType : RepeatSelectData.NoRepeat;
+          }
+        });
+
+        return arr;
       });
+
+      absentMember &&
+        setParticipantList((participant) => {
+          let attendeesData: IDepartmentAndUserListValue[] = [];
+
+          absentMember.length > 0 &&
+            absentMember.map((item) =>
+              attendeesData.push({
+                id: item,
+                name: item,
+                type: 1,
+                parentid: "1",
+                selected: false,
+                isCollapsed: false,
+                children: [],
+              })
+            );
+
+          return attendeesData;
+        });
+
+      setAdminUser([
+        {
+          id: adminUserId,
+          name: adminUserId,
+          type: 1,
+          parentid: "1",
+          selected: false,
+          isCollapsed: false,
+          children: [],
+        },
+      ]);
+      setAppLoading(false);
+    }
   };
 
   //初始化会议数据
   useEffect(() => {
-    if (isOpenMeetingSettings && meetingIdCorpIdAndAppId) {
-      //获取appId
-      GetCorpAppList({ CorpId: meetingIdCorpIdAndAppId.corpId })
-        .then((res) => {
-          if (res && res.length > 0) {
-            res?.map((item) => {
-              if (item.id === meetingIdCorpIdAndAppId.appId) {
-                const data: GetWorkWeChatMeeting = {
-                  AppId: item.appId,
-                  MeetingId: meetingIdCorpIdAndAppId.meetingId,
-                };
-                onGetMeetingData(data);
-              }
-            });
-          } else {
-            setTipsObject({
-              show: true,
-              msg: "Failed to obtain application information",
-            });
-          }
-        })
-        .catch((err) => {
-          setTipsObject({
-            show: true,
-            msg: "Failed to obtain application information",
-          });
-        });
-      setAppLoading(true);
-    } else {
-      clearData();
-    }
+    meetingData && onGetMeetingData(meetingData);
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
@@ -1178,6 +1176,11 @@ const useAction = (props: MeetingSettingsProps) => {
     meetingDuration.value === MeetingDuration.CustomEndTime &&
       customEndTimeAction.setTrue();
   }, [meetingDuration.value]);
+
+  //创建会议前清空数据
+  useEffect(() => {
+    meetingState === "create" && clearData();
+  }, [meetingState]);
 
   return {
     editor,
