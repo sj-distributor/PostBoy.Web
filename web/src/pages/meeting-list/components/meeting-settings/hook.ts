@@ -929,7 +929,6 @@ const useAction = (props: MeetingSettingsProps) => {
 
           await updateMeeting(data)
             .then((res) => {
-              console.log(res);
               if (res && res.errcode === 0) {
                 successAction.setTrue();
                 loadingAction.setFalse();

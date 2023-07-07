@@ -135,7 +135,6 @@ const useAction = () => {
 
           cancelMeeting(cancelData)
             .then((res) => {
-              console.log(res);
               if (res && res.errcode === 0) {
                 successAction.setTrue();
                 setSuccessText("Successfully cancelled the meeting");
