@@ -651,7 +651,6 @@ const useAction = (props: MeetingSettingsProps) => {
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
     };
     if (
-      isOpenMeetingSettings &&
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
@@ -671,9 +670,9 @@ const useAction = (props: MeetingSettingsProps) => {
 
       // 开始load数据
       setIsLoadStop(false);
-      corpAppValue?.appId && loadDepartment(corpAppValue.appId);
+      corpAppValue?.appId && isShowDialog && loadDepartment(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId, isOpenMeetingSettings]);
+  }, [isShowDialog]);
 
   const clearData = () => {
     setAppointList([]);
