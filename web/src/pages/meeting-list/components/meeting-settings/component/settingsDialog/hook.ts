@@ -169,12 +169,15 @@ const useAction = (props: SettingDialogProps) => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const onMembershipPassword = (value: string, index: number) => {
-    if ((isNaN(parseFloat(value)) && value.length > 0) || value.length > 6)
+    if ((isNaN(parseInt(value)) && value.length > 0) || value.length > 6)
       return;
-    const newList = clone(meetingSettingList);
-    const password = value;
-    newList.map((item, i) => i === index && (item.password = password));
-    setMeetingSettingList([...newList]);
+
+    setMeetingSettingList((prev) => {
+      const newList = clone(prev);
+      newList.map((item, i) => i === index && (item.password = value));
+
+      return newList;
+    });
   };
 
   const handleChange = (value: string, index: number) => {
