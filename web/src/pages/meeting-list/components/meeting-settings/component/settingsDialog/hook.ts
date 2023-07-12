@@ -173,10 +173,10 @@ const useAction = (props: SettingDialogProps) => {
       return;
 
     setMeetingSettingList((prev) => {
-      const newList = clone(prev);
-      newList.map((item, i) => i === index && (item.password = value));
-
-      return newList;
+      return prev.map((item, i) => ({
+        ...item,
+        password: i === index ? value : item.password,
+      }));
     });
   };
 
