@@ -271,7 +271,7 @@ export interface MeetingSettingList {
   optionData?: number;
   optionList?: SelectDataType[];
   icon?: boolean;
-  password?: number;
+  password?: string;
   key?: string;
 }
 
@@ -288,7 +288,7 @@ export interface WorkWeChatMeetingReminderDto {
 }
 
 export interface WorkWeChatMeetingSettingDto {
-  password: number | "";
+  password: string;
   enable_waiting_room: boolean;
   allow_enter_before_host: boolean;
   remind_scope: number;
@@ -362,7 +362,7 @@ export interface GetAllMeetingsData {
   status: MeetingStatus;
   agentId: number;
   calId: string;
-  password: number | null;
+  password: string;
   enableWaitingRoom: boolean;
   allowEnterBeforeHost: boolean;
   remindScope: number;

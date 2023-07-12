@@ -169,9 +169,11 @@ const useAction = (props: SettingDialogProps) => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const onMembershipPassword = (value: string, index: number) => {
+    if ((isNaN(parseFloat(value)) && value.length > 0) || value.length > 6)
+      return;
     const newList = clone(meetingSettingList);
-    const password = value.slice(0, MeetingPasswordLimitation.Max);
-    newList.map((item, i) => i === index && (item.password = +password));
+    const password = value;
+    newList.map((item, i) => i === index && (item.password = password));
     setMeetingSettingList([...newList]);
   };
 
@@ -351,7 +353,7 @@ const useAction = (props: SettingDialogProps) => {
       settingsData.map((item) => {
         switch (item.key) {
           case "password":
-            item.password = password ? password : undefined;
+            item.password = password ?? undefined;
             item.isOption = password ? true : false;
             break;
           case "enable_waiting_room":
