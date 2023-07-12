@@ -6,7 +6,6 @@ import {
   CancelWorkWeChatMeetingDto,
   CandelDto,
   GetAllMeetingsData,
-  MeetingIdCorpIdAndAppId,
 } from "../../dtos/meeting-seetings";
 
 const useAction = () => {
@@ -27,25 +26,19 @@ const useAction = () => {
     ketWord: "",
   });
   const [rows, setRows] = useState<GetAllMeetingsData[]>([]);
-  const [isOpenMeetingSettings, setIsOpenMeetingSettings] =
-    useState<boolean>(false);
-  const [meetingIdCorpIdAndAppId, setMeetingIdCorpIdAndAppId] =
-    useState<MeetingIdCorpIdAndAppId | null>();
+  const [isOpenMeetingSettings, setMeetingData] = useState<boolean>(false);
+  const [meetingData, setGetAllMeetingsData] =
+    useState<GetAllMeetingsData | null>();
 
   const meetingSetting = (data: GetAllMeetingsData) => {
-    const { meetingId, workWeChatCorpApplicationId, workWeChatCorpId } = data;
-    setMeetingIdCorpIdAndAppId({
-      meetingId,
-      appId: workWeChatCorpApplicationId,
-      corpId: workWeChatCorpId,
-    });
-    setIsOpenMeetingSettings(true);
+    setGetAllMeetingsData(data);
+    setMeetingData(true);
     setMeetingState("update");
   };
 
   const meetingCreate = () => {
-    setMeetingIdCorpIdAndAppId(null);
-    setIsOpenMeetingSettings(true);
+    setGetAllMeetingsData(null);
+    setMeetingData(true);
     setMeetingState("create");
   };
 
@@ -183,8 +176,8 @@ const useAction = () => {
   return {
     rows,
     isOpenMeetingSettings,
-    setIsOpenMeetingSettings,
-    meetingIdCorpIdAndAppId,
+    setMeetingData,
+    meetingData,
     success,
     failSend,
     loading,

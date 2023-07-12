@@ -177,8 +177,9 @@ export enum RepeatSelectData {
 
 //自动开启会议录制
 export enum MeetingRecording {
-  Soundcloud = 1, //主持人入会后开启云录制
-  LocalRecording = 2, //主持人入会后开启本地录制
+  Disable = 0, //禁用录制
+  LocalRecording = 1, //主持人入会后开启本地录制
+  Soundcloud = 2, //主持人入会后开启云录制
 }
 
 export enum RecordWatermark {
@@ -256,8 +257,8 @@ export interface SettingDialogProps {
 
 export interface MeetingSettingsProps {
   isOpenMeetingSettings: boolean;
-  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>;
-  meetingIdCorpIdAndAppId?: MeetingIdCorpIdAndAppId | null;
+  setMeetingData: React.Dispatch<React.SetStateAction<boolean>>;
+  meetingData?: GetAllMeetingsData | null;
   getMeetingList: () => void;
   meetingState: string;
 }
@@ -283,7 +284,7 @@ export interface WorkWeChatMeetingReminderDto {
   repeat_type: number;
   repeat_until: number;
   repeat_interval: number;
-  remind_before: [number] | null;
+  remind_before: number[] | number;
 }
 
 export interface WorkWeChatMeetingSettingDto {
@@ -294,7 +295,11 @@ export interface WorkWeChatMeetingSettingDto {
   enable_enter_mute: number;
   allow_external_user: boolean;
   enable_screen_watermark: boolean;
+  meetingRecordType: MeetingRecording;
+  enableCloudRecordSummary: boolean;
+  meetingSummaryDistributionEnabled: boolean;
   hosts?: WorkWeChatMeetingUserDto;
+  auto_record_type?: string;
   ring_users?: WorkWeChatMeetingUserDto;
 }
 
@@ -324,11 +329,6 @@ export interface CreateMeetingResponse {
   excessUsers: string[];
 }
 
-export interface GetWorkWeChatMeeting {
-  AppId: string;
-  MeetingId: string;
-}
-
 export interface MeetingAttendeesUserData {
   userid: string;
   status: number;
@@ -341,26 +341,6 @@ export interface MeetingAttendeesUserData {
 export interface MeetingAttendees {
   member: MeetingAttendeesUserData[];
   tmpExternalUser: MeetingAttendeesUserData[];
-}
-
-export interface GetMeetingResponse {
-  errcode: number;
-  errmsg: string;
-  admin_userid: string;
-  title: string;
-  meeting_start: number;
-  meeting_duration: number;
-  description: string;
-  location: string;
-  main_department: number;
-  status: number;
-  agentid: number;
-  attendees: MeetingAttendees;
-  settings: WorkWeChatMeetingSettingDto;
-  cal_id: string;
-  reminders: WorkWeChatMeetingReminderDto;
-  meeting_code: string;
-  meeting_link: string;
 }
 
 export interface GetAllMeetingsData {
@@ -395,9 +375,12 @@ export interface GetAllMeetingsData {
   repeatType: number;
   repeatUntil: number;
   repeatInterval: number;
-  remindBefore: null;
+  remindBefore: string;
   createdDate: string;
   isDelete: boolean;
+  meetingRecordType: MeetingRecording;
+  enableCloudRecordSummary: boolean;
+  meetingSummaryDistributionEnabled: boolean;
 }
 
 export interface GetAllMeetingDto {
@@ -446,7 +429,7 @@ export interface UpdateMeetingResponse {
   excess_users: [];
 }
 
-export interface MeetingIdCorpIdAndAppId {
+export interface GetAllMeetingsData {
   meetingId: string;
   corpId: string;
   appId: string;

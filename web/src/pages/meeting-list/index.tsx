@@ -39,8 +39,8 @@ const MeetingList = () => {
   const {
     rows,
     isOpenMeetingSettings,
-    setIsOpenMeetingSettings,
-    meetingIdCorpIdAndAppId,
+    setMeetingData,
+    meetingData,
     meetingSetting,
     meetingCancel,
     meetingCreate,
@@ -313,8 +313,8 @@ const MeetingList = () => {
 
         <MeetingSettings
           isOpenMeetingSettings={isOpenMeetingSettings}
-          setIsOpenMeetingSettings={setIsOpenMeetingSettings}
-          meetingIdCorpIdAndAppId={meetingIdCorpIdAndAppId}
+          setMeetingData={setMeetingData}
+          meetingData={meetingData}
           getMeetingList={getMeetingList}
           meetingState={meetingState}
         />

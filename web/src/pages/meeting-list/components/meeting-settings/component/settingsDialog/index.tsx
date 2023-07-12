@@ -41,6 +41,8 @@ const SeetingsDialog = (props: SettingDialogProps) => {
     showPassword,
     radioDisabled,
     tipsObject,
+    meetingSummaryDistributionEnabled,
+    setMeetingSummaryDistributionEnabled,
     onIsOption,
     handleChange,
     handleClickShowPassword,
@@ -133,6 +135,7 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                     )}
                   </div>
                 </div>
+
                 {item.optionList?.length && item.isOption && (
                   <RadioGroup
                     aria-labelledby="demo-controlled-radio-buttons-group"
@@ -221,6 +224,22 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                       }
                     />
                   </form>
+                )}
+                {item.key === "enableCloudRecordSummary" && item.isOption && (
+                  <div className={style.settingsList}>
+                    <div className="title">是否发送会议总结给参会人</div>
+                    <div>
+                      <input
+                        type="checkbox"
+                        checked={meetingSummaryDistributionEnabled}
+                        onChange={(event) =>
+                          setMeetingSummaryDistributionEnabled(
+                            event.target.checked
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
                 )}
               </Fragment>
             );

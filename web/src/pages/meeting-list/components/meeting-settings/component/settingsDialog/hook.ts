@@ -25,6 +25,11 @@ const useAction = (props: SettingDialogProps) => {
     settings,
     open,
   } = props;
+  const [
+    meetingSummaryDistributionEnabled,
+    setMeetingSummaryDistributionEnabled,
+  ] = useState<boolean>(false);
+
   const settingList: MeetingSettingList[] = [
     {
       title: "指定主持人",
@@ -36,15 +41,17 @@ const useAction = (props: SettingDialogProps) => {
     {
       title: "入会密码",
       optionType: "input",
+      key: "password",
       border: true,
       isOption: false,
     },
     {
       title: "自动开启会议录制",
       optionType: "checkbox",
+      key: "meetingRecordType",
       border: true,
       isOption: false,
-      optionData: MeetingRecording.Soundcloud,
+      optionData: MeetingRecording.Disable,
       optionList: [
         {
           lable: "主持人入会后开启云录制",
@@ -55,6 +62,13 @@ const useAction = (props: SettingDialogProps) => {
           value: MeetingRecording.LocalRecording,
         },
       ],
+    },
+    {
+      title: "是否开启会议总结",
+      key: "enableCloudRecordSummary",
+      optionType: "checkbox",
+      border: true,
+      isOption: false,
     },
     {
       title: "开启等候室",
@@ -170,6 +184,7 @@ const useAction = (props: SettingDialogProps) => {
     ) {
       onAppint();
     }
+
     setMeetingSettingList([...newList]);
   };
 
@@ -185,6 +200,19 @@ const useAction = (props: SettingDialogProps) => {
     if (newList[index].title === "允许成员在主持人进会前加入") {
       setRadioDisabled(checked);
     }
+
+    if (newList[index].key === "meetingRecordType") {
+      newList[index].optionData = checked
+        ? MeetingRecording.Soundcloud
+        : MeetingRecording.Disable;
+    }
+
+    if (newList[index].key === "enableCloudRecordSummary") {
+      !checked &&
+        meetingSummaryDistributionEnabled &&
+        setMeetingSummaryDistributionEnabled(false);
+    }
+
     setMeetingSettingList([...newList]);
   };
 
@@ -228,6 +256,9 @@ const useAction = (props: SettingDialogProps) => {
       enable_screen_watermark: false,
       hosts: undefined,
       ring_users: undefined,
+      meetingRecordType: MeetingRecording.Disable,
+      enableCloudRecordSummary: false,
+      meetingSummaryDistributionEnabled: meetingSummaryDistributionEnabled,
     };
 
     meetingSettingList.map((item) => {
@@ -258,6 +289,14 @@ const useAction = (props: SettingDialogProps) => {
         case "enable_screen_watermark":
           settingData.enable_screen_watermark = !!item.isOption;
           break;
+        case "meetingRecordType":
+          settingData.meetingRecordType = item.optionData
+            ? item.optionData
+            : MeetingRecording.Disable;
+          break;
+        case "enableCloudRecordSummary":
+          settingData.enableCloudRecordSummary = !!item.isOption;
+          break;
         default:
           break;
       }
@@ -279,6 +318,7 @@ const useAction = (props: SettingDialogProps) => {
     settingData.ring_users =
       ring_user.userid.length > 0 ? ring_user : undefined;
     handleGetSettingData && handleGetSettingData(settingData);
+
     setDialog(false);
     setMeetingSettingList(settingList);
   };
@@ -292,6 +332,7 @@ const useAction = (props: SettingDialogProps) => {
   useEffect(() => {
     if (settings && open) {
       let settingsData = clone(meetingSettingList);
+
       const {
         password,
         enable_waiting_room,
@@ -300,22 +341,52 @@ const useAction = (props: SettingDialogProps) => {
         enable_enter_mute,
         allow_external_user,
         enable_screen_watermark,
+        auto_record_type,
+        enableCloudRecordSummary,
+        meetingSummaryDistributionEnabled,
       } = settings;
 
+      setMeetingSummaryDistributionEnabled(meetingSummaryDistributionEnabled);
+
       settingsData.map((item) => {
-        item.optionType === "input" && password && (item.password = password);
-        item.password && (item.isOption = true);
-        item.key === "enable_waiting_room" &&
-          (item.isOption = enable_waiting_room);
-        item.key === "allow_enter_before_host" &&
-          (item.isOption = allow_enter_before_host);
-        item.key === "remind_scope" && (item.optionData = remind_scope);
-        item.key === "enable_enter_mute" &&
-          (item.optionData = enable_enter_mute);
-        item.key === "allow_external_user" &&
-          (item.optionData = +allow_external_user);
-        item.key === "enable_screen_watermark" &&
-          (item.isOption = enable_screen_watermark);
+        switch (item.key) {
+          case "password":
+            password && (item.password = password);
+            item.password && (item.isOption = true);
+            break;
+          case "enable_waiting_room":
+            item.isOption = enable_waiting_room;
+            break;
+          case "allow_enter_before_host":
+            item.isOption = allow_enter_before_host;
+            break;
+          case "enable_enter_mute":
+            item.optionData = enable_enter_mute;
+            break;
+          case "remind_scope":
+            item.optionData = remind_scope;
+            break;
+          case "allow_external_user":
+            item.optionData = +allow_external_user;
+            break;
+          case "enable_screen_watermark":
+            item.isOption = enable_screen_watermark;
+            break;
+          case "meetingRecordType":
+            if (auto_record_type) {
+              item.optionData =
+                auto_record_type === "local"
+                  ? MeetingRecording.LocalRecording
+                  : MeetingRecording.Soundcloud;
+              item.isOption = true;
+            }
+            break;
+          case "enableCloudRecordSummary":
+            item.isOption = enableCloudRecordSummary;
+            break;
+          default:
+            break;
+        }
       });
 
       setMeetingSettingList(settingsData);
@@ -356,6 +427,8 @@ const useAction = (props: SettingDialogProps) => {
     showPassword,
     radioDisabled,
     tipsObject,
+    meetingSummaryDistributionEnabled,
+    setMeetingSummaryDistributionEnabled,
     onIsOption,
     handleChange,
     handleClickShowPassword,
