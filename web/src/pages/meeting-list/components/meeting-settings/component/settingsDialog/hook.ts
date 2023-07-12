@@ -341,7 +341,7 @@ const useAction = (props: SettingDialogProps) => {
         enable_enter_mute,
         allow_external_user,
         enable_screen_watermark,
-        auto_record_type,
+        meetingRecordType,
         enableCloudRecordSummary,
         meetingSummaryDistributionEnabled,
       } = settings;
@@ -373,13 +373,8 @@ const useAction = (props: SettingDialogProps) => {
             item.isOption = enable_screen_watermark;
             break;
           case "meetingRecordType":
-            if (auto_record_type) {
-              item.optionData =
-                auto_record_type === "local"
-                  ? MeetingRecording.LocalRecording
-                  : MeetingRecording.Soundcloud;
-              item.isOption = true;
-            }
+            item.optionData = meetingRecordType;
+            item.isOption = true;
             break;
           case "enableCloudRecordSummary":
             item.isOption = enableCloudRecordSummary;
