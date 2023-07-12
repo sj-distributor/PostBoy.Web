@@ -82,7 +82,7 @@ const useAction = (props: SettingDialogProps) => {
       optionType: "checkbox",
       key: "allow_enter_before_host",
       border: true,
-      isOption: true,
+      isOption: false,
     },
     {
       title: "开启屏幕共享水印",
@@ -169,10 +169,15 @@ const useAction = (props: SettingDialogProps) => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const onMembershipPassword = (value: string, index: number) => {
-    const newList = clone(meetingSettingList);
-    const password = value.slice(0, MeetingPasswordLimitation.Max);
-    newList.map((item, i) => i === index && (item.password = +password));
-    setMeetingSettingList([...newList]);
+    if ((isNaN(parseInt(value)) && value.length > 0) || value.length > 6)
+      return;
+
+    setMeetingSettingList((prev) => {
+      return prev.map((item, i) => ({
+        ...item,
+        password: i === index ? value : item.password,
+      }));
+    });
   };
 
   const handleChange = (value: string, index: number) => {
@@ -341,7 +346,7 @@ const useAction = (props: SettingDialogProps) => {
         enable_enter_mute,
         allow_external_user,
         enable_screen_watermark,
-        auto_record_type,
+        meetingRecordType,
         enableCloudRecordSummary,
         meetingSummaryDistributionEnabled,
       } = settings;
@@ -351,8 +356,8 @@ const useAction = (props: SettingDialogProps) => {
       settingsData.map((item) => {
         switch (item.key) {
           case "password":
-            password && (item.password = password);
-            item.password && (item.isOption = true);
+            item.password = password ?? undefined;
+            item.isOption = !!password;
             break;
           case "enable_waiting_room":
             item.isOption = enable_waiting_room;
@@ -373,13 +378,10 @@ const useAction = (props: SettingDialogProps) => {
             item.isOption = enable_screen_watermark;
             break;
           case "meetingRecordType":
-            if (auto_record_type) {
-              item.optionData =
-                auto_record_type === "local"
-                  ? MeetingRecording.LocalRecording
-                  : MeetingRecording.Soundcloud;
-              item.isOption = true;
-            }
+            item.optionData = meetingRecordType;
+
+            item.isOption = !!meetingRecordType;
+
             break;
           case "enableCloudRecordSummary":
             item.isOption = enableCloudRecordSummary;

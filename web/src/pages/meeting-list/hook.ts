@@ -26,19 +26,20 @@ const useAction = () => {
     ketWord: "",
   });
   const [rows, setRows] = useState<GetAllMeetingsData[]>([]);
-  const [isOpenMeetingSettings, setMeetingData] = useState<boolean>(false);
+  const [isOpenMeetingSettings, setIsOpenMeetingSettings] =
+    useState<boolean>(false);
   const [meetingData, setGetAllMeetingsData] =
     useState<GetAllMeetingsData | null>();
 
   const meetingSetting = (data: GetAllMeetingsData) => {
     setGetAllMeetingsData(data);
-    setMeetingData(true);
+    setIsOpenMeetingSettings(true);
     setMeetingState("update");
   };
 
   const meetingCreate = () => {
     setGetAllMeetingsData(null);
-    setMeetingData(true);
+    setIsOpenMeetingSettings(true);
     setMeetingState("create");
   };
 
@@ -176,7 +177,7 @@ const useAction = () => {
   return {
     rows,
     isOpenMeetingSettings,
-    setMeetingData,
+    setIsOpenMeetingSettings,
     meetingData,
     success,
     failSend,

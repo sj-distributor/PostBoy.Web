@@ -46,7 +46,7 @@ const useAction = (props: MeetingSettingsProps) => {
     isOpenMeetingSettings,
     getMeetingList,
     meetingState,
-    setMeetingData,
+    setIsOpenMeetingSettings,
   } = props;
 
   // 拿到的企业对象
@@ -902,7 +902,7 @@ const useAction = (props: MeetingSettingsProps) => {
                 const meetingId = res.meetingid;
                 if (meetingId !== null) {
                   successAction.setTrue();
-                  setMeetingData(false);
+                  setIsOpenMeetingSettings(false);
                   getMeetingList();
                 } else {
                   failSendAction.setTrue();
@@ -931,7 +931,7 @@ const useAction = (props: MeetingSettingsProps) => {
               if (res && res.errcode === 0) {
                 successAction.setTrue();
                 loadingAction.setFalse();
-                setMeetingData(false);
+                setIsOpenMeetingSettings(false);
                 getMeetingList();
               } else {
                 loadingAction.setFalse();
