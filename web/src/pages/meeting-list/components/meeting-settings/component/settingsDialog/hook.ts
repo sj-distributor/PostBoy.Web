@@ -354,7 +354,7 @@ const useAction = (props: SettingDialogProps) => {
         switch (item.key) {
           case "password":
             item.password = password ?? undefined;
-            item.isOption = password ? true : false;
+            item.isOption = !!password;
             break;
           case "enable_waiting_room":
             item.isOption = enable_waiting_room;
