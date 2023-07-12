@@ -52,7 +52,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 export default function MeetingSetting(props: MeetingSettingsProps) {
   const {
     isOpenMeetingSettings,
-    setMeetingData,
+    setIsOpenMeetingSettings,
     meetingData,
     getMeetingList,
     meetingState,
@@ -141,7 +141,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     meetingGroup,
     setMeetingGroup,
   } = useAction({
-    setMeetingData,
+    setIsOpenMeetingSettings,
     meetingData,
     isOpenMeetingSettings,
     getMeetingList,
@@ -225,7 +225,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
 
       <Dialog
         open={isOpenMeetingSettings}
-        onClose={() => setMeetingData(false)}
+        onClose={() => setIsOpenMeetingSettings(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         onClick={() => {}}
@@ -806,7 +806,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
           }}
         >
           <Button
-            onClick={() => setMeetingData(false)}
+            onClick={() => setIsOpenMeetingSettings(false)}
             variant="contained"
             component="label"
           >

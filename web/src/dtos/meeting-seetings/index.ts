@@ -257,7 +257,7 @@ export interface SettingDialogProps {
 
 export interface MeetingSettingsProps {
   isOpenMeetingSettings: boolean;
-  setMeetingData: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>;
   meetingData?: GetAllMeetingsData | null;
   getMeetingList: () => void;
   meetingState: string;

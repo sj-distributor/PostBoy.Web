@@ -82,7 +82,7 @@ const useAction = (props: SettingDialogProps) => {
       optionType: "checkbox",
       key: "allow_enter_before_host",
       border: true,
-      isOption: true,
+      isOption: false,
     },
     {
       title: "开启屏幕共享水印",
@@ -351,8 +351,8 @@ const useAction = (props: SettingDialogProps) => {
       settingsData.map((item) => {
         switch (item.key) {
           case "password":
-            password && (item.password = password);
-            item.password && (item.isOption = true);
+            item.password = password ? password : undefined;
+            item.isOption = password ? true : false;
             break;
           case "enable_waiting_room":
             item.isOption = enable_waiting_room;
@@ -374,7 +374,9 @@ const useAction = (props: SettingDialogProps) => {
             break;
           case "meetingRecordType":
             item.optionData = meetingRecordType;
-            item.isOption = true;
+
+            item.isOption = !!meetingRecordType;
+
             break;
           case "enableCloudRecordSummary":
             item.isOption = enableCloudRecordSummary;
