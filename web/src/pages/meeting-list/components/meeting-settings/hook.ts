@@ -537,22 +537,22 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [tipsObject.show]);
 
   //获取选择人员
-  const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
-    const personnelData = getUserChildrenList(
+  const handleGetSelectData = async (data: IDepartmentAndUserListValue[]) => {
+    const personnelData = await getUserChildrenList(
       departmentKeyValue?.data,
       data,
       []
     );
     if (clickName === "选择参会人") {
-      setParticipantList([...personnelData]);
+      await setParticipantList(personnelData);
     }
 
-    clickName === "选择指定提醒人员" && setAppointList([...personnelData]);
-    clickName === "选择指定主持人" && setHostList([...personnelData]);
+    clickName === "选择指定提醒人员" && (await setAppointList(personnelData));
+    clickName === "选择指定主持人" && (await setHostList(personnelData));
 
     if (clickName === "指定会议管理员") {
-      setAdminUser([...personnelData]);
-      setParticipantList([...personnelData]);
+      await setAdminUser(personnelData);
+      await setParticipantList(personnelData);
     }
   };
 
