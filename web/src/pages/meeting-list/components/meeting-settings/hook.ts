@@ -40,6 +40,12 @@ import { useBoolean } from "ahooks";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+enum UpdateListType {
+  Fold,
+  Flatten,
+  All,
+}
+
 const useAction = (props: MeetingSettingsProps) => {
   const {
     meetingData,
@@ -305,59 +311,62 @@ const useAction = (props: MeetingSettingsProps) => {
     AppId: string,
     department: IDepartmentData,
     users: IDepartmentUsersData[],
-    defaultChild: IDepartmentAndUserListValue
+    defaultChild: IDepartmentAndUserListValue,
+    type: UpdateListType
   ) => {
-    setDepartmentAndUserList((prev) => {
-      const newValue = clone(prev);
-      const hasData = newValue.find((e) => e.key === AppId);
-      let idList = [];
-      // 是否现有key的数据
-      hasData && hasData.data.length > 0
-        ? (idList = recursiveDeptList(
-            hasData.data,
-            defaultChild,
-            department,
-            []
-          ))
-        : newValue.push({ key: AppId, data: [defaultChild] });
-      idList.length === 0 && hasData?.data.push(defaultChild);
-      setDepartmentAndUserListBackups(newValue);
-      return newValue;
-    });
+    type !== UpdateListType.Flatten &&
+      setDepartmentAndUserList((prev) => {
+        const newValue = clone(prev);
+        const hasData = newValue.find((e) => e.key === AppId);
+        let idList = [];
+        // 是否现有key的数据
+        hasData && hasData.data.length > 0
+          ? (idList = recursiveDeptList(
+              hasData.data,
+              defaultChild,
+              department,
+              []
+            ))
+          : newValue.push({ key: AppId, data: [defaultChild] });
+        idList.length === 0 && hasData?.data.push(defaultChild);
+        setDepartmentAndUserListBackups(newValue);
+        return newValue;
+      });
 
-    setFlattenDepartmentList((prev) => {
-      const newValue = clone(prev);
-      let hasData = newValue.find((e) => e.key === AppId);
-      const insertData = [
-        {
-          id: department.id,
-          name: department.name,
-          parentid: department.name,
-          type: DepartmentAndUserType.Department,
-          selected: false,
-          children: [],
-        },
-        ...flatten(
-          users.map((item) => ({
-            id: item.userid,
-            name: item.userid,
+    type !== UpdateListType.Fold &&
+      setFlattenDepartmentList((prev) => {
+        const newValue = clone(prev);
+        let hasData = newValue.find((e) => e.key === AppId);
+        const insertData = [
+          {
+            id: department.id,
+            name: department.name,
             parentid: department.name,
-            type: DepartmentAndUserType.User,
+            type: DepartmentAndUserType.Department,
             selected: false,
-            canSelect: true,
             children: [],
-          }))
-        ),
-      ];
-      hasData
-        ? (hasData.data = [...hasData.data, ...insertData])
-        : newValue.push({
-            key: AppId,
-            data: insertData,
-          });
-      setFlattenDepartmentListBackups(newValue);
-      return newValue;
-    });
+          },
+          ...flatten(
+            users.map((item) => ({
+              id: item.userid,
+              name: item.userid,
+              parentid: department.name,
+              type: DepartmentAndUserType.User,
+              selected: false,
+              canSelect: true,
+              children: [],
+            }))
+          ),
+        ];
+        hasData
+          ? (hasData.data = [...hasData.data, ...insertData])
+          : newValue.push({
+              key: AppId,
+              data: insertData,
+            });
+        setFlattenDepartmentListBackups(newValue);
+        return newValue;
+      });
   };
 
   const loadDeptUsers = async (
@@ -383,7 +392,7 @@ const useAction = (props: MeetingSettingsProps) => {
         parentid: String(department.parentid),
         selected: false,
         children: users.map((item) => ({
-          id: item.userid,
+          id: `${item.userid}`,
           name: item.userid,
           type: DepartmentAndUserType.User,
           parentid: item.department,
@@ -393,6 +402,14 @@ const useAction = (props: MeetingSettingsProps) => {
           children: [],
         })),
       };
+
+      updateDeptUserList(
+        AppId,
+        department,
+        users,
+        defaultChild,
+        UpdateListType.Flatten
+      );
 
       let isContinue: boolean = false;
 
@@ -422,13 +439,20 @@ const useAction = (props: MeetingSettingsProps) => {
             AppId,
             value.department,
             value.users,
-            value.defaultChild
+            value.defaultChild,
+            UpdateListType.Fold
           );
         }
         continue;
       }
 
-      updateDeptUserList(AppId, department, users, defaultChild);
+      updateDeptUserList(
+        AppId,
+        department,
+        users,
+        defaultChild,
+        UpdateListType.Fold
+      );
     }
     setIsTreeViewLoading(false);
     setIsLoadStop(true);
