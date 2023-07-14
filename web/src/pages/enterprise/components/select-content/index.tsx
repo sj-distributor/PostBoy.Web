@@ -1,4 +1,4 @@
-import { memo } from "react"
+import { memo, useState } from "react"
 import {
   Box,
   Button,
@@ -16,7 +16,7 @@ import {
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
 import { SelectContentProps } from "./props"
-import { useAction } from "./hook"
+import { defaultAppValue, useAction } from "./hook"
 import SelectTargetDialog from "../select-target-dialog"
 import {
   messageTypeList,
@@ -26,6 +26,7 @@ import {
 import {
   DeptUserCanSelectStatus,
   FileObject,
+  ICorpAppData,
   MessageDataFileType,
   MessageJobSendType,
   PictureText,
@@ -36,6 +37,7 @@ import DateSelector from "../date-selector"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import * as wangEditor from "@wangeditor/editor"
 import { MentionsInput, Mention } from "react-mentions"
+import useDeptUserData from "../../../../hooks/deptUserData"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -51,11 +53,24 @@ const SelectContent = memo(
       setIsShowPage,
     } = props
 
+    // 拿到的App对象
+    const [corpAppValue, setCorpAppValue] =
+      useState<ICorpAppData>(defaultAppValue)
+
+    const {
+      departmentAndUserList,
+      flattenDepartmentList,
+      departmentKeyValue,
+      searchKeyValue,
+      setDepartmentAndUserList,
+      setFlattenDepartmentList,
+      recursiveSearchDeptOrUser,
+      loadDeptUsers,
+    } = useDeptUserData({ appId: corpAppValue?.appId })
+
     const {
       corpsValue,
       setCorpsValue,
-      corpAppValue,
-      setCorpAppValue,
       corpsList,
       corpAppList,
       messageTypeValue,
@@ -65,10 +80,6 @@ const SelectContent = memo(
       timeZoneValue,
       isShowDialog,
       setIsShowDialog,
-      departmentAndUserList,
-      setDepartmentAndUserList,
-      departmentKeyValue,
-      searchKeyValue,
       isTreeViewLoading,
       tagsList,
       setTagsValue,
@@ -129,6 +140,16 @@ const SelectContent = memo(
       showErrorPrompt,
       clearData,
       setIsShowPage,
+      corpAppValue,
+      setCorpAppValue,
+      departmentAndUserList,
+      flattenDepartmentList,
+      departmentKeyValue,
+      searchKeyValue,
+      setDepartmentAndUserList,
+      setFlattenDepartmentList,
+      recursiveSearchDeptOrUser,
+      loadDeptUsers,
     })
 
     const fileOrImage = (file: FileObject, state: string) => {

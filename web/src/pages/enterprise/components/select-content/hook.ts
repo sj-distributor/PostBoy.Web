@@ -36,9 +36,17 @@ import { SelectContentHookProps } from "./props"
 import * as wangEditor from "@wangeditor/editor"
 import { annexEditorConfig } from "../../../../uilts/wangEditor"
 import { useBoolean } from "ahooks"
-import useDeptUserData from "../../../../hooks/deptUserData"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
+
+export const defaultAppValue = {
+  appId: "",
+  id: "",
+  name: "",
+  workWeChatCorpId: "",
+  display: true,
+  agentId: 0,
+}
 
 export const useAction = (props: SelectContentHookProps) => {
   const {
@@ -50,6 +58,16 @@ export const useAction = (props: SelectContentHookProps) => {
     showErrorPrompt,
     clearData,
     setIsShowPage,
+    corpAppValue,
+    setCorpAppValue,
+    departmentAndUserList,
+    flattenDepartmentList,
+    departmentKeyValue,
+    searchKeyValue,
+    setDepartmentAndUserList,
+    setFlattenDepartmentList,
+    recursiveSearchDeptOrUser,
+    loadDeptUsers,
   } = props
 
   const defaultCorpValue = {
@@ -58,20 +76,8 @@ export const useAction = (props: SelectContentHookProps) => {
     id: "",
   }
 
-  const defaultAppValue = {
-    appId: "",
-    id: "",
-    name: "",
-    workWeChatCorpId: "",
-    display: true,
-    agentId: 0,
-  }
-
   // 拿到的企业对象
   const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
-  // 拿到的App对象
-  const [corpAppValue, setCorpAppValue] =
-    useState<ICorpAppData>(defaultAppValue)
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -169,17 +175,6 @@ export const useAction = (props: SelectContentHookProps) => {
   const [appLoading, setAppLoading] = useState<boolean>(true)
 
   const [groupLoading, setGroupLoading] = useState<boolean>(true)
-
-  const {
-    departmentAndUserList,
-    flattenDepartmentList,
-    departmentKeyValue,
-    searchKeyValue,
-    setDepartmentAndUserList,
-    setFlattenDepartmentList,
-    recursiveSearchDeptOrUser,
-    loadDeptUsers,
-  } = useDeptUserData({ appId: corpAppValue?.appId })
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -1022,8 +1017,6 @@ export const useAction = (props: SelectContentHookProps) => {
   return {
     corpsValue,
     setCorpsValue,
-    corpAppValue,
-    setCorpAppValue,
     corpsList,
     corpAppList,
     messageTypeValue,

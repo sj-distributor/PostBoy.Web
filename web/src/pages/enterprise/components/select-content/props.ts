@@ -1,5 +1,10 @@
 import {
+  ICorpAppData,
+  IDepartmentAndUserListValue,
+  IDepartmentKeyControl,
+  IDeptAndUserList,
   ILastShowTableData,
+  ISearchList,
   ISendMessageCommand,
   IUpdateMessageCommand,
 } from "../../../../dtos/enterprise"
@@ -33,4 +38,22 @@ export interface SelectContentHookProps {
   showErrorPrompt: (text: string) => void
   clearData?: boolean
   setIsShowPage?: React.Dispatch<React.SetStateAction<boolean>>
+  corpAppValue: ICorpAppData
+  setCorpAppValue: React.Dispatch<React.SetStateAction<ICorpAppData>>
+  departmentAndUserList: IDepartmentKeyControl[]
+  flattenDepartmentList: ISearchList[]
+  departmentKeyValue: IDepartmentKeyControl
+  searchKeyValue: IDepartmentAndUserListValue[]
+  setDepartmentAndUserList: React.Dispatch<
+    React.SetStateAction<IDepartmentKeyControl[]>
+  >
+  setFlattenDepartmentList: React.Dispatch<React.SetStateAction<ISearchList[]>>
+  recursiveSearchDeptOrUser: (
+    hasData: IDepartmentAndUserListValue[],
+    callback: (e: IDepartmentAndUserListValue) => void
+  ) => IDepartmentAndUserListValue[]
+  loadDeptUsers: (
+    AppId: string,
+    deptListResponse: IDeptAndUserList[]
+  ) => Promise<unknown>
 }
