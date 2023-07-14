@@ -80,7 +80,8 @@ const useAction = (props: MeetingSettingsProps) => {
     useState<boolean>(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState<boolean>(false);
   const [adminUser, setAdminUser] = useState<IDepartmentAndUserListValue[]>([]);
-  const [selectGroup, setSelectGroup] = useState<SelectGroupType[]>([
+
+  const selectGroupInitData: SelectGroupType[] = [
     {
       title: "提醒",
       key: "reminderTime",
@@ -135,7 +136,9 @@ const useAction = (props: MeetingSettingsProps) => {
         },
       ],
     },
-  ]);
+  ];
+  const [selectGroup, setSelectGroup] =
+    useState<SelectGroupType[]>(selectGroupInitData);
   const [meetingDuration, setMeetingDuration] = useState<{
     value: number;
     menuItemList: SelectDataType[];
@@ -703,6 +706,18 @@ const useAction = (props: MeetingSettingsProps) => {
     setHtml("");
     setAdminUser([]);
 
+    setSelectGroup(selectGroupInitData);
+
+    customEndTimeAction.setFalse();
+
+    setMeetingReminders({
+      is_repeat: 0,
+      repeat_type: 0,
+      repeat_until: 0,
+      repeat_interval: 0,
+      remind_before: [0],
+    });
+
     setMeetingStartDate(dayjs().format("YYYY-MM-DD"));
     setMeetingStartTime(
       dayjs()
@@ -721,7 +736,7 @@ const useAction = (props: MeetingSettingsProps) => {
       password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
-      remind_scope: 3,
+      remind_scope: 0,
       enable_enter_mute: 0,
       allow_external_user: true,
       enable_screen_watermark: false,
