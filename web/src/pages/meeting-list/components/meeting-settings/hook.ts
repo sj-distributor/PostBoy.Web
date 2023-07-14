@@ -710,6 +710,8 @@ const useAction = (props: MeetingSettingsProps) => {
 
     customEndTimeAction.setFalse();
 
+    setMeetingDuration((prev) => ({ ...prev, value: MeetingDuration.Minutes }));
+
     setMeetingReminders({
       is_repeat: 0,
       repeat_type: 0,
