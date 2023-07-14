@@ -521,8 +521,8 @@ const useAction = (props: MeetingSettingsProps) => {
       setHostList([]);
     }
 
-    clickName === "选择指定提醒人员" && setAppointList(clone(data));
-    clickName === "选择指定主持人" && setHostList(clone(data));
+    clickName === "选择指定提醒人员" && setAppointList(data);
+    clickName === "选择指定主持人" && setHostList(data);
 
     if (clickName === "指定会议管理员") {
       setAdminUser(data);
@@ -1180,81 +1180,52 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
-    if (clickName === "选择指定提醒人员" && isShowDialog) {
-      if (participantList && participantList?.length > 0) {
-        // const participantListData = getUserChildrenList(
-        //   departmentKeyValue?.data,
-        //   participantList,
-        //   []
-        // );
-        setDepartmentAndUserList([
-          {
-            data:
-              appointList && appointList.length > 0
-                ? participantList.map((item) => ({
-                    ...item,
-                    selected: appointList.find((i) => i.id === item.id)
-                      ? !!appointList.find((i) => i.id === item.id)?.selected
-                      : false,
-                  }))
-                : participantList.map((item) => ({ ...item, selected: false })),
-            key: departmentKeyValue.key,
-          },
-        ]);
-        setFlattenDepartmentList([
-          {
-            data:
-              appointList && appointList.length > 0
-                ? participantList.map((item) => ({
-                    ...item,
-                    selected: appointList.find((i) => i.id === item.id)
-                      ? !!appointList.find((i) => i.id === item.id)?.selected
-                      : false,
-                  }))
-                : participantList.map((item) => ({ ...item, selected: false })),
-            key: departmentKeyValue.key,
-          },
-        ]);
-      } else {
-        setDepartmentAndUserList([]);
-        setFlattenDepartmentList([]);
-      }
-    }
+    if (participantList && participantList?.length > 0) {
+      const getHostListAndReminderListData = (
+        data: IDepartmentAndUserListValue[]
+      ) => {
+        return data && data.length > 0
+          ? participantList.map((item) => ({
+              ...item,
+              selected: data.find((i) => i.id === item.id)
+                ? !!data.find((i) => i.id === item.id)?.selected
+                : false,
+            }))
+          : participantList.map((item) => ({ ...item, selected: false }));
+      };
 
-    if (clickName === "选择指定主持人" && isShowDialog) {
-      if (participantList && participantList?.length > 0) {
+      if (clickName === "选择指定提醒人员" && isShowDialog) {
         setDepartmentAndUserList([
           {
-            data:
-              hostList && hostList.length > 0
-                ? participantList.map((item) => ({
-                    ...item,
-                    selected: hostList.find((i) => i.id === item.id)
-                      ? !!hostList.find((i) => i.id === item.id)?.selected
-                      : false,
-                  }))
-                : participantList.map((item) => ({ ...item, selected: false })),
+            data: getHostListAndReminderListData(appointList ?? []),
             key: departmentKeyValue.key,
           },
         ]);
         setFlattenDepartmentList([
           {
-            data:
-              hostList && hostList.length > 0
-                ? participantList.map((item) => ({
-                    ...item,
-                    selected: hostList.find((i) => i.id === item.id)
-                      ? !!hostList.find((i) => i.id === item.id)?.selected
-                      : false,
-                  }))
-                : participantList.map((item) => ({ ...item, selected: false })),
+            data: getHostListAndReminderListData(appointList ?? []),
             key: departmentKeyValue.key,
           },
         ]);
-      } else {
-        setDepartmentAndUserList([]);
-        setFlattenDepartmentList([]);
       }
+
+      if (clickName === "选择指定主持人" && isShowDialog) {
+        setDepartmentAndUserList([
+          {
+            data: getHostListAndReminderListData(hostList ?? []),
+            key: departmentKeyValue.key,
+          },
+        ]);
+        setFlattenDepartmentList([
+          {
+            data: getHostListAndReminderListData(hostList ?? []),
+            key: departmentKeyValue.key,
+          },
+        ]);
+      }
+    } else {
+      setDepartmentAndUserList([]);
+      setFlattenDepartmentList([]);
     }
   }, [isShowDialog]);
 

@@ -186,7 +186,6 @@ const useAction = (props: {
           msg: "Cannot select department and up to ten hosts",
         });
 
-      setSearchToDeptValue([]);
       return;
     }
     setOpenFunction(false);
