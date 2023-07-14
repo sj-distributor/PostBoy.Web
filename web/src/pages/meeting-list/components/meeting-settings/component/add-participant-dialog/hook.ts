@@ -9,6 +9,7 @@ import {
   DeptUserCanSelectStatus,
   SendObjOrGroup,
   IFirstState,
+  DefaultDisplay,
 } from "../../../../../../dtos/meeting-seetings";
 
 const useAction = (props: {
@@ -111,7 +112,7 @@ const useAction = (props: {
           e.id === clickedItem.id &&
             (type === ClickType.Collapse
               ? (e.isCollapsed = !e.isCollapsed)
-              : (e.selected = !e.selected));
+              : (e.selected = e.id !== e.name ? e.selected : !e.selected));
         });
       return newValue;
     });
@@ -121,6 +122,7 @@ const useAction = (props: {
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
       const newValue = prev.filter((e) => !!e);
+
       const activeData = newValue.find(
         (e) => e.key === departmentKeyValue?.key
       );
@@ -173,6 +175,27 @@ const useAction = (props: {
         return;
       }
     }
+
+    if (
+      clickName === "选择指定主持人" &&
+      departmentSelectedList.length > DefaultDisplay.hostList
+    ) {
+      tipsObject &&
+        setTipsObject({
+          show: true,
+          msg: "Cannot select department and up to ten hosts",
+        });
+
+      return;
+    }
+    if (!departmentSelectedList || !departmentSelectedList.length) {
+      setTipsObject({
+        show: true,
+        msg: "Please select relevant personnel",
+      });
+
+      return;
+    }
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
@@ -218,33 +241,33 @@ const useAction = (props: {
       });
   }, [open]);
 
+  const handleData = (
+    prev: IDepartmentAndUserListValue[],
+    listData: IDepartmentKeyControl[]
+  ) => {
+    const newValue = loadSelectData
+      ? loadSelectData.filter((x) => x)
+      : prev.filter((x) => x);
+    const hasData = listData.find((x) => x.key === AppId);
+    if (hasData) {
+      loadSelectData
+        ? loadSelectData.forEach((item) => {
+            recursiveSeachDeptOrUser(hasData.data, (user) => {
+              user.selected = !!loadSelectData.find((e) => e.id === user.id);
+            });
+          })
+        : recursiveSeachDeptOrUser(hasData.data, (user) => {
+            user.selected = false;
+          });
+    }
+
+    return newValue;
+  };
+
   useEffect(() => {
     departmentAndUserList.length && setSearchToDeptValue([]);
-    const handleData = (
-      prev: IDepartmentAndUserListValue[],
-      listData: IDepartmentKeyControl[]
-    ) => {
-      const newValue = loadSelectData
-        ? loadSelectData.filter((x) => x)
-        : prev.filter((x) => x);
-      const hasData = listData.find((x) => x.key === AppId);
-      if (hasData) {
-        loadSelectData
-          ? loadSelectData.forEach((item) => {
-              recursiveSeachDeptOrUser(hasData.data, (user) => {
-                user.selected = !!loadSelectData.find((e) => e.id === user.id);
-              });
-            })
-          : recursiveSeachDeptOrUser(hasData.data, (user) => {
-              user.selected = false;
-            });
-      }
-
-      return newValue;
-    };
-    // 打开时load上次选中的数据
     open
-      ? loadSelectData
+      ? loadSelectData && loadSelectData.length > 0
         ? setDepartmentSelectedList((prev) =>
             handleData(prev, departmentAndUserList)
           )

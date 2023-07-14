@@ -40,6 +40,12 @@ import { useBoolean } from "ahooks";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+enum UpdateListType {
+  Fold,
+  Flatten,
+  All,
+}
+
 const useAction = (props: MeetingSettingsProps) => {
   const {
     meetingData,
@@ -74,7 +80,8 @@ const useAction = (props: MeetingSettingsProps) => {
     useState<boolean>(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState<boolean>(false);
   const [adminUser, setAdminUser] = useState<IDepartmentAndUserListValue[]>([]);
-  const [selectGroup, setSelectGroup] = useState<SelectGroupType[]>([
+
+  const selectGroupInitData: SelectGroupType[] = [
     {
       title: "提醒",
       key: "reminderTime",
@@ -129,7 +136,9 @@ const useAction = (props: MeetingSettingsProps) => {
         },
       ],
     },
-  ]);
+  ];
+  const [selectGroup, setSelectGroup] =
+    useState<SelectGroupType[]>(selectGroupInitData);
   const [meetingDuration, setMeetingDuration] = useState<{
     value: number;
     menuItemList: SelectDataType[];
@@ -305,59 +314,62 @@ const useAction = (props: MeetingSettingsProps) => {
     AppId: string,
     department: IDepartmentData,
     users: IDepartmentUsersData[],
-    defaultChild: IDepartmentAndUserListValue
+    defaultChild: IDepartmentAndUserListValue,
+    type: UpdateListType
   ) => {
-    setDepartmentAndUserList((prev) => {
-      const newValue = clone(prev);
-      const hasData = newValue.find((e) => e.key === AppId);
-      let idList = [];
-      // 是否现有key的数据
-      hasData && hasData.data.length > 0
-        ? (idList = recursiveDeptList(
-            hasData.data,
-            defaultChild,
-            department,
-            []
-          ))
-        : newValue.push({ key: AppId, data: [defaultChild] });
-      idList.length === 0 && hasData?.data.push(defaultChild);
-      setDepartmentAndUserListBackups(newValue);
-      return newValue;
-    });
+    type !== UpdateListType.Flatten &&
+      setDepartmentAndUserList((prev) => {
+        const newValue = clone(prev);
+        const hasData = newValue.find((e) => e.key === AppId);
+        let idList = [];
+        // 是否现有key的数据
+        hasData && hasData.data.length > 0
+          ? (idList = recursiveDeptList(
+              hasData.data,
+              defaultChild,
+              department,
+              []
+            ))
+          : newValue.push({ key: AppId, data: [defaultChild] });
+        idList.length === 0 && hasData?.data.push(defaultChild);
+        setDepartmentAndUserListBackups(newValue);
+        return newValue;
+      });
 
-    setFlattenDepartmentList((prev) => {
-      const newValue = clone(prev);
-      let hasData = newValue.find((e) => e.key === AppId);
-      const insertData = [
-        {
-          id: department.id,
-          name: department.name,
-          parentid: department.name,
-          type: DepartmentAndUserType.Department,
-          selected: false,
-          children: [],
-        },
-        ...flatten(
-          users.map((item) => ({
-            id: item.userid,
-            name: item.userid,
+    type !== UpdateListType.Fold &&
+      setFlattenDepartmentList((prev) => {
+        const newValue = clone(prev);
+        let hasData = newValue.find((e) => e.key === AppId);
+        const insertData = [
+          {
+            id: department.id,
+            name: department.name,
             parentid: department.name,
-            type: DepartmentAndUserType.User,
+            type: DepartmentAndUserType.Department,
             selected: false,
-            canSelect: true,
             children: [],
-          }))
-        ),
-      ];
-      hasData
-        ? (hasData.data = [...hasData.data, ...insertData])
-        : newValue.push({
-            key: AppId,
-            data: insertData,
-          });
-      setFlattenDepartmentListBackups(newValue);
-      return newValue;
-    });
+          },
+          ...flatten(
+            users.map((item) => ({
+              id: item.userid,
+              name: item.userid,
+              parentid: department.name,
+              type: DepartmentAndUserType.User,
+              selected: false,
+              canSelect: true,
+              children: [],
+            }))
+          ),
+        ];
+        hasData
+          ? (hasData.data = [...hasData.data, ...insertData])
+          : newValue.push({
+              key: AppId,
+              data: insertData,
+            });
+        setFlattenDepartmentListBackups(newValue);
+        return newValue;
+      });
   };
 
   const loadDeptUsers = async (
@@ -383,7 +395,7 @@ const useAction = (props: MeetingSettingsProps) => {
         parentid: String(department.parentid),
         selected: false,
         children: users.map((item) => ({
-          id: item.userid,
+          id: `${item.userid}`,
           name: item.userid,
           type: DepartmentAndUserType.User,
           parentid: item.department,
@@ -393,6 +405,14 @@ const useAction = (props: MeetingSettingsProps) => {
           children: [],
         })),
       };
+
+      updateDeptUserList(
+        AppId,
+        department,
+        users,
+        defaultChild,
+        UpdateListType.Flatten
+      );
 
       let isContinue: boolean = false;
 
@@ -422,13 +442,20 @@ const useAction = (props: MeetingSettingsProps) => {
             AppId,
             value.department,
             value.users,
-            value.defaultChild
+            value.defaultChild,
+            UpdateListType.Fold
           );
         }
         continue;
       }
 
-      updateDeptUserList(AppId, department, users, defaultChild);
+      updateDeptUserList(
+        AppId,
+        department,
+        users,
+        defaultChild,
+        UpdateListType.Fold
+      );
     }
     setIsTreeViewLoading(false);
     setIsLoadStop(true);
@@ -475,30 +502,7 @@ const useAction = (props: MeetingSettingsProps) => {
     return newArr;
   };
 
-  //显示全部人员
-  const participantLists = useMemo(() => {
-    let arr = participantList && getUserChildrenData(participantList, []);
-    return arr as IDepartmentAndUserListValue[];
-  }, [participantList]);
-
-  const appointLists = useMemo(() => {
-    let arr = appointList && getUserChildrenData(appointList, []);
-    return arr as IDepartmentAndUserListValue[];
-  }, [appointList]);
-
-  const hostLists = useMemo(() => {
-    let arr = hostList && getUserChildrenData(hostList, []);
-    if (arr && arr.length > DefaultDisplay.hostList) {
-      tipsObject &&
-        setTipsObject({
-          show: true,
-          msg: "Cannot select department and up to ten hosts",
-        });
-      setHostList([]);
-      return (arr = []);
-    }
-    return arr as IDepartmentAndUserListValue[];
-  }, [hostList]);
+  const [participantPage, setParticipantPage] = useState<number>(1);
 
   useEffect(() => {
     // 3s关闭提示
@@ -514,21 +518,22 @@ const useAction = (props: MeetingSettingsProps) => {
 
   //获取选择人员
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
-    const personnelData = getUserChildrenList(
-      departmentKeyValue?.data,
-      data,
-      []
-    );
     if (clickName === "选择参会人") {
-      setParticipantList([...personnelData]);
+      setParticipantList(data);
+      setAppointList([]);
+      setHostList([]);
     }
 
-    clickName === "选择指定提醒人员" && setAppointList([...personnelData]);
-    clickName === "选择指定主持人" && setHostList([...personnelData]);
+    clickName === "选择指定提醒人员" && setAppointList(data);
+    clickName === "选择指定主持人" && setHostList(data);
 
     if (clickName === "指定会议管理员") {
-      setAdminUser([...personnelData]);
-      setParticipantList([...personnelData]);
+      setAdminUser(data);
+      setParticipantList((prev) => {
+        const newArr = clone(prev);
+        newArr?.push(...data);
+        return newArr;
+      });
     }
   };
 
@@ -546,7 +551,20 @@ const useAction = (props: MeetingSettingsProps) => {
           getUserChildrenList(hasData[key].children, data, personnelData);
       }
     });
+    let newArr: string[] = [];
+    getUserId(personnelData, newArr);
+
     return personnelData;
+  };
+
+  const getUserId = (data: IDepartmentAndUserListValue[], arr: string[]) => {
+    data.map((item) => {
+      if (item.children && item.children.length > 0) {
+        getUserId(item.children, arr);
+      } else {
+        arr.push(item.name);
+      }
+    });
   };
 
   const onSetParticipant = () => {
@@ -635,10 +653,10 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [corpAppList]);
 
   useEffect(() => {
-    participantLists &&
-      participantLists.length > DefaultDisplay.Participant &&
+    participantList &&
+      participantList.length > DefaultDisplay.Participant &&
       setIsShowMoreParticipantList(true);
-  }, [participantLists]);
+  }, [participantList]);
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
@@ -670,7 +688,10 @@ const useAction = (props: MeetingSettingsProps) => {
 
       // 开始load数据
       setIsLoadStop(false);
-      corpAppValue?.appId && isShowDialog && loadDepartment(corpAppValue.appId);
+      corpAppValue?.appId &&
+        isShowDialog &&
+        (clickName === "选择参会人" || clickName === "指定会议管理员") &&
+        loadDepartment(corpAppValue.appId);
     }
   }, [isShowDialog]);
 
@@ -684,6 +705,20 @@ const useAction = (props: MeetingSettingsProps) => {
     setMeetingTitle("");
     setHtml("");
     setAdminUser([]);
+
+    setSelectGroup(selectGroupInitData);
+
+    customEndTimeAction.setFalse();
+
+    setMeetingDuration((prev) => ({ ...prev, value: MeetingDuration.Minutes }));
+
+    setMeetingReminders({
+      is_repeat: 0,
+      repeat_type: 0,
+      repeat_until: 0,
+      repeat_interval: 0,
+      remind_before: [0],
+    });
 
     setMeetingStartDate(dayjs().format("YYYY-MM-DD"));
     setMeetingStartTime(
@@ -703,7 +738,7 @@ const useAction = (props: MeetingSettingsProps) => {
       password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
-      remind_scope: 3,
+      remind_scope: 0,
       enable_enter_mute: 0,
       allow_external_user: true,
       enable_screen_watermark: false,
@@ -790,7 +825,9 @@ const useAction = (props: MeetingSettingsProps) => {
 
       let attendeesList: string[] = [];
 
-      participantLists.map((item) => attendeesList.push(item.id + ""));
+      participantList &&
+        participantList.map((item) => attendeesList.push(item.id + ""));
+
       const admin_userid = adminUser
         ? adminUser.length > 0
           ? adminUser[0].id
@@ -903,6 +940,7 @@ const useAction = (props: MeetingSettingsProps) => {
                 if (meetingId !== null) {
                   successAction.setTrue();
                   setIsOpenMeetingSettings(false);
+                  clearData();
                   getMeetingList();
                 } else {
                   failSendAction.setTrue();
@@ -1155,17 +1193,48 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
-    if (clickName === "选择指定主持人" || clickName === "选择指定提醒人员") {
-      if (participantList && participantList?.length > 0) {
+    if (participantList && participantList?.length > 0) {
+      const getHostListAndReminderListData = (
+        data: IDepartmentAndUserListValue[]
+      ) => {
+        return data && data.length > 0
+          ? participantList.map((item) => ({
+              ...item,
+              selected: data.find((i) => i.id === item.id)
+                ? !!data.find((i) => i.id === item.id)?.selected
+                : false,
+            }))
+          : participantList.map((item) => ({ ...item, selected: false }));
+      };
+
+      if (clickName === "选择指定提醒人员" && isShowDialog) {
         setDepartmentAndUserList([
-          { data: participantList, key: departmentKeyValue.key },
+          {
+            data: getHostListAndReminderListData(appointList ?? []),
+            key: departmentKeyValue.key,
+          },
         ]);
         setFlattenDepartmentList([
-          { data: participantList, key: departmentKeyValue.key },
+          {
+            data: getHostListAndReminderListData(appointList ?? []),
+            key: departmentKeyValue.key,
+          },
         ]);
-      } else {
-        setDepartmentAndUserList([]);
-        setFlattenDepartmentList([]);
+      }
+
+      if (clickName === "选择指定主持人" && isShowDialog) {
+        setDepartmentAndUserList([
+          {
+            data: getHostListAndReminderListData(hostList ?? []),
+            key: departmentKeyValue.key,
+          },
+        ]);
+        setFlattenDepartmentList([
+          {
+            data: getHostListAndReminderListData(hostList ?? []),
+            key: departmentKeyValue.key,
+          },
+        ]);
       }
     }
   }, [isShowDialog]);
@@ -1210,9 +1279,9 @@ const useAction = (props: MeetingSettingsProps) => {
     clickName,
     chatId,
     loadSelectData,
-    appointLists,
-    hostLists,
-    participantLists,
+    appointList,
+    hostList,
+    participantList,
     tipsObject,
     appLoading,
     setCorpsValue,
@@ -1263,6 +1332,8 @@ const useAction = (props: MeetingSettingsProps) => {
     setMeetingDuration,
     meetingGroup,
     setMeetingGroup,
+    participantPage,
+    setParticipantPage,
   };
 };
 
