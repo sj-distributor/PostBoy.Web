@@ -827,15 +827,6 @@ const useAction = (props: MeetingSettingsProps) => {
 
       !settingsData.password && (settingsData.password = "");
 
-      // const attendeesListData = getUserChildrenList(
-      //   departmentKeyValue?.data,
-      //   participantLists,
-      //   []
-      // );
-
-      // const inviterData: string[] = [];
-      // getUserId(attendeesListData, inviterData);
-
       const createOrUpdateMeetingData: CreateOrUpdateWorkWeChatMeetingDto = {
         appId: corpAppValue.appId,
         admin_userid: admin_userid + "",
@@ -932,6 +923,7 @@ const useAction = (props: MeetingSettingsProps) => {
                 if (meetingId !== null) {
                   successAction.setTrue();
                   setIsOpenMeetingSettings(false);
+                  clearData();
                   getMeetingList();
                 } else {
                   failSendAction.setTrue();
