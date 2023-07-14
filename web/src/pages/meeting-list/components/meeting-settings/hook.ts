@@ -460,8 +460,6 @@ const useAction = (props: MeetingSettingsProps) => {
     }
     setIsTreeViewLoading(false);
     setIsLoadStop(true);
-    console.log(loadSelectData)
-    
   };
   //指定提醒人员
   const [appointList, setAppointList] =
@@ -523,8 +521,32 @@ const useAction = (props: MeetingSettingsProps) => {
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
     if (clickName === "选择参会人") {
       setParticipantList(data);
-      setAppointList([]);
-      setHostList([]);
+
+      const newAppointList = appointList?.filter((item) => {
+        return data.some((i) => i.id === item.id);
+      });
+
+      if (!newAppointList || newAppointList.length <= 0) {
+        setSettings((prev) => ({
+          ...prev,
+          remind_scope: MeetingCallReminder.NoRemind,
+        }));
+      }
+
+      if (
+        adminUser &&
+        adminUser.length &&
+        !!data.find((item) => item.id === adminUser[0].id)
+      ) {
+      }
+
+      setAppointList(newAppointList);
+
+      setHostList(
+        hostList?.filter((item) => {
+          return data.some((i) => i.id === item.id);
+        })
+      );
     }
 
     clickName === "选择指定提醒人员" && setAppointList(data);
@@ -668,7 +690,6 @@ const useAction = (props: MeetingSettingsProps) => {
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false);
 
-       
       !!deptListResponse &&
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
     };
@@ -676,8 +697,6 @@ const useAction = (props: MeetingSettingsProps) => {
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
-      console.log('SF')
-     
       // 设置相对应key的数据为空
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev);
@@ -744,7 +763,7 @@ const useAction = (props: MeetingSettingsProps) => {
       password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
-      remind_scope:MeetingCallReminder.NoRemind,
+      remind_scope: MeetingCallReminder.NoRemind,
       enable_enter_mute: 0,
       allow_external_user: true,
       enable_screen_watermark: false,
@@ -903,7 +922,7 @@ const useAction = (props: MeetingSettingsProps) => {
           msg: "The meeting duration cannot be less than 5 minutes",
         });
       dayjs.tz(
-        dayjs.unix(createOrUpdateMeetingData.meeting_start),
+        dayjs.unix(createOrUpdateMeetingData.meeting_start * 1000),
         "Asia/Shanghai"
       ) < dayjs.tz(dayjs(), "Asia/Shanghai") &&
         setTipsObject({
@@ -917,7 +936,7 @@ const useAction = (props: MeetingSettingsProps) => {
         createOrUpdateMeetingData.meeting_start &&
         createOrUpdateMeetingData.meeting_duration >= 300 &&
         dayjs.tz(
-          dayjs.unix(createOrUpdateMeetingData.meeting_start),
+          dayjs.unix(createOrUpdateMeetingData.meeting_start * 1000),
           "Asia/Shanghai"
         ) > dayjs.tz(dayjs(), "Asia/Shanghai") &&
         attendeesList.findIndex(
@@ -1199,7 +1218,7 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
-    if (participantList && participantList?.length > 0&&corpAppValue.appId) {
+    if (participantList && participantList?.length > 0 && corpAppValue.appId) {
       const getHostListAndReminderListData = (
         data: IDepartmentAndUserListValue[]
       ) => {
@@ -1213,39 +1232,35 @@ const useAction = (props: MeetingSettingsProps) => {
           : participantList.map((item) => ({ ...item, selected: false }));
       };
 
-      console.log(appointList,hostList,'value=>',corpsValue,corpAppValue)
-
       if (clickName === "选择指定提醒人员" && isShowDialog) {
         setDepartmentAndUserList([
           {
             data: getHostListAndReminderListData(appointList ?? []),
-            key:corpAppValue.appId,
+            key: corpAppValue.appId,
           },
         ]);
         setFlattenDepartmentList([
           {
             data: getHostListAndReminderListData(appointList ?? []),
-            key:corpAppValue.appId,
+            key: corpAppValue.appId,
           },
         ]);
-        
       }
 
       if (clickName === "选择指定主持人" && isShowDialog) {
         setDepartmentAndUserList([
           {
             data: getHostListAndReminderListData(hostList ?? []),
-            key:corpAppValue.appId,
+            key: corpAppValue.appId,
           },
         ]);
         setFlattenDepartmentList([
           {
             data: getHostListAndReminderListData(hostList ?? []),
-            key:corpAppValue.appId,
+            key: corpAppValue.appId,
           },
         ]);
       }
-      
     }
   }, [isShowDialog]);
 
