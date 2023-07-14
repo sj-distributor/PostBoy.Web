@@ -28,7 +28,7 @@ import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { memo } from "react"
 
-const fiteringDeptAndUsers = (
+const onFilterDeptAndUsers = (
   options: IDepartmentAndUserListValue[],
   state: FilterOptionsState<IDepartmentAndUserListValue>
 ) => {
@@ -341,7 +341,7 @@ const SelectTargetDialog = memo(
                         />
                       )}
                       filterOptions={(options, state) =>
-                        fiteringDeptAndUsers(options, state)
+                        onFilterDeptAndUsers(options, state)
                       }
                       onChange={(e, value) =>
                         value && setSearchToDeptValue(value)
