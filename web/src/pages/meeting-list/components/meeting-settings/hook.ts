@@ -526,7 +526,11 @@ const useAction = (props: MeetingSettingsProps) => {
 
     if (clickName === "指定会议管理员") {
       setAdminUser(data);
-      setParticipantList(data);
+      setParticipantList((prev) => {
+        const newArr = clone(prev);
+        newArr?.push(...data);
+        return newArr;
+      });
     }
   };
 
@@ -1223,9 +1227,6 @@ const useAction = (props: MeetingSettingsProps) => {
           },
         ]);
       }
-    } else {
-      setDepartmentAndUserList([]);
-      setFlattenDepartmentList([]);
     }
   }, [isShowDialog]);
 

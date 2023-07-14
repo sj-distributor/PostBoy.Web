@@ -188,6 +188,14 @@ const useAction = (props: {
 
       return;
     }
+    if (!departmentSelectedList || !departmentSelectedList.length) {
+      setTipsObject({
+        show: true,
+        msg: "Please select relevant personnel",
+      });
+
+      return;
+    }
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
