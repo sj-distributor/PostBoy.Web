@@ -521,8 +521,8 @@ const useAction = (props: MeetingSettingsProps) => {
       setHostList([]);
     }
 
-    clickName === "选择指定提醒人员" && setAppointList(data);
-    clickName === "选择指定主持人" && setHostList(data);
+    clickName === "选择指定提醒人员" && setAppointList(clone(data));
+    clickName === "选择指定主持人" && setHostList(clone(data));
 
     if (clickName === "指定会议管理员") {
       setAdminUser(data);
@@ -1180,7 +1180,7 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
-    if (clickName === "选择指定主持人" || clickName === "选择指定提醒人员") {
+    if (clickName === "选择指定提醒人员" && isShowDialog) {
       if (participantList && participantList?.length > 0) {
         // const participantListData = getUserChildrenList(
         //   departmentKeyValue?.data,
@@ -1188,10 +1188,68 @@ const useAction = (props: MeetingSettingsProps) => {
         //   []
         // );
         setDepartmentAndUserList([
-          { data: participantList, key: departmentKeyValue.key },
+          {
+            data:
+              appointList && appointList.length > 0
+                ? participantList.map((item) => ({
+                    ...item,
+                    selected: appointList.find((i) => i.id === item.id)
+                      ? !!appointList.find((i) => i.id === item.id)?.selected
+                      : false,
+                  }))
+                : participantList.map((item) => ({ ...item, selected: false })),
+            key: departmentKeyValue.key,
+          },
         ]);
         setFlattenDepartmentList([
-          { data: participantList, key: departmentKeyValue.key },
+          {
+            data:
+              appointList && appointList.length > 0
+                ? participantList.map((item) => ({
+                    ...item,
+                    selected: appointList.find((i) => i.id === item.id)
+                      ? !!appointList.find((i) => i.id === item.id)?.selected
+                      : false,
+                  }))
+                : participantList.map((item) => ({ ...item, selected: false })),
+            key: departmentKeyValue.key,
+          },
+        ]);
+      } else {
+        setDepartmentAndUserList([]);
+        setFlattenDepartmentList([]);
+      }
+    }
+
+    if (clickName === "选择指定主持人" && isShowDialog) {
+      if (participantList && participantList?.length > 0) {
+        setDepartmentAndUserList([
+          {
+            data:
+              hostList && hostList.length > 0
+                ? participantList.map((item) => ({
+                    ...item,
+                    selected: hostList.find((i) => i.id === item.id)
+                      ? !!hostList.find((i) => i.id === item.id)?.selected
+                      : false,
+                  }))
+                : participantList.map((item) => ({ ...item, selected: false })),
+            key: departmentKeyValue.key,
+          },
+        ]);
+        setFlattenDepartmentList([
+          {
+            data:
+              hostList && hostList.length > 0
+                ? participantList.map((item) => ({
+                    ...item,
+                    selected: hostList.find((i) => i.id === item.id)
+                      ? !!hostList.find((i) => i.id === item.id)?.selected
+                      : false,
+                  }))
+                : participantList.map((item) => ({ ...item, selected: false })),
+            key: departmentKeyValue.key,
+          },
         ]);
       } else {
         setDepartmentAndUserList([]);

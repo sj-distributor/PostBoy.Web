@@ -109,19 +109,10 @@ const useAction = (props: {
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
       activeData &&
         recursiveSeachDeptOrUser(activeData.data, (e) => {
-          if (e.id === clickedItem.id) {
-            if (type === ClickType.Collapse) {
-              e.isCollapsed = !e.isCollapsed;
-            } else {
-              if (e.id !== e.name) {
-                setTipsObject({
-                  show: true,
-                  msg: "Selection of groups is currently not supported",
-                });
-              }
-              e.selected = e.id !== e.name ? e.selected : !e.selected;
-            }
-          }
+          e.id === clickedItem.id &&
+            (type === ClickType.Collapse
+              ? (e.isCollapsed = !e.isCollapsed)
+              : (e.selected = e.id !== e.name ? e.selected : !e.selected));
         });
       return newValue;
     });
@@ -138,13 +129,6 @@ const useAction = (props: {
       if (activeData) {
         valueArr.length > 0
           ? valueArr.forEach((item) => {
-              if (item.id !== item.name) {
-                setTipsObject({
-                  show: true,
-                  msg: "Selection of groups is currently not supported",
-                });
-                return;
-              }
               recursiveSeachDeptOrUser(activeData.data, (user) => {
                 user.selected = !!valueArr.find((e) => e.id === user.id);
               });
@@ -275,10 +259,6 @@ const useAction = (props: {
 
   useEffect(() => {
     departmentAndUserList.length && setSearchToDeptValue([]);
-  }, [open]);
-
-  // 打开时load上次选中的数据
-  useEffect(() => {
     open
       ? loadSelectData && loadSelectData.length > 0
         ? setDepartmentSelectedList((prev) =>
@@ -289,7 +269,7 @@ const useAction = (props: {
         (() => {
           setDepartmentSelectedList([]);
         })();
-  }, [loadSelectData]);
+  }, [open]);
 
   useEffect(() => {
     // 3s关闭提示
