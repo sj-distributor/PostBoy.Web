@@ -138,6 +138,13 @@ const useAction = (props: {
       if (activeData) {
         valueArr.length > 0
           ? valueArr.forEach((item) => {
+              if (item.id !== item.name) {
+                setTipsObject({
+                  show: true,
+                  msg: "Selection of groups is currently not supported",
+                });
+                return;
+              }
               recursiveSeachDeptOrUser(activeData.data, (user) => {
                 user.selected = !!valueArr.find((e) => e.id === user.id);
               });
@@ -243,32 +250,35 @@ const useAction = (props: {
       });
   }, [open]);
 
+  const handleData = (
+    prev: IDepartmentAndUserListValue[],
+    listData: IDepartmentKeyControl[]
+  ) => {
+    const newValue = loadSelectData
+      ? loadSelectData.filter((x) => x)
+      : prev.filter((x) => x);
+    const hasData = listData.find((x) => x.key === AppId);
+    if (hasData) {
+      loadSelectData
+        ? loadSelectData.forEach((item) => {
+            recursiveSeachDeptOrUser(hasData.data, (user) => {
+              user.selected = !!loadSelectData.find((e) => e.id === user.id);
+            });
+          })
+        : recursiveSeachDeptOrUser(hasData.data, (user) => {
+            user.selected = false;
+          });
+    }
+
+    return newValue;
+  };
+
   useEffect(() => {
     departmentAndUserList.length && setSearchToDeptValue([]);
-    const handleData = (
-      prev: IDepartmentAndUserListValue[],
-      listData: IDepartmentKeyControl[]
-    ) => {
-      const newValue = loadSelectData
-        ? loadSelectData.filter((x) => x)
-        : prev.filter((x) => x);
-      const hasData = listData.find((x) => x.key === AppId);
-      if (hasData) {
-        loadSelectData
-          ? loadSelectData.forEach((item) => {
-              recursiveSeachDeptOrUser(hasData.data, (user) => {
-                user.selected = !!loadSelectData.find((e) => e.id === user.id);
-              });
-            })
-          : recursiveSeachDeptOrUser(hasData.data, (user) => {
-              user.selected = false;
-            });
-      }
+  }, [open]);
 
-      return newValue;
-    };
-    // 打开时load上次选中的数据
-
+  // 打开时load上次选中的数据
+  useEffect(() => {
     open
       ? loadSelectData && loadSelectData.length > 0
         ? setDepartmentSelectedList((prev) =>
@@ -279,7 +289,7 @@ const useAction = (props: {
         (() => {
           setDepartmentSelectedList([]);
         })();
-  }, [open]);
+  }, [loadSelectData]);
 
   useEffect(() => {
     // 3s关闭提示
