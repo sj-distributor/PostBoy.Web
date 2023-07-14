@@ -87,9 +87,9 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     clickName,
     chatId,
     loadSelectData,
-    appointLists,
-    hostLists,
-    participantLists,
+    appointList,
+    hostList,
+    participantList,
     tipsObject,
     appLoading,
     setCorpsValue,
@@ -218,8 +218,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         openAddDialog={isShowDialog}
         setOpenAddDialog={setIsShowDialog}
         setClickName={setClickName}
-        appointList={appointLists}
-        hostList={hostLists}
+        appointList={appointList}
+        hostList={hostList}
         handleGetSettingData={handleGetSettingData}
         settings={settings}
         setSettings={setSettings}
@@ -398,9 +398,9 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       参会人
                     </div>
                     <div className={style.participantDataBox}>
-                      {participantLists &&
-                        participantLists?.length >= 1 &&
-                        participantLists
+                      {participantList &&
+                        participantList?.length >= 1 &&
+                        participantList
                           .slice(
                             0,
                             participantPage * DefaultDisplay.Participant
@@ -423,14 +423,14 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                               </div>
                             );
                           })}
-                      {participantLists &&
-                        participantLists?.length >
+                      {participantList &&
+                        participantList?.length >
                           DefaultDisplay.Participant && (
                           <div
                             className={style.showParticipantData}
                             onClick={() => {
                               const maxPage = Math.ceil(
-                                participantLists.length /
+                                participantList.length /
                                   DefaultDisplay.Participant
                               );
 
@@ -441,13 +441,13 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                             }}
                           >
                             {participantPage <
-                            participantLists.length /
+                            participantList.length /
                               DefaultDisplay.Participant ? (
                               <ExpandMoreIcon />
                             ) : (
                               <ExpandLessIcon />
                             )}{" "}
-                            共{participantLists.length}人
+                            共{participantList.length}人
                           </div>
                         )}
                       <div

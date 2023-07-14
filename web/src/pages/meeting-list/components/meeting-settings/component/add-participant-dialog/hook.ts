@@ -9,6 +9,7 @@ import {
   DeptUserCanSelectStatus,
   SendObjOrGroup,
   IFirstState,
+  DefaultDisplay,
 } from "../../../../../../dtos/meeting-seetings";
 
 const useAction = (props: {
@@ -104,20 +105,23 @@ const useAction = (props: {
     clickedItem: IDepartmentAndUserListValue
   ) => {
     setDeptUserList((prev) => {
-      if (clickedItem.id !== clickedItem.name) {
-        setTipsObject({
-          show: true,
-          msg: "Selection of groups is currently not supported",
-        });
-      }
       const newValue = prev.filter((e) => !!e);
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
       activeData &&
         recursiveSeachDeptOrUser(activeData.data, (e) => {
-          e.id === clickedItem.id &&
-            (type === ClickType.Collapse
-              ? (e.isCollapsed = !e.isCollapsed)
-              : (e.selected = e.id !== e.name ? e.selected : !e.selected));
+          if (e.id === clickedItem.id) {
+            if (type === ClickType.Collapse) {
+              e.isCollapsed = !e.isCollapsed;
+            } else {
+              if (e.id !== e.name) {
+                setTipsObject({
+                  show: true,
+                  msg: "Selection of groups is currently not supported",
+                });
+              }
+              e.selected = e.id !== e.name ? e.selected : !e.selected;
+            }
+          }
         });
       return newValue;
     });
@@ -179,6 +183,20 @@ const useAction = (props: {
         });
         return;
       }
+    }
+
+    if (
+      clickName === "选择指定主持人" &&
+      departmentSelectedList.length > DefaultDisplay.hostList
+    ) {
+      tipsObject &&
+        setTipsObject({
+          show: true,
+          msg: "Cannot select department and up to ten hosts",
+        });
+
+      setSearchToDeptValue([]);
+      return;
     }
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
@@ -250,8 +268,9 @@ const useAction = (props: {
       return newValue;
     };
     // 打开时load上次选中的数据
+
     open
-      ? loadSelectData
+      ? loadSelectData && loadSelectData.length > 0
         ? setDepartmentSelectedList((prev) =>
             handleData(prev, departmentAndUserList)
           )
