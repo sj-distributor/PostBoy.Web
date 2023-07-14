@@ -310,6 +310,20 @@ const useAction = (props: {
       });
   }, [AppId, CorpId]);
 
+  useEffect(()=>{
+  console.log(departmentAndUserList,loadSelectData,'key=>', departmentKeyValue)
+  if(departmentAndUserList &&departmentAndUserList.length>0 && loadSelectData){
+    setDepartmentSelectedList(loadSelectData)
+   
+  }
+  },[isLoading,loadSelectData])
+
+  useEffect(()=>{
+    if((clickName === "选择指定提醒人员" ||clickName === "选择指定主持人") &&loadSelectData){
+      setDepartmentSelectedList(loadSelectData)
+    }
+  },[clickName])
+
   return {
     departmentSelectedList,
     tagsValue,

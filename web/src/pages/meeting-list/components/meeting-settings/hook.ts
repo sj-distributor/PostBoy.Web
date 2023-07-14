@@ -30,6 +30,7 @@ import {
   IDepartmentUsersData,
   MeetingRecording,
   GetAllMeetingsData,
+  MeetingCallReminder,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -459,6 +460,8 @@ const useAction = (props: MeetingSettingsProps) => {
     }
     setIsTreeViewLoading(false);
     setIsLoadStop(true);
+    console.log(loadSelectData)
+    
   };
   //指定提醒人员
   const [appointList, setAppointList] =
@@ -665,6 +668,7 @@ const useAction = (props: MeetingSettingsProps) => {
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false);
 
+       
       !!deptListResponse &&
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
     };
@@ -672,6 +676,8 @@ const useAction = (props: MeetingSettingsProps) => {
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
+      console.log('SF')
+     
       // 设置相对应key的数据为空
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev);
@@ -738,7 +744,7 @@ const useAction = (props: MeetingSettingsProps) => {
       password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
-      remind_scope: 0,
+      remind_scope:MeetingCallReminder.NoRemind,
       enable_enter_mute: 0,
       allow_external_user: true,
       enable_screen_watermark: false,
@@ -1111,7 +1117,7 @@ const useAction = (props: MeetingSettingsProps) => {
               name: item,
               type: 1,
               parentid: "1",
-              selected: false,
+              selected: true,
               isCollapsed: false,
               children: [],
             })
@@ -1128,7 +1134,7 @@ const useAction = (props: MeetingSettingsProps) => {
               name: item,
               type: 1,
               parentid: "1",
-              selected: false,
+              selected: true,
               isCollapsed: false,
               children: [],
             })
@@ -1163,7 +1169,7 @@ const useAction = (props: MeetingSettingsProps) => {
                 name: item,
                 type: 1,
                 parentid: "1",
-                selected: false,
+                selected: true,
                 isCollapsed: false,
                 children: [],
               })
@@ -1178,7 +1184,7 @@ const useAction = (props: MeetingSettingsProps) => {
           name: adminUserId,
           type: 1,
           parentid: "1",
-          selected: false,
+          selected: true,
           isCollapsed: false,
           children: [],
         },
@@ -1193,7 +1199,7 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
-    if (participantList && participantList?.length > 0) {
+    if (participantList && participantList?.length > 0&&corpAppValue.appId) {
       const getHostListAndReminderListData = (
         data: IDepartmentAndUserListValue[]
       ) => {
@@ -1207,35 +1213,39 @@ const useAction = (props: MeetingSettingsProps) => {
           : participantList.map((item) => ({ ...item, selected: false }));
       };
 
+      console.log(appointList,hostList,'value=>',corpsValue,corpAppValue)
+
       if (clickName === "选择指定提醒人员" && isShowDialog) {
         setDepartmentAndUserList([
           {
             data: getHostListAndReminderListData(appointList ?? []),
-            key: departmentKeyValue.key,
+            key:corpAppValue.appId,
           },
         ]);
         setFlattenDepartmentList([
           {
             data: getHostListAndReminderListData(appointList ?? []),
-            key: departmentKeyValue.key,
+            key:corpAppValue.appId,
           },
         ]);
+        
       }
 
       if (clickName === "选择指定主持人" && isShowDialog) {
         setDepartmentAndUserList([
           {
             data: getHostListAndReminderListData(hostList ?? []),
-            key: departmentKeyValue.key,
+            key:corpAppValue.appId,
           },
         ]);
         setFlattenDepartmentList([
           {
             data: getHostListAndReminderListData(hostList ?? []),
-            key: departmentKeyValue.key,
+            key:corpAppValue.appId,
           },
         ]);
       }
+      
     }
   }, [isShowDialog]);
 
