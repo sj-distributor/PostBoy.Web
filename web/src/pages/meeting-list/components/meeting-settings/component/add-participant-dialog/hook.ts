@@ -104,6 +104,12 @@ const useAction = (props: {
     clickedItem: IDepartmentAndUserListValue
   ) => {
     setDeptUserList((prev) => {
+      if (clickedItem.id !== clickedItem.name) {
+        setTipsObject({
+          show: true,
+          msg: "Selection of groups is currently not supported",
+        });
+      }
       const newValue = prev.filter((e) => !!e);
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
       activeData &&
@@ -111,7 +117,7 @@ const useAction = (props: {
           e.id === clickedItem.id &&
             (type === ClickType.Collapse
               ? (e.isCollapsed = !e.isCollapsed)
-              : (e.selected = !e.selected));
+              : (e.selected = e.id !== e.name ? e.selected : !e.selected));
         });
       return newValue;
     });
@@ -121,6 +127,7 @@ const useAction = (props: {
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
       const newValue = prev.filter((e) => !!e);
+
       const activeData = newValue.find(
         (e) => e.key === departmentKeyValue?.key
       );

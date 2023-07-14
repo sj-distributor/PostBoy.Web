@@ -140,6 +140,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     setMeetingDuration,
     meetingGroup,
     setMeetingGroup,
+    participantPage,
+    setParticipantPage,
   } = useAction({
     setIsOpenMeetingSettings,
     meetingData,
@@ -399,10 +401,9 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       {participantLists &&
                         participantLists?.length >= 1 &&
                         participantLists
-                          .filter((item, index) =>
-                            isShowMoreParticipantList
-                              ? index < DefaultDisplay.Participant
-                              : true
+                          .slice(
+                            0,
+                            participantPage * DefaultDisplay.Participant
                           )
                           .map((item, index) => {
                             return (
@@ -427,11 +428,21 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                           DefaultDisplay.Participant && (
                           <div
                             className={style.showParticipantData}
-                            onClick={() =>
-                              setIsShowMoreParticipantList((val) => !val)
-                            }
+                            onClick={() => {
+                              const maxPage = Math.ceil(
+                                participantLists.length /
+                                  DefaultDisplay.Participant
+                              );
+
+                              setParticipantPage((prev) =>
+                                prev + 1 > maxPage ? prev : prev + 1
+                              );
+                              setIsShowMoreParticipantList((val) => !val);
+                            }}
                           >
-                            {isShowMoreParticipantList ? (
+                            {participantPage <
+                            participantLists.length /
+                              DefaultDisplay.Participant ? (
                               <ExpandMoreIcon />
                             ) : (
                               <ExpandLessIcon />

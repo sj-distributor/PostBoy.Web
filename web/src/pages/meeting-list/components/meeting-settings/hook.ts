@@ -499,8 +499,11 @@ const useAction = (props: MeetingSettingsProps) => {
     return newArr;
   };
 
+  const [participantPage, setParticipantPage] = useState<number>(1);
+
   //显示全部人员
   const participantLists = useMemo(() => {
+    setParticipantPage(1);
     let arr = participantList && getUserChildrenData(participantList, []);
     return arr as IDepartmentAndUserListValue[];
   }, [participantList]);
@@ -512,6 +515,7 @@ const useAction = (props: MeetingSettingsProps) => {
 
   const hostLists = useMemo(() => {
     let arr = hostList && getUserChildrenData(hostList, []);
+
     if (arr && arr.length > DefaultDisplay.hostList) {
       tipsObject &&
         setTipsObject({
@@ -538,11 +542,6 @@ const useAction = (props: MeetingSettingsProps) => {
 
   //获取选择人员
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
-    // const personnelData = getUserChildrenList(
-    //   departmentKeyValue?.data,
-    //   data,
-    //   []
-    // );
     if (clickName === "选择参会人") {
       setParticipantList(data);
     }
@@ -570,7 +569,20 @@ const useAction = (props: MeetingSettingsProps) => {
           getUserChildrenList(hasData[key].children, data, personnelData);
       }
     });
+    let newArr: string[] = [];
+    getUserId(personnelData, newArr);
+
     return personnelData;
+  };
+
+  const getUserId = (data: IDepartmentAndUserListValue[], arr: string[]) => {
+    data.map((item) => {
+      if (item.children && item.children.length > 0) {
+        getUserId(item.children, arr);
+      } else {
+        arr.push(item.name);
+      }
+    });
   };
 
   const onSetParticipant = () => {
@@ -814,7 +826,8 @@ const useAction = (props: MeetingSettingsProps) => {
 
       let attendeesList: string[] = [];
 
-      participantLists.map((item) => attendeesList.push(item.id + ""));
+      // participantLists.map((item) => attendeesList.push(item.id + ""));
+
       const admin_userid = adminUser
         ? adminUser.length > 0
           ? adminUser[0].id
@@ -831,6 +844,15 @@ const useAction = (props: MeetingSettingsProps) => {
 
       !settingsData.password && (settingsData.password = "");
 
+      const attendeesListData = getUserChildrenList(
+        departmentKeyValue?.data,
+        participantLists,
+        []
+      );
+
+      const inviterData: string[] = [];
+      getUserId(attendeesListData, inviterData);
+
       const createOrUpdateMeetingData: CreateOrUpdateWorkWeChatMeetingDto = {
         appId: corpAppValue.appId,
         admin_userid: admin_userid + "",
@@ -841,7 +863,7 @@ const useAction = (props: MeetingSettingsProps) => {
         location: meetingLocation,
         settings: settingsData,
         invitees: {
-          userid: attendeesList,
+          userid: inviterData,
         },
         reminders: meetingReminders,
       };
@@ -1181,11 +1203,16 @@ const useAction = (props: MeetingSettingsProps) => {
   useEffect(() => {
     if (clickName === "选择指定主持人" || clickName === "选择指定提醒人员") {
       if (participantList && participantList?.length > 0) {
+        const participantListData = getUserChildrenList(
+          departmentKeyValue?.data,
+          participantLists,
+          []
+        );
         setDepartmentAndUserList([
-          { data: participantList, key: departmentKeyValue.key },
+          { data: participantListData, key: departmentKeyValue.key },
         ]);
         setFlattenDepartmentList([
-          { data: participantList, key: departmentKeyValue.key },
+          { data: participantListData, key: departmentKeyValue.key },
         ]);
       } else {
         setDepartmentAndUserList([]);
@@ -1287,6 +1314,8 @@ const useAction = (props: MeetingSettingsProps) => {
     setMeetingDuration,
     meetingGroup,
     setMeetingGroup,
+    participantPage,
+    setParticipantPage,
   };
 };
 
