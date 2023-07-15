@@ -1265,7 +1265,6 @@ const useAction = (props: MeetingSettingsProps) => {
         ]);
       }
     }
-
   }, [isShowDialog]);
 
   useEffect(() => {
