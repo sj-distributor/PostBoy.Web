@@ -30,6 +30,7 @@ import {
   IDepartmentUsersData,
   MeetingRecording,
   GetAllMeetingsData,
+  MeetingCallReminder,
 } from "../../../../dtos/meeting-seetings";
 import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise";
 import { clone, flatten } from "ramda";
@@ -520,8 +521,32 @@ const useAction = (props: MeetingSettingsProps) => {
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
     if (clickName === "选择参会人") {
       setParticipantList(data);
-      setAppointList([]);
-      setHostList([]);
+
+      const newAppointList = appointList?.filter((item) => {
+        return data.some((i) => i.id === item.id);
+      });
+
+      if (!newAppointList || newAppointList.length <= 0) {
+        setSettings((prev) => ({
+          ...prev,
+          remind_scope: MeetingCallReminder.NoRemind,
+        }));
+      }
+
+      if (
+        adminUser &&
+        adminUser.length &&
+        !!data.find((item) => item.id === adminUser[0].id)
+      ) {
+      }
+
+      setAppointList(newAppointList);
+
+      setHostList(
+        hostList?.filter((item) => {
+          return data.some((i) => i.id === item.id);
+        })
+      );
     }
 
     clickName === "选择指定提醒人员" && setAppointList(data);
@@ -530,8 +555,12 @@ const useAction = (props: MeetingSettingsProps) => {
     if (clickName === "指定会议管理员") {
       setAdminUser(data);
       setParticipantList((prev) => {
-        const newArr = clone(prev);
-        newArr?.push(...data);
+        let newArr = prev ? clone(prev) : [];
+
+        if (!newArr.find((item) => item.id === data[0].id)) {
+          newArr.push(data[0]);
+        }
+
         return newArr;
       });
     }
@@ -738,7 +767,7 @@ const useAction = (props: MeetingSettingsProps) => {
       password: "",
       enable_waiting_room: false,
       allow_enter_before_host: true,
-      remind_scope: 0,
+      remind_scope: MeetingCallReminder.NoRemind,
       enable_enter_mute: 0,
       allow_external_user: true,
       enable_screen_watermark: false,
@@ -806,7 +835,7 @@ const useAction = (props: MeetingSettingsProps) => {
     content: "",
   });
 
-  const onCreateUpdateMeeting = async () => {
+  const onCreateUpdateMeeting = () => {
     if (!loading) {
       loadingAction.setTrue();
       const meeting_start = Math.ceil(
@@ -897,7 +926,7 @@ const useAction = (props: MeetingSettingsProps) => {
           msg: "The meeting duration cannot be less than 5 minutes",
         });
       dayjs.tz(
-        dayjs.unix(createOrUpdateMeetingData.meeting_start),
+        dayjs.unix(createOrUpdateMeetingData.meeting_start * 1000),
         "Asia/Shanghai"
       ) < dayjs.tz(dayjs(), "Asia/Shanghai") &&
         setTipsObject({
@@ -911,7 +940,7 @@ const useAction = (props: MeetingSettingsProps) => {
         createOrUpdateMeetingData.meeting_start &&
         createOrUpdateMeetingData.meeting_duration >= 300 &&
         dayjs.tz(
-          dayjs.unix(createOrUpdateMeetingData.meeting_start),
+          dayjs.unix(createOrUpdateMeetingData.meeting_start * 1000),
           "Asia/Shanghai"
         ) > dayjs.tz(dayjs(), "Asia/Shanghai") &&
         attendeesList.findIndex(
@@ -933,7 +962,7 @@ const useAction = (props: MeetingSettingsProps) => {
             },
           };
 
-          await createMeeting(data)
+          createMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
                 const meetingId = res.meetingid;
@@ -960,11 +989,12 @@ const useAction = (props: MeetingSettingsProps) => {
             });
         } else if (meetingState === "update") {
           createOrUpdateMeetingData.meetingid = meetingData?.meetingId;
+
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
 
-          await updateMeeting(data)
+          updateMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
                 successAction.setTrue();
@@ -1083,9 +1113,9 @@ const useAction = (props: MeetingSettingsProps) => {
         remind_before: [+remindBefore],
       });
 
-      const ring_users = ringUsers ? ringUsers.split(",") : [""];
+      const ring_users = ringUsers ? ringUsers.split(",") : [];
 
-      const hostsData = hosts ? hosts.split(",") : [""];
+      const hostsData = hosts ? hosts.split(",") : [];
 
       setSettings({
         password: password ?? "",
@@ -1102,39 +1132,37 @@ const useAction = (props: MeetingSettingsProps) => {
         meetingSummaryDistributionEnabled: meetingSummaryDistributionEnabled,
       });
 
-      hosts &&
-        setHostList((host) => {
-          let hostData: IDepartmentAndUserListValue[] = [];
-          hostsData.map((item) =>
-            hostData.push({
-              id: item,
-              name: item,
-              type: 1,
-              parentid: "1",
-              selected: false,
-              isCollapsed: false,
-              children: [],
-            })
-          );
-          return hostData;
-        });
+      setHostList((host) => {
+        let hostData: IDepartmentAndUserListValue[] = [];
+        hostsData.map((item) =>
+          hostData.push({
+            id: item,
+            name: item,
+            type: 1,
+            parentid: "1",
+            selected: true,
+            isCollapsed: false,
+            children: [],
+          })
+        );
+        return hostData;
+      });
 
-      ringUsers &&
-        setAppointList((apponint) => {
-          let apponintData: IDepartmentAndUserListValue[] = [];
-          ringUsers.split(",").map((item) =>
-            apponintData.push({
-              id: item,
-              name: item,
-              type: 1,
-              parentid: "1",
-              selected: false,
-              isCollapsed: false,
-              children: [],
-            })
-          );
-          return apponintData;
-        });
+      setAppointList((apponint) => {
+        let apponintData: IDepartmentAndUserListValue[] = [];
+        ring_users.map((item) =>
+          apponintData.push({
+            id: item,
+            name: item,
+            type: 1,
+            parentid: "1",
+            selected: true,
+            isCollapsed: false,
+            children: [],
+          })
+        );
+        return apponintData;
+      });
 
       setSelectGroup((selectData) => {
         let arr = clone(selectData);
@@ -1152,25 +1180,24 @@ const useAction = (props: MeetingSettingsProps) => {
         return arr;
       });
 
-      absentMember &&
-        setParticipantList((participant) => {
-          let attendeesData: IDepartmentAndUserListValue[] = [];
+      setParticipantList((participant) => {
+        let attendeesData: IDepartmentAndUserListValue[] = [];
 
-          absentMember.length > 0 &&
-            absentMember.map((item) =>
-              attendeesData.push({
-                id: item,
-                name: item,
-                type: 1,
-                parentid: "1",
-                selected: false,
-                isCollapsed: false,
-                children: [],
-              })
-            );
+        absentMember.length > 0 &&
+          absentMember.map((item) =>
+            attendeesData.push({
+              id: item,
+              name: item,
+              type: 1,
+              parentid: "1",
+              selected: true,
+              isCollapsed: false,
+              children: [],
+            })
+          );
 
-          return attendeesData;
-        });
+        return attendeesData;
+      });
 
       setAdminUser([
         {
@@ -1178,7 +1205,7 @@ const useAction = (props: MeetingSettingsProps) => {
           name: adminUserId,
           type: 1,
           parentid: "1",
-          selected: false,
+          selected: true,
           isCollapsed: false,
           children: [],
         },
@@ -1193,7 +1220,7 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
-    if (participantList && participantList?.length > 0) {
+    if (participantList && participantList?.length > 0 && corpAppValue.appId) {
       const getHostListAndReminderListData = (
         data: IDepartmentAndUserListValue[]
       ) => {
@@ -1211,13 +1238,13 @@ const useAction = (props: MeetingSettingsProps) => {
         setDepartmentAndUserList([
           {
             data: getHostListAndReminderListData(appointList ?? []),
-            key: departmentKeyValue.key,
+            key: corpAppValue.appId,
           },
         ]);
         setFlattenDepartmentList([
           {
             data: getHostListAndReminderListData(appointList ?? []),
-            key: departmentKeyValue.key,
+            key: corpAppValue.appId,
           },
         ]);
       }
@@ -1226,13 +1253,13 @@ const useAction = (props: MeetingSettingsProps) => {
         setDepartmentAndUserList([
           {
             data: getHostListAndReminderListData(hostList ?? []),
-            key: departmentKeyValue.key,
+            key: corpAppValue.appId,
           },
         ]);
         setFlattenDepartmentList([
           {
             data: getHostListAndReminderListData(hostList ?? []),
-            key: departmentKeyValue.key,
+            key: corpAppValue.appId,
           },
         ]);
       }

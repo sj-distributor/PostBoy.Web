@@ -221,24 +221,7 @@ const SelectTargetDialog = memo(
                   {departmentKeyValue?.data.length > 0 &&
                     recursiveRenderDeptList(departmentKeyValue.data, 0, true)}
                 </div>
-                {
-                  <Autocomplete
-                    disableClearable
-                    fullWidth
-                    id="type-simple-select"
-                    defaultValue={"对象"}
-                    size="small"
-                    options={[]}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        className={styles.inputButton}
-                        margin="dense"
-                        type="button"
-                      />
-                    )}
-                  />
-                }
+
                 {flattenDepartmentList && (
                   <Autocomplete
                     id={"sreach-input" + clickName}
