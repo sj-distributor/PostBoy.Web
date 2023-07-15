@@ -659,10 +659,6 @@ const useAction = (props: MeetingSettingsProps) => {
         corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display));
       });
     }
-    
-    if(isOpenMeetingSettings&& appLoading){
-      setCorpAppValue(corpAppList[0])
-    }
   }, [corpsValue?.id]);
 
   // 默认选择App对象
@@ -788,9 +784,6 @@ const useAction = (props: MeetingSettingsProps) => {
       isMeetingCode: true,
       isMeetingLink: true,
     });
-
-    corpsList && corpsList.length > 0 && setCorpsValue((prev)=>corpsList[0]);
-
   };
 
   const [loading, loadingAction] = useBoolean(false);
@@ -1278,6 +1271,17 @@ const useAction = (props: MeetingSettingsProps) => {
     meetingDuration.value === MeetingDuration.CustomEndTime &&
       customEndTimeAction.setTrue();
   }, [meetingDuration.value]);
+
+  useEffect(()=>{
+    if(corpsList &&
+      corpsList.length&&
+      corpAppList &&
+      corpAppList.length &&
+      meetingState==='create'){
+     setCorpsValue(corpsList[0])
+     setCorpAppValue(corpAppList[0])
+    }
+  },[meetingState])
 
   return {
     editor,
