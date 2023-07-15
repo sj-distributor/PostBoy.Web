@@ -555,8 +555,12 @@ const useAction = (props: MeetingSettingsProps) => {
     if (clickName === "指定会议管理员") {
       setAdminUser(data);
       setParticipantList((prev) => {
-        const newArr = clone(prev);
-        newArr?.push(...data);
+        let newArr = prev ? clone(prev) : [];
+
+        if (!newArr.find((item) => item.id === data[0].id)) {
+          newArr.push(data[0]);
+        }
+
         return newArr;
       });
     }
@@ -831,7 +835,7 @@ const useAction = (props: MeetingSettingsProps) => {
     content: "",
   });
 
-  const onCreateUpdateMeeting = async () => {
+  const onCreateUpdateMeeting = () => {
     if (!loading) {
       loadingAction.setTrue();
       const meeting_start = Math.ceil(
@@ -958,7 +962,7 @@ const useAction = (props: MeetingSettingsProps) => {
             },
           };
 
-          await createMeeting(data)
+          createMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
                 const meetingId = res.meetingid;
@@ -985,11 +989,12 @@ const useAction = (props: MeetingSettingsProps) => {
             });
         } else if (meetingState === "update") {
           createOrUpdateMeetingData.meetingid = meetingData?.meetingId;
+
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
 
-          await updateMeeting(data)
+          updateMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
                 successAction.setTrue();
@@ -1108,9 +1113,9 @@ const useAction = (props: MeetingSettingsProps) => {
         remind_before: [+remindBefore],
       });
 
-      const ring_users = ringUsers ? ringUsers.split(",") : [""];
+      const ring_users = ringUsers ? ringUsers.split(",") : [];
 
-      const hostsData = hosts ? hosts.split(",") : [""];
+      const hostsData = hosts ? hosts.split(",") : [];
 
       setSettings({
         password: password ?? "",
@@ -1127,39 +1132,37 @@ const useAction = (props: MeetingSettingsProps) => {
         meetingSummaryDistributionEnabled: meetingSummaryDistributionEnabled,
       });
 
-      hosts &&
-        setHostList((host) => {
-          let hostData: IDepartmentAndUserListValue[] = [];
-          hostsData.map((item) =>
-            hostData.push({
-              id: item,
-              name: item,
-              type: 1,
-              parentid: "1",
-              selected: true,
-              isCollapsed: false,
-              children: [],
-            })
-          );
-          return hostData;
-        });
+      setHostList((host) => {
+        let hostData: IDepartmentAndUserListValue[] = [];
+        hostsData.map((item) =>
+          hostData.push({
+            id: item,
+            name: item,
+            type: 1,
+            parentid: "1",
+            selected: true,
+            isCollapsed: false,
+            children: [],
+          })
+        );
+        return hostData;
+      });
 
-      ringUsers &&
-        setAppointList((apponint) => {
-          let apponintData: IDepartmentAndUserListValue[] = [];
-          ringUsers.split(",").map((item) =>
-            apponintData.push({
-              id: item,
-              name: item,
-              type: 1,
-              parentid: "1",
-              selected: true,
-              isCollapsed: false,
-              children: [],
-            })
-          );
-          return apponintData;
-        });
+      setAppointList((apponint) => {
+        let apponintData: IDepartmentAndUserListValue[] = [];
+        ring_users.map((item) =>
+          apponintData.push({
+            id: item,
+            name: item,
+            type: 1,
+            parentid: "1",
+            selected: true,
+            isCollapsed: false,
+            children: [],
+          })
+        );
+        return apponintData;
+      });
 
       setSelectGroup((selectData) => {
         let arr = clone(selectData);
@@ -1177,25 +1180,24 @@ const useAction = (props: MeetingSettingsProps) => {
         return arr;
       });
 
-      absentMember &&
-        setParticipantList((participant) => {
-          let attendeesData: IDepartmentAndUserListValue[] = [];
+      setParticipantList((participant) => {
+        let attendeesData: IDepartmentAndUserListValue[] = [];
 
-          absentMember.length > 0 &&
-            absentMember.map((item) =>
-              attendeesData.push({
-                id: item,
-                name: item,
-                type: 1,
-                parentid: "1",
-                selected: true,
-                isCollapsed: false,
-                children: [],
-              })
-            );
+        absentMember.length > 0 &&
+          absentMember.map((item) =>
+            attendeesData.push({
+              id: item,
+              name: item,
+              type: 1,
+              parentid: "1",
+              selected: true,
+              isCollapsed: false,
+              children: [],
+            })
+          );
 
-          return attendeesData;
-        });
+        return attendeesData;
+      });
 
       setAdminUser([
         {
