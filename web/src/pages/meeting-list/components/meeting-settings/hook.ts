@@ -784,6 +784,16 @@ const useAction = (props: MeetingSettingsProps) => {
       isMeetingCode: true,
       isMeetingLink: true,
     });
+
+   if(meetingState==='create'){
+    if(corpsList && corpsList.length){
+      setCorpsValue(corpsList[0])
+     }
+ 
+     if(corpAppList && corpAppList.length){
+       setCorpAppValue(corpAppList[0])
+      }
+   }
   };
 
   const [loading, loadingAction] = useBoolean(false);
