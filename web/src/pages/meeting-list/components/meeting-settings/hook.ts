@@ -1217,6 +1217,7 @@ const useAction = (props: MeetingSettingsProps) => {
   //初始化会议数据
   useEffect(() => {
     meetingData && onGetMeetingData(meetingData);
+    !isOpenMeetingSettings && clearData();
   }, [isOpenMeetingSettings]);
 
   useEffect(() => {
@@ -1264,17 +1265,13 @@ const useAction = (props: MeetingSettingsProps) => {
         ]);
       }
     }
+
   }, [isShowDialog]);
 
   useEffect(() => {
     meetingDuration.value === MeetingDuration.CustomEndTime &&
       customEndTimeAction.setTrue();
   }, [meetingDuration.value]);
-
-  //创建会议前清空数据
-  useEffect(() => {
-    meetingState === "create" && clearData();
-  }, [meetingState]);
 
   return {
     editor,
