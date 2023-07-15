@@ -107,6 +107,7 @@ const useAction = (props: {
     setDeptUserList((prev) => {
       const newValue = prev.filter((e) => !!e);
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
+
       activeData &&
         recursiveSeachDeptOrUser(activeData.data, (e) => {
           e.id === clickedItem.id &&
@@ -202,6 +203,7 @@ const useAction = (props: {
 
   useEffect(() => {
     // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
+
     !isLoading &&
       departmentKeyValue?.data.length > 0 &&
       setDepartmentSelectedList((prev) => {
@@ -242,6 +244,7 @@ const useAction = (props: {
       ? loadSelectData.filter((x) => x)
       : prev.filter((x) => x);
     const hasData = listData.find((x) => x.key === AppId);
+
     if (hasData) {
       loadSelectData
         ? loadSelectData.forEach((item) => {
@@ -259,6 +262,7 @@ const useAction = (props: {
 
   useEffect(() => {
     departmentAndUserList.length && setSearchToDeptValue([]);
+
     open
       ? loadSelectData && loadSelectData.length > 0
         ? setDepartmentSelectedList((prev) =>
@@ -269,7 +273,7 @@ const useAction = (props: {
         (() => {
           setDepartmentSelectedList([]);
         })();
-  }, [open]);
+  }, [open, isLoading]);
 
   useEffect(() => {
     // 3s关闭提示
