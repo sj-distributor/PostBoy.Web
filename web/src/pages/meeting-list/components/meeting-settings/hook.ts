@@ -645,10 +645,20 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [corpsList]);
 
   useEffect(() => {
-    meetingData &&
-      setCorpsValue(
-        corpsList.filter((item) => item.id === meetingData.workWeChatCorpId)[0]
-      );
+    if (corpsList && corpsList.length && meetingData) {
+      const workWeChatCorpValue = corpsList.filter(
+        (item) => item.id === meetingData.workWeChatCorpId
+      )[0];
+
+      workWeChatCorpValue && setCorpsValue(workWeChatCorpValue);
+
+      const workWeChatCorpApplicationValue = corpAppList.filter(
+        (item) => item.id === meetingData.workWeChatCorpApplicationId
+      )[0];
+
+      workWeChatCorpApplicationValue &&
+        setCorpAppValue(workWeChatCorpApplicationValue);
+    }
   }, [meetingData]);
 
   // 初始化App数组
