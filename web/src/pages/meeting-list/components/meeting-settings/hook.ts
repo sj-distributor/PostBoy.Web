@@ -664,7 +664,7 @@ const useAction = (props: MeetingSettingsProps) => {
   // 初始化App数组
   useEffect(() => {
     if (!!corpsValue.id) {
-      setAppLoading(true);
+      meetingState === "update" && setAppLoading(true);
 
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
         setTimeout(() => {
