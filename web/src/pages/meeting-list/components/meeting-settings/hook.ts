@@ -990,6 +990,17 @@ const useAction = (props: MeetingSettingsProps) => {
         } else if (meetingState === "update") {
           createOrUpdateMeetingData.meetingid = meetingData?.meetingId;
 
+          //用于没有选择主持人时默认管理员主持
+          if (
+            createOrUpdateMeetingData.admin_userid &&
+            createOrUpdateMeetingData.settings &&
+            !createOrUpdateMeetingData.settings.hosts
+          ) {
+            createOrUpdateMeetingData.settings.hosts = {
+              userid: [createOrUpdateMeetingData.admin_userid],
+            };
+          }
+
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
