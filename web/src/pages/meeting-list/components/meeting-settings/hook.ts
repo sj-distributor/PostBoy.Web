@@ -645,17 +645,31 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [corpsList]);
 
   useEffect(() => {
-    meetingData &&
-      setCorpsValue(
-        corpsList.filter((item) => item.id === meetingData.workWeChatCorpId)[0]
-      );
+    if (corpsList && corpsList.length && meetingData) {
+      const workWeChatCorpValue = corpsList.filter(
+        (item) => item.id === meetingData.workWeChatCorpId
+      )[0];
+
+      workWeChatCorpValue && setCorpsValue(workWeChatCorpValue);
+
+      const workWeChatCorpApplicationValue = corpAppList.filter(
+        (item) => item.id === meetingData.workWeChatCorpApplicationId
+      )[0];
+
+      workWeChatCorpApplicationValue &&
+        setCorpAppValue(workWeChatCorpApplicationValue);
+    }
   }, [meetingData]);
 
   // 初始化App数组
   useEffect(() => {
     if (!!corpsValue.id) {
+      setAppLoading(true);
+
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
-        setAppLoading(false);
+        setTimeout(() => {
+          setAppLoading(false);
+        }, 300);
         corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display));
       });
     }
@@ -785,15 +799,15 @@ const useAction = (props: MeetingSettingsProps) => {
       isMeetingLink: true,
     });
 
-   if(meetingState==='create'){
-    if(corpsList && corpsList.length){
-      setCorpsValue(corpsList[0])
-     }
- 
-     if(corpAppList && corpAppList.length){
-       setCorpAppValue(corpAppList[0])
+    if (meetingState === "create") {
+      if (corpsList && corpsList.length) {
+        setCorpsValue(corpsList[0]);
       }
-   }
+
+      if (corpAppList && corpAppList.length) {
+        setCorpAppValue(corpAppList[0]);
+      }
+    }
   };
 
   const [loading, loadingAction] = useBoolean(false);
@@ -1282,16 +1296,18 @@ const useAction = (props: MeetingSettingsProps) => {
       customEndTimeAction.setTrue();
   }, [meetingDuration.value]);
 
-  useEffect(()=>{
-    if(corpsList &&
-      corpsList.length&&
+  useEffect(() => {
+    if (
+      corpsList &&
+      corpsList.length &&
       corpAppList &&
       corpAppList.length &&
-      meetingState==='create'){
-     setCorpsValue(corpsList[0])
-     setCorpAppValue(corpAppList[0])
+      meetingState === "create"
+    ) {
+      setCorpsValue(corpsList[0]);
+      setCorpAppValue(corpAppList[0]);
     }
-  },[meetingState])
+  }, [meetingState]);
 
   return {
     editor,
