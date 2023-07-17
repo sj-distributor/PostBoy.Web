@@ -112,8 +112,17 @@ const useAction = (props: {
         recursiveSeachDeptOrUser(activeData.data, (e) => {
           e.id === clickedItem.id &&
             (type === ClickType.Collapse
-              ? (e.isCollapsed = !e.isCollapsed)
-              : (e.selected = e.id !== e.name ? e.selected : !e.selected));
+              ? (() => {
+                  e.isCollapsed = !e.isCollapsed;
+                })()
+              : (() => {
+                  if (e.name !== e.id && e.children.length) {
+                    e.children.map((item) => {
+                      handleDeptOrUserClick(ClickType.Select, item);
+                    });
+                  }
+                  e.selected = !e.selected;
+                })());
         });
       return newValue;
     });
@@ -131,7 +140,11 @@ const useAction = (props: {
         valueArr.length > 0
           ? valueArr.forEach((item) => {
               recursiveSeachDeptOrUser(activeData.data, (user) => {
-                user.selected = !!valueArr.find((e) => e.id === user.id);
+                if (item.id !== item.name && item.id === user.id) {
+                  handleDeptOrUserClick(ClickType.Select, user);
+                } else {
+                  user.selected = !!valueArr.find((e) => e.id === user.id);
+                }
               });
             })
           : recursiveSeachDeptOrUser(
@@ -193,7 +206,10 @@ const useAction = (props: {
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
-    handleGetSelectData && handleGetSelectData(departmentSelectedList);
+    handleGetSelectData &&
+      handleGetSelectData(
+        departmentSelectedList.filter((item) => item.id === item.name)
+      );
   };
 
   const handleCancel = () => {
