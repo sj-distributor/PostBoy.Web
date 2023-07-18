@@ -1042,6 +1042,18 @@ const useAction = (props: MeetingSettingsProps) => {
         } else if (meetingState === "update") {
           createOrUpdateMeetingData.meetingid = meetingData?.meetingId;
 
+          const hostList = createOrUpdateMeetingData.settings?.hosts;
+
+          if (
+            !hostList &&
+            createOrUpdateMeetingData.settings &&
+            meetingData?.adminUserId
+          ) {
+            createOrUpdateMeetingData.settings.hosts = {
+              userid: [meetingData?.adminUserId],
+            };
+          }
+
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
