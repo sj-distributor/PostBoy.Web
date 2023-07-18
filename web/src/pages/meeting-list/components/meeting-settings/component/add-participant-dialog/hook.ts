@@ -112,17 +112,8 @@ const useAction = (props: {
         recursiveSeachDeptOrUser(activeData.data, (e) => {
           e.id === clickedItem.id &&
             (type === ClickType.Collapse
-              ? (() => {
-                  e.isCollapsed = !e.isCollapsed;
-                })()
-              : (() => {
-                  if (e.name !== e.id && e.children.length) {
-                    e.children.map((item) => {
-                      handleDeptOrUserClick(ClickType.Select, item);
-                    });
-                  }
-                  e.selected = !e.selected;
-                })());
+              ? (e.isCollapsed = !e.isCollapsed)
+              : (e.selected = !e.selected));
         });
       return newValue;
     });
@@ -140,11 +131,7 @@ const useAction = (props: {
         valueArr.length > 0
           ? valueArr.forEach((item) => {
               recursiveSeachDeptOrUser(activeData.data, (user) => {
-                if (item.id !== item.name && item.id === user.id) {
-                  handleDeptOrUserClick(ClickType.Select, user);
-                } else {
-                  user.selected = !!valueArr.find((e) => e.id === user.id);
-                }
+                user.selected = !!valueArr.find((e) => e.id === user.id);
               });
             })
           : recursiveSeachDeptOrUser(
@@ -169,6 +156,24 @@ const useAction = (props: {
       : canSelect === DeptUserCanSelectStatus.User;
   };
 
+  const getUserChildrenList = (
+    hasData: IDepartmentAndUserListValue[],
+    data: IDepartmentAndUserListValue[],
+    personnelData: IDepartmentAndUserListValue[]
+  ) => {
+    data.forEach((i) => {
+      for (const key in hasData) {
+        i.id === hasData[key].id &&
+          personnelData.findIndex((item) => item === hasData[key]) === -1 &&
+          personnelData.push(hasData[key]);
+        hasData[key].children.length > 0 &&
+          getUserChildrenList(hasData[key].children, data, personnelData);
+      }
+    });
+
+    return personnelData;
+  };
+
   const handleConfirm = () => {
     if (clickName === "指定会议管理员") {
       const isUserArr = departmentSelectedList.filter(
@@ -190,26 +195,33 @@ const useAction = (props: {
       }
     }
 
-    if (
-      clickName === "选择指定主持人" &&
-      departmentSelectedList.length > DefaultDisplay.hostList
-    ) {
-      tipsObject &&
-        setTipsObject({
-          show: true,
-          msg: "Cannot select department and up to ten hosts",
-        });
+    if (clickName === "选择指定主持人") {
+      const hostList = [];
+      departmentSelectedList.map((item) => {
+        if (item.id !== item.name) {
+          getUserChildrenList();
+        } else {
+          hostList.push(item);
+        }
+      });
+      if (
+        clickName === "选择指定主持人" &&
+        departmentSelectedList.length > DefaultDisplay.hostList
+      ) {
+        tipsObject &&
+          setTipsObject({
+            show: true,
+            msg: "Cannot select department and up to ten hosts",
+          });
 
-      return;
+        return;
+      }
     }
 
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
-    handleGetSelectData &&
-      handleGetSelectData(
-        departmentSelectedList.filter((item) => item.id === item.name)
-      );
+    handleGetSelectData && handleGetSelectData(departmentSelectedList);
   };
 
   const handleCancel = () => {

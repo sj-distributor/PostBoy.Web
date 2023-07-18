@@ -229,6 +229,7 @@ const SelectTargetDialog = memo(
                     openOnFocus
                     multiple
                     disableCloseOnSelect
+                    limitTags={9}
                     size="small"
                     sx={{
                       margin: "1rem 0 calc(1rem - 4px)",
