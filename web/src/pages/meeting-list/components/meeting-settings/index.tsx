@@ -234,11 +234,13 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
       >
         <DialogTitle
           id="alert-dialog-title"
-          sx={{ backgroundColor: "#f2f3f4", width: "33rem", height: "40rem" }}
+          sx={{ backgroundColor: "#f2f3f4" }}
         >
           {meetingState === "update" ? "编辑会议" : "创建会议"}
         </DialogTitle>
-        <DialogContent sx={{ backgroundColor: "#f2f3f4" }}>
+        <DialogContent
+          sx={{ backgroundColor: "#f2f3f4", width: "33rem", height: "40rem" }}
+        >
           <div className={style.container}>
             <div className={style.appointmentMeeting}>
               {corpsList.length > 0 && !appLoading && (
