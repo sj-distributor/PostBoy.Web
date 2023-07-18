@@ -1,4 +1,4 @@
-import { clone, flatten, isEmpty, uniqWith } from "ramda"
+import { clone, isEmpty, uniqWith } from "ramda"
 import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
@@ -16,14 +16,9 @@ import {
   ICorpAppData,
   ICorpData,
   IDepartmentAndUserListValue,
-  IDepartmentData,
-  IDepartmentKeyControl,
-  IDepartmentUsersData,
-  IDeptAndUserList,
   IJobSettingDto,
   IMentionList,
   IMessageTypeData,
-  ISearchList,
   ITagsList,
   ITagsListResponse,
   IWorkCorpAppGroup,
@@ -45,6 +40,15 @@ import { MyWorker } from "../../../../hooks/deptUserData/webWorker"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
 
+export const defaultAppValue = {
+  appId: "",
+  id: "",
+  name: "",
+  workWeChatCorpId: "",
+  display: true,
+  agentId: 0,
+}
+
 export const useAction = (props: SelectContentHookProps) => {
   const {
     outerSendData,
@@ -55,6 +59,16 @@ export const useAction = (props: SelectContentHookProps) => {
     showErrorPrompt,
     clearData,
     setIsShowPage,
+    corpAppValue,
+    setCorpAppValue,
+    departmentAndUserList,
+    flattenDepartmentList,
+    departmentKeyValue,
+    searchKeyValue,
+    setDepartmentAndUserList,
+    setFlattenDepartmentList,
+    recursiveSearchDeptOrUser,
+    loadDeptUsers,
   } = props
 
   const defaultCorpValue = {
@@ -63,20 +77,8 @@ export const useAction = (props: SelectContentHookProps) => {
     id: "",
   }
 
-  const defaultAppValue = {
-    appId: "",
-    id: "",
-    name: "",
-    workWeChatCorpId: "",
-    display: true,
-    agentId: 0,
-  }
-
   // 拿到的企业对象
   const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
-  // 拿到的App对象
-  const [corpAppValue, setCorpAppValue] =
-    useState<ICorpAppData>(defaultAppValue)
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -97,14 +99,6 @@ export const useAction = (props: SelectContentHookProps) => {
   )
   // 弹出选择对象框 boolean
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
-  // 部门和用户数组
-  const [departmentAndUserList, setDepartmentAndUserList] = useState<
-    IDepartmentKeyControl[]
-  >([])
-  //
-  const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-    ISearchList[]
-  >([])
   // TreeView显示展开
   const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
   // 发送标签
@@ -348,216 +342,13 @@ export const useAction = (props: SelectContentHookProps) => {
         })()
   }, [corpAppList])
 
-  const departmentKeyValue = useMemo(() => {
-    const result = departmentAndUserList.find(
-      (e) => e.key === corpAppValue?.appId
-    )
-    return result as IDepartmentKeyControl
-  }, [departmentAndUserList, corpAppValue?.appId])
-
-  const searchKeyValue = useMemo(() => {
-    const result = flattenDepartmentList.find(
-      (e) => e.key === corpAppValue?.appId
-    )
-    return result?.data as IDepartmentAndUserListValue[]
-  }, [flattenDepartmentList, corpAppValue?.appId])
-
-  const recursiveDeptList = (
-    hasData: IDepartmentAndUserListValue[],
-    defaultChild: IDepartmentAndUserListValue,
-    department: IDepartmentData,
-    parentRouteId: number[]
-  ) => {
-    for (const key in hasData) {
-      const e = hasData[key]
-      parentRouteId.push(Number(e.id))
-      if (e.id === department.parentid) {
-        e.children.push(defaultChild)
-        return parentRouteId
-      }
-      if (e.children.length > 0) {
-        const idList: number[] = recursiveDeptList(
-          e.children,
-          defaultChild,
-          department,
-          [...parentRouteId]
-        )
-        if (idList.length !== parentRouteId.length) return idList
-        parentRouteId.pop()
-      } else {
-        parentRouteId.pop()
-      }
-    }
-    return parentRouteId
-  }
-
-  // const updateDeptUserList = (
-  //   AppId: string,
-  //   department: IDepartmentData,
-  //   users: IDepartmentUsersData[],
-  //   defaultChild: IDepartmentAndUserListValue,
-  //   type: UpdateListType
-  // ) => {
-  //   type !== UpdateListType.Flatten &&
-  //     setDepartmentAndUserList((prev) => {
-  //       const newValue = clone(prev)
-  //       const hasData = newValue.find((e) => e.key === AppId)
-  //       let idList = []
-  //       // 是否现有key的数据
-  //       hasData && hasData.data.length > 0
-  //         ? (idList = recursiveDeptList(
-  //             hasData.data,
-  //             defaultChild,
-  //             department,
-  //             []
-  //           ))
-  //         : newValue.push({ key: AppId, data: [defaultChild] })
-  //       idList.length === 0 && hasData?.data.push(defaultChild)
-  //       return newValue
-  //     })
-
-  //   type !== UpdateListType.Fold &&
-  //     setFlattenDepartmentList((prev) => {
-  //       const newValue = clone(prev)
-  //       let hasData = newValue.find((e) => e.key === AppId)
-  //       const insertData = [
-  //         {
-  //           id: department.id,
-  //           name: department.name,
-  //           parentid: department.name,
-  //           type: DepartmentAndUserType.Department,
-  //           selected: false,
-  //           children: [],
-  //         },
-  //         ...flatten(
-  //           users.map((item) => ({
-  //             id: item.userid,
-  //             name: item.userid,
-  //             parentid: department.name,
-  //             type: DepartmentAndUserType.User,
-  //             selected: false,
-  //             canSelect: true,
-  //             children: [],
-  //           }))
-  //         ),
-  //       ]
-
-  //       hasData
-  //         ? (hasData.data = [...hasData.data, ...insertData])
-  //         : newValue.push({
-  //             key: AppId,
-  //             data: insertData,
-  //           })
-  //       return newValue
-  //     })
-  // }
-
-  // const loadDeptUsers = async (
-  //   AppId: string,
-  //   deptListResponse: IDeptAndUserList[]
-  // ) => {
-  //   const copyDeptListResponse = deptListResponse.sort(
-  //     (a, b) => a.department.id - b.department.id
-  //   )
-  //   const waitList = new Map()
-  //   for (let index = 0; index < copyDeptListResponse.length; index++) {
-  //     // 当前的部门
-  //     const department = copyDeptListResponse[index].department
-  //     // 当前的用户列表
-  //     const users = copyDeptListResponse[index].users
-  //     // 需要插入的数据
-  //     const defaultChild: IDepartmentAndUserListValue = {
-  //       id: department.id,
-  //       name: department.name,
-  //       type: DepartmentAndUserType.Department,
-  //       parentid: String(department.parentid),
-  //       selected: false,
-  //       children: users.map((item) => ({
-  //         id: `${item.userid}`,
-  //         name: item.userid,
-  //         type: DepartmentAndUserType.User,
-  //         parentid: item.department,
-  //         selected: false,
-  //         isCollapsed: false,
-  //         canSelect: true,
-  //         children: [],
-  //       })),
-  //     }
-
-  //     updateDeptUserList(
-  //       AppId,
-  //       department,
-  //       users,
-  //       defaultChild,
-  //       UpdateListType.Flatten
-  //     )
-
-  //     let isContinue: boolean = false
-
-  //     if (waitList.size > 0) {
-  //       for (let [key, value] of waitList) {
-  //         value.department.parentid === department.id &&
-  //           defaultChild.children.push(value.defaultChild) &&
-  //           waitList.delete(key)
-  //         if (key === department.parentid) {
-  //           value.defaultChild.children.push(defaultChild)
-  //           isContinue = true
-  //           break
-  //         }
-  //       }
-  //     }
-
-  //     if (isContinue) continue
-
-  //     if (department.parentid > department.id) {
-  //       waitList.set(department.id, { defaultChild, department, users })
-  //       if (index !== copyDeptListResponse.length - 1) continue
-  //     }
-
-  //     if (waitList.size > 0 && index === copyDeptListResponse.length - 1) {
-  //       for (let [key, value] of waitList) {
-  //         updateDeptUserList(
-  //           AppId,
-  //           value.department,
-  //           value.users,
-  //           value.defaultChild,
-  //           UpdateListType.Fold
-  //         )
-  //       }
-  //       continue
-  //     }
-
-  //     updateDeptUserList(
-  //       AppId,
-  //       department,
-  //       users,
-  //       defaultChild,
-  //       UpdateListType.Fold
-  //     )
-  //   }
-  //   setIsTreeViewLoading(false)
-  //   setIsLoadStop(true)
-  // }
-
-  const recursiveSeachDeptOrUser = (
-    hasData: IDepartmentAndUserListValue[],
-    callback: (e: IDepartmentAndUserListValue) => void
-  ) => {
-    for (const key in hasData) {
-      callback(hasData[key])
-      hasData[key].children.length > 0 &&
-        recursiveSeachDeptOrUser(hasData[key].children, callback)
-    }
-    return hasData
-  }
-
   useEffect(() => {
     if (isLoadStop && sendObject !== undefined && !!sendObject) {
       const selectedList = [...sendObject.toParties, ...sendObject.toUsers]
       const array = departmentAndUserList.filter((x) => x)
       array.map((item) => {
         if (item.key === corpAppValue?.appId) {
-          item.data = recursiveSeachDeptOrUser(
+          item.data = recursiveSearchDeptOrUser(
             departmentKeyValue?.data,
             (e) => {
               if (selectedList.some((item) => item === e.id)) e.selected = true
@@ -575,7 +366,7 @@ export const useAction = (props: SelectContentHookProps) => {
   useEffect(() => {
     if (!isShowDialog) {
       const noneHandleSelected: IDepartmentAndUserListValue[] = []
-      recursiveSeachDeptOrUser(
+      recursiveSearchDeptOrUser(
         departmentKeyValue?.data,
         (e) => e.selected && noneHandleSelected.push(e)
       )
@@ -633,9 +424,9 @@ export const useAction = (props: SelectContentHookProps) => {
       //   loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
 
       !!deptListResponse &&
-        loadDeptUsersFromWebWorker({
-          AppId,
-          workWeChatUnits: deptListResponse.workWeChatUnits,
+        loadDeptUsers(AppId, deptListResponse.workWeChatUnits).then(() => {
+          setIsTreeViewLoading(false)
+          setIsLoadStop(true)
         })
     }
     if (
@@ -1227,7 +1018,7 @@ export const useAction = (props: SelectContentHookProps) => {
       setChatName("")
       setDepartmentAndUserList((prev) => {
         return prev.map((item) => {
-          recursiveSeachDeptOrUser(item.data, (e) => (e.selected = false))
+          recursiveSearchDeptOrUser(item.data, (e) => (e.selected = false))
           return item
         })
       })
@@ -1258,8 +1049,6 @@ export const useAction = (props: SelectContentHookProps) => {
   return {
     corpsValue,
     setCorpsValue,
-    corpAppValue,
-    setCorpAppValue,
     corpsList,
     corpAppList,
     messageTypeValue,
