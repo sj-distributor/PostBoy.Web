@@ -184,8 +184,8 @@ export const MyWorker = () => {
         loadDeptUsers(e.data)
 
       this.postMessage({
-        departmentAndUserList: copyDepartmentAndUserList,
-        flattenDepartmentList: copyFlattenDepartmentList,
+        copyDepartmentAndUserList,
+        copyFlattenDepartmentList,
       }) // 返回结果
     }
   }

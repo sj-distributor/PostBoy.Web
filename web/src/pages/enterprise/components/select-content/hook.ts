@@ -212,15 +212,24 @@ export const useAction = (props: SelectContentHookProps) => {
   }) => {
     const worker = MyWorker()
 
-    console.log(MyWorker)
-
     worker.postMessage(data)
 
     worker.onmessage = function (this: Worker, ev: MessageEvent<any>) {
-      console.log("msg from worker: ", ev)
+      const { copyDepartmentAndUserList, copyFlattenDepartmentList } = ev.data
 
-      setIsTreeViewLoading(false)
-      setIsLoadStop(true)
+      setDepartmentAndUserList((prev) => [
+        ...prev,
+        { key: data.AppId, data: copyDepartmentAndUserList },
+      ])
+      setFlattenDepartmentList((prev) => [
+        ...prev,
+        { key: data.AppId, data: copyFlattenDepartmentList },
+      ])
+
+      setTimeout(() => {
+        setIsTreeViewLoading(false)
+        setIsLoadStop(true)
+      }, 500)
       worker.terminate()
     }
   }
