@@ -317,14 +317,14 @@ const useAction = (props: {
     }
   }, [isLoading, loadSelectData]);
 
-  useEffect(() => {
-    if (
-      (clickName === "选择指定提醒人员" || clickName === "选择指定主持人") &&
-      loadSelectData
-    ) {
-      setDepartmentSelectedList(loadSelectData);
-    }
-  }, [clickName]);
+  // useEffect(() => {
+  //   if (
+  //     (clickName === "选择指定提醒人员" || clickName === "选择指定主持人") &&
+  //     loadSelectData
+  //   ) {
+  //     setDepartmentSelectedList(loadSelectData);
+  //   }
+  // }, [clickName]);
 
   return {
     departmentSelectedList,

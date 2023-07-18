@@ -1,5 +1,5 @@
-import { clone, flatten, isEmpty, uniqWith } from "ramda"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { clone, flatten, isEmpty, uniqWith } from "ramda";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GetCorpAppList,
   GetCorpsList,
@@ -9,7 +9,7 @@ import {
   GetTagsList,
   GetWeChatWorkCorpAppGroups,
   PostAttachmentUpload,
-} from "../../../../api/enterprise"
+} from "../../../../api/enterprise";
 import {
   DepartmentAndUserType,
   FileObject,
@@ -34,15 +34,15 @@ import {
   SendObject,
   SendObjOrGroup,
   SendParameter,
-} from "../../../../dtos/enterprise"
-import { messageTypeList, timeZone } from "../../../../dtos/send-message-job"
-import { convertBase64 } from "../../../../uilts/convert-base64"
-import { SelectContentHookProps } from "./props"
-import * as wangEditor from "@wangeditor/editor"
-import { annexEditorConfig } from "../../../../uilts/wangEditor"
-import { useBoolean } from "ahooks"
+} from "../../../../dtos/enterprise";
+import { messageTypeList, timeZone } from "../../../../dtos/send-message-job";
+import { convertBase64 } from "../../../../uilts/convert-base64";
+import { SelectContentHookProps } from "./props";
+import * as wangEditor from "@wangeditor/editor";
+import { annexEditorConfig } from "../../../../uilts/wangEditor";
+import { useBoolean } from "ahooks";
 
-type InsertImageFnType = (url: string, alt: string, href: string) => void
+type InsertImageFnType = (url: string, alt: string, href: string) => void;
 
 enum UpdateListType {
   Fold,
@@ -60,13 +60,13 @@ export const useAction = (props: SelectContentHookProps) => {
     showErrorPrompt,
     clearData,
     setIsShowPage,
-  } = props
+  } = props;
 
   const defaultCorpValue = {
     corpName: "",
     corpId: "",
     id: "",
-  }
+  };
 
   const defaultAppValue = {
     appId: "",
@@ -75,118 +75,118 @@ export const useAction = (props: SelectContentHookProps) => {
     workWeChatCorpId: "",
     display: true,
     agentId: 0,
-  }
+  };
 
   // 拿到的企业对象
-  const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
+  const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue);
   // 拿到的App对象
   const [corpAppValue, setCorpAppValue] =
-    useState<ICorpAppData>(defaultAppValue)
+    useState<ICorpAppData>(defaultAppValue);
   // 获取的企业数组
-  const [corpsList, setCorpsList] = useState<ICorpData[]>([])
+  const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
   // 获取的App数组
-  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([])
+  const [corpAppList, setCorpAppList] = useState<ICorpAppData[]>([]);
   // 获取的Tags数组
-  const [tagsList, setTagsList] = useState<ITagsList[]>([])
+  const [tagsList, setTagsList] = useState<ITagsList[]>([]);
   // 消息类型选择
   const [messageTypeValue, setMessageTypeValue] = useState<IMessageTypeData>(
     messageTypeList[0]
-  )
+  );
   // 发送类型选择
   const [sendTypeValue, setSendTypeValue] = useState<MessageJobSendType>(
     MessageJobSendType.Fire
-  )
+  );
   // 时区选择
   const [timeZoneValue, setTimeZoneValue] = useState<number>(
     timeZone.filter((x) => !x.disable)[0].value
-  )
+  );
   // 弹出选择对象框 boolean
-  const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
+  const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
   // 部门和用户数组
   const [departmentAndUserList, setDepartmentAndUserList] = useState<
     IDepartmentKeyControl[]
-  >([])
+  >([]);
   //
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
     ISearchList[]
-  >([])
+  >([]);
   // TreeView显示展开
-  const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false)
+  const [isTreeViewLoading, setIsTreeViewLoading] = useState<boolean>(false);
   // 发送标签
-  const [tagsValue, setTagsValue] = useState<ITagsList[]>([])
+  const [tagsValue, setTagsValue] = useState<ITagsList[]>([]);
   // 发送人员
   const [sendObject, setSendObject] = useState<SendObject>({
     toUsers: [],
     toParties: [],
-  })
+  });
   // 标题
-  const [title, setTitle] = useState<string>("")
+  const [title, setTitle] = useState<string>("");
   // 内容
-  const [content, setContent] = useState<string>("")
+  const [content, setContent] = useState<string>("");
   // 纯净内容
-  const [cleanContent, setCleanContent] = useState<string>("")
+  const [cleanContent, setCleanContent] = useState<string>("");
   // 推文
-  const [pictureText, setPictureText] = useState<PictureText[]>([])
+  const [pictureText, setPictureText] = useState<PictureText[]>([]);
   // 文件
   const [file, setFile] = useState<FileObject>({
     fileContent: "",
     fileName: "",
     fileType: messageTypeValue.type,
-  })
+  });
   // 发送时间
-  const [dateValue, setDateValue] = useState<string>("")
+  const [dateValue, setDateValue] = useState<string>("");
   // 终止时间
-  const [endDateValue, setEndDateValue] = useState<string>("")
+  const [endDateValue, setEndDateValue] = useState<string>("");
   // 循环周期
-  const [cronExp, setCronExp] = useState<string>("0 0 * * *")
+  const [cronExp, setCronExp] = useState<string>("0 0 * * *");
   // 输出周期报错
-  const [cronError, setCronError] = useState<string>("")
+  const [cronError, setCronError] = useState<string>("");
   //  拉取数据旋转
-  const [isLoadStop, setIsLoadStop] = useState<boolean>(false)
+  const [isLoadStop, setIsLoadStop] = useState<boolean>(false);
   //  jobSetting
-  const [jobSetting, setJobSetting] = useState<IJobSettingDto>()
+  const [jobSetting, setJobSetting] = useState<IJobSettingDto>();
   // workWeChatAppNotification SendParameter
-  const [sendParameter, setSendParameter] = useState<SendParameter>()
+  const [sendParameter, setSendParameter] = useState<SendParameter>();
   // workWeChatAppNotification SendParameter
-  const [sendData, setSendData] = useState<SendData>()
+  const [sendData, setSendData] = useState<SendData>();
   // 判断是否拿到上次用户部门数据
-  const [isGetLastTimeData, setIsGetLastTimeData] = useState<boolean>(false)
+  const [isGetLastTimeData, setIsGetLastTimeData] = useState<boolean>(false);
   // 上次上传的tagsList
-  const [lastTimeTagsList, setLastTimeTagsList] = useState<string[]>([])
+  const [lastTimeTagsList, setLastTimeTagsList] = useState<string[]>([]);
   // 上次上传的pictureText
   const [lastTimePictureText, setLastTimePictureText] = useState<PictureText[]>(
     []
-  )
+  );
   // 上次上传的File
-  const [lastTimeFile, setLastTimeFile] = useState<FileObject>()
+  const [lastTimeFile, setLastTimeFile] = useState<FileObject>();
   // 点击的是群组还是发送目标
-  const [clickName, setClickName] = useState<string>("")
+  const [clickName, setClickName] = useState<string>("");
 
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
   // 群组列表
-  const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([])
-  const [chatId, setChatId] = useState<string>("")
-  const [chatName, setChatName] = useState<string>("")
+  const [groupList, setGroupList] = useState<IWorkCorpAppGroup[]>([]);
+  const [chatId, setChatId] = useState<string>("");
+  const [chatName, setChatName] = useState<string>("");
 
   const [sendType, setSendType] = useState<SendObjOrGroup>(
     SendObjOrGroup.Object
-  )
+  );
 
-  const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false)
+  const [isUpdatedDeptUser, setIsUpdatedDeptUser] = useState(false);
 
-  const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null)
+  const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null);
 
-  const [html, setHtml] = useState("")
+  const [html, setHtml] = useState("");
 
-  const [htmlText, setHtmlText] = useState("")
+  const [htmlText, setHtmlText] = useState("");
 
-  const [isFocusing, focusAction] = useBoolean(false)
+  const [isFocusing, focusAction] = useBoolean(false);
 
-  const [mentionList, setMentionList] = useState<IMentionList[]>([])
+  const [mentionList, setMentionList] = useState<IMentionList[]>([]);
 
-  const [appLoading, setAppLoading] = useState<boolean>(true)
+  const [appLoading, setAppLoading] = useState<boolean>(true);
 
-  const [groupLoading, setGroupLoading] = useState<boolean>(true)
+  const [groupLoading, setGroupLoading] = useState<boolean>(true);
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -198,37 +198,37 @@ export const useAction = (props: SelectContentHookProps) => {
       uploadImage: {
         async customUpload(file: File, insertFn: InsertImageFnType) {
           if (file.size / 1024 > 20 * 1024) {
-            showErrorPrompt("The Image size is too large!")
-            return
+            showErrorPrompt("The Image size is too large!");
+            return;
           }
-          const formData = new FormData()
-          formData.append("file", file)
+          const formData = new FormData();
+          formData.append("file", file);
           PostAttachmentUpload(formData).then((res) => {
-            if (res) insertFn(res?.fileUrl, res.fileName, res.filePath)
-          })
+            if (res) insertFn(res?.fileUrl, res.fileName, res.filePath);
+          });
         },
       },
     },
-  }
+  };
 
   useEffect(() => {
     return () => {
-      if (editor == null) return
-      editor.destroy()
-      setEditor(null)
-    }
-  }, [editor])
+      if (editor == null) return;
+      editor.destroy();
+      setEditor(null);
+    };
+  }, [editor]);
 
   const selectedShowArr = useMemo(() => {
-    const result = []
+    const result = [];
     const partiesSelected = flattenDepartmentList.find(
       (e) => e.key === corpAppValue?.appId
-    )?.data
+    )?.data;
 
     const workWeChatAppNotification =
       sendObject ??
       outerSendData?.workWeChatAppNotification ??
-      updateMessageJobInformation?.workWeChatAppNotification
+      updateMessageJobInformation?.workWeChatAppNotification;
 
     if (sendType === SendObjOrGroup.Object) {
       workWeChatAppNotification?.toParties &&
@@ -241,20 +241,20 @@ export const useAction = (props: SelectContentHookProps) => {
               )
             )
             .map((e) => e.name)
-        )
+        );
 
       workWeChatAppNotification?.toUsers &&
-        result.push(...workWeChatAppNotification.toUsers)
-      tagsValue && result.push(...tagsValue.map((x) => x.tagName))
+        result.push(...workWeChatAppNotification.toUsers);
+      tagsValue && result.push(...tagsValue.map((x) => x.tagName));
     } else {
       !!chatId &&
         !!chatName &&
         result.push({
           chatId: chatId,
           chatName: chatName,
-        })
+        });
     }
-    return result
+    return result;
   }, [
     sendObject,
     outerSendData?.workWeChatAppNotification,
@@ -262,82 +262,82 @@ export const useAction = (props: SelectContentHookProps) => {
     groupList,
     chatId,
     corpAppValue,
-  ])
+  ]);
 
   // 初始化企业数组
   useEffect(() => {
     GetCorpsList().then((data) => {
-      data && setCorpsList(data)
-    })
-  }, [])
+      data && setCorpsList(data);
+    });
+  }, []);
 
   // 默认选择第一个企业对象
   useEffect(() => {
     isNewOrUpdate === "new" &&
       !corpsValue.corpId &&
       corpsList.length > 0 &&
-      setCorpsValue(corpsList[0])
-  }, [corpsList])
+      setCorpsValue(corpsList[0]);
+  }, [corpsList]);
 
   // 初始化App数组
   useEffect(() => {
     if (!!corpsValue.id) {
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
-        setAppLoading(false)
-        corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display))
-      })
+        setAppLoading(false);
+        corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display));
+      });
     }
-  }, [corpsValue?.id])
+  }, [corpsValue?.id]);
 
   // 获取Tags数组
   useEffect(() => {
     if (corpAppValue?.appId) {
       GetTagsList({ AppId: corpAppValue.appId }).then(
         (tagsData: ITagsListResponse | null | undefined) => {
-          tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist)
+          tagsData && tagsData.errcode === 0 && setTagsList(tagsData.taglist);
         }
-      )
+      );
       corpAppValue.id &&
         GetWeChatWorkCorpAppGroups(corpAppValue.id).then((data) => {
-          setGroupLoading(false)
-          data && setGroupList(data)
-        })
+          setGroupLoading(false);
+          data && setGroupList(data);
+        });
       if (isNewOrUpdate === "new") {
         // 清空切换应用时的已选值
-        setChatId("")
-        setChatName("")
-        setTagsValue([])
+        setChatId("");
+        setChatName("");
+        setTagsValue([]);
         setSendObject({
           toUsers: [],
           toParties: [],
-        })
+        });
       }
     }
-  }, [corpAppValue?.appId])
+  }, [corpAppValue?.appId]);
 
   // 默认选择第一个App对象
   useEffect(() => {
     corpAppList.length > 0
       ? setCorpAppValue(corpAppList[0])
       : (() => {
-          setCorpAppValue(defaultAppValue)
-          setGroupList([])
-        })()
-  }, [corpAppList])
+          setCorpAppValue(defaultAppValue);
+          setGroupList([]);
+        })();
+  }, [corpAppList]);
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
       (e) => e.key === corpAppValue?.appId
-    )
-    return result as IDepartmentKeyControl
-  }, [departmentAndUserList, corpAppValue?.appId])
+    );
+    return result as IDepartmentKeyControl;
+  }, [departmentAndUserList, corpAppValue?.appId]);
 
   const searchKeyValue = useMemo(() => {
     const result = flattenDepartmentList.find(
       (e) => e.key === corpAppValue?.appId
-    )
-    return result?.data as IDepartmentAndUserListValue[]
-  }, [flattenDepartmentList, corpAppValue?.appId])
+    );
+    return result?.data as IDepartmentAndUserListValue[];
+  }, [flattenDepartmentList, corpAppValue?.appId]);
 
   const recursiveDeptList = (
     hasData: IDepartmentAndUserListValue[],
@@ -346,11 +346,11 @@ export const useAction = (props: SelectContentHookProps) => {
     parentRouteId: number[]
   ) => {
     for (const key in hasData) {
-      const e = hasData[key]
-      parentRouteId.push(Number(e.id))
+      const e = hasData[key];
+      parentRouteId.push(Number(e.id));
       if (e.id === department.parentid) {
-        e.children.push(defaultChild)
-        return parentRouteId
+        e.children.push(defaultChild);
+        return parentRouteId;
       }
       if (e.children.length > 0) {
         const idList: number[] = recursiveDeptList(
@@ -358,15 +358,15 @@ export const useAction = (props: SelectContentHookProps) => {
           defaultChild,
           department,
           [...parentRouteId]
-        )
-        if (idList.length !== parentRouteId.length) return idList
-        parentRouteId.pop()
+        );
+        if (idList.length !== parentRouteId.length) return idList;
+        parentRouteId.pop();
       } else {
-        parentRouteId.pop()
+        parentRouteId.pop();
       }
     }
-    return parentRouteId
-  }
+    return parentRouteId;
+  };
 
   const updateDeptUserList = (
     AppId: string,
@@ -377,9 +377,9 @@ export const useAction = (props: SelectContentHookProps) => {
   ) => {
     type !== UpdateListType.Flatten &&
       setDepartmentAndUserList((prev) => {
-        const newValue = clone(prev)
-        const hasData = newValue.find((e) => e.key === AppId)
-        let idList = []
+        const newValue = clone(prev);
+        const hasData = newValue.find((e) => e.key === AppId);
+        let idList = [];
         // 是否现有key的数据
         hasData && hasData.data.length > 0
           ? (idList = recursiveDeptList(
@@ -388,15 +388,15 @@ export const useAction = (props: SelectContentHookProps) => {
               department,
               []
             ))
-          : newValue.push({ key: AppId, data: [defaultChild] })
-        idList.length === 0 && hasData?.data.push(defaultChild)
-        return newValue
-      })
+          : newValue.push({ key: AppId, data: [defaultChild] });
+        idList.length === 0 && hasData?.data.push(defaultChild);
+        return newValue;
+      });
 
     type !== UpdateListType.Fold &&
       setFlattenDepartmentList((prev) => {
-        const newValue = clone(prev)
-        let hasData = newValue.find((e) => e.key === AppId)
+        const newValue = clone(prev);
+        let hasData = newValue.find((e) => e.key === AppId);
         const insertData = [
           {
             id: department.id,
@@ -417,17 +417,17 @@ export const useAction = (props: SelectContentHookProps) => {
               children: [],
             }))
           ),
-        ]
+        ];
 
         hasData
           ? (hasData.data = [...hasData.data, ...insertData])
           : newValue.push({
               key: AppId,
               data: insertData,
-            })
-        return newValue
-      })
-  }
+            });
+        return newValue;
+      });
+  };
 
   const loadDeptUsers = async (
     AppId: string,
@@ -435,13 +435,13 @@ export const useAction = (props: SelectContentHookProps) => {
   ) => {
     const copyDeptListResponse = deptListResponse.sort(
       (a, b) => a.department.id - b.department.id
-    )
-    const waitList = new Map()
+    );
+    const waitList = new Map();
     for (let index = 0; index < copyDeptListResponse.length; index++) {
       // 当前的部门
-      const department = copyDeptListResponse[index].department
+      const department = copyDeptListResponse[index].department;
       // 当前的用户列表
-      const users = copyDeptListResponse[index].users
+      const users = copyDeptListResponse[index].users;
       // 需要插入的数据
       const defaultChild: IDepartmentAndUserListValue = {
         id: department.id,
@@ -459,7 +459,7 @@ export const useAction = (props: SelectContentHookProps) => {
           canSelect: true,
           children: [],
         })),
-      }
+      };
 
       updateDeptUserList(
         AppId,
@@ -467,28 +467,28 @@ export const useAction = (props: SelectContentHookProps) => {
         users,
         defaultChild,
         UpdateListType.Flatten
-      )
+      );
 
-      let isContinue: boolean = false
+      let isContinue: boolean = false;
 
       if (waitList.size > 0) {
         for (let [key, value] of waitList) {
           value.department.parentid === department.id &&
             defaultChild.children.push(value.defaultChild) &&
-            waitList.delete(key)
+            waitList.delete(key);
           if (key === department.parentid) {
-            value.defaultChild.children.push(defaultChild)
-            isContinue = true
-            break
+            value.defaultChild.children.push(defaultChild);
+            isContinue = true;
+            break;
           }
         }
       }
 
-      if (isContinue) continue
+      if (isContinue) continue;
 
       if (department.parentid > department.id) {
-        waitList.set(department.id, { defaultChild, department, users })
-        if (index !== copyDeptListResponse.length - 1) continue
+        waitList.set(department.id, { defaultChild, department, users });
+        if (index !== copyDeptListResponse.length - 1) continue;
       }
 
       if (waitList.size > 0 && index === copyDeptListResponse.length - 1) {
@@ -499,9 +499,9 @@ export const useAction = (props: SelectContentHookProps) => {
             value.users,
             value.defaultChild,
             UpdateListType.Fold
-          )
+          );
         }
-        continue
+        continue;
       }
 
       updateDeptUserList(
@@ -510,57 +510,57 @@ export const useAction = (props: SelectContentHookProps) => {
         users,
         defaultChild,
         UpdateListType.Fold
-      )
+      );
     }
-    setIsTreeViewLoading(false)
-    setIsLoadStop(true)
-  }
+    setIsTreeViewLoading(false);
+    setIsLoadStop(true);
+  };
 
   const recursiveSeachDeptOrUser = (
     hasData: IDepartmentAndUserListValue[],
     callback: (e: IDepartmentAndUserListValue) => void
   ) => {
     for (const key in hasData) {
-      callback(hasData[key])
+      callback(hasData[key]);
       hasData[key].children.length > 0 &&
-        recursiveSeachDeptOrUser(hasData[key].children, callback)
+        recursiveSeachDeptOrUser(hasData[key].children, callback);
     }
-    return hasData
-  }
+    return hasData;
+  };
 
   useEffect(() => {
     if (isLoadStop && sendObject !== undefined && !!sendObject) {
-      const selectedList = [...sendObject.toParties, ...sendObject.toUsers]
-      const array = departmentAndUserList.filter((x) => x)
+      const selectedList = [...sendObject.toParties, ...sendObject.toUsers];
+      const array = departmentAndUserList.filter((x) => x);
       array.map((item) => {
         if (item.key === corpAppValue?.appId) {
           item.data = recursiveSeachDeptOrUser(
             departmentKeyValue?.data,
             (e) => {
-              if (selectedList.some((item) => item === e.id)) e.selected = true
-              else e.selected = false
+              if (selectedList.some((item) => item === e.id)) e.selected = true;
+              else e.selected = false;
             }
-          )
+          );
         }
-        return item
-      })
-      setIsUpdatedDeptUser(true)
-      setDepartmentAndUserList(array)
+        return item;
+      });
+      setIsUpdatedDeptUser(true);
+      setDepartmentAndUserList(array);
     }
-  }, [isLoadStop])
+  }, [isLoadStop]);
 
   useEffect(() => {
     if (!isShowDialog) {
-      const noneHandleSelected: IDepartmentAndUserListValue[] = []
+      const noneHandleSelected: IDepartmentAndUserListValue[] = [];
       recursiveSeachDeptOrUser(
         departmentKeyValue?.data,
         (e) => e.selected && noneHandleSelected.push(e)
-      )
+      );
       const selectedList = uniqWith(
         (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
-          return a.id === b.id
+          return a.id === b.id;
         }
-      )(noneHandleSelected)
+      )(noneHandleSelected);
       if (
         (isGetLastTimeData && isNewOrUpdate === "update") ||
         (!isGetLastTimeData &&
@@ -574,7 +574,7 @@ export const useAction = (props: SelectContentHookProps) => {
           toParties: selectedList
             .filter((e) => e.type === DepartmentAndUserType.Department)
             .map((e) => String(e.id)),
-        })
+        });
 
       chatId &&
         corpAppValue?.appId &&
@@ -593,22 +593,22 @@ export const useAction = (props: SelectContentHookProps) => {
                     id: item.name,
                     display: item.name,
                   })),
-                ])
-            })
-        })
+                ]);
+            });
+        });
     }
-  }, [isShowDialog])
+  }, [isShowDialog]);
 
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
-      setIsTreeViewLoading(true)
-      const deptListResponse = await GetDeptsAndUserList(AppId)
+      setIsTreeViewLoading(true);
+      const deptListResponse = await GetDeptsAndUserList(AppId);
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
-        setIsTreeViewLoading(false)
+        setIsTreeViewLoading(false);
 
       !!deptListResponse &&
-        loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
-    }
+        loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
+    };
     if (
       isShowDialog &&
       !!corpAppValue &&
@@ -616,28 +616,28 @@ export const useAction = (props: SelectContentHookProps) => {
     ) {
       // 设置相对应key的数据为空
       setDepartmentAndUserList((prev) => {
-        const newValue = clone(prev)
-        const hasData = newValue.find((e) => e.key === corpAppValue.appId)
-        hasData && (hasData.data = [])
-        return newValue
-      })
+        const newValue = clone(prev);
+        const hasData = newValue.find((e) => e.key === corpAppValue.appId);
+        hasData && (hasData.data = []);
+        return newValue;
+      });
       setFlattenDepartmentList((prev) => {
-        const newValue = clone(prev)
-        const hasData = newValue.find((e) => e.key === corpAppValue.appId)
-        hasData && (hasData.data = [])
-        return newValue
-      })
+        const newValue = clone(prev);
+        const hasData = newValue.find((e) => e.key === corpAppValue.appId);
+        hasData && (hasData.data = []);
+        return newValue;
+      });
 
       !updateMessageJobInformation?.workWeChatAppNotification &&
         setSendObject({
           toUsers: [],
           toParties: [],
-        })
+        });
       // 开始load数据
-      setIsLoadStop(false)
-      corpAppValue.appId && loadDepartment(corpAppValue.appId)
+      setIsLoadStop(false);
+      corpAppValue.appId && loadDepartment(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId, isShowDialog])
+  }, [corpAppValue?.appId, isShowDialog]);
 
   // 判断文件大小
   const judgingFileSize = (
@@ -646,24 +646,24 @@ export const useAction = (props: SelectContentHookProps) => {
     fileType?: MessageDataFileType
   ) => {
     if (type === "推文") {
-      return files.some((item) => item.size / 1024 > 1024 * 10)
+      return files.some((item) => item.size / 1024 > 1024 * 10);
     } else {
       switch (fileType) {
         case MessageDataFileType.Image: {
-          return files.some((item) => item.size / 1024 > 1024 * 10)
+          return files.some((item) => item.size / 1024 > 1024 * 10);
         }
         case MessageDataFileType.Voice: {
-          return files.some((item) => item.size / 1024 > 1024 * 2)
+          return files.some((item) => item.size / 1024 > 1024 * 2);
         }
         case MessageDataFileType.Video: {
-          return files.some((item) => item.size / 1024 > 1024 * 10)
+          return files.some((item) => item.size / 1024 > 1024 * 10);
         }
         case MessageDataFileType.File: {
-          return files.some((item) => item.size / 1024 > 1024 * 20)
+          return files.some((item) => item.size / 1024 > 1024 * 20);
         }
       }
     }
-  }
+  };
 
   // 文件上传
   const fileUpload = async (
@@ -675,25 +675,25 @@ export const useAction = (props: SelectContentHookProps) => {
       const array =
         Array.from(files).length > 8
           ? Array.from(files).slice(-8)
-          : Array.from(files)
+          : Array.from(files);
 
-      const isExceedSize = judgingFileSize("推文", array)
+      const isExceedSize = judgingFileSize("推文", array);
       if (isExceedSize) {
-        e.target.value = ""
-        showErrorPrompt("The file size is too large!")
+        e.target.value = "";
+        showErrorPrompt("The file size is too large!");
       } else {
         if (array.length > 0) {
-          const objectList: PictureText[] = []
+          const objectList: PictureText[] = [];
           for (const key in array) {
-            const base64 = await convertBase64(array[key])
+            const base64 = await convertBase64(array[key]);
             objectList.push({
               title: title,
               content: html,
               fileContent: base64 as string,
               fileName: array[key].name,
-            })
+            });
           }
-          setPictureText(objectList)
+          setPictureText(objectList);
         }
       }
     } else {
@@ -702,23 +702,23 @@ export const useAction = (props: SelectContentHookProps) => {
           "文件",
           Array.from(files),
           messageTypeValue.type
-        )
+        );
         if (isExceedSize) {
-          e.target.value = ""
-          showErrorPrompt("The file size is too large！")
+          e.target.value = "";
+          showErrorPrompt("The file size is too large！");
         } else {
-          const file = files[0]
-          const base64 = await convertBase64(file)
+          const file = files[0];
+          const base64 = await convertBase64(file);
 
           setFile((prev) => ({
             ...prev,
             fileName: file.name,
             fileContent: base64 as string,
-          }))
+          }));
         }
       }
     }
-  }
+  };
 
   // 文件删除
   const fileDelete = (name: string, index?: number) => {
@@ -727,61 +727,61 @@ export const useAction = (props: SelectContentHookProps) => {
         fileName: "",
         fileContent: "",
         fileType: 0,
-      })
+      });
     } else {
-      const arr = pictureText.filter((x, i) => i !== index)
-      setPictureText(arr)
+      const arr = pictureText.filter((x, i) => i !== index);
+      setPictureText(arr);
     }
-  }
+  };
 
   // 文件标记
   const fileMark = useMemo(() => {
     switch (messageTypeValue.type) {
       case MessageDataFileType.File: {
-        return "文件大小限制20MB!"
+        return "文件大小限制20MB!";
       }
       case MessageDataFileType.Image: {
-        return "图片大小限制10MB,仅支持JPG和PNG格式!"
+        return "图片大小限制10MB,仅支持JPG和PNG格式!";
       }
       case MessageDataFileType.Video: {
-        return "视频大小限制10MB,仅支持MP4格式!"
+        return "视频大小限制10MB,仅支持MP4格式!";
       }
       case MessageDataFileType.Voice: {
-        return "语音大小限制2MB,仅支持AMR格式!"
+        return "语音大小限制2MB,仅支持AMR格式!";
       }
       default: {
-        return ""
+        return "";
       }
     }
-  }, [messageTypeValue.type])
+  }, [messageTypeValue.type]);
 
   // 文件上传类型限制
   const fileAccept = useMemo(() => {
     if (messageTypeValue.groupBy === "文件")
       switch (messageTypeValue.type) {
         case MessageDataFileType.Image: {
-          return "image/jpg,image/png"
+          return "image/jpg,image/png";
         }
         case MessageDataFileType.Voice: {
-          return "audio/amr"
+          return "audio/amr";
         }
         case MessageDataFileType.Video: {
-          return "video/mp4"
+          return "video/mp4";
         }
         default: {
-          return ""
+          return "";
         }
       }
-  }, [messageTypeValue])
+  }, [messageTypeValue]);
 
   // 切换时区Fun
   const switchTimeZone = (index: number) => {
-    setTimeZoneValue(index)
-  }
+    setTimeZoneValue(index);
+  };
 
   const tagsNameList = useMemo(() => {
-    return tagsValue.map((item) => item.tagName)
-  }, [tagsValue])
+    return tagsValue.map((item) => item.tagName);
+  }, [tagsValue]);
 
   // 消息类型更换时替换文件的字段
   useEffect(() => {
@@ -793,32 +793,32 @@ export const useAction = (props: SelectContentHookProps) => {
         fileName: "",
         fileUrl: "",
         fileType: messageTypeValue.type,
-      })
+      });
     }
-    if (inputRef.current) inputRef.current.value = ""
-  }, [messageTypeValue])
+    if (inputRef.current) inputRef.current.value = "";
+  }, [messageTypeValue]);
 
   // 图文上传时 标题内容自动更新
   useEffect(() => {
     if (messageTypeValue.groupBy === "" && messageTypeValue.title === "推文") {
       if (pictureText.length > 0) {
         const newArr = pictureText.map((item) => {
-          item.content = html
-          item.title = title
-          return item
-        })
-        setPictureText(newArr)
+          item.content = html;
+          item.title = title;
+          return item;
+        });
+        setPictureText(newArr);
       }
       if (lastTimePictureText.length > 0) {
         const lastArr = lastTimePictureText.map((item) => {
-          item.content = html
-          item.title = title
-          return item
-        })
-        setLastTimePictureText(lastArr)
+          item.content = html;
+          item.title = title;
+          return item;
+        });
+        setLastTimePictureText(lastArr);
       }
     }
-  }, [html, title])
+  }, [html, title]);
 
   // jobSetting参数
   useEffect(() => {
@@ -826,8 +826,8 @@ export const useAction = (props: SelectContentHookProps) => {
       case MessageJobSendType.Fire: {
         setJobSetting({
           timezone: timeZone[timeZoneValue].convertTimeZone,
-        })
-        break
+        });
+        break;
       }
       case MessageJobSendType.Delayed: {
         setJobSetting({
@@ -835,8 +835,8 @@ export const useAction = (props: SelectContentHookProps) => {
           delayedJob: {
             enqueueAt: dateValue,
           },
-        })
-        break
+        });
+        break;
       }
       default: {
         setJobSetting({
@@ -849,11 +849,11 @@ export const useAction = (props: SelectContentHookProps) => {
             : {
                 cronExpression: cronExp,
               },
-        })
-        break
+        });
+        break;
       }
     }
-  }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue])
+  }, [sendTypeValue, timeZoneValue, cronExp, dateValue, endDateValue]);
 
   // sendData
   useEffect(() => {
@@ -868,8 +868,8 @@ export const useAction = (props: SelectContentHookProps) => {
                 ? `${title}\r\n${content}`
                 : content,
           },
-        })
-        break
+        });
+        break;
       }
       case "推文": {
         setSendData({
@@ -881,8 +881,8 @@ export const useAction = (props: SelectContentHookProps) => {
                 ? lastTimePictureText
                 : pictureText,
           },
-        })
-        break
+        });
+        break;
       }
       default: {
         const send: SendData = {
@@ -895,10 +895,10 @@ export const useAction = (props: SelectContentHookProps) => {
           text: {
             content: `${title}\r\n${content}`,
           },
-        }
+        };
 
-        setSendData(send)
-        break
+        setSendData(send);
+        break;
       }
     }
   }, [
@@ -911,61 +911,61 @@ export const useAction = (props: SelectContentHookProps) => {
     messageTypeValue.title,
     isNewOrUpdate,
     cleanContent,
-  ])
+  ]);
 
   // sendParameter
   useEffect(() => {
     const a: SendParameter = {
       appId: !!corpAppValue?.appId ? corpAppValue?.appId : "",
-    }
+    };
     if (!isEmpty(tagsNameList)) {
-      a.toTags = tagsNameList
+      a.toTags = tagsNameList;
     }
     if (!isEmpty(sendObject.toUsers)) {
-      a.toUsers = sendObject.toUsers
+      a.toUsers = sendObject.toUsers;
     }
     if (!isEmpty(sendObject.toParties)) {
-      a.toParties = sendObject.toParties
+      a.toParties = sendObject.toParties;
     }
     if (!isEmpty(chatId)) {
-      a.chatId = chatId
+      a.chatId = chatId;
     }
-    setSendParameter(a)
-  }, [corpAppValue?.id, tagsNameList, sendObject])
+    setSendParameter(a);
+  }, [corpAppValue?.id, tagsNameList, sendObject]);
 
   useEffect(() => {
     if (updateMessageJobInformation !== undefined) {
-      setCorpsValue(updateMessageJobInformation.enterprise)
-      setAppLoading(false)
-      setCorpAppValue(updateMessageJobInformation.app)
-      setSendTypeValue(updateMessageJobInformation.jobType)
+      setCorpsValue(updateMessageJobInformation.enterprise);
+      setAppLoading(false);
+      setCorpAppValue(updateMessageJobInformation.app);
+      setSendTypeValue(updateMessageJobInformation.jobType);
 
       setTitle(
         updateMessageJobInformation.title !== undefined
           ? updateMessageJobInformation.title
           : ""
-      )
+      );
 
-      setCleanContent(updateMessageJobInformation.cleanContent)
+      setCleanContent(updateMessageJobInformation.cleanContent);
 
       const workWeChatAppNotification =
-        updateMessageJobInformation.workWeChatAppNotification
+        updateMessageJobInformation.workWeChatAppNotification;
       if (workWeChatAppNotification.text !== null) {
-        setMessageTypeValue(messageTypeList[0])
+        setMessageTypeValue(messageTypeList[0]);
         setContent(
           updateMessageJobInformation.cleanContent !== undefined
             ? updateMessageJobInformation.cleanContent
             : updateMessageJobInformation?.content !== undefined
             ? updateMessageJobInformation?.content
             : ""
-        )
+        );
       } else if (
         workWeChatAppNotification.mpNews !== null &&
         workWeChatAppNotification.mpNews?.articles !== undefined &&
         workWeChatAppNotification.mpNews?.articles.length > 0
       ) {
         if (workWeChatAppNotification.mpNews?.articles.length > 0) {
-          const arr: PictureText[] = []
+          const arr: PictureText[] = [];
           workWeChatAppNotification.mpNews?.articles.map((item: PictureText) =>
             arr.push({
               title: item.title,
@@ -973,14 +973,14 @@ export const useAction = (props: SelectContentHookProps) => {
               fileUrl: item.fileUrl,
               fileName: item.fileName,
             })
-          )
-          setLastTimePictureText(arr)
+          );
+          setLastTimePictureText(arr);
         } else {
-          setLastTimePictureText([])
+          setLastTimePictureText([]);
         }
-        setLastTimePictureText(workWeChatAppNotification.mpNews?.articles)
-        setMessageTypeValue(messageTypeList[1])
-        setHtml(workWeChatAppNotification.mpNews?.articles[0].content)
+        setLastTimePictureText(workWeChatAppNotification.mpNews?.articles);
+        setMessageTypeValue(messageTypeList[1]);
+        setHtml(workWeChatAppNotification.mpNews?.articles[0].content);
       } else if (workWeChatAppNotification.file !== null) {
         setLastTimeFile({
           fileName: !!workWeChatAppNotification.file?.fileName
@@ -991,46 +991,46 @@ export const useAction = (props: SelectContentHookProps) => {
               ? workWeChatAppNotification.file?.fileType
               : 0,
           fileUrl: workWeChatAppNotification.file?.fileUrl,
-        })
+        });
 
         switch (workWeChatAppNotification.file?.fileType) {
           case MessageDataFileType.Image: {
-            setMessageTypeValue(messageTypeList[2])
-            break
+            setMessageTypeValue(messageTypeList[2]);
+            break;
           }
           case MessageDataFileType.Voice: {
-            setMessageTypeValue(messageTypeList[3])
-            break
+            setMessageTypeValue(messageTypeList[3]);
+            break;
           }
           case MessageDataFileType.Video: {
-            setMessageTypeValue(messageTypeList[4])
-            break
+            setMessageTypeValue(messageTypeList[4]);
+            break;
           }
           case MessageDataFileType.File: {
-            setMessageTypeValue(messageTypeList[5])
-            break
+            setMessageTypeValue(messageTypeList[5]);
+            break;
           }
         }
       }
 
       // 发送类型
-      const jobSetting = JSON.parse(updateMessageJobInformation.jobSettingJson)
+      const jobSetting = JSON.parse(updateMessageJobInformation.jobSettingJson);
       const oldTimeZone = timeZone.find(
         (item) =>
           item.title ===
           JSON.parse(updateMessageJobInformation.jobSettingJson).Timezone
-      )?.value
-      oldTimeZone !== undefined && setTimeZoneValue(oldTimeZone)
+      )?.value;
+      oldTimeZone !== undefined && setTimeZoneValue(oldTimeZone);
 
       if (jobSetting.DelayedJob !== null) {
-        setSendTypeValue(MessageJobSendType.Delayed)
-        setDateValue(jobSetting.DelayedJob.EnqueueAt)
+        setSendTypeValue(MessageJobSendType.Delayed);
+        setDateValue(jobSetting.DelayedJob.EnqueueAt);
       } else if (jobSetting.RecurringJob !== null) {
-        setSendTypeValue(MessageJobSendType.Recurring)
-        setEndDateValue(jobSetting.RecurringJob.EndDate)
-        setCronExp(jobSetting.RecurringJob.CronExpression)
+        setSendTypeValue(MessageJobSendType.Recurring);
+        setEndDateValue(jobSetting.RecurringJob.EndDate);
+        setCronExp(jobSetting.RecurringJob.CronExpression);
       } else {
-        setSendTypeValue(MessageJobSendType.Fire)
+        setSendTypeValue(MessageJobSendType.Fire);
       }
 
       // sendObject
@@ -1043,26 +1043,26 @@ export const useAction = (props: SelectContentHookProps) => {
           workWeChatAppNotification.toParties !== undefined
             ? workWeChatAppNotification.toParties
             : [],
-      })
+      });
 
       updateMessageJobInformation.workWeChatAppNotification.toTags !==
         undefined &&
         setLastTimeTagsList(
           updateMessageJobInformation.workWeChatAppNotification.toTags
-        )
+        );
 
-      setIsGetLastTimeData(true)
+      setIsGetLastTimeData(true);
       // 回显群组名称
       if (
         updateMessageJobInformation.groupId &&
         updateMessageJobInformation.groupName
       ) {
-        setChatId(updateMessageJobInformation.groupId)
-        setChatName(updateMessageJobInformation.groupName)
-        setSendType(SendObjOrGroup.Group)
+        setChatId(updateMessageJobInformation.groupId);
+        setChatName(updateMessageJobInformation.groupName);
+        setSendType(SendObjOrGroup.Group);
       }
     }
-  }, [updateMessageJobInformation])
+  }, [updateMessageJobInformation]);
 
   // 返回最终的数据给外层
   useEffect(() => {
@@ -1108,7 +1108,7 @@ export const useAction = (props: SelectContentHookProps) => {
           key: "cleanContent",
           value: messageTypeValue.title === "推文" ? htmlText : content,
         },
-      ]
+      ];
       !isShowDialog &&
         sendType === SendObjOrGroup.Group &&
         chatId &&
@@ -1122,22 +1122,22 @@ export const useAction = (props: SelectContentHookProps) => {
             key: "groupId",
             value: chatId,
           }
-        )
+        );
 
       // 在传出去外层前做判断, 不清除无用已选项
-      const handleSendParams = { ...sendParameter }
+      const handleSendParams = { ...sendParameter };
       sendType === SendObjOrGroup.Group
         ? (() => {
-            delete handleSendParams.toParties
-            delete handleSendParams.toUsers
-            delete handleSendParams.toTags
+            delete handleSendParams.toParties;
+            delete handleSendParams.toUsers;
+            delete handleSendParams.toTags;
           })()
-        : delete handleSendParams.chatId
+        : delete handleSendParams.chatId;
 
       const workWeChatAppNotification = {
         ...handleSendParams,
         ...sendData,
-      }
+      };
 
       isNewOrUpdate === "new"
         ? getSendData !== undefined &&
@@ -1154,7 +1154,7 @@ export const useAction = (props: SelectContentHookProps) => {
             jobSetting: jobSetting,
             metadata: metadata,
             workWeChatAppNotification: workWeChatAppNotification,
-          })
+          });
     }
   }, [
     title,
@@ -1169,62 +1169,62 @@ export const useAction = (props: SelectContentHookProps) => {
     chatId,
     messageTypeValue.title,
     isShowDialog,
-  ])
+  ]);
 
   useEffect(() => {
     if (clearData && isNewOrUpdate === "new") {
-      setTitle("")
-      setContent("")
-      setCorpsValue(corpsList[0])
-      setCorpAppValue(corpAppList[0])
-      setTagsValue([])
-      setMessageTypeValue(messageTypeList[0])
-      setSendTypeValue(MessageJobSendType.Fire)
-      setTimeZoneValue(timeZone.filter((x) => !x.disable)[0].value)
+      setTitle("");
+      setContent("");
+      setCorpsValue(corpsList[0]);
+      setCorpAppValue(corpAppList[0]);
+      setTagsValue([]);
+      setMessageTypeValue(messageTypeList[0]);
+      setSendTypeValue(MessageJobSendType.Fire);
+      setTimeZoneValue(timeZone.filter((x) => !x.disable)[0].value);
       setSendObject({
         toUsers: [],
         toParties: [],
-      })
-      setPictureText([])
+      });
+      setPictureText([]);
       setFile({
         fileContent: "",
         fileName: "",
         fileType: messageTypeValue.type,
-      })
-      setDateValue("")
-      setEndDateValue("")
-      setCronExp("0 0 * * *")
-      setChatId("")
-      setChatName("")
+      });
+      setDateValue("");
+      setEndDateValue("");
+      setCronExp("0 0 * * *");
+      setChatId("");
+      setChatName("");
       setDepartmentAndUserList((prev) => {
         return prev.map((item) => {
-          recursiveSeachDeptOrUser(item.data, (e) => (e.selected = false))
-          return item
-        })
-      })
-      setHtml("")
-      setEditor(null)
+          recursiveSeachDeptOrUser(item.data, (e) => (e.selected = false));
+          return item;
+        });
+      });
+      setHtml("");
+      setEditor(null);
     }
-  }, [clearData, isNewOrUpdate])
+  }, [clearData, isNewOrUpdate]);
 
   const detectMentionToDelete = (value: string, key: string) => {
-    const afterPattern = /[^@]+$/
-    const beforePattern = /.*(?=@[^@]*$)/
+    const afterPattern = /[^@]+$/;
+    const beforePattern = /.*(?=@[^@]*$)/;
     key === "Backspace" &&
       value.slice(-1) === " " &&
       mentionList.some(
         (item) => item.display === value.match(afterPattern)?.[0].trim()
       ) &&
-      setContent(value.match(beforePattern)?.[0] ?? "")
-  }
+      setContent(value.match(beforePattern)?.[0] ?? "");
+  };
 
   useEffect(() => {
     setIsShowPage &&
       setIsShowPage(
         (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
           isNewOrUpdate !== "new"
-      )
-  }, [isNewOrUpdate, appLoading, corpsList])
+      );
+  }, [isNewOrUpdate, appLoading, corpsList]);
 
   return {
     corpsValue,
@@ -1297,5 +1297,5 @@ export const useAction = (props: SelectContentHookProps) => {
     detectMentionToDelete,
     appLoading,
     groupLoading,
-  }
-}
+  };
+};

@@ -583,14 +583,14 @@ const useAction = (props: MeetingSettingsProps) => {
     let newArr: string[] = [];
     getUserId(personnelData, newArr);
 
-    return personnelData;
+    return newArr;
   };
 
   const getUserId = (data: IDepartmentAndUserListValue[], arr: string[]) => {
     data.map((item) => {
       if (item.children && item.children.length > 0) {
         getUserId(item.children, arr);
-      } else {
+      } else if (!arr.find((i) => item.id === i)) {
         arr.push(item.name);
       }
     });
@@ -711,6 +711,7 @@ const useAction = (props: MeetingSettingsProps) => {
       !!deptListResponse &&
         loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
     };
+
     if (
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
@@ -731,12 +732,9 @@ const useAction = (props: MeetingSettingsProps) => {
 
       // 开始load数据
       setIsLoadStop(false);
-      corpAppValue?.appId &&
-        isShowDialog &&
-        (clickName === "选择参会人" || clickName === "指定会议管理员") &&
-        loadDepartment(corpAppValue.appId);
+      corpAppValue?.appId && isShowDialog && loadDepartment(corpAppValue.appId);
     }
-  }, [isShowDialog]);
+  }, [corpAppValue?.appId, isShowDialog]);
 
   const clearData = () => {
     setAppointList([]);
@@ -879,7 +877,11 @@ const useAction = (props: MeetingSettingsProps) => {
       let attendeesList: string[] = [];
 
       participantList &&
-        participantList.map((item) => attendeesList.push(item.id + ""));
+        (attendeesList = getUserChildrenList(
+          departmentKeyValue.data,
+          participantList,
+          []
+        ));
 
       const admin_userid = adminUser
         ? adminUser.length > 0
@@ -893,6 +895,32 @@ const useAction = (props: MeetingSettingsProps) => {
       }
       if (!settingsData.ring_users) {
         delete settingsData.ring_users;
+      }
+
+      if (
+        attendeesList.length &&
+        settingsData.ring_users &&
+        settingsData.ring_users.userid.some(
+          (item) => !attendeesList.includes(item)
+        )
+      ) {
+        setTipsObject({
+          show: true,
+          msg: "Reminder objects need to all participate in the meeting",
+        });
+        return;
+      }
+
+      if (
+        attendeesList.length &&
+        settingsData.hosts &&
+        settingsData.hosts.userid.some((item) => !attendeesList.includes(item))
+      ) {
+        setTipsObject({
+          show: true,
+          msg: "The meeting host needs to all participate in the meeting",
+        });
+        return;
       }
 
       !settingsData.password && (settingsData.password = "");
@@ -986,6 +1014,7 @@ const useAction = (props: MeetingSettingsProps) => {
             },
           };
 
+          return;
           createMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
@@ -1018,6 +1047,7 @@ const useAction = (props: MeetingSettingsProps) => {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
 
+          return;
           updateMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
@@ -1243,53 +1273,6 @@ const useAction = (props: MeetingSettingsProps) => {
     meetingData && onGetMeetingData(meetingData);
     !isOpenMeetingSettings && clearData();
   }, [isOpenMeetingSettings]);
-
-  useEffect(() => {
-    if (participantList && participantList?.length > 0 && corpAppValue.appId) {
-      const getHostListAndReminderListData = (
-        data: IDepartmentAndUserListValue[]
-      ) => {
-        return data && data.length > 0
-          ? participantList.map((item) => ({
-              ...item,
-              selected: data.find((i) => i.id === item.id)
-                ? !!data.find((i) => i.id === item.id)?.selected
-                : false,
-            }))
-          : participantList.map((item) => ({ ...item, selected: false }));
-      };
-
-      if (clickName === "选择指定提醒人员" && isShowDialog) {
-        setDepartmentAndUserList([
-          {
-            data: getHostListAndReminderListData(appointList ?? []),
-            key: corpAppValue.appId,
-          },
-        ]);
-        setFlattenDepartmentList([
-          {
-            data: getHostListAndReminderListData(appointList ?? []),
-            key: corpAppValue.appId,
-          },
-        ]);
-      }
-
-      if (clickName === "选择指定主持人" && isShowDialog) {
-        setDepartmentAndUserList([
-          {
-            data: getHostListAndReminderListData(hostList ?? []),
-            key: corpAppValue.appId,
-          },
-        ]);
-        setFlattenDepartmentList([
-          {
-            data: getHostListAndReminderListData(hostList ?? []),
-            key: corpAppValue.appId,
-          },
-        ]);
-      }
-    }
-  }, [isShowDialog]);
 
   useEffect(() => {
     meetingDuration.value === MeetingDuration.CustomEndTime &&
