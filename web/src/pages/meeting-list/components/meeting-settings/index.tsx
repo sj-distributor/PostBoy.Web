@@ -234,14 +234,14 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
       >
         <DialogTitle
           id="alert-dialog-title"
-          sx={{ backgroundColor: "#f2f3f4" }}
+          sx={{ backgroundColor: "#f2f3f4", width: "33rem", height: "40rem" }}
         >
           {meetingState === "update" ? "编辑会议" : "创建会议"}
         </DialogTitle>
         <DialogContent sx={{ backgroundColor: "#f2f3f4" }}>
           <div className={style.container}>
             <div className={style.appointmentMeeting}>
-              {corpsList.length > 0 && !appLoading ? (
+              {corpsList.length > 0 && !appLoading && (
                 <>
                   <div className={style.fromItem}>
                     <div className={style.title}>企业</div>
@@ -435,7 +435,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                               );
 
                               setParticipantPage((prev) =>
-                                prev + 1 > maxPage ? prev : prev + 1
+                                prev + 1 > maxPage ? 1 : prev + 1
                               );
                               setIsShowMoreParticipantList((val) => !val);
                             }}
@@ -789,21 +789,6 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                       </Button>
                     </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
-                  <Skeleton height={80} width={550} animation="wave" />
                 </>
               )}
             </div>

@@ -113,7 +113,7 @@ const useAction = (props: {
           e.id === clickedItem.id &&
             (type === ClickType.Collapse
               ? (e.isCollapsed = !e.isCollapsed)
-              : (e.selected = e.id !== e.name ? e.selected : !e.selected));
+              : (e.selected = !e.selected));
         });
       return newValue;
     });
