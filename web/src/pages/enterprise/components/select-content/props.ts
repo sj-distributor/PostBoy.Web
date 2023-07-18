@@ -1,4 +1,5 @@
 import {
+  IDeptAndUserList,
   ILastShowTableData,
   ISendMessageCommand,
   IUpdateMessageCommand,
@@ -33,4 +34,9 @@ export interface SelectContentHookProps {
   showErrorPrompt: (text: string) => void
   clearData?: boolean
   setIsShowPage?: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export interface IDeptUserWebWorkerProps {
+  AppId: string
+  workWeChatUnits: IDeptAndUserList[]
 }
