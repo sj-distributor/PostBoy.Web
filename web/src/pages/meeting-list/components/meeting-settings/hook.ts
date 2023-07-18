@@ -1014,7 +1014,6 @@ const useAction = (props: MeetingSettingsProps) => {
             },
           };
 
-          return;
           createMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
@@ -1047,7 +1046,6 @@ const useAction = (props: MeetingSettingsProps) => {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
 
-          return;
           updateMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
