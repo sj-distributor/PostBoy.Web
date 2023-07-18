@@ -98,7 +98,7 @@ const useAction = (props: SettingDialogProps) => {
       border: true,
       isOption: true,
       key: "remind_scope",
-      optionData: MeetingCallReminder.Host,
+      optionData: MeetingCallReminder.NoRemind,
       optionList: [
         {
           lable: "所有成员",
@@ -331,7 +331,7 @@ const useAction = (props: SettingDialogProps) => {
   useEffect(() => {
     !openAddDialog &&
       (!appointList || appointList.length === 0) &&
-      onAppintRadio(MeetingCallReminder.Host);
+      onAppintRadio(MeetingCallReminder.NoRemind);
   }, [appointList, openAddDialog]);
 
   useEffect(() => {
@@ -404,7 +404,7 @@ const useAction = (props: SettingDialogProps) => {
           item.title === "会议开始时来电提醒" &&
           item.optionData === MeetingCallReminder.All
         ) {
-          item.optionData = MeetingCallReminder.Host;
+          item.optionData = MeetingCallReminder.NoRemind;
         }
       });
 

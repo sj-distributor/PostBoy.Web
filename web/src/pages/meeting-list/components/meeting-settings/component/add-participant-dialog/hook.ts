@@ -107,6 +107,7 @@ const useAction = (props: {
     setDeptUserList((prev) => {
       const newValue = prev.filter((e) => !!e);
       const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
+
       activeData &&
         recursiveSeachDeptOrUser(activeData.data, (e) => {
           e.id === clickedItem.id &&
@@ -188,14 +189,7 @@ const useAction = (props: {
 
       return;
     }
-    if (!departmentSelectedList || !departmentSelectedList.length) {
-      setTipsObject({
-        show: true,
-        msg: "Please select relevant personnel",
-      });
 
-      return;
-    }
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
@@ -209,6 +203,7 @@ const useAction = (props: {
 
   useEffect(() => {
     // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
+
     !isLoading &&
       departmentKeyValue?.data.length > 0 &&
       setDepartmentSelectedList((prev) => {
@@ -249,6 +244,7 @@ const useAction = (props: {
       ? loadSelectData.filter((x) => x)
       : prev.filter((x) => x);
     const hasData = listData.find((x) => x.key === AppId);
+
     if (hasData) {
       loadSelectData
         ? loadSelectData.forEach((item) => {
@@ -266,6 +262,7 @@ const useAction = (props: {
 
   useEffect(() => {
     departmentAndUserList.length && setSearchToDeptValue([]);
+
     open
       ? loadSelectData && loadSelectData.length > 0
         ? setDepartmentSelectedList((prev) =>
@@ -276,7 +273,7 @@ const useAction = (props: {
         (() => {
           setDepartmentSelectedList([]);
         })();
-  }, [open]);
+  }, [open, isLoading]);
 
   useEffect(() => {
     // 3s关闭提示
@@ -309,6 +306,25 @@ const useAction = (props: {
         user.selected = false;
       });
   }, [AppId, CorpId]);
+
+  useEffect(() => {
+    if (
+      departmentAndUserList &&
+      departmentAndUserList.length > 0 &&
+      loadSelectData
+    ) {
+      setDepartmentSelectedList(loadSelectData);
+    }
+  }, [isLoading, loadSelectData]);
+
+  useEffect(() => {
+    if (
+      (clickName === "选择指定提醒人员" || clickName === "选择指定主持人") &&
+      loadSelectData
+    ) {
+      setDepartmentSelectedList(loadSelectData);
+    }
+  }, [clickName]);
 
   return {
     departmentSelectedList,
