@@ -27,37 +27,7 @@ import {
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { memo } from "react"
-
-const onFilterDeptAndUsers = (
-  options: IDepartmentAndUserListValue[],
-  state: FilterOptionsState<IDepartmentAndUserListValue>
-) => {
-  if (state.inputValue !== "") {
-    const array: IDepartmentAndUserListValue[] = []
-    const findArray = options.filter((item) =>
-      item.name.toUpperCase().includes(state.inputValue.toUpperCase())
-    )
-    for (let i = 0; i < findArray.length; i++) {
-      array.push(findArray[i])
-      const findParent = options.find(
-        (item) => item.name === findArray[i].parentid
-      )
-      if (!!findParent) {
-        const index = array.findIndex(
-          (item) => item.name === findArray[i].parentid
-        )
-        if (index === -1) {
-          const index = array.findIndex(
-            (item) => item.parentid === findParent.name
-          )
-          array.splice(index, 0, findParent)
-        }
-      }
-    }
-    return array
-  }
-  return options
-}
+import { onFilterDeptAndUsers } from "../../../../components/treeViewSelector/fitler"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {

@@ -36,7 +36,6 @@ import { SelectContentHookProps } from "./props"
 import * as wangEditor from "@wangeditor/editor"
 import { annexEditorConfig } from "../../../../uilts/wangEditor"
 import { useBoolean } from "ahooks"
-import { MyWorker } from "../../../../hooks/deptUserData/webWorker"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
 
@@ -68,7 +67,7 @@ export const useAction = (props: SelectContentHookProps) => {
     setDepartmentAndUserList,
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,
-    loadDeptUsers,
+    loadDeptUsersFromWebWorker,
   } = props
 
   const defaultCorpValue = {
@@ -198,34 +197,6 @@ export const useAction = (props: SelectContentHookProps) => {
         },
       },
     },
-  }
-
-  const loadDeptUsersFromWebWorker = (data: {
-    AppId: string
-    workWeChatUnits: IDeptAndUserList[]
-  }) => {
-    const worker = MyWorker()
-
-    worker.postMessage(data)
-
-    worker.onmessage = function (this: Worker, ev: MessageEvent<any>) {
-      const { copyDepartmentAndUserList, copyFlattenDepartmentList } = ev.data
-
-      setDepartmentAndUserList((prev) => [
-        ...prev,
-        { key: data.AppId, data: copyDepartmentAndUserList },
-      ])
-      setFlattenDepartmentList((prev) => [
-        ...prev,
-        { key: data.AppId, data: copyFlattenDepartmentList },
-      ])
-
-      setTimeout(() => {
-        setIsTreeViewLoading(false)
-        setIsLoadStop(true)
-      }, 500)
-      worker.terminate()
-    }
   }
 
   useEffect(() => {
@@ -420,11 +391,11 @@ export const useAction = (props: SelectContentHookProps) => {
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false)
 
-      // !!deptListResponse &&
-      //   loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
-
       !!deptListResponse &&
-        loadDeptUsers(AppId, deptListResponse.workWeChatUnits).then(() => {
+        loadDeptUsersFromWebWorker({
+          AppId,
+          workWeChatUnits: deptListResponse.workWeChatUnits,
+        }).then(() => {
           setIsTreeViewLoading(false)
           setIsLoadStop(true)
         })

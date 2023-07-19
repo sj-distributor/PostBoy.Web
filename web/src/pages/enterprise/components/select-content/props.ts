@@ -52,15 +52,10 @@ export interface SelectContentHookProps {
     hasData: IDepartmentAndUserListValue[],
     callback: (e: IDepartmentAndUserListValue) => void
   ) => IDepartmentAndUserListValue[]
-  loadDeptUsers: (
-    AppId: string,
-    deptListResponse: IDeptAndUserList[]
-  ) => Promise<unknown>
-}
-
-export interface IDeptUserWebWorkerProps {
-  AppId: string
-  workWeChatUnits: IDeptAndUserList[]
+  loadDeptUsersFromWebWorker: (data: {
+    AppId: string
+    workWeChatUnits: IDeptAndUserList[]
+  }) => Promise<unknown>
 }
 
 export interface IDeptUserWebWorkerProps {

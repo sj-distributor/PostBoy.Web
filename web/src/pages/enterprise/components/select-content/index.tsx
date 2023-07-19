@@ -65,7 +65,7 @@ const SelectContent = memo(
       setDepartmentAndUserList,
       setFlattenDepartmentList,
       recursiveSearchDeptOrUser,
-      loadDeptUsers,
+      loadDeptUsersFromWebWorker,
     } = useDeptUserData({ appId: corpAppValue?.appId })
 
     const {
@@ -149,7 +149,7 @@ const SelectContent = memo(
       setDepartmentAndUserList,
       setFlattenDepartmentList,
       recursiveSearchDeptOrUser,
-      loadDeptUsers,
+      loadDeptUsersFromWebWorker,
     })
 
     const fileOrImage = (file: FileObject, state: string) => {
