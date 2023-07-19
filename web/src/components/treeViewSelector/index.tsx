@@ -14,7 +14,7 @@ import useAction from "./hook"
 import { ITreeViewProps } from "./props"
 import styles from "./index.module.scss"
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
-import { ClickType, IDepartmentAndUserListValue } from "../../dtos/enterprise"
+import { ClickType, DepartmentAndUserType, IDepartmentAndUserListValue } from "../../dtos/enterprise"
 
 const TreeViewSelector = ({
   appId,
@@ -125,16 +125,50 @@ const TreeViewSelector = ({
       >
         {foldData && recursiveRenderDeptList(foldData, 0, true)}
       </div>
-      {foldData && (
+
+      {children && children}
+
+      {flattenData && (
         <Autocomplete
           {...flattenSelectorProps}
-          options={foldData}
+          options={flattenData}
           filterOptions={(options, state) =>
             onFilterDeptAndUsers(options, state)
           }
+          getOptionLabel={(option: IDepartmentAndUserListValue) => option.name}
+          isOptionEqualToValue={(option, value) =>
+            option.id === value.id
+          }
+          groupBy={(option) => option.parentid as string}
+          componentsProps={{
+            paper: { elevation: 3 },
+            popper: {
+              placement: "top",
+            },
+          }}
+          renderGroup={(params) => {
+            const { key, group, children } = params
+            return <div key={key}>{children}</div>
+          }}
+          renderOption={(props, option, state) => {
+            let style = Object.assign(
+              option.type === DepartmentAndUserType.Department
+                ? { color: "#666" }
+                : { paddingLeft: "2rem" },
+              { fontSize: "0.9rem" }
+            )
+            !handleTypeIsCanSelect(canSelect, option.type) &&
+              (props.onClick = () => {})
+            return (
+              <li {...props} style={style}>
+                {option.name}
+              </li>
+            )
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
+              size="small"
               value={inputValue}
               className={styles.InputButton}
               margin="dense"
