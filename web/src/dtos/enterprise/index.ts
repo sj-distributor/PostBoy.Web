@@ -68,7 +68,7 @@ export interface IDepartmentAndUserListValue {
   type: DepartmentAndUserType
   parentid: string | number[]
   selected: boolean
-  isCollapsed?: boolean
+  isCollapsed: boolean
   children: IDepartmentAndUserListValue[]
 }
 

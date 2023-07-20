@@ -134,6 +134,7 @@ const SelectTargetDialog = memo(
               type: deptUserData.type,
               parentid: String(deptUserData.parentid),
               selected: deptUserData.selected,
+              isCollapsed: deptUserData.isCollapsed,
               children: [],
             }
             return (

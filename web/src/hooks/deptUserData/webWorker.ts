@@ -74,6 +74,7 @@ export const MyWorker = () => {
             parentid: department.name,
             type: DepartmentAndUserType.User,
             selected: false,
+            isCollapsed: false,
             canSelect: true,
             children: [],
           }))
@@ -108,6 +109,7 @@ export const MyWorker = () => {
           type: DepartmentAndUserType.Department,
           parentid: String(department.parentid),
           selected: false,
+          isCollapsed: false,
           children: users.map((item) => ({
             id: `${item.userid}`,
             name: item.userid,

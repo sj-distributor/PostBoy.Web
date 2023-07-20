@@ -63,9 +63,13 @@ const useAction = ({
     type: ClickType,
     clickedItem: IDepartmentAndUserListValue
   ) => {
-    type === ClickType.Collapse
-      ? sourceMapSetter(String(clickedItem.id), clickedItem)
-      : sourceMapSetter(String(clickedItem.id), clickedItem)
+    const isCollapsed = sourceMapGetter(String(clickedItem.id))?.isCollapsed
+    const selected = sourceMapGetter(String(clickedItem.id))?.selected
+    const selectOrCollepse =
+      type === ClickType.Collapse
+        ? { isCollapsed: !isCollapsed }
+        : { isCollapsed, selected: !selected }
+    sourceMapSetter(String(clickedItem.id), Object.assign(clickedItem, selectOrCollepse))
   }
 
   // 搜索框变化时同步到部门列表

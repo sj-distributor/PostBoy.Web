@@ -72,6 +72,7 @@ const useAction = (props: {
     type: DepartmentAndUserType.User,
     parentid: "",
     selected: false,
+    isCollapsed: false,
     children: [],
   }
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
@@ -136,6 +137,7 @@ const useAction = (props: {
             type: DepartmentAndUserType.User,
             parentid: String(e.parentid),
             selected: e.selected,
+            isCollapsed: false,
             children: [],
           })
         : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1)
