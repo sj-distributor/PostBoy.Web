@@ -28,6 +28,7 @@ import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { memo } from "react"
 import { onFilterDeptAndUsers } from "../../../../components/treeViewSelector/fitler"
+import TreeViewSelector from "../../../../components/treeViewSelector"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -263,6 +264,21 @@ const SelectTargetDialog = memo(
                       />
                     )}
                   />
+                )}
+
+                {departmentKeyValue && departmentKeyValue.key && (
+                  <div>
+                    <TreeViewSelector
+                      appId={AppId}
+                      inputValue={""}
+                      sourceData={{
+                        foldData: departmentKeyValue.data,
+                        flattenData: flattenDepartmentList ?? [],
+                      }}
+                      defaultSelectedList={[]}
+                      settingSelectedList={(value) => {}}
+                    />
+                  </div>
                 )}
 
                 {clickName === "选择发送目标" &&

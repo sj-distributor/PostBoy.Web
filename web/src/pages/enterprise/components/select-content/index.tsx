@@ -447,6 +447,7 @@ const SelectContent = memo(
             isUpdatedDeptUser={isUpdatedDeptUser}
           />
         </div>
+
         <div className={styles.typeShow}>
           {selectedShowArr.length > 0 && (
             <div className={styles.rowBox}>
