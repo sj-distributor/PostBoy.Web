@@ -242,30 +242,6 @@ const SelectTargetDialog = memo(
                         )
                       })()}
                 </div>
-                {clickName === "选择发送目标" && (
-                  <Autocomplete
-                    disableClearable
-                    fullWidth
-                    id="type-simple-select"
-                    value={sendType}
-                    size="small"
-                    options={sendList}
-                    getOptionLabel={(x) =>
-                      x === SendObjOrGroup.Group ? "群组" : "对象"
-                    }
-                    onChange={(e, value) => {
-                      setSendType && setSendType(value)
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        className={styles.InputButton}
-                        margin="dense"
-                        type="button"
-                      />
-                    )}
-                  />
-                )}
 
                 {departmentKeyValue && departmentKeyValue.key && (
                   <div>
@@ -278,7 +254,32 @@ const SelectTargetDialog = memo(
                       }}
                       defaultSelectedList={[]}
                       settingSelectedList={(value) => {}}
-                    />
+                    >
+                      {clickName === "选择发送目标" && (
+                        <Autocomplete
+                          disableClearable
+                          fullWidth
+                          id="type-simple-select"
+                          value={sendType}
+                          size="small"
+                          options={sendList}
+                          getOptionLabel={(x) =>
+                            x === SendObjOrGroup.Group ? "群组" : "对象"
+                          }
+                          onChange={(_e, value) => {
+                            setSendType && setSendType(value)
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              className={styles.InputButton}
+                              margin="dense"
+                              type="button"
+                            />
+                          )}
+                        />
+                      )}
+                    </TreeViewSelector>
                   </div>
                 )}
 

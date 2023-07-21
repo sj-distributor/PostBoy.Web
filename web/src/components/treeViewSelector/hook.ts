@@ -5,14 +5,14 @@ import {
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
-  IDepartmentKeyControl,
 } from "../../dtos/enterprise"
 import useDeptUserData from "../../hooks/deptUserData"
-import { ISelectedItem, ITreeViewHookProps } from "./props"
+import { ITreeViewHookProps } from "./props"
 
 const useAction = ({
   appId,
   defaultSelectedList,
+  flattenData,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const {
@@ -22,13 +22,16 @@ const useAction = ({
     searchKeyValue,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
-    recursiveSearchDeptOrUser,
-    loadDeptUsersFromWebWorker,
   } = useDeptUserData({ appId })
 
   const [
     sourceMap,
-    { set: sourceMapSetter, get: sourceMapGetter, setAll: sourceMapSetAll },
+    {
+      set: sourceMapSetter,
+      get: sourceMapGetter,
+      setAll: sourceMapSetAll,
+      reset: sourceReset,
+    },
   ] = useMap<string, IDepartmentAndUserListValue>()
 
   const [selectedList, setSelectedList] = useState<
@@ -62,15 +65,7 @@ const useAction = ({
   const handleDeptOrUserClick = (
     type: ClickType,
     clickedItem: IDepartmentAndUserListValue
-  ) => {
-    const isCollapsed = sourceMapGetter(String(clickedItem.id))?.isCollapsed
-    const selected = sourceMapGetter(String(clickedItem.id))?.selected
-    const selectOrCollepse =
-      type === ClickType.Collapse
-        ? { isCollapsed: !isCollapsed }
-        : { isCollapsed, selected: !selected }
-    sourceMapSetter(String(clickedItem.id), Object.assign(clickedItem, selectOrCollepse))
-  }
+  ) => {}
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -78,17 +73,24 @@ const useAction = ({
   }
 
   useEffect(() => {
-    flattenList.forEach((item) => {
+    flattenData.forEach((item) => {
       sourceMapSetter(String(item.id), item)
     })
-  }, [])
+  }, [flattenData])
 
   useEffect(() => {
     // 同步外部selectedList
     settingSelectedList(selectedList)
   }, [selectedList])
 
+  useEffect(() => {
+    selectedList.forEach((item) => {
+      // 同步到map数据
+    })
+  }, [defaultSelectedList])
+
   return {
+    selectedList,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,

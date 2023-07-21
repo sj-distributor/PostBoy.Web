@@ -7,8 +7,6 @@ import {
 
 type AutocompleteProps = typeof Autocomplete
 
-export interface ISelectedItem extends IDepartmentAndUserListValue {}
-
 export interface IFoldSelectorProps extends AutocompleteProps {}
 export interface IFlattenSelectorProps extends AutocompleteProps {}
 
@@ -22,7 +20,7 @@ export interface ITreeViewProps {
   inputValue: string
   sourceData?: ISourceData
   isCanSelect?: DeptUserCanSelectStatus
-  children?: React.ReactDOM | string
+  children?: React.ReactNode
   defaultSelectedList: IDepartmentAndUserListValue[]
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
   foldSelectorProps?: IFoldSelectorProps
@@ -31,6 +29,7 @@ export interface ITreeViewProps {
 
 export interface ITreeViewHookProps {
   appId: string
+  flattenData: IDepartmentAndUserListValue[]
   defaultSelectedList: IDepartmentAndUserListValue[]
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }
