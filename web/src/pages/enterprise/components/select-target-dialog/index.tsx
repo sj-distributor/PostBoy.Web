@@ -30,7 +30,8 @@ import { memo } from "react"
 import { onFilterDeptAndUsers } from "../../../../components/treeViewSelector/fitler"
 import TreeViewSelector from "../../../../components/treeViewSelector"
 
-const SelectTargetDialog = memo(
+const SelectTargetDialog =
+  // memo(
   (props: ITargetDialogProps) => {
     const {
       open,
@@ -50,6 +51,7 @@ const SelectTargetDialog = memo(
       sendType,
       outerTagsValue,
       isUpdatedDeptUser,
+      idRouteMap,
       setSendType,
       setChatId,
       setChatName,
@@ -215,7 +217,7 @@ const SelectTargetDialog = memo(
           <DialogContent sx={{ width: "30rem" }}>
             {!isLoading ? (
               <>
-                <div
+                {/* <div
                   style={{
                     height: "15rem",
                     overflowY: "auto",
@@ -241,7 +243,7 @@ const SelectTargetDialog = memo(
                           recursiveRenderDeptList(activeData.data, 0, true)
                         )
                       })()}
-                </div>
+                </div> */}
 
                 {departmentKeyValue && departmentKeyValue.key && (
                   <div>
@@ -251,6 +253,7 @@ const SelectTargetDialog = memo(
                       sourceData={{
                         foldData: departmentKeyValue.data,
                         flattenData: flattenDepartmentList ?? [],
+                        idRouteMap,
                       }}
                       defaultSelectedList={[]}
                       settingSelectedList={(value) => {}}
@@ -283,7 +286,7 @@ const SelectTargetDialog = memo(
                   </div>
                 )}
 
-                {clickName === "选择发送目标" &&
+                {/* {clickName === "选择发送目标" &&
                 sendType !== SendObjOrGroup.Object ? (
                   <></>
                 ) : (
@@ -355,7 +358,7 @@ const SelectTargetDialog = memo(
                       }}
                     />
                   )
-                )}
+                )} */}
 
                 {clickName === "选择发送目标" ? (
                   <>
@@ -545,6 +548,7 @@ const SelectTargetDialog = memo(
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            idRouteMap={idRouteMap}
           />
         )}
 
@@ -559,19 +563,19 @@ const SelectTargetDialog = memo(
         />
       </div>
     )
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.open === nextProps.open &&
-      prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
-      prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
-      prevProps.AppId === nextProps.AppId &&
-      prevProps.groupList === nextProps.groupList &&
-      prevProps.chatId === nextProps.chatId &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.sendType === nextProps.sendType
-    )
   }
-)
+// (prevProps, nextProps) => {
+//   return (
+//     prevProps.open === nextProps.open &&
+//     prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
+//     prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
+//     prevProps.AppId === nextProps.AppId &&
+//     prevProps.groupList === nextProps.groupList &&
+//     prevProps.chatId === nextProps.chatId &&
+//     prevProps.isLoading === nextProps.isLoading &&
+//     prevProps.sendType === nextProps.sendType
+//   )
+// }
+// )
 
 export default SelectTargetDialog

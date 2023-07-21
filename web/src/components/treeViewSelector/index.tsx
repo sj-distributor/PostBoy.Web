@@ -32,23 +32,27 @@ const TreeViewSelector = ({
   foldSelectorProps,
   flattenSelectorProps,
 }: ITreeViewProps) => {
-  const { foldData, flattenData } = sourceData ?? {
+  const { foldData, flattenData, idRouteMap } = sourceData ?? {
     foldData: [],
     flattenData: [],
+    idRouteMap: new Map(),
   }
 
   const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both
 
   const {
+    foldList,
+    flattenList,
     selectedList,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,
-    sourceMapGetter,
   } = useAction({
     appId,
     defaultSelectedList,
+    foldData,
     flattenData,
+    idRouteMap,
     settingSelectedList,
   })
 
@@ -74,12 +78,12 @@ const TreeViewSelector = ({
             name: deptUserData.name,
             type: deptUserData.type,
             parentid: String(deptUserData.parentid),
-            isCollapsed: false,
+            isCollapsed: deptUserData.isCollapsed,
             selected: deptUserData.selected,
             children: [],
           }
           return (
-            <div key={deptUserData.id}>
+            <div key={deptUserData.name}>
               <ListItemButton
                 sx={{ pl, height: "2.2rem" }}
                 onClick={(e) => {
@@ -88,33 +92,21 @@ const TreeViewSelector = ({
                     handleDeptOrUserClick(ClickType.Collapse, insertData)
                 }}
               >
-                {handleTypeIsCanSelect(canSelect, deptUserData.type) &&
-                  (sourceMapGetter(String(insertData.id))?.selected ? (
-                    <Checkbox
-                      edge="start"
-                      value={true}
-                      tabIndex={-1}
-                      disableRipple
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeptOrUserClick(ClickType.Select, insertData)
-                      }}
-                    />
-                  ) : (
-                    <Checkbox
-                      edge="start"
-                      value={true}
-                      tabIndex={-1}
-                      disableRipple
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeptOrUserClick(ClickType.Select, insertData)
-                      }}
-                    />
-                  ))}
+                {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
+                  <Checkbox
+                    edge="start"
+                    checked={deptUserData.selected}
+                    tabIndex={-1}
+                    disableRipple
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeptOrUserClick(ClickType.Select, insertData)
+                    }}
+                  />
+                )}
                 <ListItemText primary={deptUserData.name} />
                 {deptUserData.children.length > 0 &&
-                  (!!sourceMapGetter(String(insertData.id))?.isCollapsed ? (
+                  (!!deptUserData.isCollapsed ? (
                     <ExpandLess />
                   ) : (
                     <ExpandMore />
@@ -122,7 +114,7 @@ const TreeViewSelector = ({
               </ListItemButton>
               {deptUserData.children.length > 0 && (
                 <Collapse
-                  in={!!sourceMapGetter(String(insertData.id))?.isCollapsed}
+                  in={!!deptUserData.isCollapsed}
                   timeout={0}
                   unmountOnExit
                 >
@@ -153,7 +145,7 @@ const TreeViewSelector = ({
           ...center(),
         }}
       >
-        {foldData && recursiveRenderDeptList(foldData, 0, true)}
+        {foldList && recursiveRenderDeptList(foldList, 0, true)}
       </div>
 
       {children && children}

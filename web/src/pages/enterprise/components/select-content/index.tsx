@@ -62,6 +62,7 @@ const SelectContent = memo(
       flattenDepartmentList,
       departmentKeyValue,
       searchKeyValue,
+      idRouteMap,
       setDepartmentAndUserList,
       setFlattenDepartmentList,
       recursiveSearchDeptOrUser,
@@ -445,6 +446,7 @@ const SelectContent = memo(
             sendType={sendType}
             setSendType={setSendType}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            idRouteMap={idRouteMap}
           />
         </div>
 

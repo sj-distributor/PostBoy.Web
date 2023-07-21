@@ -57,7 +57,7 @@ export interface IDepartmentData {
 export interface IDepartmentUsersData {
   name: string
   userid: string
-  department: number[]
+  department: number
   open_userid: string
   selected: boolean
 }
@@ -66,9 +66,10 @@ export interface IDepartmentAndUserListValue {
   id: number | string
   name: string
   type: DepartmentAndUserType
-  parentid: string | number[]
+  parentid: string
   selected: boolean
   isCollapsed: boolean
+  idRoute?: number[]
   children: IDepartmentAndUserListValue[]
 }
 
@@ -129,6 +130,7 @@ export interface ITargetDialogProps {
   sendType?: SendObjOrGroup
   outerTagsValue?: ITagsList[]
   isUpdatedDeptUser: boolean
+  idRouteMap: Map<number, IDepartmentAndUserListValue>
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setChatName?: React.Dispatch<React.SetStateAction<string>>

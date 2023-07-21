@@ -1,5 +1,6 @@
 import { useMap } from "ahooks"
-import { useEffect, useState } from "react"
+import { clone } from "ramda"
+import { Key, useEffect, useState } from "react"
 import {
   ClickType,
   DepartmentAndUserType,
@@ -13,6 +14,8 @@ const useAction = ({
   appId,
   defaultSelectedList,
   flattenData,
+  foldData,
+  idRouteMap,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const {
@@ -22,17 +25,8 @@ const useAction = ({
     searchKeyValue,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
+    recursiveSearchDeptOrUser,
   } = useDeptUserData({ appId })
-
-  const [
-    sourceMap,
-    {
-      set: sourceMapSetter,
-      get: sourceMapGetter,
-      setAll: sourceMapSetAll,
-      reset: sourceReset,
-    },
-  ] = useMap<string, IDepartmentAndUserListValue>()
 
   const [selectedList, setSelectedList] = useState<
     IDepartmentAndUserListValue[]
@@ -42,12 +36,12 @@ const useAction = ({
     IDepartmentAndUserListValue[]
   >([])
 
-  const [defaultFold, setDefaultFold] = useState<IDepartmentAndUserListValue[]>(
-    []
+  const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
+    clone(foldData)
   )
 
   const [flattenList, setFlattenList] = useState<IDepartmentAndUserListValue[]>(
-    []
+    clone(flattenData)
   )
 
   // 处理部门列表能否被选择
@@ -64,19 +58,64 @@ const useAction = ({
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
-    clickedItem: IDepartmentAndUserListValue
-  ) => {}
+    clickedItem: IDepartmentAndUserListValue,
+    value?: boolean
+  ) => {
+    setFoldList((prev) => {
+      const newValue = prev.slice()
+
+      recursiveSearchDeptOrUser(newValue, (e) => {
+        // console.log(e.id, clickedItem.id)
+        e.id === clickedItem.id &&
+          (type === ClickType.Collapse
+            ? (e.isCollapsed = !e.isCollapsed)
+            : (e.selected = value ?? !e.selected))
+      })
+      return newValue
+    })
+    // const idRouteArr = idRouteMap.get(
+    //   Number(
+    //     clickedItem.type === DepartmentAndUserType.User
+    //       ? clickedItem.parentid
+    //       : clickedItem.id
+    //   )
+    // )
+    // console.log(idRouteArr)
+    // const data = [...foldList]
+    // const routeArr =
+    //   idRouteArr && idRouteArr.idRoute ? [...idRouteArr.idRoute] : []
+    // let innerItem: IDepartmentAndUserListValue | undefined = data.find(
+    //   (cell) => routeArr?.[0] === cell.id
+    // )
+    // console.log(innerItem)
+    // routeArr.shift()
+    // routeArr.forEach((item) => {
+    //   innerItem = innerItem?.children.find((cell) => cell.id === item)
+    // })
+    // innerItem =
+    //   clickedItem.type === DepartmentAndUserType.Department
+    //     ? innerItem
+    //     : innerItem?.children.find((cell) => cell.id === clickedItem.id)
+    // innerItem &&
+    //   (type === ClickType.Select
+    //     ? (innerItem.selected = value ?? !innerItem.selected)
+    //     : (innerItem.isCollapsed = !innerItem.isCollapsed))
+
+    // console.log(data)
+    // setFoldList(data)
+  }
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     setSelectedList(valueArr)
-  }
-
-  useEffect(() => {
-    flattenData.forEach((item) => {
-      sourceMapSetter(String(item.id), item)
+    setFoldList((prev) => {
+      const newValue = prev.slice()
+      recursiveSearchDeptOrUser(newValue, (user) => {
+        user.selected = !!valueArr.find((e) => e.id === user.id)
+      })
+      return newValue
     })
-  }, [flattenData])
+  }
 
   useEffect(() => {
     // 同步外部selectedList
@@ -89,12 +128,17 @@ const useAction = ({
     })
   }, [defaultSelectedList])
 
+  useEffect(() => {
+    console.log(foldList)
+  }, [foldList])
+
   return {
+    foldList,
+    flattenList,
     selectedList,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,
-    sourceMapGetter,
   }
 }
 

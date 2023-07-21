@@ -1,3 +1,4 @@
+import { useMap } from "ahooks"
 import { useMemo, useState } from "react"
 import {
   IDepartmentAndUserListValue,
@@ -18,6 +19,11 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     ISearchList[]
   >([])
 
+  const [idRouteMap, { setAll: idRouteMapSetAll }] = useMap<
+    number,
+    IDepartmentAndUserListValue
+  >()
+
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find((e) => e.key === appId)
     return result as IDepartmentKeyControl
@@ -29,15 +35,15 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
   }, [flattenDepartmentList, appId])
 
   const recursiveSearchDeptOrUser = (
-    hasData: IDepartmentAndUserListValue[],
+    dataList: IDepartmentAndUserListValue[],
     callback: (e: IDepartmentAndUserListValue) => void
   ) => {
-    for (const key in hasData) {
-      callback(hasData[key])
-      hasData[key].children.length > 0 &&
-        recursiveSearchDeptOrUser(hasData[key].children, callback)
+    for (const key in dataList) {
+      callback(dataList[key])
+      dataList[key].children.length > 0 &&
+        recursiveSearchDeptOrUser(dataList[key].children, callback)
     }
-    return hasData
+    return dataList
   }
 
   const loadDeptUsersFromWebWorker = (data: {
@@ -50,7 +56,11 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
       worker.postMessage(data)
 
       worker.onmessage = function (this: Worker, ev: MessageEvent<any>) {
-        const { copyDepartmentAndUserList, copyFlattenDepartmentList } = ev.data
+        const {
+          copyDepartmentAndUserList,
+          copyFlattenDepartmentList,
+          idRouteMap,
+        } = ev.data
 
         setDepartmentAndUserList((prev) => [
           ...prev,
@@ -60,6 +70,8 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
           ...prev,
           { key: data.AppId, data: copyFlattenDepartmentList },
         ])
+
+        idRouteMapSetAll(idRouteMap)
 
         resolve(true)
 
@@ -73,6 +85,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     flattenDepartmentList,
     departmentKeyValue,
     searchKeyValue,
+    idRouteMap,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,

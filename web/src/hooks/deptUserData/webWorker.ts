@@ -54,16 +54,23 @@ export const MyWorker = () => {
       defaultChild: IDepartmentAndUserListValue,
       type: UpdateListType,
       copyDepartmentAndUserList: IDepartmentAndUserListValue[],
-      copyFlattenDepartmentList: IDepartmentAndUserListValue[]
+      copyFlattenDepartmentList: IDepartmentAndUserListValue[],
+      idRouteMap: Map<number, IDepartmentAndUserListValue>
     ) => {
-      type !== UpdateListType.Flatten &&
-        recursiveDeptList(
+      if (type !== UpdateListType.Flatten) {
+        const idRoute = recursiveDeptList(
           copyDepartmentAndUserList,
           defaultChild,
           department,
           []
-        ).length === 0 &&
-        copyDepartmentAndUserList.push(defaultChild)
+        )
+        idRouteMap.set(Number(defaultChild.id), {
+          ...defaultChild,
+          idRoute: [...idRoute, Number(defaultChild.id)],
+        })
+
+        idRoute.length === 0 && copyDepartmentAndUserList.push(defaultChild)
+      }
 
       type !== UpdateListType.Fold &&
         copyFlattenDepartmentList.push(
@@ -85,7 +92,9 @@ export const MyWorker = () => {
       AppId,
       workWeChatUnits,
     }: IDeptUserWebWorkerProps): {
-      [index: string]: IDepartmentAndUserListValue[]
+      idRouteMap: Map<number, IDepartmentAndUserListValue>
+      copyDepartmentAndUserList: IDepartmentAndUserListValue[]
+      copyFlattenDepartmentList: IDepartmentAndUserListValue[]
     } => {
       const copyDepartmentAndUserList: IDepartmentAndUserListValue[] = []
 
@@ -94,6 +103,8 @@ export const MyWorker = () => {
       const copyDeptListResponse = workWeChatUnits.sort(
         (a, b) => a.department.id - b.department.id
       )
+
+      const idRouteMap = new Map<number, IDepartmentAndUserListValue>()
 
       const waitList = new Map()
 
@@ -114,7 +125,7 @@ export const MyWorker = () => {
             id: `${item.userid}`,
             name: item.userid,
             type: DepartmentAndUserType.User,
-            parentid: item.department,
+            parentid: String(item.department),
             selected: false,
             isCollapsed: false,
             canSelect: true,
@@ -129,7 +140,8 @@ export const MyWorker = () => {
           defaultChild,
           UpdateListType.Flatten,
           copyDepartmentAndUserList,
-          copyFlattenDepartmentList
+          copyFlattenDepartmentList,
+          idRouteMap
         )
 
         let isContinue: boolean = false
@@ -163,7 +175,8 @@ export const MyWorker = () => {
               value.defaultChild,
               UpdateListType.Fold,
               copyDepartmentAndUserList,
-              copyFlattenDepartmentList
+              copyFlattenDepartmentList,
+              idRouteMap
             )
           }
           continue
@@ -176,18 +189,27 @@ export const MyWorker = () => {
           defaultChild,
           UpdateListType.Fold,
           copyDepartmentAndUserList,
-          copyFlattenDepartmentList
+          copyFlattenDepartmentList,
+          idRouteMap
         )
       }
-      return { copyDepartmentAndUserList, copyFlattenDepartmentList }
+      return {
+        copyDepartmentAndUserList,
+        copyFlattenDepartmentList,
+        idRouteMap,
+      }
     }
     this.onmessage = function (e: MessageEvent) {
-      const { copyDepartmentAndUserList, copyFlattenDepartmentList } =
-        loadDeptUsers(e.data)
+      const {
+        copyDepartmentAndUserList,
+        copyFlattenDepartmentList,
+        idRouteMap,
+      } = loadDeptUsers(e.data)
 
       this.postMessage({
         copyDepartmentAndUserList,
         copyFlattenDepartmentList,
+        idRouteMap,
       }) // 返回结果
     }
   }
