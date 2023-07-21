@@ -106,7 +106,7 @@ const useAction = ({
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     setSelectedList(valueArr)
     valueArr.forEach((item) => {
-      handleDeptOrUserClick(ClickType.Select, item)
+      handleDeptOrUserClick(ClickType.Select, item, true)
     })
     // setFoldList((prev) => {
     //   const newValue = prev.slice()
