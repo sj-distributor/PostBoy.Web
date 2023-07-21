@@ -61,60 +61,60 @@ const useAction = ({
     clickedItem: IDepartmentAndUserListValue,
     value?: boolean
   ) => {
-    setFoldList((prev) => {
-      const newValue = prev.slice()
+    // setFoldList((prev) => {
+    //   const newValue = prev.slice()
 
-      recursiveSearchDeptOrUser(newValue, (e) => {
-        // console.log(e.id, clickedItem.id)
-        e.id === clickedItem.id &&
-          (type === ClickType.Collapse
-            ? (e.isCollapsed = !e.isCollapsed)
-            : (e.selected = value ?? !e.selected))
-      })
-      return newValue
-    })
-    // const idRouteArr = idRouteMap.get(
-    //   Number(
-    //     clickedItem.type === DepartmentAndUserType.User
-    //       ? clickedItem.parentid
-    //       : clickedItem.id
-    //   )
-    // )
-    // console.log(idRouteArr)
-    // const data = [...foldList]
-    // const routeArr =
-    //   idRouteArr && idRouteArr.idRoute ? [...idRouteArr.idRoute] : []
-    // let innerItem: IDepartmentAndUserListValue | undefined = data.find(
-    //   (cell) => routeArr?.[0] === cell.id
-    // )
-    // console.log(innerItem)
-    // routeArr.shift()
-    // routeArr.forEach((item) => {
-    //   innerItem = innerItem?.children.find((cell) => cell.id === item)
+    //   recursiveSearchDeptOrUser(newValue, (e) => {
+    //     e.id === clickedItem.id &&
+    //       (type === ClickType.Collapse
+    //         ? (e.isCollapsed = !e.isCollapsed)
+    //         : (e.selected = !e.selected))
+    //   })
+    //   return newValue
     // })
-    // innerItem =
-    //   clickedItem.type === DepartmentAndUserType.Department
-    //     ? innerItem
-    //     : innerItem?.children.find((cell) => cell.id === clickedItem.id)
-    // innerItem &&
-    //   (type === ClickType.Select
-    //     ? (innerItem.selected = value ?? !innerItem.selected)
-    //     : (innerItem.isCollapsed = !innerItem.isCollapsed))
+    const idRouteArr = idRouteMap.get(
+      Number(
+        clickedItem.type === DepartmentAndUserType.User
+          ? clickedItem.parentid
+          : clickedItem.id
+      )
+    )
+    const data = [...foldList]
+    const routeArr =
+      idRouteArr && idRouteArr.idRoute ? [...idRouteArr.idRoute] : []
+    let innerItem: IDepartmentAndUserListValue | undefined = data.find(
+      (cell) => routeArr?.[0] === cell.id
+    )
+    routeArr.shift()
+    routeArr.forEach((item) => {
+      innerItem = innerItem?.children.find((cell) => cell.id === item)
+    })
+    innerItem =
+      clickedItem.type === DepartmentAndUserType.Department
+        ? innerItem
+        : innerItem?.children.find((cell) => cell.id === clickedItem.id)
+    innerItem &&
+      (type === ClickType.Select
+        ? (innerItem.selected = value ?? !innerItem.selected)
+        : (innerItem.isCollapsed = !innerItem.isCollapsed))
 
-    // console.log(data)
-    // setFoldList(data)
+    console.log(data)
+    setFoldList(data)
   }
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     setSelectedList(valueArr)
-    setFoldList((prev) => {
-      const newValue = prev.slice()
-      recursiveSearchDeptOrUser(newValue, (user) => {
-        user.selected = !!valueArr.find((e) => e.id === user.id)
-      })
-      return newValue
+    valueArr.forEach((item) => {
+      handleDeptOrUserClick(ClickType.Select, item)
     })
+    // setFoldList((prev) => {
+    //   const newValue = prev.slice()
+    //   recursiveSearchDeptOrUser(newValue, (user) => {
+    //     user.selected = !!valueArr.find((e) => e.id === user.id)
+    //   })
+    //   return newValue
+    // })
   }
 
   useEffect(() => {
@@ -128,9 +128,6 @@ const useAction = ({
     })
   }, [defaultSelectedList])
 
-  useEffect(() => {
-    console.log(foldList)
-  }, [foldList])
 
   return {
     foldList,
