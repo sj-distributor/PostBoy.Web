@@ -13,7 +13,7 @@ export interface IFlattenSelectorProps extends AutocompleteProps {}
 export interface ISourceData {
   foldData: IDepartmentAndUserListValue[]
   flattenData: IDepartmentAndUserListValue[]
-  idRouteMap: Map<number, IDepartmentAndUserListValue>
+  idRouteMap: Map<string, IDepartmentAndUserListValue>
 }
 
 export interface ITreeViewProps {
@@ -33,6 +33,6 @@ export interface ITreeViewHookProps {
   defaultSelectedList: IDepartmentAndUserListValue[]
   foldData: IDepartmentAndUserListValue[]
   flattenData: IDepartmentAndUserListValue[]
-  idRouteMap: Map<number, IDepartmentAndUserListValue>
+  idRouteMap: Map<string, IDepartmentAndUserListValue>
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }

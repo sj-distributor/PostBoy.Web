@@ -134,7 +134,7 @@ const SelectTargetDialog =
               id: deptUserData.id,
               name: deptUserData.name,
               type: deptUserData.type,
-              parentid: String(deptUserData.parentid),
+              parentid: deptUserData.parentid,
               selected: deptUserData.selected,
               isCollapsed: deptUserData.isCollapsed,
               children: [],

@@ -130,7 +130,7 @@ export interface ITargetDialogProps {
   sendType?: SendObjOrGroup
   outerTagsValue?: ITagsList[]
   isUpdatedDeptUser: boolean
-  idRouteMap: Map<number, IDepartmentAndUserListValue>
+  idRouteMap: Map<string, IDepartmentAndUserListValue>
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setChatName?: React.Dispatch<React.SetStateAction<string>>

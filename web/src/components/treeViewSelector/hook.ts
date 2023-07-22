@@ -1,5 +1,5 @@
 import { useMap } from "ahooks"
-import { clone } from "ramda"
+import { clone, difference, remove } from "ramda"
 import { Key, useEffect, useState } from "react"
 import {
   ClickType,
@@ -61,22 +61,11 @@ const useAction = ({
     clickedItem: IDepartmentAndUserListValue,
     value?: boolean
   ) => {
-    // setFoldList((prev) => {
-    //   const newValue = prev.slice()
-
-    //   recursiveSearchDeptOrUser(newValue, (e) => {
-    //     e.id === clickedItem.id &&
-    //       (type === ClickType.Collapse
-    //         ? (e.isCollapsed = !e.isCollapsed)
-    //         : (e.selected = !e.selected))
-    //   })
-    //   return newValue
-    // })
     const idRouteArr = idRouteMap.get(
-      Number(
+      String(
         clickedItem.type === DepartmentAndUserType.User
           ? clickedItem.parentid
-          : clickedItem.id
+          : clickedItem.name
       )
     )
     const data = [...foldList]
@@ -98,23 +87,32 @@ const useAction = ({
         ? (innerItem.selected = value ?? !innerItem.selected)
         : (innerItem.isCollapsed = !innerItem.isCollapsed))
 
-    console.log(data)
     setFoldList(data)
+    setSelectedList((prev) => {
+      return clickedItem.selected
+        ? remove(
+            prev.findIndex((item) => item.id === clickedItem.id),
+            1,
+            prev
+          )
+        : [...prev, clickedItem]
+    })
   }
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
+    const diff = difference(valueArr, selectedList)
+    const diffReverse = difference(selectedList, valueArr)
+    diff.length > 0 &&
+      diff.forEach((item) =>
+        handleDeptOrUserClick(ClickType.Select, item, true)
+      )
+    diffReverse.length > 0 &&
+      diffReverse.forEach((item) =>
+        handleDeptOrUserClick(ClickType.Select, item, false)
+      )
+
     setSelectedList(valueArr)
-    valueArr.forEach((item) => {
-      handleDeptOrUserClick(ClickType.Select, item, true)
-    })
-    // setFoldList((prev) => {
-    //   const newValue = prev.slice()
-    //   recursiveSearchDeptOrUser(newValue, (user) => {
-    //     user.selected = !!valueArr.find((e) => e.id === user.id)
-    //   })
-    //   return newValue
-    // })
   }
 
   useEffect(() => {
@@ -127,7 +125,6 @@ const useAction = ({
       // 同步到map数据
     })
   }, [defaultSelectedList])
-
 
   return {
     foldList,

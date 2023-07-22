@@ -135,7 +135,7 @@ const useAction = (props: {
             id: e.id,
             name: e.name,
             type: DepartmentAndUserType.User,
-            parentid: String(e.parentid),
+            parentid: e.parentid,
             selected: e.selected,
             isCollapsed: false,
             children: [],
