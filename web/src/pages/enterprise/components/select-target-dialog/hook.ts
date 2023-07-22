@@ -70,7 +70,7 @@ const useAction = (props: {
     id: "-1",
     name: "随机群主",
     type: DepartmentAndUserType.User,
-    parentid: "",
+    parentid: -1,
     selected: false,
     isCollapsed: false,
     children: [],

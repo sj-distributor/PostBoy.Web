@@ -20,7 +20,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
   >([])
 
   const [idRouteMap, { setAll: idRouteMapSetAll }] = useMap<
-    string,
+    number,
     IDepartmentAndUserListValue
   >()
 

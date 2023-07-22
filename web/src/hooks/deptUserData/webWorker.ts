@@ -18,6 +18,18 @@ export const MyWorker = () => {
       User,
     }
 
+    const recursiveSearchDeptOrUser = (
+      dataList: IDepartmentAndUserListValue[],
+      callback: (e: IDepartmentAndUserListValue) => void
+    ) => {
+      for (const key in dataList) {
+        callback(dataList[key])
+        dataList[key].children.length > 0 &&
+          recursiveSearchDeptOrUser(dataList[key].children, callback)
+      }
+      return dataList
+    }
+
     const recursiveDeptList = (
       hasData: IDepartmentAndUserListValue[],
       defaultChild: IDepartmentAndUserListValue,
@@ -55,7 +67,7 @@ export const MyWorker = () => {
       type: UpdateListType,
       copyDepartmentAndUserList: IDepartmentAndUserListValue[],
       copyFlattenDepartmentList: IDepartmentAndUserListValue[],
-      idRouteMap: Map<string, IDepartmentAndUserListValue>
+      idRouteMap: Map<number, IDepartmentAndUserListValue>
     ) => {
       if (type !== UpdateListType.Flatten) {
         const idRoute = recursiveDeptList(
@@ -64,7 +76,20 @@ export const MyWorker = () => {
           department,
           []
         )
-        idRouteMap.set(String(defaultChild.name), {
+        const deptDataList = defaultChild.children.filter(
+          (item) => item.type === DepartmentAndUserType.Department
+        )
+
+        recursiveSearchDeptOrUser(deptDataList, (item) => {})
+
+        deptDataList.length > 0 &&
+          console.log(
+            JSON.stringify(
+              deptDataList.map((item) => item.children.map((x) => x.id))
+            )
+          )
+        // TODO 嵌套增加id route
+        idRouteMap.set(Number(defaultChild.id), {
           ...defaultChild,
           idRoute: [...idRoute, Number(defaultChild.id)],
         })
@@ -78,7 +103,7 @@ export const MyWorker = () => {
           ...users.map((item) => ({
             id: item.userid,
             name: item.userid,
-            parentid: department.name,
+            parentid: department.id,
             type: DepartmentAndUserType.User,
             selected: false,
             isCollapsed: false,
@@ -92,7 +117,7 @@ export const MyWorker = () => {
       AppId,
       workWeChatUnits,
     }: IDeptUserWebWorkerProps): {
-      idRouteMap: Map<string, IDepartmentAndUserListValue>
+      idRouteMap: Map<number, IDepartmentAndUserListValue>
       copyDepartmentAndUserList: IDepartmentAndUserListValue[]
       copyFlattenDepartmentList: IDepartmentAndUserListValue[]
     } => {
@@ -104,7 +129,7 @@ export const MyWorker = () => {
         (a, b) => a.department.id - b.department.id
       )
 
-      const idRouteMap = new Map<string, IDepartmentAndUserListValue>()
+      const idRouteMap = new Map<number, IDepartmentAndUserListValue>()
 
       const waitList = new Map()
 
@@ -118,14 +143,14 @@ export const MyWorker = () => {
           id: department.id,
           name: department.name,
           type: DepartmentAndUserType.Department,
-          parentid: String(department.parentid),
+          parentid: department.parentid,
           selected: false,
           isCollapsed: false,
           children: users.map((item) => ({
             id: `${item.userid}`,
             name: item.userid,
             type: DepartmentAndUserType.User,
-            parentid: department.name,
+            parentid: department.id,
             selected: false,
             isCollapsed: false,
             canSelect: true,

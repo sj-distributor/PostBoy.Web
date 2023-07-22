@@ -11,21 +11,11 @@ export const onFilterDeptAndUsers = (
       item.name.toUpperCase().includes(state.inputValue.toUpperCase())
     )
     for (let i = 0; i < findArray.length; i++) {
-      array.push(findArray[i])
+      array.unshift(findArray[i])
       const findParent = options.find(
-        (item) => item.name === findArray[i].parentid
+        (item) => item.id === Number(findArray[i].parentid)
       )
-      if (!!findParent) {
-        const index = array.findIndex(
-          (item) => item.name === findArray[i].parentid
-        )
-        if (index === -1) {
-          const index = array.findIndex(
-            (item) => item.parentid === findParent.name
-          )
-          array.splice(index, 0, findParent)
-        }
-      }
+      findParent && array.unshift(findParent)
     }
     return array
   }

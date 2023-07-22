@@ -165,7 +165,7 @@ const TreeViewSelector = ({
           }
           getOptionLabel={(option: IDepartmentAndUserListValue) => option.name}
           isOptionEqualToValue={(option, value) => option.id === value.id}
-          groupBy={(option) => option.parentid as string}
+          groupBy={(option) => String(option.parentid)}
           componentsProps={{
             paper: { elevation: 3 },
             popper: {

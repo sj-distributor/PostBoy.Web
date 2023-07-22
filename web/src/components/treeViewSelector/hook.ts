@@ -32,10 +32,6 @@ const useAction = ({
     IDepartmentAndUserListValue[]
   >([])
 
-  const [collapsedList, setCollapsedList] = useState<
-    IDepartmentAndUserListValue[]
-  >([])
-
   const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
     clone(foldData)
   )
@@ -55,47 +51,81 @@ const useAction = ({
       : canSelect === DeptUserCanSelectStatus.User
   }
 
+  function findNodeByIdRoute(
+    node: IDepartmentAndUserListValue,
+    idRoute: number[]
+  ): IDepartmentAndUserListValue | undefined {
+    if (idRoute.length === 0 || node.id !== idRoute[0]) {
+      return undefined
+    }
+
+    if (idRoute.length === 1 && idRoute[0] === node.id) {
+      return node
+    }
+
+    for (const child of node.children) {
+      const foundNode = findNodeByIdRoute(child, idRoute.slice(1))
+      if (foundNode) {
+        return foundNode
+      }
+    }
+
+    return undefined
+  }
+
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
     clickedItem: IDepartmentAndUserListValue,
     value?: boolean
   ) => {
-    const idRouteArr = idRouteMap.get(
-      String(
+    const idRouteItem = idRouteMap.get(
+      Number(
         clickedItem.type === DepartmentAndUserType.User
           ? clickedItem.parentid
-          : clickedItem.name
+          : clickedItem.id
       )
     )
-    const data = [...foldList]
-    const routeArr =
-      idRouteArr && idRouteArr.idRoute ? [...idRouteArr.idRoute] : []
-    let innerItem: IDepartmentAndUserListValue | undefined = data.find(
-      (cell) => routeArr?.[0] === cell.id
+
+    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
+      (item) => ({ ...item })
     )
-    routeArr.shift()
-    routeArr.forEach((item) => {
-      innerItem = innerItem?.children.find((cell) => cell.id === item)
-    })
-    innerItem =
+
+    console.log(
+      clickedItem.type === DepartmentAndUserType.User
+        ? clickedItem.parentid
+        : clickedItem.id,
+      idRouteMap,
+      idRouteItem,
+      copyFoldList
+    )
+
+    const routeArr = idRouteItem?.idRoute ?? []
+
+    const innerItem: IDepartmentAndUserListValue | undefined =
+      findNodeByIdRoute(copyFoldList[0], routeArr)
+
+    const finalInnerItem =
       clickedItem.type === DepartmentAndUserType.Department
         ? innerItem
         : innerItem?.children.find((cell) => cell.id === clickedItem.id)
-    innerItem &&
-      (type === ClickType.Select
-        ? (innerItem.selected = value ?? !innerItem.selected)
-        : (innerItem.isCollapsed = !innerItem.isCollapsed))
 
-    setFoldList(data)
+    finalInnerItem &&
+      (type === ClickType.Select
+        ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
+        : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed))
+
+    setFoldList(copyFoldList)
     setSelectedList((prev) => {
-      return clickedItem.selected
-        ? remove(
-            prev.findIndex((item) => item.id === clickedItem.id),
-            1,
-            prev
-          )
-        : [...prev, clickedItem]
+      return type === ClickType.Select
+        ? clickedItem.selected
+          ? remove(
+              prev.findIndex((item) => item.id === clickedItem.id),
+              1,
+              prev
+            )
+          : [...prev, clickedItem]
+        : prev
     })
   }
 
@@ -103,6 +133,7 @@ const useAction = ({
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     const diff = difference(valueArr, selectedList)
     const diffReverse = difference(selectedList, valueArr)
+
     diff.length > 0 &&
       diff.forEach((item) =>
         handleDeptOrUserClick(ClickType.Select, item, true)
