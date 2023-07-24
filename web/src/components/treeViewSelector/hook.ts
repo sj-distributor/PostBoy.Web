@@ -76,46 +76,44 @@ const useAction = ({
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
-    clickedItem: IDepartmentAndUserListValue,
+    clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
     value?: boolean
   ) => {
-    const idRouteItem = idRouteMap.get(
-      Number(
-        clickedItem.type === DepartmentAndUserType.User
-          ? clickedItem.parentid
-          : clickedItem.id
-      )
-    )
-
     const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
       (item) => ({ ...item })
     )
 
-    console.log(
-      clickedItem.type === DepartmentAndUserType.User
-        ? clickedItem.parentid
-        : clickedItem.id,
-      idRouteMap,
-      idRouteItem,
-      copyFoldList
-    )
+    clickedList = Array.isArray(clickedList) ? clickedList : [clickedList]
 
-    const routeArr = idRouteItem?.idRoute ?? []
+    for (const clickedItem of clickedList) {
+      const idRouteItem = idRouteMap.get(
+        Number(
+          clickedItem.type === DepartmentAndUserType.User
+            ? clickedItem.parentid
+            : clickedItem.id
+        )
+      )
 
-    const innerItem: IDepartmentAndUserListValue | undefined =
-      findNodeByIdRoute(copyFoldList[0], routeArr)
+      const routeArr = idRouteItem?.idRoute ?? []
 
-    const finalInnerItem =
-      clickedItem.type === DepartmentAndUserType.Department
-        ? innerItem
-        : innerItem?.children.find((cell) => cell.id === clickedItem.id)
+      const innerItem: IDepartmentAndUserListValue | undefined =
+        findNodeByIdRoute(copyFoldList[0], routeArr)
 
-    finalInnerItem &&
-      (type === ClickType.Select
-        ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
-        : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed))
+      const finalInnerItem =
+        clickedItem.type === DepartmentAndUserType.Department
+          ? innerItem
+          : innerItem?.children.find((cell) => cell.id === clickedItem.id)
+
+      finalInnerItem &&
+        (type === ClickType.Select
+          ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
+          : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed))
+    }
 
     setFoldList(copyFoldList)
+    const clickedItem = !Array.isArray(clickedList)
+      ? clickedList
+      : clickedList[0]
     setSelectedList((prev) => {
       return type === ClickType.Select
         ? clickedItem.selected
@@ -134,14 +132,9 @@ const useAction = ({
     const diff = difference(valueArr, selectedList)
     const diffReverse = difference(selectedList, valueArr)
 
-    diff.length > 0 &&
-      diff.forEach((item) =>
-        handleDeptOrUserClick(ClickType.Select, item, true)
-      )
+    diff.length > 0 && handleDeptOrUserClick(ClickType.Select, diff, true)
     diffReverse.length > 0 &&
-      diffReverse.forEach((item) =>
-        handleDeptOrUserClick(ClickType.Select, item, false)
-      )
+      handleDeptOrUserClick(ClickType.Select, diffReverse, false)
 
     setSelectedList(valueArr)
   }

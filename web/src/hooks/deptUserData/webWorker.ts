@@ -18,16 +18,28 @@ export const MyWorker = () => {
       User,
     }
 
-    const recursiveSearchDeptOrUser = (
+    const addRouteWithWaitedItem = (
       dataList: IDepartmentAndUserListValue[],
-      callback: (e: IDepartmentAndUserListValue) => void
+      idRouteMap: Map<number, IDepartmentAndUserListValue>,
+      idRoute: number[]
     ) => {
-      for (const key in dataList) {
-        callback(dataList[key])
-        dataList[key].children.length > 0 &&
-          recursiveSearchDeptOrUser(dataList[key].children, callback)
+      if (dataList.length === 0) return
+
+      for (const item of dataList) {
+        idRouteMap.set(Number(item.id), {
+          ...item,
+          idRoute: [...idRoute, Number(item.id)],
+        })
+        const deptList = item.children.filter(
+          (item) => item.type === DepartmentAndUserType.Department
+        )
+        if (deptList.length > 0) {
+          addRouteWithWaitedItem(deptList, idRouteMap, [
+            ...idRoute,
+            Number(item.id),
+          ])
+        }
       }
-      return dataList
     }
 
     const recursiveDeptList = (
@@ -76,19 +88,17 @@ export const MyWorker = () => {
           department,
           []
         )
+
         const deptDataList = defaultChild.children.filter(
           (item) => item.type === DepartmentAndUserType.Department
         )
 
-        recursiveSearchDeptOrUser(deptDataList, (item) => {})
+        // 嵌套增加id route
+        addRouteWithWaitedItem(deptDataList, idRouteMap, [
+          ...idRoute,
+          Number(defaultChild.id),
+        ])
 
-        deptDataList.length > 0 &&
-          console.log(
-            JSON.stringify(
-              deptDataList.map((item) => item.children.map((x) => x.id))
-            )
-          )
-        // TODO 嵌套增加id route
         idRouteMap.set(Number(defaultChild.id), {
           ...defaultChild,
           idRoute: [...idRoute, Number(defaultChild.id)],
