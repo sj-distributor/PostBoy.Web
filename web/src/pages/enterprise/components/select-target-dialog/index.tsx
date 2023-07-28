@@ -18,48 +18,17 @@ import styles from "./index.module.scss"
 
 import {
   ClickType,
-  DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
 } from "../../../../dtos/enterprise"
-import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
+import { CircularProgress, Snackbar } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
-import { memo } from "react"
+import TreeViewSelector from "../../../../components/treeViewSelector"
 
-const fiteringDeptAndUsers = (
-  options: IDepartmentAndUserListValue[],
-  state: FilterOptionsState<IDepartmentAndUserListValue>
-) => {
-  if (state.inputValue !== "") {
-    const array: IDepartmentAndUserListValue[] = []
-    const findArray = options.filter((item) =>
-      item.name.toUpperCase().includes(state.inputValue.toUpperCase())
-    )
-    for (let i = 0; i < findArray.length; i++) {
-      array.push(findArray[i])
-      const findParent = options.find(
-        (item) => item.name === findArray[i].parentid
-      )
-      if (!!findParent) {
-        const index = array.findIndex(
-          (item) => item.name === findArray[i].parentid
-        )
-        if (index === -1) {
-          const index = array.findIndex(
-            (item) => item.parentid === findParent.name
-          )
-          array.splice(index, 0, findParent)
-        }
-      }
-    }
-    return array
-  }
-  return options
-}
-
-const SelectTargetDialog = memo(
+const SelectTargetDialog =
+  // memo(
   (props: ITargetDialogProps) => {
     const {
       open,
@@ -86,6 +55,7 @@ const SelectTargetDialog = memo(
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
+      settingSelectedList,
     } = props
 
     const {
@@ -140,88 +110,6 @@ const SelectTargetDialog = memo(
       setGroupList,
     })
 
-    const center = () =>
-      (clickName === "选择发送目标" ? !departmentKeyValue : !groupDeptUserList)
-        ? {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }
-        : {}
-
-    const recursiveRenderDeptList = (
-      data: IDepartmentAndUserListValue[],
-      pl: number,
-      isDivider: boolean
-    ) => {
-      const result = (
-        <List key={AppId} dense>
-          {data.map((deptUserData, index) => {
-            const insertData: IDepartmentAndUserListValue = {
-              id: deptUserData.id,
-              name: deptUserData.name,
-              type: deptUserData.type,
-              parentid: String(deptUserData.parentid),
-              selected: deptUserData.selected,
-              children: [],
-            }
-            return (
-              <div key={deptUserData.id}>
-                <ListItemButton
-                  sx={{ pl, height: "2.2rem" }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    deptUserData.children.length > 0 &&
-                      handleDeptOrUserClick(
-                        ClickType.Collapse,
-                        Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed,
-                        })
-                      )
-                  }}
-                >
-                  {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
-                    <Checkbox
-                      edge="start"
-                      checked={deptUserData.selected}
-                      tabIndex={-1}
-                      disableRipple
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeptOrUserClick(ClickType.Select, insertData)
-                      }}
-                    />
-                  )}
-                  <ListItemText primary={deptUserData.name} />
-                  {deptUserData.children.length > 0 &&
-                    (!!deptUserData.isCollapsed ? (
-                      <ExpandLess />
-                    ) : (
-                      <ExpandMore />
-                    ))}
-                </ListItemButton>
-                {deptUserData.children.length > 0 && (
-                  <Collapse
-                    in={!!deptUserData.isCollapsed}
-                    timeout={0}
-                    unmountOnExit
-                  >
-                    {recursiveRenderDeptList(
-                      deptUserData.children,
-                      pl + 2,
-                      index !== data.length - 1
-                    )}
-                  </Collapse>
-                )}
-              </div>
-            )
-          })}
-          {isDivider && <Divider />}
-        </List>
-      )
-      return result
-    }
-
     return (
       <div>
         <Dialog open={open} PaperProps={{ sx: { overflowY: "unset" } }}>
@@ -243,7 +131,7 @@ const SelectTargetDialog = memo(
           <DialogContent sx={{ width: "30rem" }}>
             {!isLoading ? (
               <>
-                <div
+                {/* <div
                   style={{
                     height: "15rem",
                     overflowY: "auto",
@@ -269,33 +157,48 @@ const SelectTargetDialog = memo(
                           recursiveRenderDeptList(activeData.data, 0, true)
                         )
                       })()}
-                </div>
-                {clickName === "选择发送目标" && (
-                  <Autocomplete
-                    disableClearable
-                    fullWidth
-                    id="type-simple-select"
-                    value={sendType}
-                    size="small"
-                    options={sendList}
-                    getOptionLabel={(x) =>
-                      x === SendObjOrGroup.Group ? "群组" : "对象"
-                    }
-                    onChange={(e, value) => {
-                      setSendType && setSendType(value)
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        className={styles.InputButton}
-                        margin="dense"
-                        type="button"
-                      />
-                    )}
-                  />
+                </div> */}
+
+                {departmentKeyValue && departmentKeyValue.key && (
+                  <div>
+                    <TreeViewSelector
+                      appId={AppId}
+                      inputValue={""}
+                      sourceData={{
+                        foldData: departmentKeyValue.data,
+                        flattenData: flattenDepartmentList ?? [],
+                      }}
+                      settingSelectedList={settingSelectedList}
+                    >
+                      {clickName === "选择发送目标" && (
+                        <Autocomplete
+                          disableClearable
+                          fullWidth
+                          id="type-simple-select"
+                          value={sendType}
+                          size="small"
+                          options={sendList}
+                          getOptionLabel={(x) =>
+                            x === SendObjOrGroup.Group ? "群组" : "对象"
+                          }
+                          onChange={(_e, value) => {
+                            setSendType && setSendType(value)
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              className={styles.InputButton}
+                              margin="dense"
+                              type="button"
+                            />
+                          )}
+                        />
+                      )}
+                    </TreeViewSelector>
+                  </div>
                 )}
 
-                {clickName === "选择发送目标" &&
+                {/* {clickName === "选择发送目标" &&
                 sendType !== SendObjOrGroup.Object ? (
                   <></>
                 ) : (
@@ -341,7 +244,7 @@ const SelectTargetDialog = memo(
                         />
                       )}
                       filterOptions={(options, state) =>
-                        fiteringDeptAndUsers(options, state)
+                        onFilterDeptAndUsers(options, state)
                       }
                       onChange={(e, value) =>
                         value && setSearchToDeptValue(value)
@@ -367,7 +270,7 @@ const SelectTargetDialog = memo(
                       }}
                     />
                   )
-                )}
+                )} */}
 
                 {clickName === "选择发送目标" ? (
                   <>
@@ -557,6 +460,7 @@ const SelectTargetDialog = memo(
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            settingSelectedList={settingSelectedList}
           />
         )}
 
@@ -571,19 +475,19 @@ const SelectTargetDialog = memo(
         />
       </div>
     )
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.open === nextProps.open &&
-      prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
-      prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
-      prevProps.AppId === nextProps.AppId &&
-      prevProps.groupList === nextProps.groupList &&
-      prevProps.chatId === nextProps.chatId &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.sendType === nextProps.sendType
-    )
   }
-)
+// (prevProps, nextProps) => {
+//   return (
+//     prevProps.open === nextProps.open &&
+//     prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
+//     prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
+//     prevProps.AppId === nextProps.AppId &&
+//     prevProps.groupList === nextProps.groupList &&
+//     prevProps.chatId === nextProps.chatId &&
+//     prevProps.isLoading === nextProps.isLoading &&
+//     prevProps.sendType === nextProps.sendType
+//   )
+// }
+// )
 
 export default SelectTargetDialog

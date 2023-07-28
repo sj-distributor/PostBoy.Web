@@ -1,8 +1,6 @@
-import { memo } from "react"
+import { memo, useState } from "react"
 import {
-  Box,
   Button,
-  CircularProgress,
   FormControl,
   InputLabel,
   List,
@@ -10,13 +8,12 @@ import {
   MenuItem,
   Paper,
   Select,
-  Skeleton,
   TextField,
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
 import { SelectContentProps } from "./props"
-import { useAction } from "./hook"
+import { defaultAppValue, useAction } from "./hook"
 import SelectTargetDialog from "../select-target-dialog"
 import {
   messageTypeList,
@@ -26,6 +23,7 @@ import {
 import {
   DeptUserCanSelectStatus,
   FileObject,
+  ICorpAppData,
   MessageDataFileType,
   MessageJobSendType,
   PictureText,
@@ -36,6 +34,7 @@ import DateSelector from "../date-selector"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import * as wangEditor from "@wangeditor/editor"
 import { MentionsInput, Mention } from "react-mentions"
+import useDeptUserData from "../../../../hooks/deptUserData"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -54,8 +53,6 @@ const SelectContent = memo(
     const {
       corpsValue,
       setCorpsValue,
-      corpAppValue,
-      setCorpAppValue,
       corpsList,
       corpAppList,
       messageTypeValue,
@@ -65,10 +62,6 @@ const SelectContent = memo(
       timeZoneValue,
       isShowDialog,
       setIsShowDialog,
-      departmentAndUserList,
-      setDepartmentAndUserList,
-      departmentKeyValue,
-      searchKeyValue,
       isTreeViewLoading,
       tagsList,
       setTagsValue,
@@ -120,6 +113,17 @@ const SelectContent = memo(
       detectMentionToDelete,
       appLoading,
       groupLoading,
+      departmentAndUserList,
+      flattenDepartmentList,
+      departmentKeyValue,
+      searchKeyValue,
+      corpAppValue,
+      setCorpAppValue,
+      setDepartmentAndUserList,
+      setFlattenDepartmentList,
+      recursiveSearchDeptOrUser,
+      loadDeptUsersFromWebWorker,
+      settingSelectedList,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -424,8 +428,10 @@ const SelectContent = memo(
             sendType={sendType}
             setSendType={setSendType}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            settingSelectedList={settingSelectedList}
           />
         </div>
+
         <div className={styles.typeShow}>
           {selectedShowArr.length > 0 && (
             <div className={styles.rowBox}>
