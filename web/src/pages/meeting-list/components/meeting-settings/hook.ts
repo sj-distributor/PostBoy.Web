@@ -592,14 +592,14 @@ const useAction = (props: MeetingSettingsProps) => {
     let newArr: string[] = [];
     getUserId(personnelData, newArr);
 
-    return newArr;
+    return personnelData;
   };
 
   const getUserId = (data: IDepartmentAndUserListValue[], arr: string[]) => {
     data.map((item) => {
       if (item.children && item.children.length > 0) {
         getUserId(item.children, arr);
-      } else if (!arr.find((i) => item.id === i)) {
+      } else {
         arr.push(item.name);
       }
     });
@@ -654,31 +654,17 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [corpsList]);
 
   useEffect(() => {
-    if (corpsList && corpsList.length && meetingData) {
-      const workWeChatCorpValue = corpsList.filter(
-        (item) => item.id === meetingData.workWeChatCorpId
-      )[0];
-
-      workWeChatCorpValue && setCorpsValue(workWeChatCorpValue);
-
-      const workWeChatCorpApplicationValue = corpAppList.filter(
-        (item) => item.id === meetingData.workWeChatCorpApplicationId
-      )[0];
-
-      workWeChatCorpApplicationValue &&
-        setCorpAppValue(workWeChatCorpApplicationValue);
-    }
+    meetingData &&
+      setCorpsValue(
+        corpsList.filter((item) => item.id === meetingData.workWeChatCorpId)[0]
+      );
   }, [meetingData]);
 
   // 初始化App数组
   useEffect(() => {
     if (!!corpsValue.id) {
-      meetingState === "update" && setAppLoading(true);
-
       GetCorpAppList({ CorpId: corpsValue.id }).then((corpAppResult) => {
-        setTimeout(() => {
-          setAppLoading(false);
-        }, 300);
+        setAppLoading(false);
         corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display));
       });
     }
@@ -718,9 +704,14 @@ const useAction = (props: MeetingSettingsProps) => {
         setIsTreeViewLoading(false);
 
       !!deptListResponse &&
-        loadDeptUsers(AppId, deptListResponse.workWeChatUnits);
+        loadDeptUsersFromWebWorker({
+          AppId,
+          workWeChatUnits: deptListResponse.workWeChatUnits,
+        }).then(() => {
+          setIsTreeViewLoading(false);
+          setIsLoadStop(true);
+        });
     };
-
     if (
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
@@ -741,9 +732,12 @@ const useAction = (props: MeetingSettingsProps) => {
 
       // 开始load数据
       setIsLoadStop(false);
-      corpAppValue?.appId && isShowDialog && loadDepartment(corpAppValue.appId);
+      corpAppValue?.appId &&
+        isShowDialog &&
+        (clickName === "选择参会人" || clickName === "指定会议管理员") &&
+        loadDepartment(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId, isShowDialog]);
+  }, [isShowDialog]);
 
   const clearData = () => {
     setAppointList([]);
@@ -805,16 +799,6 @@ const useAction = (props: MeetingSettingsProps) => {
       isMeetingCode: true,
       isMeetingLink: true,
     });
-
-    if (meetingState === "create") {
-      if (corpsList && corpsList.length) {
-        setCorpsValue(corpsList[0]);
-      }
-
-      if (corpAppList && corpAppList.length) {
-        setCorpAppValue(corpAppList[0]);
-      }
-    }
   };
 
   const [loading, loadingAction] = useBoolean(false);
@@ -886,11 +870,7 @@ const useAction = (props: MeetingSettingsProps) => {
       let attendeesList: string[] = [];
 
       participantList &&
-        (attendeesList = getUserChildrenList(
-          departmentKeyValue.data,
-          participantList,
-          []
-        ));
+        participantList.map((item) => attendeesList.push(item.id + ""));
 
       const admin_userid = adminUser
         ? adminUser.length > 0
@@ -904,32 +884,6 @@ const useAction = (props: MeetingSettingsProps) => {
       }
       if (!settingsData.ring_users) {
         delete settingsData.ring_users;
-      }
-
-      if (
-        attendeesList.length &&
-        settingsData.ring_users &&
-        settingsData.ring_users.userid.some(
-          (item) => !attendeesList.includes(item)
-        )
-      ) {
-        setTipsObject({
-          show: true,
-          msg: "Reminder objects need to all participate in the meeting",
-        });
-        return;
-      }
-
-      if (
-        attendeesList.length &&
-        settingsData.hosts &&
-        settingsData.hosts.userid.some((item) => !attendeesList.includes(item))
-      ) {
-        setTipsObject({
-          show: true,
-          msg: "The meeting host needs to all participate in the meeting",
-        });
-        return;
       }
 
       !settingsData.password && (settingsData.password = "");
@@ -1050,18 +1004,6 @@ const useAction = (props: MeetingSettingsProps) => {
             });
         } else if (meetingState === "update") {
           createOrUpdateMeetingData.meetingid = meetingData?.meetingId;
-
-          const hostList = createOrUpdateMeetingData.settings?.hosts;
-
-          if (
-            !hostList &&
-            createOrUpdateMeetingData.settings &&
-            meetingData?.adminUserId
-          ) {
-            createOrUpdateMeetingData.settings.hosts = {
-              userid: [meetingData?.adminUserId],
-            };
-          }
 
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
@@ -1290,25 +1232,63 @@ const useAction = (props: MeetingSettingsProps) => {
   //初始化会议数据
   useEffect(() => {
     meetingData && onGetMeetingData(meetingData);
-    !isOpenMeetingSettings && clearData();
   }, [isOpenMeetingSettings]);
+
+  useEffect(() => {
+    if (participantList && participantList?.length > 0 && corpAppValue.appId) {
+      const getHostListAndReminderListData = (
+        data: IDepartmentAndUserListValue[]
+      ) => {
+        return data && data.length > 0
+          ? participantList.map((item) => ({
+              ...item,
+              selected: data.find((i) => i.id === item.id)
+                ? !!data.find((i) => i.id === item.id)?.selected
+                : false,
+            }))
+          : participantList.map((item) => ({ ...item, selected: false }));
+      };
+
+      if (clickName === "选择指定提醒人员" && isShowDialog) {
+        setDepartmentAndUserList([
+          {
+            data: getHostListAndReminderListData(appointList ?? []),
+            key: corpAppValue.appId,
+          },
+        ]);
+        setFlattenDepartmentList([
+          {
+            data: getHostListAndReminderListData(appointList ?? []),
+            key: corpAppValue.appId,
+          },
+        ]);
+      }
+
+      if (clickName === "选择指定主持人" && isShowDialog) {
+        setDepartmentAndUserList([
+          {
+            data: getHostListAndReminderListData(hostList ?? []),
+            key: corpAppValue.appId,
+          },
+        ]);
+        setFlattenDepartmentList([
+          {
+            data: getHostListAndReminderListData(hostList ?? []),
+            key: corpAppValue.appId,
+          },
+        ]);
+      }
+    }
+  }, [isShowDialog]);
 
   useEffect(() => {
     meetingDuration.value === MeetingDuration.CustomEndTime &&
       customEndTimeAction.setTrue();
   }, [meetingDuration.value]);
 
+  //创建会议前清空数据
   useEffect(() => {
-    if (
-      corpsList &&
-      corpsList.length &&
-      corpAppList &&
-      corpAppList.length &&
-      meetingState === "create"
-    ) {
-      setCorpsValue(corpsList[0]);
-      setCorpAppValue(corpAppList[0]);
-    }
+    meetingState === "create" && clearData();
   }, [meetingState]);
 
   return {
