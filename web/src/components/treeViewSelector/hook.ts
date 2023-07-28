@@ -1,4 +1,3 @@
-import { useMap } from "ahooks"
 import { clone, difference, remove } from "ramda"
 import { useEffect, useState } from "react"
 import {
@@ -29,7 +28,7 @@ const useAction = ({
 
   const [selectedList, setSelectedList] = useState<
     IDepartmentAndUserListValue[]
-  >([])
+  >(defaultSelectedList ?? [])
 
   const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
     clone(foldData)
@@ -135,12 +134,6 @@ const useAction = ({
     // 同步外部selectedList
     settingSelectedList(selectedList)
   }, [selectedList])
-
-  useEffect(() => {
-    selectedList.forEach((item) => {
-      // 同步到map数据
-    })
-  }, [defaultSelectedList])
 
   return {
     foldList,

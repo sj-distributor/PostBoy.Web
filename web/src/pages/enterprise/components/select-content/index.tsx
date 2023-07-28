@@ -50,10 +50,6 @@ const SelectContent = memo(
       setIsShowPage,
     } = props
 
-    // 拿到的App对象
-    const [corpAppValue, setCorpAppValue] =
-      useState<ICorpAppData>(defaultAppValue)
-
     const {
       corpsValue,
       setCorpsValue,
@@ -121,10 +117,13 @@ const SelectContent = memo(
       flattenDepartmentList,
       departmentKeyValue,
       searchKeyValue,
+      corpAppValue,
+      setCorpAppValue,
       setDepartmentAndUserList,
       setFlattenDepartmentList,
       recursiveSearchDeptOrUser,
       loadDeptUsersFromWebWorker,
+      settingSelectedList,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -134,8 +133,6 @@ const SelectContent = memo(
       showErrorPrompt,
       clearData,
       setIsShowPage,
-      corpAppValue,
-      setCorpAppValue,
     })
 
     const fileOrImage = (file: FileObject, state: string) => {
@@ -431,6 +428,7 @@ const SelectContent = memo(
             sendType={sendType}
             setSendType={setSendType}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            settingSelectedList={settingSelectedList}
           />
         </div>
 

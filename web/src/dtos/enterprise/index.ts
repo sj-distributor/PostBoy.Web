@@ -127,6 +127,7 @@ export interface ITargetDialogProps {
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
+  settingSelectedList: (valueList: IDepartmentAndUserListValue[]) => void
 }
 
 export enum DeptUserCanSelectStatus {

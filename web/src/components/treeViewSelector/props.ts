@@ -21,7 +21,7 @@ export interface ITreeViewProps {
   sourceData?: ISourceData
   isCanSelect?: DeptUserCanSelectStatus
   children?: React.ReactNode
-  defaultSelectedList: IDepartmentAndUserListValue[]
+  defaultSelectedList?: IDepartmentAndUserListValue[]
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
   foldSelectorProps?: IFoldSelectorProps
   flattenSelectorProps?: IFlattenSelectorProps
@@ -29,7 +29,7 @@ export interface ITreeViewProps {
 
 export interface ITreeViewHookProps {
   appId: string
-  defaultSelectedList: IDepartmentAndUserListValue[]
+  defaultSelectedList?: IDepartmentAndUserListValue[]
   foldData: IDepartmentAndUserListValue[]
   flattenData: IDepartmentAndUserListValue[]
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void

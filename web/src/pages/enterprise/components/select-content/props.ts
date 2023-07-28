@@ -1,10 +1,6 @@
 import {
-  ICorpAppData,
-  IDepartmentAndUserListValue,
-  IDepartmentKeyControl,
   IDeptAndUserList,
   ILastShowTableData,
-  ISearchList,
   ISendMessageCommand,
   IUpdateMessageCommand,
 } from "../../../../dtos/enterprise"
@@ -38,8 +34,6 @@ export interface SelectContentHookProps {
   showErrorPrompt: (text: string) => void
   clearData?: boolean
   setIsShowPage?: React.Dispatch<React.SetStateAction<boolean>>
-  corpAppValue: ICorpAppData
-  setCorpAppValue: React.Dispatch<React.SetStateAction<ICorpAppData>>
 }
 
 export interface IDeptUserWebWorkerProps {

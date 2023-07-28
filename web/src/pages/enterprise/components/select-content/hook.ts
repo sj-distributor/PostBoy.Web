@@ -59,10 +59,19 @@ export const useAction = (props: SelectContentHookProps) => {
     showErrorPrompt,
     clearData,
     setIsShowPage,
-    corpAppValue,
-    setCorpAppValue,
   } = props
 
+  const defaultCorpValue = {
+    corpName: "",
+    corpId: "",
+    id: "",
+  }
+
+  // 拿到的企业对象
+  const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
+  // 拿到的App对象
+  const [corpAppValue, setCorpAppValue] =
+    useState<ICorpAppData>(defaultAppValue)
   const {
     departmentAndUserList,
     flattenDepartmentList,
@@ -73,15 +82,6 @@ export const useAction = (props: SelectContentHookProps) => {
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
   } = useDeptUserData({ appId: corpAppValue?.appId })
-
-  const defaultCorpValue = {
-    corpName: "",
-    corpId: "",
-    id: "",
-  }
-
-  // 拿到的企业对象
-  const [corpsValue, setCorpsValue] = useState<ICorpData>(defaultCorpValue)
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -179,6 +179,14 @@ export const useAction = (props: SelectContentHookProps) => {
   const [appLoading, setAppLoading] = useState<boolean>(true)
 
   const [groupLoading, setGroupLoading] = useState<boolean>(true)
+
+  const [targetSelectedList, setTargetSelectedList] = useState<
+    IDepartmentAndUserListValue[]
+  >([])
+
+  const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
+    setTargetSelectedList(valueList)
+  }
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -1089,9 +1097,12 @@ export const useAction = (props: SelectContentHookProps) => {
     flattenDepartmentList,
     departmentKeyValue,
     searchKeyValue,
+    corpAppValue,
+    setCorpAppValue,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
+    settingSelectedList,
   }
 }

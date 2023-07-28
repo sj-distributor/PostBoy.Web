@@ -1,6 +1,5 @@
 import {
   Autocomplete,
-  AutocompleteRenderInputParams,
   Checkbox,
   Collapse,
   Divider,
@@ -139,7 +138,7 @@ const TreeViewSelector = ({
 
       {children && children}
 
-      {flattenData && (
+      {flattenList && (
         <Autocomplete
           {...flattenSelectorProps}
           disablePortal
@@ -148,7 +147,7 @@ const TreeViewSelector = ({
           disableCloseOnSelect
           size="small"
           value={selectedList}
-          options={flattenData}
+          options={flattenList}
           filterOptions={(options, state) =>
             onFilterDeptAndUsers(options, state)
           }
@@ -161,11 +160,10 @@ const TreeViewSelector = ({
               placement: "top",
             },
           }}
-          renderGroup={(params) => {
-            const { key, group, children } = params
-            return <div key={key}>{children}</div>
-          }}
-          renderOption={(props, option, state) => {
+          renderGroup={(params) => (
+            <div key={params.key}>{params.children}</div>
+          )}
+          renderOption={(props, option) => {
             let style = Object.assign(
               option.type === DepartmentAndUserType.Department
                 ? { color: "#666" }
