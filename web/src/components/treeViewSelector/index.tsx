@@ -32,10 +32,9 @@ const TreeViewSelector = ({
   foldSelectorProps,
   flattenSelectorProps,
 }: ITreeViewProps) => {
-  const { foldData, flattenData, idRouteMap } = sourceData ?? {
+  const { foldData, flattenData } = sourceData ?? {
     foldData: [],
     flattenData: [],
-    idRouteMap: new Map(),
   }
 
   const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both
@@ -52,7 +51,6 @@ const TreeViewSelector = ({
     defaultSelectedList,
     foldData,
     flattenData,
-    idRouteMap,
     settingSelectedList,
   })
 
@@ -73,15 +71,6 @@ const TreeViewSelector = ({
     const result = (
       <List key={appId} dense>
         {data.map((deptUserData, index) => {
-          const insertData: IDepartmentAndUserListValue = {
-            id: deptUserData.id,
-            name: deptUserData.name,
-            type: deptUserData.type,
-            parentid: deptUserData.parentid,
-            isCollapsed: deptUserData.isCollapsed,
-            selected: deptUserData.selected,
-            children: [],
-          }
           return (
             <div key={deptUserData.name}>
               <ListItemButton
@@ -89,7 +78,7 @@ const TreeViewSelector = ({
                 onClick={(e) => {
                   e.stopPropagation()
                   deptUserData.children.length > 0 &&
-                    handleDeptOrUserClick(ClickType.Collapse, insertData)
+                    handleDeptOrUserClick(ClickType.Collapse, deptUserData)
                 }}
               >
                 {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
@@ -100,7 +89,7 @@ const TreeViewSelector = ({
                     disableRipple
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeptOrUserClick(ClickType.Select, insertData)
+                      handleDeptOrUserClick(ClickType.Select, deptUserData)
                     }}
                   />
                 )}

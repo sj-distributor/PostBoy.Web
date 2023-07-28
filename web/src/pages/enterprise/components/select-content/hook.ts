@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import {
   GetCorpAppList,
   GetCorpsList,
-  GetDeptsAndUserList,
+  GetDeptTreeList,
   GetGroupDetail,
   GetGroupUsersDetail,
   GetTagsList,
@@ -36,6 +36,7 @@ import { SelectContentHookProps } from "./props"
 import * as wangEditor from "@wangeditor/editor"
 import { annexEditorConfig } from "../../../../uilts/wangEditor"
 import { useBoolean } from "ahooks"
+import useDeptUserData from "../../../../hooks/deptUserData"
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void
 
@@ -60,6 +61,9 @@ export const useAction = (props: SelectContentHookProps) => {
     setIsShowPage,
     corpAppValue,
     setCorpAppValue,
+  } = props
+
+  const {
     departmentAndUserList,
     flattenDepartmentList,
     departmentKeyValue,
@@ -68,7 +72,7 @@ export const useAction = (props: SelectContentHookProps) => {
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
-  } = props
+  } = useDeptUserData({ appId: corpAppValue?.appId })
 
   const defaultCorpValue = {
     corpName: "",
@@ -387,7 +391,7 @@ export const useAction = (props: SelectContentHookProps) => {
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
       setIsTreeViewLoading(true)
-      const deptListResponse = await GetDeptsAndUserList(AppId)
+      const deptListResponse = await GetDeptTreeList(AppId)
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false)
 
@@ -1030,10 +1034,6 @@ export const useAction = (props: SelectContentHookProps) => {
     setTimeZoneValue,
     isShowDialog,
     setIsShowDialog,
-    departmentAndUserList,
-    setDepartmentAndUserList,
-    departmentKeyValue,
-    searchKeyValue,
     isTreeViewLoading,
     tagsList,
     chatId,
@@ -1071,7 +1071,6 @@ export const useAction = (props: SelectContentHookProps) => {
     fileMark,
     clickName,
     setClickName,
-    setFlattenDepartmentList,
     editor,
     setEditor,
     editorConfig,
@@ -1086,5 +1085,13 @@ export const useAction = (props: SelectContentHookProps) => {
     detectMentionToDelete,
     appLoading,
     groupLoading,
+    departmentAndUserList,
+    flattenDepartmentList,
+    departmentKeyValue,
+    searchKeyValue,
+    setDepartmentAndUserList,
+    setFlattenDepartmentList,
+    recursiveSearchDeptOrUser,
+    loadDeptUsersFromWebWorker,
   }
 }

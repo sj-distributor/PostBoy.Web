@@ -1,6 +1,6 @@
 import { useMap } from "ahooks"
 import { clone, difference, remove } from "ramda"
-import { Key, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ClickType,
   DepartmentAndUserType,
@@ -15,7 +15,6 @@ const useAction = ({
   defaultSelectedList,
   flattenData,
   foldData,
-  idRouteMap,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const {
@@ -79,6 +78,21 @@ const useAction = ({
     clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
     value?: boolean
   ) => {
+    const clickedItem = !Array.isArray(clickedList)
+      ? clickedList
+      : clickedList[0]
+    setSelectedList((prev) => {
+      return type === ClickType.Select
+        ? clickedItem.selected
+          ? remove(
+              prev.findIndex((item) => item.id === clickedItem.id),
+              1,
+              prev
+            )
+          : [...prev, clickedItem]
+        : prev
+    })
+
     const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
       (item) => ({ ...item })
     )
@@ -86,15 +100,7 @@ const useAction = ({
     clickedList = Array.isArray(clickedList) ? clickedList : [clickedList]
 
     for (const clickedItem of clickedList) {
-      const idRouteItem = idRouteMap.get(
-        Number(
-          clickedItem.type === DepartmentAndUserType.User
-            ? clickedItem.parentid
-            : clickedItem.id
-        )
-      )
-
-      const routeArr = idRouteItem?.idRoute ?? []
+      const routeArr = clickedItem.idRoute ?? []
 
       const innerItem: IDepartmentAndUserListValue | undefined =
         findNodeByIdRoute(copyFoldList[0], routeArr)
@@ -111,20 +117,6 @@ const useAction = ({
     }
 
     setFoldList(copyFoldList)
-    const clickedItem = !Array.isArray(clickedList)
-      ? clickedList
-      : clickedList[0]
-    setSelectedList((prev) => {
-      return type === ClickType.Select
-        ? clickedItem.selected
-          ? remove(
-              prev.findIndex((item) => item.id === clickedItem.id),
-              1,
-              prev
-            )
-          : [...prev, clickedItem]
-        : prev
-    })
   }
 
   // 搜索框变化时同步到部门列表

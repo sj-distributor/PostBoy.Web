@@ -1,13 +1,13 @@
 import { useMap } from "ahooks"
 import { useMemo, useState } from "react"
 import {
+  DepartmentAndUserType,
   IDepartmentAndUserListValue,
   IDepartmentKeyControl,
   IDeptAndUserList,
   IDeptUserDataHookProp,
   ISearchList,
 } from "../../dtos/enterprise"
-import { MyWorker } from "./webWorker"
 
 const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
   // 部门和用户数组
@@ -16,13 +16,8 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
   >([])
   //
   const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-    ISearchList[]
+    IDepartmentKeyControl[]
   >([])
-
-  const [idRouteMap, { setAll: idRouteMapSetAll }] = useMap<
-    number,
-    IDepartmentAndUserListValue
-  >()
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find((e) => e.key === appId)
@@ -46,37 +41,72 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     return dataList
   }
 
+  const recursiveTransformList = (
+    sourceList: IDeptAndUserList[],
+    resultList: IDepartmentAndUserListValue[],
+    flattenList: IDepartmentAndUserListValue[],
+    idRoute: number[]
+  ): IDepartmentAndUserListValue[] => {
+    sourceList.forEach((source) => {
+      const department: IDepartmentAndUserListValue = {
+        id: source.department.id,
+        name: source.department.name,
+        type: DepartmentAndUserType.Department,
+        parentid: source.department.parentid,
+        selected: false,
+        isCollapsed: false,
+        idRoute: [...idRoute, source.department.id],
+        children: [],
+      }
+      const users = source.users.map((user) => ({
+        id: user.userid,
+        name: user.userid,
+        type: DepartmentAndUserType.User,
+        parentid: user.department,
+        selected: false,
+        isCollapsed: false,
+        idRoute: [...idRoute, source.department.id],
+        children: [],
+      }))
+      department.children.push(...users)
+      flattenList.push({ ...department }, ...users)
+      resultList.unshift(department)
+      source.childrens.length > 0 &&
+        recursiveTransformList(
+          source.childrens,
+          department.children,
+          flattenList,
+          [...idRoute, source.department.id]
+        )
+    })
+
+    return resultList
+  }
+
   const loadDeptUsersFromWebWorker = (data: {
     AppId: string
     workWeChatUnits: IDeptAndUserList[]
   }) => {
+    const flattenList: IDepartmentAndUserListValue[] = []
+    const dataList = recursiveTransformList(
+      data.workWeChatUnits,
+      [],
+      flattenList,
+      []
+    )
     return new Promise((resolve) => {
-      const worker = MyWorker()
-
-      worker.postMessage(data)
-
-      worker.onmessage = function (this: Worker, ev: MessageEvent<any>) {
-        const {
-          copyDepartmentAndUserList,
-          copyFlattenDepartmentList,
-          idRouteMap,
-        } = ev.data
-
-        setDepartmentAndUserList((prev) => [
-          ...prev,
-          { key: data.AppId, data: copyDepartmentAndUserList },
-        ])
-        setFlattenDepartmentList((prev) => [
-          ...prev,
-          { key: data.AppId, data: copyFlattenDepartmentList },
-        ])
-
-        idRouteMapSetAll(idRouteMap)
-
-        resolve(true)
-
-        worker.terminate()
-      }
+      setDepartmentAndUserList((prev) => [
+        ...prev,
+        { key: data.AppId, data: dataList },
+      ])
+      setFlattenDepartmentList((prev) => [
+        ...prev,
+        {
+          key: data.AppId,
+          data: flattenList,
+        },
+      ])
+      resolve(true)
     })
   }
 
@@ -85,7 +115,6 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     flattenDepartmentList,
     departmentKeyValue,
     searchKeyValue,
-    idRouteMap,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,

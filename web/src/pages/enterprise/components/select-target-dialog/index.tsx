@@ -18,16 +18,13 @@ import styles from "./index.module.scss"
 
 import {
   ClickType,
-  DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
 } from "../../../../dtos/enterprise"
-import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material"
+import { CircularProgress, Snackbar } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
-import { memo } from "react"
-import { onFilterDeptAndUsers } from "../../../../components/treeViewSelector/fitler"
 import TreeViewSelector from "../../../../components/treeViewSelector"
 
 const SelectTargetDialog =
@@ -51,7 +48,6 @@ const SelectTargetDialog =
       sendType,
       outerTagsValue,
       isUpdatedDeptUser,
-      idRouteMap,
       setSendType,
       setChatId,
       setChatName,
@@ -253,7 +249,6 @@ const SelectTargetDialog =
                       sourceData={{
                         foldData: departmentKeyValue.data,
                         flattenData: flattenDepartmentList ?? [],
-                        idRouteMap,
                       }}
                       defaultSelectedList={[]}
                       settingSelectedList={(value) => {}}
@@ -548,7 +543,6 @@ const SelectTargetDialog =
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
             isUpdatedDeptUser={isUpdatedDeptUser}
-            idRouteMap={idRouteMap}
           />
         )}
 

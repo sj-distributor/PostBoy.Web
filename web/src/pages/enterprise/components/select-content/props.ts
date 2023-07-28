@@ -40,22 +40,6 @@ export interface SelectContentHookProps {
   setIsShowPage?: React.Dispatch<React.SetStateAction<boolean>>
   corpAppValue: ICorpAppData
   setCorpAppValue: React.Dispatch<React.SetStateAction<ICorpAppData>>
-  departmentAndUserList: IDepartmentKeyControl[]
-  flattenDepartmentList: ISearchList[]
-  departmentKeyValue: IDepartmentKeyControl
-  searchKeyValue: IDepartmentAndUserListValue[]
-  setDepartmentAndUserList: React.Dispatch<
-    React.SetStateAction<IDepartmentKeyControl[]>
-  >
-  setFlattenDepartmentList: React.Dispatch<React.SetStateAction<ISearchList[]>>
-  recursiveSearchDeptOrUser: (
-    hasData: IDepartmentAndUserListValue[],
-    callback: (e: IDepartmentAndUserListValue) => void
-  ) => IDepartmentAndUserListValue[]
-  loadDeptUsersFromWebWorker: (data: {
-    AppId: string
-    workWeChatUnits: IDeptAndUserList[]
-  }) => Promise<unknown>
 }
 
 export interface IDeptUserWebWorkerProps {

@@ -38,28 +38,18 @@ export interface IDepartmentKeyControl {
   key: string
 }
 
-export interface IDeptTreeList {
-  data: IDepartmentData[]
-  children: IDeptTreeList[]
-}
-
 export interface IDepartmentData {
   department_leader: []
   id: number
   name: string
-  name_en: null
+  name_en: string | null
   order: number
   parentid: number
-  departmentUserList: IDepartmentUsersData[]
-  selected: boolean
 }
 
 export interface IDepartmentUsersData {
-  name: string
   userid: string
   department: number
-  open_userid: string
-  selected: boolean
 }
 
 export interface IDepartmentAndUserListValue {
@@ -130,7 +120,6 @@ export interface ITargetDialogProps {
   sendType?: SendObjOrGroup
   outerTagsValue?: ITagsList[]
   isUpdatedDeptUser: boolean
-  idRouteMap: Map<number, IDepartmentAndUserListValue>
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setChatId?: React.Dispatch<React.SetStateAction<string>>
   setChatName?: React.Dispatch<React.SetStateAction<string>>
@@ -410,6 +399,7 @@ export interface IGetDeptAndUsersResponse {
 export interface IDeptAndUserList {
   department: IDepartmentData
   users: IDepartmentUsersData[]
+  childrens: IDeptAndUserList[]
 }
 
 export enum SendObjOrGroup {

@@ -32,11 +32,15 @@ import {
   GetAllMeetingsData,
   MeetingCallReminder,
 } from "../../../../dtos/meeting-seetings"
-import { GetCorpAppList, GetCorpsList } from "../../../../api/enterprise"
+import {
+  GetCorpAppList,
+  GetCorpsList,
+  GetDeptTreeList,
+} from "../../../../api/enterprise"
 import { clone, flatten } from "ramda"
-import { GetDeptsAndUserList } from "../../../../api/enterprise"
 import { createMeeting, updateMeeting } from "../../../../api/meeting-seetings"
 import { useBoolean } from "ahooks"
+import useDeptUserData from "../../../../hooks/deptUserData"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -71,6 +75,11 @@ const useAction = (props: MeetingSettingsProps) => {
     display: true,
     agentId: 0,
   })
+
+  const { loadDeptUsersFromWebWorker } = useDeptUserData({
+    appId: corpAppValue?.appId,
+  })
+
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -690,12 +699,18 @@ const useAction = (props: MeetingSettingsProps) => {
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
       setIsTreeViewLoading(true)
-      const deptListResponse = await GetDeptsAndUserList(AppId)
+      const deptListResponse = await GetDeptTreeList(AppId)
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false)
 
       !!deptListResponse &&
-        loadDeptUsers(AppId, deptListResponse.workWeChatUnits)
+        loadDeptUsersFromWebWorker({
+          AppId,
+          workWeChatUnits: deptListResponse.workWeChatUnits,
+        }).then(() => {
+          setIsTreeViewLoading(false)
+          setIsLoadStop(true)
+        })
     }
     if (
       !!corpAppValue &&

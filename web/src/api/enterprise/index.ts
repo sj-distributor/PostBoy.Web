@@ -99,9 +99,9 @@ export const GetWeChatWorkCorpAppGroups = async (
   )
 }
 
-export const GetDeptsAndUserList = async (AppId: string) => {
+export const GetDeptTreeList = async (AppId: string) => {
   return await Get<IGetDeptAndUsersResponse>(
-    "/api/WeChat/work/depts/users?AppId=" + AppId
+    "/api/WeChat/work/depts/users/tree?AppId=" + AppId
   )
 }
 

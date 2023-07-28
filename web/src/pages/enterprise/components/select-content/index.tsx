@@ -1,8 +1,6 @@
 import { memo, useState } from "react"
 import {
-  Box,
   Button,
-  CircularProgress,
   FormControl,
   InputLabel,
   List,
@@ -10,7 +8,6 @@ import {
   MenuItem,
   Paper,
   Select,
-  Skeleton,
   TextField,
 } from "@mui/material"
 import Autocomplete from "@mui/material/Autocomplete"
@@ -56,18 +53,6 @@ const SelectContent = memo(
     // 拿到的App对象
     const [corpAppValue, setCorpAppValue] =
       useState<ICorpAppData>(defaultAppValue)
-
-    const {
-      departmentAndUserList,
-      flattenDepartmentList,
-      departmentKeyValue,
-      searchKeyValue,
-      idRouteMap,
-      setDepartmentAndUserList,
-      setFlattenDepartmentList,
-      recursiveSearchDeptOrUser,
-      loadDeptUsersFromWebWorker,
-    } = useDeptUserData({ appId: corpAppValue?.appId })
 
     const {
       corpsValue,
@@ -132,6 +117,14 @@ const SelectContent = memo(
       detectMentionToDelete,
       appLoading,
       groupLoading,
+      departmentAndUserList,
+      flattenDepartmentList,
+      departmentKeyValue,
+      searchKeyValue,
+      setDepartmentAndUserList,
+      setFlattenDepartmentList,
+      recursiveSearchDeptOrUser,
+      loadDeptUsersFromWebWorker,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -143,14 +136,6 @@ const SelectContent = memo(
       setIsShowPage,
       corpAppValue,
       setCorpAppValue,
-      departmentAndUserList,
-      flattenDepartmentList,
-      departmentKeyValue,
-      searchKeyValue,
-      setDepartmentAndUserList,
-      setFlattenDepartmentList,
-      recursiveSearchDeptOrUser,
-      loadDeptUsersFromWebWorker,
     })
 
     const fileOrImage = (file: FileObject, state: string) => {
@@ -446,7 +431,6 @@ const SelectContent = memo(
             sendType={sendType}
             setSendType={setSendType}
             isUpdatedDeptUser={isUpdatedDeptUser}
-            idRouteMap={idRouteMap}
           />
         </div>
 
