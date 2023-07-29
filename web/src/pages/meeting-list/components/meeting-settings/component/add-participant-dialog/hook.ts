@@ -10,6 +10,7 @@ import {
   SendObjOrGroup,
   IFirstState,
   DefaultDisplay,
+  SelectPersonnelType,
 } from "../../../../../../dtos/meeting-seetings";
 
 const useAction = (props: {
@@ -20,7 +21,7 @@ const useAction = (props: {
   open: boolean;
   lastTagsValue: string[] | undefined;
   tagsList: ITagsList[];
-  clickName: string;
+  clickName: SelectPersonnelType;
   chatId: string;
   outerTagsValue?: ITagsList[];
   CorpId: string;
@@ -77,27 +78,27 @@ const useAction = (props: {
     return hasData;
   };
 
-  const recursiveDeptList = (
-    hasData: IDepartmentAndUserListValue[],
-    changeList: IDepartmentAndUserListValue[]
-  ) => {
-    for (const key in hasData) {
-      const e = hasData[key];
-      const hasItemIndex = changeList.findIndex((item) => item.id === e.id);
-      e.selected
-        ? hasItemIndex <= -1 &&
-          changeList.push({
-            id: e.id,
-            name: e.name,
-            type: DepartmentAndUserType.User,
-            parentid: String(e.parentid),
-            selected: e.selected,
-            children: [],
-          })
-        : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1);
-      e.children.length > 0 && recursiveDeptList(e.children, changeList);
-    }
-  };
+  // const recursiveDeptList = (
+  //   hasData: IDepartmentAndUserListValue[],
+  //   changeList: IDepartmentAndUserListValue[]
+  // ) => {
+  //   for (const key in hasData) {
+  //     const e = hasData[key];
+  //     const hasItemIndex = changeList.findIndex((item) => item.id === e.id);
+  //     e.selected
+  //       ? hasItemIndex <= -1 &&
+  //         changeList.push({
+  //           id: e.id,
+  //           name: e.name,
+  //           type: DepartmentAndUserType.User,
+  //           parentid: String(e.parentid),
+  //           selected: e.selected,
+  //           children: [],
+  //         })
+  //       : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1);
+  //     e.children.length > 0 && recursiveDeptList(e.children, changeList);
+  //   }
+  // };
 
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
@@ -157,7 +158,7 @@ const useAction = (props: {
   };
 
   const handleConfirm = () => {
-    if (clickName === "指定会议管理员") {
+    if (clickName === SelectPersonnelType.ConferenceAdministrator) {
       const isUserArr = departmentSelectedList.filter(
         (item) => typeof item.id !== "string"
       );
@@ -178,7 +179,7 @@ const useAction = (props: {
     }
 
     if (
-      clickName === "选择指定主持人" &&
+      clickName === SelectPersonnelType.Moderator &&
       departmentSelectedList.length > DefaultDisplay.hostList
     ) {
       tipsObject &&
@@ -201,17 +202,17 @@ const useAction = (props: {
     clearSelected();
   };
 
-  useEffect(() => {
-    // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
+  // useEffect(() => {
+  //   // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
 
-    !isLoading &&
-      departmentKeyValue?.data.length > 0 &&
-      setDepartmentSelectedList((prev) => {
-        const newValue = prev.filter((e) => !!e);
-        recursiveDeptList(departmentKeyValue.data, newValue);
-        return newValue;
-      });
-  }, [departmentAndUserList]);
+  //   !isLoading &&
+  //     departmentKeyValue?.data.length > 0 &&
+  //     setDepartmentSelectedList((prev) => {
+  //       const newValue = prev.filter((e) => !!e);
+  //       recursiveDeptList(departmentKeyValue.data, newValue);
+  //       return newValue;
+  //     });
+  // }, [departmentAndUserList]);
 
   const clearSelected = () => {
     if (firstState) {
@@ -319,7 +320,7 @@ const useAction = (props: {
 
   // useEffect(() => {
   //   if (
-  //     (clickName === "选择指定提醒人员" || clickName === "选择指定主持人") &&
+  //     (clickName === SelectPersonnelType.SpecifyReminderPersonnel || clickName === SelectPersonnelType.Moderator) &&
   //     loadSelectData
   //   ) {
   //     setDepartmentSelectedList(loadSelectData);

@@ -45,6 +45,7 @@ import SeetingsDialog from "./component/settingsDialog";
 import {
   DefaultDisplay,
   MeetingSettingsProps,
+  SelectPersonnelType,
 } from "../../../../dtos/meeting-seetings";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -201,7 +202,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         isLoading={isTreeViewLoading}
         tagsList={tagsList}
         canSelect={
-          clickName === "选择参会人"
+          clickName === SelectPersonnelType.MeetingAttendees
             ? DeptUserCanSelectStatus.Both
             : DeptUserCanSelectStatus.User
         }

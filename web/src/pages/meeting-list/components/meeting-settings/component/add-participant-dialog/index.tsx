@@ -25,36 +25,36 @@ import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
 
-const fiteringDeptAndUsers = (
-  options: IDepartmentAndUserListValue[],
-  state: FilterOptionsState<IDepartmentAndUserListValue>
-) => {
-  if (state.inputValue !== "") {
-    const array: IDepartmentAndUserListValue[] = [];
-    const findArray = options.filter((item) =>
-      item.name.toUpperCase().includes(state.inputValue.toUpperCase())
-    );
-    for (let i = 0; i < findArray.length; i++) {
-      array.push(findArray[i]);
-      const findParent = options.find(
-        (item) => item.name === findArray[i].parentid
-      );
-      if (!!findParent) {
-        const index = array.findIndex(
-          (item) => item.name === findArray[i].parentid
-        );
-        if (index === -1) {
-          const index = array.findIndex(
-            (item) => item.parentid === findParent.name
-          );
-          array.splice(index, 0, findParent);
-        }
-      }
-    }
-    return array;
-  }
-  return options;
-};
+// const fiteringDeptAndUsers = (
+//   options: IDepartmentAndUserListValue[],
+//   state: FilterOptionsState<IDepartmentAndUserListValue>
+// ) => {
+//   if (state.inputValue !== "") {
+//     const array: IDepartmentAndUserListValue[] = [];
+//     const findArray = options.filter((item) =>
+//       item.name.toUpperCase().includes(state.inputValue.toUpperCase())
+//     );
+//     for (let i = 0; i < findArray.length; i++) {
+//       array.push(findArray[i]);
+//       const findParent = options.find(
+//         (item) => item.name === findArray[i].parentid
+//       );
+//       if (!!findParent) {
+//         const index = array.findIndex(
+//           (item) => item.name === findArray[i].parentid
+//         );
+//         if (index === -1) {
+//           const index = array.findIndex(
+//             (item) => item.parentid === findParent.name
+//           );
+//           array.splice(index, 0, findParent);
+//         }
+//       }
+//     }
+//     return array;
+//   }
+//   return options;
+// };
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -119,78 +119,78 @@ const SelectTargetDialog = memo(
           }
         : {};
 
-    const recursiveRenderDeptList = (
-      data: IDepartmentAndUserListValue[],
-      pl: number,
-      isDivider: boolean
-    ) => {
-      const result = (
-        <List key={AppId} dense>
-          {data.map((deptUserData, index) => {
-            const insertData: IDepartmentAndUserListValue = {
-              id: deptUserData.id,
-              name: deptUserData.name,
-              type: deptUserData.type,
-              parentid: String(deptUserData.parentid),
-              selected: deptUserData.selected,
-              children: [],
-            };
-            return (
-              <div key={deptUserData.id}>
-                <ListItemButton
-                  sx={{ pl, height: "2.2rem" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deptUserData.children.length > 0 &&
-                      handleDeptOrUserClick(
-                        ClickType.Collapse,
-                        Object.assign(insertData, {
-                          isCollapsed: deptUserData.isCollapsed,
-                        })
-                      );
-                  }}
-                >
-                  {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
-                    <Checkbox
-                      edge="start"
-                      checked={deptUserData.selected}
-                      tabIndex={-1}
-                      disableRipple
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeptOrUserClick(ClickType.Select, insertData);
-                      }}
-                    />
-                  )}
-                  <ListItemText primary={deptUserData.name} />
-                  {deptUserData.children.length > 0 &&
-                    (!!deptUserData.isCollapsed ? (
-                      <ExpandLess />
-                    ) : (
-                      <ExpandMore />
-                    ))}
-                </ListItemButton>
-                {deptUserData.children.length > 0 && (
-                  <Collapse
-                    in={!!deptUserData.isCollapsed}
-                    timeout={0}
-                    unmountOnExit
-                  >
-                    {recursiveRenderDeptList(
-                      deptUserData.children,
-                      pl + 2,
-                      index !== data.length - 1
-                    )}
-                  </Collapse>
-                )}
-              </div>
-            );
-          })}
-          {isDivider && <Divider />}
-        </List>
-      );
-      return result;
-    };
+    // const recursiveRenderDeptList = (
+    //   data: IDepartmentAndUserListValue[],
+    //   pl: number,
+    //   isDivider: boolean
+    // ) => {
+    //   const result = (
+    //     <List key={AppId} dense>
+    //       {data.map((deptUserData, index) => {
+    //         const insertData: IDepartmentAndUserListValue = {
+    //           id: deptUserData.id,
+    //           name: deptUserData.name,
+    //           type: deptUserData.type,
+    //           parentid: String(deptUserData.parentid),
+    //           selected: deptUserData.selected,
+    //           children: [],
+    //         };
+    //         return (
+    //           <div key={deptUserData.id}>
+    //             <ListItemButton
+    //               sx={{ pl, height: "2.2rem" }}
+    //               onClick={(e) => {
+    //                 e.stopPropagation();
+    //                 deptUserData.children.length > 0 &&
+    //                   handleDeptOrUserClick(
+    //                     ClickType.Collapse,
+    //                     Object.assign(insertData, {
+    //                       isCollapsed: deptUserData.isCollapsed,
+    //                     })
+    //                   );
+    //               }}
+    //             >
+    //               {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
+    //                 <Checkbox
+    //                   edge="start"
+    //                   checked={deptUserData.selected}
+    //                   tabIndex={-1}
+    //                   disableRipple
+    //                   onClick={(e) => {
+    //                     e.stopPropagation();
+    //                     handleDeptOrUserClick(ClickType.Select, insertData);
+    //                   }}
+    //                 />
+    //               )}
+    //               <ListItemText primary={deptUserData.name} />
+    //               {deptUserData.children.length > 0 &&
+    //                 (!!deptUserData.isCollapsed ? (
+    //                   <ExpandLess />
+    //                 ) : (
+    //                   <ExpandMore />
+    //                 ))}
+    //             </ListItemButton>
+    //             {deptUserData.children.length > 0 && (
+    //               <Collapse
+    //                 in={!!deptUserData.isCollapsed}
+    //                 timeout={0}
+    //                 unmountOnExit
+    //               >
+    //                 {recursiveRenderDeptList(
+    //                   deptUserData.children,
+    //                   pl + 2,
+    //                   index !== data.length - 1
+    //                 )}
+    //               </Collapse>
+    //             )}
+    //           </div>
+    //         );
+    //       })}
+    //       {isDivider && <Divider />}
+    //     </List>
+    //   );
+    //   return result;
+    // };
 
     return (
       <div>
@@ -218,11 +218,11 @@ const SelectTargetDialog = memo(
                   }}
                 >
                   {!departmentKeyValue && <div>No Data</div>}
-                  {departmentKeyValue?.data.length > 0 &&
-                    recursiveRenderDeptList(departmentKeyValue.data, 0, true)}
+                  {/* {departmentKeyValue?.data.length > 0 &&
+                    recursiveRenderDeptList(departmentKeyValue.data, 0, true)} */}
                 </div>
 
-                {flattenDepartmentList && (
+                {/*flattenDepartmentList && (
                   <Autocomplete
                     id={"sreach-input" + clickName}
                     disablePortal
@@ -245,7 +245,7 @@ const SelectTargetDialog = memo(
                     isOptionEqualToValue={(option, value) =>
                       option.id === value.id
                     }
-                    groupBy={(option) => option.parentid as string}
+                    groupBy={(option) => option.parentid + ""}
                     renderInput={(params) => (
                       <TextField {...params} label={"部门与用户搜索"} />
                     )}
@@ -275,7 +275,7 @@ const SelectTargetDialog = memo(
                       );
                     }}
                   />
-                )}
+                  )*/}
 
                 <>
                   <Autocomplete
