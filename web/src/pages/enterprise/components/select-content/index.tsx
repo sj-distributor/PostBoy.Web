@@ -13,7 +13,7 @@ import {
 import Autocomplete from "@mui/material/Autocomplete"
 import styles from "./index.module.scss"
 import { SelectContentProps } from "./props"
-import { defaultAppValue, useAction } from "./hook"
+import { useAction } from "./hook"
 import SelectTargetDialog from "../select-target-dialog"
 import {
   messageTypeList,
@@ -23,7 +23,6 @@ import {
 import {
   DeptUserCanSelectStatus,
   FileObject,
-  ICorpAppData,
   MessageDataFileType,
   MessageJobSendType,
   PictureText,
@@ -34,7 +33,6 @@ import DateSelector from "../date-selector"
 import { Editor, Toolbar } from "@wangeditor/editor-for-react"
 import * as wangEditor from "@wangeditor/editor"
 import { MentionsInput, Mention } from "react-mentions"
-import useDeptUserData from "../../../../hooks/deptUserData"
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -118,6 +116,7 @@ const SelectContent = memo(
       departmentKeyValue,
       searchKeyValue,
       corpAppValue,
+      targetSelectedList,
       setCorpAppValue,
       setDepartmentAndUserList,
       setFlattenDepartmentList,
@@ -428,6 +427,7 @@ const SelectContent = memo(
             sendType={sendType}
             setSendType={setSendType}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            targetSelectedList={targetSelectedList}
             settingSelectedList={settingSelectedList}
           />
         </div>

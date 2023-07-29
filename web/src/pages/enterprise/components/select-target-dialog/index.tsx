@@ -4,22 +4,12 @@ import TextField from "@mui/material/TextField"
 import DialogTitle from "@mui/material/DialogTitle"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
-import List from "@mui/material/List"
-import Collapse from "@mui/material/Collapse"
-import ListItemButton from "@mui/material/ListItemButton"
-import ListItemText from "@mui/material/ListItemText"
-import ExpandLess from "@mui/icons-material/ExpandLess"
-import ExpandMore from "@mui/icons-material/ExpandMore"
-import Divider from "@mui/material/Divider"
 import Autocomplete from "@mui/material/Autocomplete"
-import Checkbox from "@mui/material/Checkbox"
 import useAction from "./hook"
 import styles from "./index.module.scss"
 
 import {
-  ClickType,
   ITargetDialogProps,
-  IDepartmentAndUserListValue,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
 } from "../../../../dtos/enterprise"
@@ -48,6 +38,7 @@ const SelectTargetDialog =
       sendType,
       outerTagsValue,
       isUpdatedDeptUser,
+      targetSelectedList,
       setSendType,
       setChatId,
       setChatName,
@@ -78,7 +69,6 @@ const SelectTargetDialog =
       setGroupName,
       setGroupOwner,
       setIsShowDialog,
-      handleDeptOrUserClick,
       setSearchToDeptValue,
       setTagsValue,
       handleTypeIsCanSelect,
@@ -86,6 +76,7 @@ const SelectTargetDialog =
       handleConfirm,
       handleCancel,
       onListBoxScrolling,
+      setDepartmentSelectedList,
     } = useAction({
       open,
       AppId,
@@ -101,6 +92,7 @@ const SelectTargetDialog =
       isUpdatedDeptUser,
       sendType,
       CorpId,
+      targetSelectedList,
       setSendType,
       setChatId,
       setChatName,
@@ -108,6 +100,7 @@ const SelectTargetDialog =
       setDeptUserList,
       setOuterTagsValue,
       setGroupList,
+      settingSelectedList,
     })
 
     return (
@@ -161,40 +154,45 @@ const SelectTargetDialog =
 
                 {departmentKeyValue && departmentKeyValue.key && (
                   <div>
-                    <TreeViewSelector
-                      appId={AppId}
-                      inputValue={""}
-                      sourceData={{
-                        foldData: departmentKeyValue.data,
-                        flattenData: flattenDepartmentList ?? [],
-                      }}
-                      settingSelectedList={settingSelectedList}
-                    >
-                      {clickName === "选择发送目标" && (
-                        <Autocomplete
-                          disableClearable
-                          fullWidth
-                          id="type-simple-select"
-                          value={sendType}
-                          size="small"
-                          options={sendList}
-                          getOptionLabel={(x) =>
-                            x === SendObjOrGroup.Group ? "群组" : "对象"
-                          }
-                          onChange={(_e, value) => {
-                            setSendType && setSendType(value)
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              className={styles.InputButton}
-                              margin="dense"
-                              type="button"
-                            />
-                          )}
-                        />
-                      )}
-                    </TreeViewSelector>
+                    {departmentSelectedList && (
+                      <TreeViewSelector
+                        appId={AppId}
+                        inputValue={""}
+                        sourceData={{
+                          foldData: departmentKeyValue.data,
+                          flattenData: flattenDepartmentList ?? [],
+                        }}
+                        defaultSelectedList={departmentSelectedList}
+                        settingSelectedList={(value) =>
+                          setDepartmentSelectedList(value)
+                        }
+                      >
+                        {clickName === "选择发送目标" && (
+                          <Autocomplete
+                            disableClearable
+                            fullWidth
+                            id="type-simple-select"
+                            value={sendType}
+                            size="small"
+                            options={sendList}
+                            getOptionLabel={(x) =>
+                              x === SendObjOrGroup.Group ? "群组" : "对象"
+                            }
+                            onChange={(_e, value) =>
+                              setSendType && setSendType(value)
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                className={styles.InputButton}
+                                margin="dense"
+                                type="button"
+                              />
+                            )}
+                          />
+                        )}
+                      </TreeViewSelector>
+                    )}
                   </div>
                 )}
 
@@ -460,6 +458,7 @@ const SelectTargetDialog =
             clickName={"创建群组"}
             groupDeptUserSelectedList={groupDeptUserSelectedList}
             isUpdatedDeptUser={isUpdatedDeptUser}
+            targetSelectedList={targetSelectedList}
             settingSelectedList={settingSelectedList}
           />
         )}

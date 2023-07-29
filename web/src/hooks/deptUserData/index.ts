@@ -1,4 +1,4 @@
-import { useMap } from "ahooks"
+
 import { useMemo, useState } from "react"
 import {
   DepartmentAndUserType,
@@ -6,7 +6,6 @@ import {
   IDepartmentKeyControl,
   IDeptAndUserList,
   IDeptUserDataHookProp,
-  ISearchList,
 } from "../../dtos/enterprise"
 
 const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
