@@ -34,6 +34,7 @@ const useAction = (props: {
   isUpdatedDeptUser: boolean
   sendType?: SendObjOrGroup
   CorpId: string
+  targetSelectedList: IDepartmentAndUserListValue[]
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
   setOpenFunction: (open: boolean) => void
   setChatId?: React.Dispatch<React.SetStateAction<string>>
@@ -41,6 +42,7 @@ const useAction = (props: {
   setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
   setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
+  settingSelectedList: (valueList: IDepartmentAndUserListValue[]) => void
 }) => {
   const {
     departmentAndUserList,
@@ -57,6 +59,7 @@ const useAction = (props: {
     lastTagsValue,
     sendType,
     CorpId,
+    targetSelectedList,
     setSendType,
     setChatId,
     setChatName,
@@ -64,6 +67,7 @@ const useAction = (props: {
     setDeptUserList,
     setOuterTagsValue,
     setGroupList,
+    settingSelectedList,
   } = props
 
   const defaultGroupOwner = {
@@ -76,8 +80,8 @@ const useAction = (props: {
     children: [],
   }
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
-    IDepartmentAndUserListValue[]
-  >([])
+    IDepartmentAndUserListValue[] | undefined
+  >()
   const [groupDeptUserSelectedList, setGroupDeptUserSelectedList] = useState<
     IDepartmentAndUserListValue[]
   >([])
@@ -146,40 +150,40 @@ const useAction = (props: {
   }
 
   // 处理部门列表点击选择或者展开
-  const handleDeptOrUserClick = (
-    type: ClickType,
-    clickedItem: IDepartmentAndUserListValue
-  ) => {
-    clickName === "选择发送目标"
-      ? setDeptUserList((prev) => {
-          const newValue = prev.filter((e) => !!e)
-          const activeData = newValue.find(
-            (e) => e.key === departmentKeyValue.key
-          )
-          activeData &&
-            recursiveSeachDeptOrUser(activeData.data, (e) => {
-              e.id === clickedItem.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected))
-            })
-          return newValue
-        })
-      : setGroupDeptUserList((prev) => {
-          const newValue = prev.filter((e) => !!e)
-          const activeData = newValue.find(
-            (e) => e.key === departmentKeyValue.key
-          )
-          activeData &&
-            recursiveSeachDeptOrUser(activeData.data, (e) => {
-              e.id === clickedItem.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected))
-            })
-          return newValue
-        })
-  }
+  // const handleDeptOrUserClick = (
+  //   type: ClickType,
+  //   clickedItem: IDepartmentAndUserListValue
+  // ) => {
+  //   clickName === "选择发送目标"
+  //     ? setDeptUserList((prev) => {
+  //         const newValue = prev.filter((e) => !!e)
+  //         const activeData = newValue.find(
+  //           (e) => e.key === departmentKeyValue.key
+  //         )
+  //         activeData &&
+  //           recursiveSeachDeptOrUser(activeData.data, (e) => {
+  //             e.id === clickedItem.id &&
+  //               (type === ClickType.Collapse
+  //                 ? (e.isCollapsed = !e.isCollapsed)
+  //                 : (e.selected = !e.selected))
+  //           })
+  //         return newValue
+  //       })
+  //     : setGroupDeptUserList((prev) => {
+  //         const newValue = prev.filter((e) => !!e)
+  //         const activeData = newValue.find(
+  //           (e) => e.key === departmentKeyValue.key
+  //         )
+  //         activeData &&
+  //           recursiveSeachDeptOrUser(activeData.data, (e) => {
+  //             e.id === clickedItem.id &&
+  //               (type === ClickType.Collapse
+  //                 ? (e.isCollapsed = !e.isCollapsed)
+  //                 : (e.selected = !e.selected))
+  //           })
+  //         return newValue
+  //       })
+  // }
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -281,6 +285,7 @@ const useAction = (props: {
   const handleConfirm = () => {
     setOpenFunction(false)
     setOuterTagsValue(tagsValue)
+    departmentSelectedList && settingSelectedList(departmentSelectedList)
     setFirstState(undefined)
   }
 
@@ -330,17 +335,6 @@ const useAction = (props: {
   }, [groupDeptUserList])
 
   useEffect(() => {
-    // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
-    !isLoading &&
-      departmentKeyValue?.data.length > 0 &&
-      setDepartmentSelectedList((prev) => {
-        const newValue = prev.filter((e) => !!e)
-        recursiveDeptList(departmentKeyValue.data, newValue)
-        return newValue
-      })
-  }, [departmentAndUserList])
-
-  useEffect(() => {
     // 当第一次拿到选择目标部门列表复制给群组部门列表
     departmentKeyValue &&
       departmentAndUserList.length > 0 &&
@@ -373,6 +367,10 @@ const useAction = (props: {
   }, [chatName, chatId, isShowDialog])
 
   useEffect(() => {
+    isUpdatedDeptUser && setDepartmentSelectedList(targetSelectedList)
+  }, [isUpdatedDeptUser, open])
+
+  useEffect(() => {
     open &&
       isUpdatedDeptUser &&
       setFirstState({
@@ -399,16 +397,13 @@ const useAction = (props: {
     }
     // 打开时load上次选中的数据
     open
-      ? clickName === "选择发送目标"
-        ? setDepartmentSelectedList((prev) =>
-            handleData(prev, departmentAndUserList)
-          )
-        : setGroupDeptUserSelectedList((prev) =>
-            handleData(prev, groupDeptUserList)
-          )
+      ? clickName !== "选择发送目标" &&
+        setGroupDeptUserSelectedList((prev) =>
+          handleData(prev, groupDeptUserList)
+        )
       : // 关闭时清空上次选中数据
         (() => {
-          setDepartmentSelectedList([])
+          // setDepartmentSelectedList([])
           setGroupDeptUserSelectedList([])
           setGroupIsNoData(false)
         })()
@@ -465,12 +460,12 @@ const useAction = (props: {
     handleTypeIsCanSelect,
     setIsShowDialog,
     setTagsValue,
-    handleDeptOrUserClick,
     setSearchToDeptValue,
     handleCreateGroup,
     handleConfirm,
     handleCancel,
     onListBoxScrolling,
+    setDepartmentSelectedList,
   }
 }
 export default useAction

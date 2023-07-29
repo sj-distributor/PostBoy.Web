@@ -72,16 +72,6 @@ export const useAction = (props: SelectContentHookProps) => {
   // 拿到的App对象
   const [corpAppValue, setCorpAppValue] =
     useState<ICorpAppData>(defaultAppValue)
-  const {
-    departmentAndUserList,
-    flattenDepartmentList,
-    departmentKeyValue,
-    searchKeyValue,
-    setDepartmentAndUserList,
-    setFlattenDepartmentList,
-    recursiveSearchDeptOrUser,
-    loadDeptUsersFromWebWorker,
-  } = useDeptUserData({ appId: corpAppValue?.appId })
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([])
   // 获取的App数组
@@ -184,9 +174,42 @@ export const useAction = (props: SelectContentHookProps) => {
     IDepartmentAndUserListValue[]
   >([])
 
+  const {
+    departmentAndUserList,
+    flattenDepartmentList,
+    departmentKeyValue,
+    searchKeyValue,
+    setDepartmentAndUserList,
+    setFlattenDepartmentList,
+    recursiveSearchDeptOrUser,
+    loadDeptUsersFromWebWorker,
+  } = useDeptUserData({ appId: corpAppValue?.appId })
+
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     setTargetSelectedList(valueList)
   }
+
+  useEffect(() => {
+    if (isLoadStop && isShowDialog) {
+      if (updateMessageJobInformation) {
+        const {
+          workWeChatAppNotification: { appId, toParties, toUsers },
+        } = updateMessageJobInformation
+        const activeFlattenData = flattenDepartmentList.find(
+          (item) => item.key === appId
+        )
+
+        activeFlattenData &&
+          setTargetSelectedList(
+            activeFlattenData.data.filter(
+              (item) =>
+                toParties?.some((cell) => cell === item.name) ||
+                toUsers?.some((cell) => cell === item.id)
+            )
+          )
+      }
+    }
+  }, [isShowDialog, isLoadStop])
 
   const editorConfig = {
     placeholder: "请输入内容...",
@@ -347,17 +370,11 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isLoadStop])
 
   useEffect(() => {
+    console.log(targetSelectedList)
+  }, [targetSelectedList])
+
+  useEffect(() => {
     if (!isShowDialog) {
-      const noneHandleSelected: IDepartmentAndUserListValue[] = []
-      recursiveSearchDeptOrUser(
-        departmentKeyValue?.data,
-        (e) => e.selected && noneHandleSelected.push(e)
-      )
-      const selectedList = uniqWith(
-        (a: IDepartmentAndUserListValue, b: IDepartmentAndUserListValue) => {
-          return a.id === b.id
-        }
-      )(noneHandleSelected)
       if (
         (isGetLastTimeData && isNewOrUpdate === "update") ||
         (!isGetLastTimeData &&
@@ -365,10 +382,10 @@ export const useAction = (props: SelectContentHookProps) => {
           isNewOrUpdate === "new")
       )
         setSendObject({
-          toUsers: selectedList
+          toUsers: targetSelectedList
             .filter((e) => e.type === DepartmentAndUserType.User)
             .map((e) => String(e.id)),
-          toParties: selectedList
+          toParties: targetSelectedList
             .filter((e) => e.type === DepartmentAndUserType.Department)
             .map((e) => String(e.id)),
         })
@@ -1098,6 +1115,7 @@ export const useAction = (props: SelectContentHookProps) => {
     departmentKeyValue,
     searchKeyValue,
     corpAppValue,
+    targetSelectedList,
     setCorpAppValue,
     setDepartmentAndUserList,
     setFlattenDepartmentList,
