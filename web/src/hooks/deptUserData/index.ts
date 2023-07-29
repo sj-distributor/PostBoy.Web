@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from "react"
 import {
   DepartmentAndUserType,
@@ -82,6 +81,10 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     return resultList
   }
 
+  const findActiveData = (appid: string, source: IDepartmentKeyControl[]) => {
+    return source.find((item) => item.key === appid)
+  }
+
   const loadDeptUsersFromWebWorker = (data: {
     AppId: string
     workWeChatUnits: IDeptAndUserList[]
@@ -94,17 +97,23 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
       []
     )
     return new Promise((resolve) => {
-      setDepartmentAndUserList((prev) => [
-        ...prev,
-        { key: data.AppId, data: dataList },
-      ])
-      setFlattenDepartmentList((prev) => [
-        ...prev,
-        {
-          key: data.AppId,
-          data: flattenList,
-        },
-      ])
+      const foldData = findActiveData(data.AppId, departmentAndUserList)
+      const flattenData = findActiveData(data.AppId, flattenDepartmentList)
+      foldData
+        ? (foldData.data = dataList)
+        : setDepartmentAndUserList((prev) => [
+            ...prev,
+            { key: data.AppId, data: dataList },
+          ])
+      flattenData
+        ? (flattenData.data = flattenList)
+        : setFlattenDepartmentList((prev) => [
+            ...prev,
+            {
+              key: data.AppId,
+              data: flattenList,
+            },
+          ])
       resolve(true)
     })
   }

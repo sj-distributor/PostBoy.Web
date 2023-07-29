@@ -16,16 +16,6 @@ const useAction = ({
   foldData,
   settingSelectedList,
 }: ITreeViewHookProps) => {
-  const {
-    departmentAndUserList,
-    flattenDepartmentList,
-    departmentKeyValue,
-    searchKeyValue,
-    setDepartmentAndUserList,
-    setFlattenDepartmentList,
-    recursiveSearchDeptOrUser,
-  } = useDeptUserData({ appId })
-
   const [selectedList, setSelectedList] = useState<
     IDepartmentAndUserListValue[]
   >(defaultSelectedList ?? [])

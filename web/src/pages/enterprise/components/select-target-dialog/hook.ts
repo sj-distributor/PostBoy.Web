@@ -149,77 +149,6 @@ const useAction = (props: {
     }
   }
 
-  // 处理部门列表点击选择或者展开
-  // const handleDeptOrUserClick = (
-  //   type: ClickType,
-  //   clickedItem: IDepartmentAndUserListValue
-  // ) => {
-  //   clickName === "选择发送目标"
-  //     ? setDeptUserList((prev) => {
-  //         const newValue = prev.filter((e) => !!e)
-  //         const activeData = newValue.find(
-  //           (e) => e.key === departmentKeyValue.key
-  //         )
-  //         activeData &&
-  //           recursiveSeachDeptOrUser(activeData.data, (e) => {
-  //             e.id === clickedItem.id &&
-  //               (type === ClickType.Collapse
-  //                 ? (e.isCollapsed = !e.isCollapsed)
-  //                 : (e.selected = !e.selected))
-  //           })
-  //         return newValue
-  //       })
-  //     : setGroupDeptUserList((prev) => {
-  //         const newValue = prev.filter((e) => !!e)
-  //         const activeData = newValue.find(
-  //           (e) => e.key === departmentKeyValue.key
-  //         )
-  //         activeData &&
-  //           recursiveSeachDeptOrUser(activeData.data, (e) => {
-  //             e.id === clickedItem.id &&
-  //               (type === ClickType.Collapse
-  //                 ? (e.isCollapsed = !e.isCollapsed)
-  //                 : (e.selected = !e.selected))
-  //           })
-  //         return newValue
-  //       })
-  // }
-
-  // 搜索框变化时同步到部门列表
-  const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
-    const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
-      const newValue = prev.filter((e) => !!e)
-      const activeData = newValue.find((e) => e.key === departmentKeyValue.key)
-      if (activeData) {
-        valueArr.length > 0
-          ? valueArr.forEach((item) => {
-              recursiveSeachDeptOrUser(activeData.data, (user) => {
-                user.selected = !!valueArr.find((e) => e.id === user.id)
-              })
-            })
-          : recursiveSeachDeptOrUser(
-              activeData.data,
-              (user) => (user.selected = false)
-            )
-      }
-      return newValue
-    }
-    if (clickName === "创建群组") {
-      setGroupDeptUserSelectedList(valueArr)
-      // 如果选择的department User list没有当前的用户之后置空群主选择
-      setGroupOwner((prev) => {
-        if (valueArr.some((item) => item.id === prev.id)) {
-          return prev
-        }
-        return defaultGroupOwner
-      })
-      setGroupDeptUserList(handleDataUpdate)
-    } else {
-      setDepartmentSelectedList(valueArr)
-      setDeptUserList(handleDataUpdate)
-    }
-  }
-
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
     canSelect: DeptUserCanSelectStatus,
@@ -236,7 +165,7 @@ const useAction = (props: {
     let requestData: IWorkGroupCreate
     !groupName
       ? setTipsObject({ show: true, msg: "Please input a valid group name" })
-      : groupDeptUserSelectedList.length <= 1
+      : (departmentSelectedList ?? []).length <= 1
       ? setTipsObject({
           show: true,
           msg: "Please select 2 or more valid users",
@@ -249,7 +178,7 @@ const useAction = (props: {
             appId: AppId,
             name: groupName,
             owner: groupOwner.id as string,
-            userList: groupDeptUserSelectedList.map(
+            userList: (departmentSelectedList ?? []).map(
               (item) => item.id as string
             ),
           }
@@ -261,15 +190,7 @@ const useAction = (props: {
               setTipsObject({ msg: "创建成功", show: true })
               setCreateLoading(false)
               // 清空数据
-              setGroupDeptUserList((prev) => {
-                const newValue = prev.filter((x) => x)
-                const hasData = newValue.find((x) => x.key === AppId)
-                hasData &&
-                  recursiveSeachDeptOrUser(hasData.data, (e) => {
-                    e.selected = false
-                  })
-                return newValue
-              })
+              setDepartmentSelectedList([])
               setGroupOwner(defaultGroupOwner)
               setGroupName("")
               GetWeChatWorkCorpAppGroups(CorpId).then((result) => {
@@ -347,7 +268,6 @@ const useAction = (props: {
   const clearSelected = () => {
     if (firstState) {
       setTagsValue(firstState.tagsValue)
-      setDeptUserList(firstState.deptUserList)
       setChatId && setChatId(firstState.chatId)
       setChatName && setChatName(firstState.chatName)
       setSendType && setSendType(firstState.sendType)
@@ -368,7 +288,7 @@ const useAction = (props: {
 
   useEffect(() => {
     isUpdatedDeptUser && setDepartmentSelectedList(targetSelectedList)
-  }, [isUpdatedDeptUser, open])
+  }, [isUpdatedDeptUser, open, targetSelectedList])
 
   useEffect(() => {
     open &&
@@ -440,7 +360,6 @@ const useAction = (props: {
     groupOwner,
     groupName,
     tipsObject,
-    groupDeptUserSelectedList,
     defaultGroupOwner,
     groupDeptUserList,
     createLoading,
@@ -453,14 +372,11 @@ const useAction = (props: {
     setKeyword,
     setGroupIsNoData,
     setCreateLoading,
-    setGroupDeptUserList,
-    setGroupDeptUserSelectedList,
     setGroupName,
     setGroupOwner,
     handleTypeIsCanSelect,
     setIsShowDialog,
     setTagsValue,
-    setSearchToDeptValue,
     handleCreateGroup,
     handleConfirm,
     handleCancel,

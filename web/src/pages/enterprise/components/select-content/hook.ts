@@ -370,10 +370,6 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isLoadStop])
 
   useEffect(() => {
-    console.log(targetSelectedList)
-  }, [targetSelectedList])
-
-  useEffect(() => {
     if (!isShowDialog) {
       if (
         (isGetLastTimeData && isNewOrUpdate === "update") ||
@@ -1022,6 +1018,7 @@ export const useAction = (props: SelectContentHookProps) => {
           return item
         })
       })
+      setTargetSelectedList([])
       setHtml("")
       setEditor(null)
     }

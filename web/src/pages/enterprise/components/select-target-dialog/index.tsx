@@ -16,9 +16,9 @@ import {
 import { CircularProgress, Snackbar } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import TreeViewSelector from "../../../../components/treeViewSelector"
+import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props"
 
-const SelectTargetDialog =
-  // memo(
+const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
     const {
       open,
@@ -56,9 +56,7 @@ const SelectTargetDialog =
       groupOwner,
       groupName,
       tipsObject,
-      groupDeptUserSelectedList,
       defaultGroupOwner,
-      groupDeptUserList,
       createLoading,
       sendList,
       keyword,
@@ -69,7 +67,6 @@ const SelectTargetDialog =
       setGroupName,
       setGroupOwner,
       setIsShowDialog,
-      setSearchToDeptValue,
       setTagsValue,
       handleTypeIsCanSelect,
       handleCreateGroup,
@@ -124,47 +121,35 @@ const SelectTargetDialog =
           <DialogContent sx={{ width: "30rem" }}>
             {!isLoading ? (
               <>
-                {/* <div
-                  style={{
-                    height: "15rem",
-                    overflowY: "auto",
-                    position: "relative",
-                    marginBottom: "1rem",
-                    ...center(),
-                  }}
-                >
-                  {(clickName === "选择发送目标"
-                    ? !departmentKeyValue
-                    : !groupDeptUserList) && <div>No Data</div>}
-                  {clickName === "选择发送目标"
-                    ? departmentKeyValue?.data.length > 0 &&
-                      recursiveRenderDeptList(departmentKeyValue.data, 0, true)
-                    : groupDeptUserList &&
-                      groupDeptUserList.length > 0 &&
-                      (() => {
-                        const activeData = groupDeptUserList.find(
-                          (x) => x.key === AppId
-                        )
-                        return (
-                          activeData &&
-                          recursiveRenderDeptList(activeData.data, 0, true)
-                        )
-                      })()}
-                </div> */}
-
                 {departmentKeyValue && departmentKeyValue.key && (
                   <div>
                     {departmentSelectedList && (
                       <TreeViewSelector
                         appId={AppId}
                         inputValue={""}
+                        flattenSelectorProps={{
+                          style: {
+                            marginTop: "1rem",
+                          },
+                        }}
                         sourceData={{
                           foldData: departmentKeyValue.data,
-                          flattenData: flattenDepartmentList ?? [],
+                          flattenData: flattenDepartmentList,
                         }}
                         defaultSelectedList={departmentSelectedList}
                         settingSelectedList={(value) =>
                           setDepartmentSelectedList(value)
+                        }
+                        inputLabel={
+                          sendType === SendObjOrGroup.Object
+                            ? "部门与用户搜索"
+                            : "用户搜索"
+                        }
+                        displayMode={
+                          clickName === "选择发送目标" &&
+                          sendType !== SendObjOrGroup.Object
+                            ? TreeViewDisplayMode.Tree
+                            : TreeViewDisplayMode.Both
                         }
                       >
                         {clickName === "选择发送目标" && (
@@ -195,80 +180,6 @@ const SelectTargetDialog =
                     )}
                   </div>
                 )}
-
-                {/* {clickName === "选择发送目标" &&
-                sendType !== SendObjOrGroup.Object ? (
-                  <></>
-                ) : (
-                  flattenDepartmentList && (
-                    <Autocomplete
-                      id={"sreach-input" + clickName}
-                      disablePortal
-                      openOnFocus
-                      multiple
-                      disableCloseOnSelect
-                      size="small"
-                      sx={{
-                        margin:
-                          clickName === "选择发送目标"
-                            ? "1rem 0 calc(1rem - 4px)"
-                            : "",
-                      }}
-                      componentsProps={{
-                        paper: { elevation: 3 },
-                        popper: {
-                          placement: "top",
-                        },
-                      }}
-                      value={
-                        clickName === "选择发送目标"
-                          ? departmentSelectedList
-                          : groupDeptUserSelectedList
-                      }
-                      options={flattenDepartmentList}
-                      getOptionLabel={(option) => option.name}
-                      isOptionEqualToValue={(option, value) =>
-                        option.id === value.id
-                      }
-                      groupBy={(option) => option.parentid as string}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={
-                            clickName === "选择发送目标"
-                              ? "部门与用户搜索"
-                              : "用户搜索"
-                          }
-                        />
-                      )}
-                      filterOptions={(options, state) =>
-                        onFilterDeptAndUsers(options, state)
-                      }
-                      onChange={(e, value) =>
-                        value && setSearchToDeptValue(value)
-                      }
-                      renderGroup={(params) => {
-                        const { key, group, children } = params
-                        return <div key={key}>{children}</div>
-                      }}
-                      renderOption={(props, option, state) => {
-                        let style = Object.assign(
-                          option.type === DepartmentAndUserType.Department
-                            ? { color: "#666" }
-                            : { paddingLeft: "2rem" },
-                          { fontSize: "0.9rem" }
-                        )
-                        !handleTypeIsCanSelect(canSelect, option.type) &&
-                          (props.onClick = () => {})
-                        return (
-                          <li {...props} style={style}>
-                            {option.name}
-                          </li>
-                        )
-                      }}
-                    />
-                  )
-                )} */}
 
                 {clickName === "选择发送目标" ? (
                   <>
@@ -375,9 +286,11 @@ const SelectTargetDialog =
                       openOnFocus
                       disableClearable
                       value={groupOwner}
-                      options={groupDeptUserSelectedList.concat(
-                        defaultGroupOwner
-                      )}
+                      options={
+                        departmentSelectedList
+                          ? departmentSelectedList.concat(defaultGroupOwner)
+                          : [defaultGroupOwner]
+                      }
                       getOptionLabel={(option) => option.name}
                       isOptionEqualToValue={(option, value) =>
                         option.id === value.id
@@ -456,7 +369,6 @@ const SelectTargetDialog =
             chatId={chatId}
             chatName={chatName}
             clickName={"创建群组"}
-            groupDeptUserSelectedList={groupDeptUserSelectedList}
             isUpdatedDeptUser={isUpdatedDeptUser}
             targetSelectedList={targetSelectedList}
             settingSelectedList={settingSelectedList}
@@ -474,19 +386,19 @@ const SelectTargetDialog =
         />
       </div>
     )
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.open === nextProps.open &&
+      prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
+      prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
+      prevProps.AppId === nextProps.AppId &&
+      prevProps.groupList === nextProps.groupList &&
+      prevProps.chatId === nextProps.chatId &&
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.sendType === nextProps.sendType
+    )
   }
-// (prevProps, nextProps) => {
-//   return (
-//     prevProps.open === nextProps.open &&
-//     prevProps.departmentAndUserList === nextProps.departmentAndUserList &&
-//     prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
-//     prevProps.AppId === nextProps.AppId &&
-//     prevProps.groupList === nextProps.groupList &&
-//     prevProps.chatId === nextProps.chatId &&
-//     prevProps.isLoading === nextProps.isLoading &&
-//     prevProps.sendType === nextProps.sendType
-//   )
-// }
-// )
+)
 
 export default SelectTargetDialog
