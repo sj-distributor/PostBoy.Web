@@ -143,6 +143,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     setMeetingGroup,
     participantPage,
     setParticipantPage,
+    settingSelectedList,
   } = useAction({
     setIsOpenMeetingSettings,
     meetingData,
@@ -216,6 +217,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         setChatId={setChatId}
         handleGetSelectData={handleGetSelectData}
         loadSelectData={loadSelectData}
+        settingSelectedList={settingSelectedList}
       />
       <SeetingsDialog
         open={openSettingsDialog}

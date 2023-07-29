@@ -78,47 +78,48 @@ const useAction = (props: {
     return hasData;
   };
 
-  // const recursiveDeptList = (
-  //   hasData: IDepartmentAndUserListValue[],
-  //   changeList: IDepartmentAndUserListValue[]
-  // ) => {
-  //   for (const key in hasData) {
-  //     const e = hasData[key];
-  //     const hasItemIndex = changeList.findIndex((item) => item.id === e.id);
-  //     e.selected
-  //       ? hasItemIndex <= -1 &&
-  //         changeList.push({
-  //           id: e.id,
-  //           name: e.name,
-  //           type: DepartmentAndUserType.User,
-  //           parentid: String(e.parentid),
-  //           selected: e.selected,
-  //           children: [],
-  //         })
-  //       : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1);
-  //     e.children.length > 0 && recursiveDeptList(e.children, changeList);
-  //   }
-  // };
+  const recursiveDeptList = (
+    hasData: IDepartmentAndUserListValue[],
+    changeList: IDepartmentAndUserListValue[]
+  ) => {
+    for (const key in hasData) {
+      const e = hasData[key];
+      const hasItemIndex = changeList.findIndex((item) => item.id === e.id);
+      e.selected
+        ? hasItemIndex <= -1 &&
+          changeList.push({
+            id: e.id,
+            name: e.name,
+            type: DepartmentAndUserType.User,
+            parentid: e.parentid,
+            selected: e.selected,
+            children: [],
+            isCollapsed: e.isCollapsed,
+          })
+        : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1);
+      e.children.length > 0 && recursiveDeptList(e.children, changeList);
+    }
+  };
 
   // 处理部门列表点击选择或者展开
-  const handleDeptOrUserClick = (
-    type: ClickType,
-    clickedItem: IDepartmentAndUserListValue
-  ) => {
-    setDeptUserList((prev) => {
-      const newValue = prev.filter((e) => !!e);
-      const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
+  // const handleDeptOrUserClick = (
+  //   type: ClickType,
+  //   clickedItem: IDepartmentAndUserListValue
+  // ) => {
+  //   setDeptUserList((prev) => {
+  //     const newValue = prev.filter((e) => !!e);
+  //     const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
 
-      activeData &&
-        recursiveSeachDeptOrUser(activeData.data, (e) => {
-          e.id === clickedItem.id &&
-            (type === ClickType.Collapse
-              ? (e.isCollapsed = !e.isCollapsed)
-              : (e.selected = !e.selected));
-        });
-      return newValue;
-    });
-  };
+  //     activeData &&
+  //       recursiveSeachDeptOrUser(activeData.data, (e) => {
+  //         e.id === clickedItem.id &&
+  //           (type === ClickType.Collapse
+  //             ? (e.isCollapsed = !e.isCollapsed)
+  //             : (e.selected = !e.selected));
+  //       });
+  //     return newValue;
+  //   });
+  // };
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -158,38 +159,38 @@ const useAction = (props: {
   };
 
   const handleConfirm = () => {
-    if (clickName === SelectPersonnelType.ConferenceAdministrator) {
-      const isUserArr = departmentSelectedList.filter(
-        (item) => typeof item.id !== "string"
-      );
-      if (isUserArr.length) {
-        setTipsObject({
-          show: true,
-          msg: "Administrators cannot select departments",
-        });
-        return;
-      }
-      if (departmentSelectedList.length > 1) {
-        setTipsObject({
-          show: true,
-          msg: "Administrators can only select one person",
-        });
-        return;
-      }
-    }
+    // if (clickName === SelectPersonnelType.ConferenceAdministrator) {
+    //   const isUserArr = departmentSelectedList.filter(
+    //     (item) => typeof item.id !== "string"
+    //   );
+    //   if (isUserArr.length) {
+    //     setTipsObject({
+    //       show: true,
+    //       msg: "Administrators cannot select departments",
+    //     });
+    //     return;
+    //   }
+    //   if (departmentSelectedList.length > 1) {
+    //     setTipsObject({
+    //       show: true,
+    //       msg: "Administrators can only select one person",
+    //     });
+    //     return;
+    //   }
+    // }
 
-    if (
-      clickName === SelectPersonnelType.Moderator &&
-      departmentSelectedList.length > DefaultDisplay.hostList
-    ) {
-      tipsObject &&
-        setTipsObject({
-          show: true,
-          msg: "Cannot select department and up to ten hosts",
-        });
+    // if (
+    //   clickName === SelectPersonnelType.Moderator &&
+    //   departmentSelectedList.length > DefaultDisplay.hostList
+    // ) {
+    //   tipsObject &&
+    //     setTipsObject({
+    //       show: true,
+    //       msg: "Cannot select department and up to ten hosts",
+    //     });
 
-      return;
-    }
+    //   return;
+    // }
 
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
@@ -202,17 +203,17 @@ const useAction = (props: {
     clearSelected();
   };
 
-  // useEffect(() => {
-  //   // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
+  useEffect(() => {
+    // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
 
-  //   !isLoading &&
-  //     departmentKeyValue?.data.length > 0 &&
-  //     setDepartmentSelectedList((prev) => {
-  //       const newValue = prev.filter((e) => !!e);
-  //       recursiveDeptList(departmentKeyValue.data, newValue);
-  //       return newValue;
-  //     });
-  // }, [departmentAndUserList]);
+    !isLoading &&
+      departmentKeyValue?.data.length > 0 &&
+      setDepartmentSelectedList((prev) => {
+        const newValue = prev.filter((e) => !!e);
+        recursiveDeptList(departmentKeyValue.data, newValue);
+        return newValue;
+      });
+  }, [departmentAndUserList]);
 
   const clearSelected = () => {
     if (firstState) {
@@ -261,20 +262,20 @@ const useAction = (props: {
     return newValue;
   };
 
-  useEffect(() => {
-    departmentAndUserList.length && setSearchToDeptValue([]);
+  // useEffect(() => {
+  //   departmentAndUserList.length && setSearchToDeptValue([]);
 
-    open
-      ? loadSelectData && loadSelectData.length > 0
-        ? setDepartmentSelectedList((prev) =>
-            handleData(prev, departmentAndUserList)
-          )
-        : setDepartmentSelectedList([])
-      : // 关闭时清空上次选中数据
-        (() => {
-          setDepartmentSelectedList([]);
-        })();
-  }, [open, isLoading]);
+  //   open
+  //     ? loadSelectData && loadSelectData.length > 0
+  //       ? setDepartmentSelectedList((prev) =>
+  //           handleData(prev, departmentAndUserList)
+  //         )
+  //       : setDepartmentSelectedList([])
+  //     : // 关闭时清空上次选中数据
+  //       (() => {
+  //         setDepartmentSelectedList([]);
+  //       })();
+  // }, [open, isLoading]);
 
   useEffect(() => {
     // 3s关闭提示
@@ -314,18 +315,23 @@ const useAction = (props: {
       departmentAndUserList.length > 0 &&
       loadSelectData
     ) {
-      setDepartmentSelectedList(loadSelectData);
+      // setDepartmentSelectedList(loadSelectData);
     }
   }, [isLoading, loadSelectData]);
 
-  // useEffect(() => {
-  //   if (
-  //     (clickName === SelectPersonnelType.SpecifyReminderPersonnel || clickName === SelectPersonnelType.Moderator) &&
-  //     loadSelectData
-  //   ) {
-  //     setDepartmentSelectedList(loadSelectData);
-  //   }
-  // }, [clickName]);
+  useEffect(() => {
+    if (
+      (clickName === SelectPersonnelType.SpecifyReminderPersonnel ||
+        clickName === SelectPersonnelType.Moderator) &&
+      loadSelectData
+    ) {
+      // setDepartmentSelectedList(loadSelectData);
+    }
+  }, [clickName]);
+
+  useEffect(() => {
+    console.log(departmentSelectedList);
+  }, [open]);
 
   return {
     departmentSelectedList,
@@ -337,7 +343,7 @@ const useAction = (props: {
     handleTypeIsCanSelect,
     setIsShowDialog,
     setTagsValue,
-    handleDeptOrUserClick,
+    // handleDeptOrUserClick,
     setSearchToDeptValue,
     handleConfirm,
     handleCancel,

@@ -77,9 +77,17 @@ const useAction = (props: MeetingSettingsProps) => {
     agentId: 0,
   });
 
-  const { loadDeptUsersFromWebWorker } = useDeptUserData({
+  const {
+    departmentAndUserList,
+    flattenDepartmentList,
+    setFlattenDepartmentList,
+    setDepartmentAndUserList,
+    loadDeptUsersFromWebWorker,
+  } = useDeptUserData({
     appId: corpAppValue?.appId,
   });
+
+  console.log(departmentAndUserList);
 
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
@@ -255,15 +263,15 @@ const useAction = (props: MeetingSettingsProps) => {
   // 弹出选择对象框 boolean
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
   // 部门和用户数组
-  const [departmentAndUserList, setDepartmentAndUserList] = useState<
-    IDepartmentKeyControl[]
-  >([]);
+  // const [departmentAndUserList, setDepartmentAndUserList] = useState<
+  //   IDepartmentKeyControl[]
+  // >([]);
   const [appLoading, setAppLoading] = useState<boolean>(true);
   const [departmentAndUserListBackups, setDepartmentAndUserListBackups] =
     useState<IDepartmentKeyControl[]>([]);
-  const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-    ISearchList[]
-  >([]);
+  // const [flattenDepartmentList, setFlattenDepartmentList] = useState<
+  //   ISearchList[]
+  // >([]);
   const [flattenDepartmentListBackups, setFlattenDepartmentListBackups] =
     useState<ISearchList[]>([]);
   // TreeView显示展开
@@ -482,6 +490,10 @@ const useAction = (props: MeetingSettingsProps) => {
     show: false,
     msg: "",
   });
+
+  const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
+    console.log(valueList);
+  };
 
   const loadSelectData = useMemo(() => {
     const result =
@@ -1384,6 +1396,7 @@ const useAction = (props: MeetingSettingsProps) => {
     setMeetingGroup,
     participantPage,
     setParticipantPage,
+    settingSelectedList,
   };
 };
 

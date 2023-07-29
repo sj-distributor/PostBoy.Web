@@ -134,6 +134,7 @@ export interface ITargetDialogProps {
   >;
   handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
   loadSelectData?: IDepartmentAndUserListValue[];
+  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }
 
 export interface DateTimeProps {

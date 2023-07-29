@@ -24,6 +24,7 @@ import {
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
+import TreeViewSelector from "../../../../../../components/treeViewSelector";
 
 // const fiteringDeptAndUsers = (
 //   options: IDepartmentAndUserListValue[],
@@ -37,15 +38,15 @@ import { memo } from "react";
 //     for (let i = 0; i < findArray.length; i++) {
 //       array.push(findArray[i]);
 //       const findParent = options.find(
-//         (item) => item.name === findArray[i].parentid
+//         (item) => item.name === String(findArray[i].parentid)
 //       );
 //       if (!!findParent) {
 //         const index = array.findIndex(
-//           (item) => item.name === findArray[i].parentid
+//           (item) => item.name === String(findArray[i].parentid)
 //         );
 //         if (index === -1) {
 //           const index = array.findIndex(
-//             (item) => item.parentid === findParent.name
+//             (item) => item.parentid === Number(findParent.name)
 //           );
 //           array.splice(index, 0, findParent);
 //         }
@@ -78,6 +79,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       handleGetSelectData,
+      settingSelectedList,
     } = props;
 
     const {
@@ -85,7 +87,7 @@ const SelectTargetDialog = memo(
       tagsValue,
       tipsObject,
       createLoading,
-      handleDeptOrUserClick,
+      // handleDeptOrUserClick,
       setSearchToDeptValue,
       setTagsValue,
       handleTypeIsCanSelect,
@@ -210,7 +212,7 @@ const SelectTargetDialog = memo(
               <>
                 <div
                   style={{
-                    height: "15rem",
+                    height: "auto",
                     overflowY: "auto",
                     position: "relative",
                     marginBottom: "1rem",
@@ -222,7 +224,26 @@ const SelectTargetDialog = memo(
                     recursiveRenderDeptList(departmentKeyValue.data, 0, true)} */}
                 </div>
 
-                {/*flattenDepartmentList && (
+                {departmentKeyValue && departmentKeyValue.key && (
+                  <div>
+                    {departmentSelectedList && (
+                      <TreeViewSelector
+                        appId={AppId}
+                        inputValue={""}
+                        sourceData={{
+                          foldData: departmentKeyValue.data,
+                          flattenData: flattenDepartmentList ?? [],
+                        }}
+                        defaultSelectedList={departmentSelectedList}
+                        settingSelectedList={(value) => {
+                          settingSelectedList(value);
+                        }}
+                      ></TreeViewSelector>
+                    )}
+                  </div>
+                )}
+
+                {/* {flattenDepartmentList && (
                   <Autocomplete
                     id={"sreach-input" + clickName}
                     disablePortal
@@ -249,9 +270,7 @@ const SelectTargetDialog = memo(
                     renderInput={(params) => (
                       <TextField {...params} label={"部门与用户搜索"} />
                     )}
-                    filterOptions={(options, state) =>
-                      fiteringDeptAndUsers(options, state)
-                    }
+                    filterOptions={(options, state) => flattenDepartmentList}
                     onChange={(e, value) =>
                       value && setSearchToDeptValue(value)
                     }
@@ -275,7 +294,7 @@ const SelectTargetDialog = memo(
                       );
                     }}
                   />
-                  )*/}
+                )} */}
 
                 <>
                   <Autocomplete
