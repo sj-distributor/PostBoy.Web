@@ -123,7 +123,7 @@ const useAction = ({
     )
 
     setFoldList(handleSelectDataSync(copyFoldList, selectedList))
-  }, [foldData])
+  }, [])
 
   const handleSelectDataSync = (
     sourceData: IDepartmentAndUserListValue[],
