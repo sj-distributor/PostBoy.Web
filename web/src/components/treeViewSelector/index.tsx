@@ -10,7 +10,7 @@ import {
 } from "@mui/material"
 import { onFilterDeptAndUsers } from "./fitler"
 import useAction from "./hook"
-import { ITreeViewProps, SelectType, TreeViewDisplayMode } from "./props"
+import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props"
 import styles from "./index.module.scss"
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import {
@@ -29,7 +29,7 @@ const TreeViewSelector = ({
   defaultSelectedList,
   displayMode,
   inputLabel,
-  selectType,
+  sourceType,
   foldSelectorProps,
   flattenSelectorProps,
   settingSelectedList,
@@ -55,7 +55,7 @@ const TreeViewSelector = ({
     defaultSelectedList,
     foldData,
     flattenData,
-    selectType: selectType ?? SelectType.Fold,
+    sourceType: sourceType ?? SourceType.Full,
     settingSelectedList,
   })
 

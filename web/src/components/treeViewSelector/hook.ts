@@ -6,15 +6,14 @@ import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
-import useDeptUserData from "../../hooks/deptUserData";
-import { ITreeViewHookProps, SelectType } from "./props";
+import { ITreeViewHookProps, SourceType } from "./props";
 
 const useAction = ({
   appId,
   defaultSelectedList,
   flattenData,
   foldData,
-  selectType,
+  sourceType,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const [selectedList, setSelectedList] = useState<
@@ -44,7 +43,10 @@ const useAction = ({
     node: IDepartmentAndUserListValue,
     idRoute: number[]
   ): IDepartmentAndUserListValue | undefined {
-    if (idRoute.length === 0 || node.id !== idRoute[0]) {
+    if (
+      idRoute.length === 0 ||
+      (node.id !== idRoute[0] && sourceType === SourceType.Full)
+    ) {
       return undefined;
     }
 
@@ -92,31 +94,9 @@ const useAction = ({
       ? clickedList
       : [clickedList];
 
-    if (selectType === SelectType.Fold) {
-      for (const clickedItem of copyClickedList) {
-        const routeArr = clickedItem.idRoute ?? [];
-
-        const innerItem: IDepartmentAndUserListValue | undefined =
-          findNodeByIdRoute(copyFoldList[0], routeArr);
-
-        const finalInnerItem =
-          clickedItem.type === DepartmentAndUserType.Department
-            ? innerItem
-            : innerItem?.children.find((cell) => cell.id === clickedItem.id);
-
-        finalInnerItem &&
-          (type === ClickType.Select
-            ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
-            : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed));
-      }
-    } else if (type === ClickType.Select) {
-      copyFoldList.forEach((item) => {
-        copyClickedList.some((cell) => cell.id === item.id) &&
-          (item.selected = !item.selected);
-      });
-    }
-
-    setFoldList(copyFoldList);
+    setFoldList(
+      handleSelectDataSync(copyFoldList, copyClickedList, value, type)
+    );
   };
 
   // 搜索框变化时同步到部门列表
@@ -135,6 +115,53 @@ const useAction = ({
     // 同步外部selectedList
     settingSelectedList(selectedList);
   }, [selectedList]);
+
+  useEffect(() => {
+    // 初始化已选择的item到foldList中
+    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
+      (item) => ({ ...item })
+    );
+
+    setFoldList(handleSelectDataSync(copyFoldList, selectedList));
+  }, [foldData]);
+
+  const handleSelectDataSync = (
+    sourceData: IDepartmentAndUserListValue[],
+    selectedList: IDepartmentAndUserListValue[],
+    value?: boolean,
+    type?: ClickType
+  ) => {
+    const copySourceData: IDepartmentAndUserListValue[] = sourceData.map(
+      (item) => ({
+        ...item,
+      })
+    );
+
+    selectedList.length > 0 &&
+      selectedList.forEach((selectedItem) => {
+        const routeArr = selectedItem.idRoute ?? [];
+
+        const innerItem: IDepartmentAndUserListValue | undefined =
+          copySourceData
+            .map((copySourceDataItem) => {
+              return findNodeByIdRoute(copySourceDataItem, routeArr);
+            })
+            .filter((x) => x)[0];
+
+        const finalInnerItem =
+          selectedItem.type === DepartmentAndUserType.Department
+            ? innerItem
+            : innerItem?.children.find((cell) => cell.id === selectedItem.id);
+
+        finalInnerItem &&
+          (type !== ClickType.Collapse
+            ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
+            : (finalInnerItem.isCollapsed =
+                value ?? !finalInnerItem?.isCollapsed));
+      });
+
+    return copySourceData;
+  };
 
   return {
     foldList,
