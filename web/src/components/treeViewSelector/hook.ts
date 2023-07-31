@@ -122,14 +122,26 @@ const useAction = ({
 
     selectedList.length > 0 &&
       selectedList.forEach((selectedItem) => {
-        const topLevelIdList = foldList.map((item) => Number(item.id))
+        // 提前判断顶层user数据选中并返回
+        const userData = copySourceData.find(
+          (item) => item.id === selectedItem.id
+        )
+        if (!Number(selectedItem.id) && userData) {
+          type !== ClickType.Collapse
+            ? (userData.selected = value ?? !userData.selected)
+            : (userData.isCollapsed = !userData?.isCollapsed)
+          return
+        }
+        // 提取顶层department数据并剪裁idRoute
+        const topLevelIdList = copySourceData.map((item) => Number(item.id))
         const topIndex = selectedItem.idRoute?.findIndex((id) =>
           topLevelIdList.some((topId) => topId === id)
         )
+        // 通用-通过idRoute修改对应数据
         const routeArr =
           (sourceType === SourceType.Part
-            ? selectedItem.idRoute?.slice(topIndex)
-            : selectedItem.idRoute) ?? []
+            ? topIndex && topIndex > -1 && selectedItem.idRoute?.slice(topIndex)
+            : selectedItem.idRoute) || []
 
         const innerItem: IDepartmentAndUserListValue | undefined =
           copySourceData
