@@ -108,20 +108,6 @@ const useAction = ({
     setSelectedList(valueArr)
   }
 
-  useEffect(() => {
-    // 同步外部selectedList
-    settingSelectedList(selectedList)
-  }, [selectedList])
-
-  useEffect(() => {
-    // 初始化已选择的item到foldList中
-    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
-      (item) => ({ ...item })
-    )
-
-    setFoldList(handleSelectDataSync(copyFoldList, selectedList))
-  }, [])
-
   const handleSelectDataSync = (
     sourceData: IDepartmentAndUserListValue[],
     selectedList: IDepartmentAndUserListValue[],
@@ -165,6 +151,20 @@ const useAction = ({
 
     return copySourceData
   }
+
+  useEffect(() => {
+    // 同步外部selectedList
+    settingSelectedList(selectedList)
+  }, [selectedList])
+
+  useEffect(() => {
+    // 初始化已选择的item到foldList中
+    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
+      (item) => ({ ...item })
+    )
+
+    setFoldList(handleSelectDataSync(copyFoldList, selectedList))
+  }, [])
 
   return {
     foldList,
