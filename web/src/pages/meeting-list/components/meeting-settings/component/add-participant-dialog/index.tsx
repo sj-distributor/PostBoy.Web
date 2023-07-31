@@ -20,11 +20,13 @@ import {
   DepartmentAndUserType,
   ITargetDialogProps,
   IDepartmentAndUserListValue,
+  SelectPersonnelType,
 } from "../../../../../../dtos/meeting-seetings";
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
 import TreeViewSelector from "../../../../../../components/treeViewSelector";
+import { SelectType } from "../../../../../../components/treeViewSelector/props";
 
 // const fiteringDeptAndUsers = (
 //   options: IDepartmentAndUserListValue[],
@@ -230,6 +232,13 @@ const SelectTargetDialog = memo(
                       <TreeViewSelector
                         appId={AppId}
                         inputValue={""}
+                        selectType={
+                          clickName === SelectPersonnelType.MeetingAttendees ||
+                          clickName ===
+                            SelectPersonnelType.ConferenceAdministrator
+                            ? SelectType.Fold
+                            : SelectType.Flatten
+                        }
                         sourceData={{
                           foldData: departmentKeyValue.data,
                           flattenData: flattenDepartmentList ?? [],
