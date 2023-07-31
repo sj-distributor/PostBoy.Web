@@ -1,12 +1,12 @@
-import { clone, difference, remove } from "ramda";
-import { useEffect, useState } from "react";
+import { clone, difference, remove } from "ramda"
+import { useEffect, useState } from "react"
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
-} from "../../dtos/enterprise";
-import { ITreeViewHookProps, SourceType } from "./props";
+} from "../../dtos/enterprise"
+import { ITreeViewHookProps, SourceType } from "./props"
 
 const useAction = ({
   appId,
@@ -18,26 +18,26 @@ const useAction = ({
 }: ITreeViewHookProps) => {
   const [selectedList, setSelectedList] = useState<
     IDepartmentAndUserListValue[]
-  >(defaultSelectedList ?? []);
+  >(defaultSelectedList ?? [])
 
   const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
     clone(foldData)
-  );
+  )
 
   const [flattenList, setFlattenList] = useState<IDepartmentAndUserListValue[]>(
     clone(flattenData)
-  );
+  )
 
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
     canSelect: DeptUserCanSelectStatus,
     type: DepartmentAndUserType
   ) => {
-    if (canSelect === DeptUserCanSelectStatus.Both) return true;
+    if (canSelect === DeptUserCanSelectStatus.Both) return true
     return type === DepartmentAndUserType.Department
       ? canSelect === DeptUserCanSelectStatus.Department
-      : canSelect === DeptUserCanSelectStatus.User;
-  };
+      : canSelect === DeptUserCanSelectStatus.User
+  }
 
   function findNodeByIdRoute(
     node: IDepartmentAndUserListValue,
@@ -47,21 +47,21 @@ const useAction = ({
       idRoute.length === 0 ||
       (node.id !== idRoute[0] && sourceType === SourceType.Full)
     ) {
-      return undefined;
+      return undefined
     }
 
     if (idRoute.length === 1 && idRoute[0] === node.id) {
-      return node;
+      return node
     }
 
     for (const child of node.children) {
-      const foundNode = findNodeByIdRoute(child, idRoute.slice(1));
+      const foundNode = findNodeByIdRoute(child, idRoute.slice(1))
       if (foundNode) {
-        return foundNode;
+        return foundNode
       }
     }
 
-    return undefined;
+    return undefined
   }
 
   // 处理部门列表点击选择或者展开
@@ -72,7 +72,7 @@ const useAction = ({
   ) => {
     const clickedItem = !Array.isArray(clickedList)
       ? clickedList
-      : clickedList[0];
+      : clickedList[0]
 
     setSelectedList((prev) => {
       return type === ClickType.Select
@@ -83,47 +83,47 @@ const useAction = ({
               prev
             )
           : [...prev, clickedItem]
-        : prev;
-    });
+        : prev
+    })
 
     const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
       (item) => ({ ...item })
-    );
+    )
 
     const copyClickedList = Array.isArray(clickedList)
       ? clickedList
-      : [clickedList];
+      : [clickedList]
 
     setFoldList(
       handleSelectDataSync(copyFoldList, copyClickedList, value, type)
-    );
-  };
+    )
+  }
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
-    const diff = difference(valueArr, selectedList);
-    const diffReverse = difference(selectedList, valueArr);
+    const diff = difference(valueArr, selectedList)
+    const diffReverse = difference(selectedList, valueArr)
 
-    diff.length > 0 && handleDeptOrUserClick(ClickType.Select, diff, true);
+    diff.length > 0 && handleDeptOrUserClick(ClickType.Select, diff, true)
     diffReverse.length > 0 &&
-      handleDeptOrUserClick(ClickType.Select, diffReverse, false);
+      handleDeptOrUserClick(ClickType.Select, diffReverse, false)
 
-    setSelectedList(valueArr);
-  };
+    setSelectedList(valueArr)
+  }
 
   useEffect(() => {
     // 同步外部selectedList
-    settingSelectedList(selectedList);
-  }, [selectedList]);
+    settingSelectedList(selectedList)
+  }, [selectedList])
 
   useEffect(() => {
     // 初始化已选择的item到foldList中
     const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
       (item) => ({ ...item })
-    );
+    )
 
-    setFoldList(handleSelectDataSync(copyFoldList, selectedList));
-  }, [foldData]);
+    setFoldList(handleSelectDataSync(copyFoldList, selectedList))
+  }, [])
 
   const handleSelectDataSync = (
     sourceData: IDepartmentAndUserListValue[],
@@ -135,33 +135,33 @@ const useAction = ({
       (item) => ({
         ...item,
       })
-    );
+    )
 
     selectedList.length > 0 &&
       selectedList.forEach((selectedItem) => {
-        const routeArr = selectedItem.idRoute ?? [];
+        const routeArr = selectedItem.idRoute ?? []
 
         const innerItem: IDepartmentAndUserListValue | undefined =
           copySourceData
             .map((copySourceDataItem) => {
-              return findNodeByIdRoute(copySourceDataItem, routeArr);
+              return findNodeByIdRoute(copySourceDataItem, routeArr)
             })
-            .filter((x) => x)[0];
+            .filter((x) => x)[0]
 
         const finalInnerItem =
           selectedItem.type === DepartmentAndUserType.Department
             ? innerItem
-            : innerItem?.children.find((cell) => cell.id === selectedItem.id);
+            : innerItem?.children.find((cell) => cell.id === selectedItem.id)
 
         finalInnerItem &&
           (type !== ClickType.Collapse
             ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
             : (finalInnerItem.isCollapsed =
-                value ?? !finalInnerItem?.isCollapsed));
-      });
+                value ?? !finalInnerItem?.isCollapsed))
+      })
 
-    return copySourceData;
-  };
+    return copySourceData
+  }
 
   return {
     foldList,
@@ -170,7 +170,7 @@ const useAction = ({
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,
-  };
-};
+  }
+}
 
-export default useAction;
+export default useAction
