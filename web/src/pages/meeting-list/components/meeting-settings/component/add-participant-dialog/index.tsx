@@ -96,6 +96,7 @@ const SelectTargetDialog = memo(
       handleConfirm,
       handleCancel,
       handleSelectDataCheck,
+      setDepartmentSelectedList,
     } = useAction({
       open,
       AppId,
@@ -114,6 +115,7 @@ const SelectTargetDialog = memo(
       setDeptUserList,
       setOuterTagsValue,
       handleGetSelectData,
+      settingSelectedList,
     });
     const center = () =>
       !departmentKeyValue
@@ -246,8 +248,7 @@ const SelectTargetDialog = memo(
                         }}
                         defaultSelectedList={loadSelectData}
                         settingSelectedList={(value) => {
-                          handleSelectDataCheck(value) &&
-                            settingSelectedList(value);
+                          setDepartmentSelectedList(value);
                         }}
                       ></TreeViewSelector>
                     )}

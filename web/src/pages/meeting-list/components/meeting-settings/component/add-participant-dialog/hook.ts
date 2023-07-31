@@ -12,28 +12,9 @@ import {
   DefaultDisplay,
   SelectPersonnelType,
 } from "../../../../../../dtos/meeting-seetings";
+import { AddParticipantDialogProps } from "./props";
 
-const useAction = (props: {
-  departmentAndUserList: IDepartmentKeyControl[];
-  departmentKeyValue: IDepartmentKeyControl;
-  AppId: string;
-  isLoading: boolean;
-  open: boolean;
-  lastTagsValue: string[] | undefined;
-  tagsList: ITagsList[];
-  clickName: SelectPersonnelType;
-  chatId: string;
-  outerTagsValue?: ITagsList[];
-  CorpId: string;
-  loadSelectData?: IDepartmentAndUserListValue[];
-  setOpenFunction: (open: boolean) => void;
-  setChatId?: React.Dispatch<React.SetStateAction<string>>;
-  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
-  setDeptUserList: React.Dispatch<
-    React.SetStateAction<IDepartmentKeyControl[]>
-  >;
-  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
-}) => {
+const useAction = (props: AddParticipantDialogProps) => {
   const {
     departmentAndUserList,
     departmentKeyValue,
@@ -52,6 +33,7 @@ const useAction = (props: {
     setDeptUserList,
     setOuterTagsValue,
     handleGetSelectData,
+    settingSelectedList,
   } = props;
 
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
@@ -160,9 +142,14 @@ const useAction = (props: {
 
   const handleSelectDataCheck = (selectData: IDepartmentAndUserListValue[]) => {
     let flg: boolean = true;
+
+    return flg;
+  };
+
+  const handleConfirm = () => {
     if (clickName === SelectPersonnelType.ConferenceAdministrator) {
-      console.log(loadSelectData);
-      const isUserArr = selectData.filter(
+      console.log(departmentSelectedList);
+      const isUserArr = departmentSelectedList.filter(
         (item) => typeof item.id !== "string"
       );
       if (isUserArr.length) {
@@ -170,33 +157,30 @@ const useAction = (props: {
           show: true,
           msg: "Administrators cannot select departments",
         });
-        flg = false;
+
+        return;
       }
-      if (selectData.length > 1) {
+      if (departmentSelectedList.length > 1) {
         setTipsObject({
           show: true,
           msg: "Administrators can only select one person",
         });
-        flg = false;
+        return;
       }
     }
-    return flg;
-  };
+    if (
+      clickName === SelectPersonnelType.Moderator &&
+      departmentSelectedList.length > DefaultDisplay.hostList
+    ) {
+      tipsObject &&
+        setTipsObject({
+          show: true,
+          msg: "Cannot select department and up to ten hosts",
+        });
 
-  const handleConfirm = () => {
-    // if (
-    //   clickName === SelectPersonnelType.Moderator &&
-    //   departmentSelectedList.length > DefaultDisplay.hostList
-    // ) {
-    //   tipsObject &&
-    //     setTipsObject({
-    //       show: true,
-    //       msg: "Cannot select department and up to ten hosts",
-    //     });
-
-    //   return;
-    // }
-
+      return;
+    }
+    settingSelectedList(departmentSelectedList);
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
@@ -349,6 +333,7 @@ const useAction = (props: {
     handleConfirm,
     handleCancel,
     handleSelectDataCheck,
+    setDepartmentSelectedList,
   };
 };
 export default useAction;
