@@ -1,14 +1,13 @@
-import { Autocomplete } from "@mui/material"
 import React from "react"
 import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise"
 
-type AutocompleteProps = typeof Autocomplete
-
-export interface IFoldSelectorProps extends AutocompleteProps {}
-export interface IFlattenSelectorProps extends AutocompleteProps {}
+export interface IFoldSelectorProps
+  extends React.AllHTMLAttributes<HTMLDivElement> {}
+export interface IFlattenSelectorProps
+  extends React.AllHTMLAttributes<HTMLDivElement> {}
 
 export interface ISourceData {
   foldData: IDepartmentAndUserListValue[]
@@ -18,13 +17,16 @@ export interface ISourceData {
 export interface ITreeViewProps {
   appId: string
   inputValue: string
+  inputLabel?: string
   sourceData?: ISourceData
   isCanSelect?: DeptUserCanSelectStatus
   children?: React.ReactNode
   defaultSelectedList?: IDepartmentAndUserListValue[]
-  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
+  displayMode: TreeViewDisplayMode
   foldSelectorProps?: IFoldSelectorProps
   flattenSelectorProps?: IFlattenSelectorProps
+  selectType?: SelectType
+  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }
 
 export interface ITreeViewHookProps {
@@ -32,5 +34,17 @@ export interface ITreeViewHookProps {
   defaultSelectedList?: IDepartmentAndUserListValue[]
   foldData: IDepartmentAndUserListValue[]
   flattenData: IDepartmentAndUserListValue[]
+  selectType?: SelectType
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
+}
+
+export enum TreeViewDisplayMode {
+  Tree,
+  Dropdown,
+  Both,
+}
+
+export enum SelectType {
+  Fold,
+  Flatten,
 }

@@ -10,7 +10,7 @@ import {
 } from "@mui/material"
 import { onFilterDeptAndUsers } from "./fitler"
 import useAction from "./hook"
-import { ITreeViewProps } from "./props"
+import { ITreeViewProps, SelectType, TreeViewDisplayMode } from "./props"
 import styles from "./index.module.scss"
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import {
@@ -27,9 +27,12 @@ const TreeViewSelector = ({
   isCanSelect,
   children,
   defaultSelectedList,
-  settingSelectedList,
+  displayMode,
+  inputLabel,
+  selectType,
   foldSelectorProps,
   flattenSelectorProps,
+  settingSelectedList,
 }: ITreeViewProps) => {
   const { foldData, flattenData } = sourceData ?? {
     foldData: [],
@@ -50,6 +53,7 @@ const TreeViewSelector = ({
     defaultSelectedList,
     foldData,
     flattenData,
+    selectType: selectType ?? SelectType.Fold,
     settingSelectedList,
   })
 
@@ -124,73 +128,79 @@ const TreeViewSelector = ({
 
   return (
     <>
-      <div
-        style={{
-          height: "15rem",
-          overflowY: "auto",
-          position: "relative",
-          marginBottom: "1rem",
-          ...center(),
-        }}
-      >
-        {foldList && recursiveRenderDeptList(foldList, 0, true)}
-      </div>
-
-      {children && children}
-
-      {flattenList && (
-        <Autocomplete
-          {...flattenSelectorProps}
-          disablePortal
-          openOnFocus
-          multiple
-          disableCloseOnSelect
-          size="small"
-          value={selectedList}
-          options={flattenList}
-          filterOptions={(options, state) =>
-            onFilterDeptAndUsers(options, state)
-          }
-          getOptionLabel={(option: IDepartmentAndUserListValue) => option.name}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          groupBy={(option) => String(option.parentid)}
-          componentsProps={{
-            paper: { elevation: 3 },
-            popper: {
-              placement: "top",
-            },
+      {displayMode !== TreeViewDisplayMode.Dropdown && (
+        <div
+          {...foldSelectorProps}
+          style={{
+            height: "15rem",
+            overflowY: "auto",
+            position: "relative",
+            marginBottom: "1rem",
+            ...center(),
           }}
-          renderGroup={(params) => (
-            <div key={params.key}>{params.children}</div>
-          )}
-          renderOption={(props, option) => {
-            let style = Object.assign(
-              option.type === DepartmentAndUserType.Department
-                ? { color: "#666" }
-                : { paddingLeft: "2rem" },
-              { fontSize: "0.9rem" }
-            )
-            !handleTypeIsCanSelect(canSelect, option.type) &&
-              (props.onClick = () => {})
-            return (
-              <li {...props} style={style}>
-                {option.name}
-              </li>
-            )
-          }}
-          onChange={(e, value) => value && setSearchToDeptValue(value)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              size="small"
-              value={inputValue}
-              className={styles.InputButton}
-              margin="dense"
-              type="text"
-              label="1"
-            />
-          )}
-        />
+        >
+          {foldList && recursiveRenderDeptList(foldList, 0, true)}
+        </div>
+      )}
+
+      {children}
+
+      {flattenList && displayMode !== TreeViewDisplayMode.Tree && (
+        <div {...flattenSelectorProps}>
+          <Autocomplete
+            disablePortal
+            openOnFocus
+            multiple
+            disableCloseOnSelect
+            size="small"
+            value={selectedList}
+            options={flattenList}
+            filterOptions={(options, state) =>
+              onFilterDeptAndUsers(options, state)
+            }
+            getOptionLabel={(option: IDepartmentAndUserListValue) =>
+              option.name
+            }
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            groupBy={(option) => String(option.parentid)}
+            componentsProps={{
+              paper: { elevation: 3 },
+              popper: {
+                placement: "top",
+              },
+            }}
+            renderGroup={(params) => (
+              <div key={params.key}>{params.children}</div>
+            )}
+            renderOption={(props, option) => {
+              let style = Object.assign(
+                option.type === DepartmentAndUserType.Department
+                  ? { color: "#666" }
+                  : { paddingLeft: "2rem" },
+                { fontSize: "0.9rem" }
+              )
+              !handleTypeIsCanSelect(canSelect, option.type) &&
+                (props.onClick = () => {})
+              return (
+                <li {...props} style={style}>
+                  {option.name}
+                </li>
+              )
+            }}
+            onChange={(e, value) => value && setSearchToDeptValue(value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                value={inputValue}
+                className={styles.InputButton}
+                margin="dense"
+                type="text"
+                label={inputLabel ?? ""}
+              />
+            )}
+          />
+        </div>
       )}
     </>
   )
