@@ -146,6 +146,30 @@ const useAction = (props: AddParticipantDialogProps) => {
     return flg;
   };
 
+  const countArrayItems = (
+    departmentSelectedList: IDepartmentAndUserListValue[]
+  ) => {
+    let count = 0;
+
+    const countChildren = (children: IDepartmentAndUserListValue[]) => {
+      if (!children || children.length === 0) {
+        return 1;
+      } else {
+        let childCount = 0;
+        for (let i = 0; i < children.length; i++) {
+          childCount += countChildren(children[i].children);
+        }
+        return childCount;
+      }
+    };
+
+    for (let i = 0; i < departmentSelectedList.length; i++) {
+      count += countChildren(departmentSelectedList[i].children);
+    }
+
+    return count;
+  };
+
   const handleConfirm = () => {
     if (clickName === SelectPersonnelType.ConferenceAdministrator) {
       console.log(departmentSelectedList);
@@ -168,10 +192,12 @@ const useAction = (props: AddParticipantDialogProps) => {
         return;
       }
     }
+    console.log(departmentSelectedList);
     if (
       clickName === SelectPersonnelType.Moderator &&
-      departmentSelectedList.length > DefaultDisplay.hostList
+      countArrayItems(departmentSelectedList) > DefaultDisplay.hostList
     ) {
+      console.log(countArrayItems(departmentSelectedList));
       tipsObject &&
         setTipsObject({
           show: true,

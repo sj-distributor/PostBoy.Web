@@ -492,11 +492,21 @@ const useAction = (props: MeetingSettingsProps) => {
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     if (clickName === SelectPersonnelType.MeetingAttendees) {
       setParticipantList([...valueList]);
+
+      const filterData = (valueList: IDepartmentAndUserListValue[]) => {
+        valueList.forEach((item, index) => {
+          item.selected = false;
+          item.isCollapsed = false;
+          valueList.some(
+            (cell, i) => cell.parentid === item.id && valueList.splice(i, 1)
+          );
+        });
+        console.log(valueList);
+      };
+      filterData(valueList);
       setDepartmentAndUserList([
         {
-          data: valueList.map((item) => {
-            return { ...item, selected: false, isCollapsed: false };
-          }),
+          data: valueList,
           key: corpAppValue.appId,
         },
       ]);
@@ -650,7 +660,7 @@ const useAction = (props: MeetingSettingsProps) => {
     let newArr: string[] = [];
     getUserId(personnelData, newArr);
 
-    return personnelData;
+    return newArr;
   };
 
   const getUserId = (data: IDepartmentAndUserListValue[], arr: string[]) => {
@@ -931,7 +941,11 @@ const useAction = (props: MeetingSettingsProps) => {
       let attendeesList: string[] = [];
 
       participantList &&
-        participantList.map((item) => attendeesList.push(item.id + ""));
+        (attendeesList = getUserChildrenList(
+          departmentAndUserList[0].data,
+          participantList,
+          []
+        ));
 
       const admin_userid = adminUser
         ? adminUser.length > 0
@@ -943,6 +957,7 @@ const useAction = (props: MeetingSettingsProps) => {
       if (!settingsData.hosts) {
         delete settingsData.hosts;
       }
+
       if (!settingsData.ring_users) {
         delete settingsData.ring_users;
       }
@@ -1037,7 +1052,8 @@ const useAction = (props: MeetingSettingsProps) => {
               content,
             },
           };
-
+          console.log(data);
+          return;
           createMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
@@ -1069,7 +1085,7 @@ const useAction = (props: MeetingSettingsProps) => {
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
-
+          return;
           updateMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
