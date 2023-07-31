@@ -17,6 +17,7 @@ import { CircularProgress, Snackbar } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import TreeViewSelector from "../../../../components/treeViewSelector"
 import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props"
+import { memo } from "react"
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {

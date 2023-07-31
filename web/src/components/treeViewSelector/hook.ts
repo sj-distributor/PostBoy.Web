@@ -7,13 +7,14 @@ import {
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise"
 import useDeptUserData from "../../hooks/deptUserData"
-import { ITreeViewHookProps } from "./props"
+import { ITreeViewHookProps, SelectType } from "./props"
 
 const useAction = ({
   appId,
   defaultSelectedList,
   flattenData,
   foldData,
+  selectType,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const [selectedList, setSelectedList] = useState<
@@ -86,23 +87,32 @@ const useAction = ({
       (item) => ({ ...item })
     )
 
-    clickedList = Array.isArray(clickedList) ? clickedList : [clickedList]
+    const copyClickedList = Array.isArray(clickedList)
+      ? clickedList
+      : [clickedList]
 
-    for (const clickedItem of clickedList) {
-      const routeArr = clickedItem.idRoute ?? []
+    if (selectType === SelectType.Fold) {
+      for (const clickedItem of copyClickedList) {
+        const routeArr = clickedItem.idRoute ?? []
 
-      const innerItem: IDepartmentAndUserListValue | undefined =
-        findNodeByIdRoute(copyFoldList[0], routeArr)
+        const innerItem: IDepartmentAndUserListValue | undefined =
+          findNodeByIdRoute(copyFoldList[0], routeArr)
 
-      const finalInnerItem =
-        clickedItem.type === DepartmentAndUserType.Department
-          ? innerItem
-          : innerItem?.children.find((cell) => cell.id === clickedItem.id)
+        const finalInnerItem =
+          clickedItem.type === DepartmentAndUserType.Department
+            ? innerItem
+            : innerItem?.children.find((cell) => cell.id === clickedItem.id)
 
-      finalInnerItem &&
-        (type === ClickType.Select
-          ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
-          : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed))
+        finalInnerItem &&
+          (type === ClickType.Select
+            ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
+            : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed))
+      }
+    } else {
+      copyFoldList.forEach((item) => {
+        copyClickedList.some((cell) => cell.id === item.id) &&
+          (item.selected = !item.selected)
+      })
     }
 
     setFoldList(copyFoldList)

@@ -23,9 +23,10 @@ export interface ITreeViewProps {
   children?: React.ReactNode
   defaultSelectedList?: IDepartmentAndUserListValue[]
   displayMode: TreeViewDisplayMode
-  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
   foldSelectorProps?: IFoldSelectorProps
   flattenSelectorProps?: IFlattenSelectorProps
+  selectType?: SelectType
+  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }
 
 export interface ITreeViewHookProps {
@@ -33,6 +34,7 @@ export interface ITreeViewHookProps {
   defaultSelectedList?: IDepartmentAndUserListValue[]
   foldData: IDepartmentAndUserListValue[]
   flattenData: IDepartmentAndUserListValue[]
+  selectType?: SelectType
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }
 
@@ -40,4 +42,9 @@ export enum TreeViewDisplayMode {
   Tree,
   Dropdown,
   Both,
+}
+
+export enum SelectType {
+  Fold,
+  Flatten,
 }
