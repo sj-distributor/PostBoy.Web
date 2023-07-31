@@ -71,6 +71,7 @@ const useAction = ({
     const clickedItem = !Array.isArray(clickedList)
       ? clickedList
       : clickedList[0];
+
     setSelectedList((prev) => {
       return type === ClickType.Select
         ? clickedItem.selected
@@ -108,7 +109,7 @@ const useAction = ({
             ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
             : (finalInnerItem.isCollapsed = !finalInnerItem.isCollapsed));
       }
-    } else {
+    } else if (type === ClickType.Select) {
       copyFoldList.forEach((item) => {
         copyClickedList.some((cell) => cell.id === item.id) &&
           (item.selected = !item.selected);
