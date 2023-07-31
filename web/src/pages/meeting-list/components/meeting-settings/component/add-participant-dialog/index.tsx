@@ -26,7 +26,7 @@ import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
 import TreeViewSelector from "../../../../../../components/treeViewSelector";
-import { SelectType } from "../../../../../../components/treeViewSelector/props";
+import { SourceType } from "../../../../../../components/treeViewSelector/props";
 
 // const fiteringDeptAndUsers = (
 //   options: IDepartmentAndUserListValue[],
@@ -233,12 +233,12 @@ const SelectTargetDialog = memo(
                       <TreeViewSelector
                         appId={AppId}
                         inputValue={""}
-                        selectType={
+                        sourceType={
                           clickName === SelectPersonnelType.MeetingAttendees ||
                           clickName ===
                             SelectPersonnelType.ConferenceAdministrator
-                            ? SelectType.Fold
-                            : SelectType.Flatten
+                            ? SourceType.Full
+                            : SourceType.Part
                         }
                         sourceData={{
                           foldData: departmentKeyValue.data,
