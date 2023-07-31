@@ -567,7 +567,7 @@ const useAction = (props: MeetingSettingsProps) => {
         : clickName === SelectPersonnelType.ConferenceAdministrator
         ? adminUser
         : undefined;
-
+    console.log(result);
     return result as IDepartmentAndUserListValue[];
   }, [participantList, appointList, hostList, clickName, adminUser]);
 
@@ -956,10 +956,28 @@ const useAction = (props: MeetingSettingsProps) => {
       let settingsData = clone(settings);
       if (!settingsData.hosts) {
         delete settingsData.hosts;
+      } else {
+        hostList &&
+          (settingsData.hosts = {
+            userid: getUserChildrenList(
+              departmentAndUserList[0].data,
+              hostList,
+              []
+            ),
+          });
       }
 
       if (!settingsData.ring_users) {
         delete settingsData.ring_users;
+      } else {
+        appointList &&
+          (settingsData.ring_users = {
+            userid: getUserChildrenList(
+              departmentAndUserList[0].data,
+              appointList,
+              []
+            ),
+          });
       }
 
       !settingsData.password && (settingsData.password = "");
@@ -1052,8 +1070,7 @@ const useAction = (props: MeetingSettingsProps) => {
               content,
             },
           };
-          console.log(data);
-          return;
+
           createMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
@@ -1085,7 +1102,7 @@ const useAction = (props: MeetingSettingsProps) => {
           const data = {
             updateWorkWeChatMeeting: createOrUpdateMeetingData,
           };
-          return;
+
           updateMeeting(data)
             .then((res) => {
               if (res && res.errcode === 0) {
