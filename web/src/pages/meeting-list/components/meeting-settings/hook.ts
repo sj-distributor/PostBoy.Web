@@ -394,15 +394,15 @@ const useAction = (props: MeetingSettingsProps) => {
 
     if (clickName === SelectPersonnelType.ConferenceAdministrator) {
       setAdminUser(valueList);
-      // setParticipantList((prev) => {
-      //   let newArr = prev ? clone(prev) : [];
+      setParticipantList((prev) => {
+        let newArr = prev ? clone(prev) : [];
 
-      //   if (!newArr.find((item) => item.id === valueList[0].id)) {
-      //     newArr.push(valueList[0]);
-      //   }
+        if (!newArr.find((item) => item.id === valueList[0].id)) {
+          newArr.push(valueList[0]);
+        }
 
-      //   return newArr;
-      // });
+        return newArr;
+      });
     }
   };
 
@@ -417,42 +417,29 @@ const useAction = (props: MeetingSettingsProps) => {
         : clickName === SelectPersonnelType.ConferenceAdministrator
         ? adminUser
         : undefined;
-    console.log(result)
-    if ((clickName === SelectPersonnelType.Moderator ||
-      clickName === SelectPersonnelType.SpecifyReminderPersonnel) && participantList){
-        setDepartmentAndUserList([
-          {
-            data: participantList.map((item) => ({ ...item, selected: false })),
-            key: corpAppValue.appId,
-          },
-        ]);
-        setFlattenDepartmentList([
-          {
-            data: participantList.map((item) => ({ ...item, selected: false })),
-            key: corpAppValue.appId,
-          },
-        ]);
-      }
+    console.log(result);
+    //切换折叠数据
+    if (
+      (clickName === SelectPersonnelType.Moderator ||
+        clickName === SelectPersonnelType.SpecifyReminderPersonnel) &&
+      participantList
+    ) {
+      setDepartmentAndUserList([
+        {
+          data: participantList.map((item) => ({ ...item, selected: false })),
+          key: corpAppValue.appId,
+        },
+      ]);
+      setFlattenDepartmentList([
+        {
+          data: participantList.map((item) => ({ ...item, selected: false })),
+          key: corpAppValue.appId,
+        },
+      ]);
+    }
 
     return result as IDepartmentAndUserListValue[];
   }, [participantList, appointList, hostList, clickName, adminUser]);
-
-  const getUserChildrenData = (
-    arr: IDepartmentAndUserListValue[],
-    newArr: IDepartmentAndUserListValue[]
-  ) => {
-    arr.map((item) => {
-      if (
-        item.children.length < 1 &&
-        newArr.findIndex((i) => i.id === item.id) === -1
-      ) {
-        newArr.push(item);
-      } else {
-        getUserChildrenData(item.children, newArr);
-      }
-    });
-    return newArr;
-  };
 
   const [participantPage, setParticipantPage] = useState<number>(1);
 
@@ -632,6 +619,8 @@ const useAction = (props: MeetingSettingsProps) => {
         loadDepartment(corpAppValue.appId);
     }
   }, [isShowDialog]);
+
+  useEffect(() => {}, [isLoadStop]);
 
   const clearData = () => {
     setAppointList([]);
@@ -1114,6 +1103,7 @@ const useAction = (props: MeetingSettingsProps) => {
         return arr;
       });
 
+      console.log(flattenDepartmentList);
       setParticipantList((participant) => {
         let attendeesData: IDepartmentAndUserListValue[] = [];
 
