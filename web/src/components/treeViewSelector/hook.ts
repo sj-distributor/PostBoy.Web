@@ -43,10 +43,7 @@ const useAction = ({
     node: IDepartmentAndUserListValue,
     idRoute: number[]
   ): IDepartmentAndUserListValue | undefined {
-    if (
-      idRoute.length === 0 ||
-      (node.id !== idRoute[0] && sourceType === SourceType.Full)
-    ) {
+    if (idRoute.length === 0 || node.id !== idRoute[0]) {
       return undefined
     }
 
@@ -139,7 +136,14 @@ const useAction = ({
 
     selectedList.length > 0 &&
       selectedList.forEach((selectedItem) => {
-        const routeArr = selectedItem.idRoute ?? []
+        const topLevelIdList = foldList.map((item) => Number(item.id))
+        const topIndex = selectedItem.idRoute?.findIndex((id) =>
+          topLevelIdList.some((topId) => topId === id)
+        )
+        const routeArr =
+          (sourceType === SourceType.Part
+            ? selectedItem.idRoute?.slice(topIndex)
+            : selectedItem.idRoute) ?? []
 
         const innerItem: IDepartmentAndUserListValue | undefined =
           copySourceData
@@ -156,8 +160,7 @@ const useAction = ({
         finalInnerItem &&
           (type !== ClickType.Collapse
             ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
-            : (finalInnerItem.isCollapsed =
-                value ?? !finalInnerItem?.isCollapsed))
+            : (finalInnerItem.isCollapsed = !finalInnerItem?.isCollapsed))
       })
 
     return copySourceData
