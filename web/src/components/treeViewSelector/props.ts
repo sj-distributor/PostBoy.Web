@@ -25,7 +25,7 @@ export interface ITreeViewProps {
   displayMode?: TreeViewDisplayMode
   foldSelectorProps?: IFoldSelectorProps
   flattenSelectorProps?: IFlattenSelectorProps
-  selectType?: SelectType
+  sourceType?: SourceType
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }
 
@@ -34,7 +34,7 @@ export interface ITreeViewHookProps {
   defaultSelectedList?: IDepartmentAndUserListValue[]
   foldData: IDepartmentAndUserListValue[]
   flattenData: IDepartmentAndUserListValue[]
-  selectType?: SelectType
+  sourceType?: SourceType
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void
 }
 
@@ -44,7 +44,7 @@ export enum TreeViewDisplayMode {
   Both,
 }
 
-export enum SelectType {
-  Fold,
-  Flatten,
+export enum SourceType {
+  Full,
+  Part,
 }
