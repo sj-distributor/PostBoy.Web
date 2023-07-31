@@ -18,7 +18,12 @@ const useAction = ({
 }: ITreeViewHookProps) => {
   const [selectedList, setSelectedList] = useState<
     IDepartmentAndUserListValue[]
-  >(defaultSelectedList ?? [])
+  >(
+    defaultSelectedList?.map((item) => ({
+      ...item,
+      idRoute: flattenData.find((cell) => cell.id === item.id)?.idRoute,
+    })) ?? []
+  )
 
   const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
     clone(foldData)
