@@ -39,6 +39,8 @@ const TreeViewSelector = ({
     flattenData: [],
   }
 
+  displayMode = displayMode ?? TreeViewDisplayMode.Both
+
   const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both
 
   const {

@@ -22,7 +22,7 @@ export interface ITreeViewProps {
   isCanSelect?: DeptUserCanSelectStatus
   children?: React.ReactNode
   defaultSelectedList?: IDepartmentAndUserListValue[]
-  displayMode: TreeViewDisplayMode
+  displayMode?: TreeViewDisplayMode
   foldSelectorProps?: IFoldSelectorProps
   flattenSelectorProps?: IFlattenSelectorProps
   selectType?: SelectType
