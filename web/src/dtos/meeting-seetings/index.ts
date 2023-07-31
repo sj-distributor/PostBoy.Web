@@ -33,6 +33,13 @@ export enum SelectPersonnelType {
   ConferenceAdministrator, //会议管理员
 }
 
+export const SelectPersonnelTitle = {
+  [SelectPersonnelType.MeetingAttendees]:'选择会议参与成员',
+  [SelectPersonnelType.ConferenceAdministrator]:'选择会议管理员',
+  [SelectPersonnelType.Moderator]:'选择会议主持人',
+  [SelectPersonnelType.SpecifyReminderPersonnel]:'选择指定提醒成员'
+}
+
 export interface IDepartmentAndUserListValue {
   id: number | string;
   name: string;
@@ -132,7 +139,6 @@ export interface ITargetDialogProps {
   setDeptUserList: React.Dispatch<
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
-  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
   loadSelectData?: IDepartmentAndUserListValue[];
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }

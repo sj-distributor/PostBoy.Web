@@ -24,6 +24,5 @@ export interface AddParticipantDialogProps {
   setDeptUserList: React.Dispatch<
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
-  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }

@@ -110,7 +110,6 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     handleClose,
     fileUpload,
     fileDelete,
-    handleGetSelectData,
     onSetParticipant,
     setClickName,
     onCreateUpdateMeeting,
@@ -211,7 +210,6 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         clickName={clickName}
         chatId={chatId}
         setChatId={setChatId}
-        handleGetSelectData={handleGetSelectData}
         loadSelectData={loadSelectData}
         settingSelectedList={settingSelectedList}
       />

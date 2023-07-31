@@ -32,7 +32,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     setOpenFunction,
     setDeptUserList,
     setOuterTagsValue,
-    handleGetSelectData,
     settingSelectedList,
   } = props;
 
@@ -83,25 +82,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     }
   };
 
-  // 处理部门列表点击选择或者展开
-  // const handleDeptOrUserClick = (
-  //   type: ClickType,
-  //   clickedItem: IDepartmentAndUserListValue
-  // ) => {
-  //   setDeptUserList((prev) => {
-  //     const newValue = prev.filter((e) => !!e);
-  //     const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
-
-  //     activeData &&
-  //       recursiveSeachDeptOrUser(activeData.data, (e) => {
-  //         e.id === clickedItem.id &&
-  //           (type === ClickType.Collapse
-  //             ? (e.isCollapsed = !e.isCollapsed)
-  //             : (e.selected = !e.selected));
-  //       });
-  //     return newValue;
-  //   });
-  // };
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
@@ -210,7 +190,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
     setFirstState(undefined);
-    handleGetSelectData && handleGetSelectData(departmentSelectedList);
   };
 
   const handleCancel = () => {
@@ -277,20 +256,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     return newValue;
   };
 
-  // useEffect(() => {
-  //   departmentAndUserList.length && setSearchToDeptValue([]);
-
-  //   open
-  //     ? loadSelectData && loadSelectData.length > 0
-  //       ? setDepartmentSelectedList((prev) =>
-  //           handleData(prev, departmentAndUserList)
-  //         )
-  //       : setDepartmentSelectedList([])
-  //     : // 关闭时清空上次选中数据
-  //       (() => {
-  //         setDepartmentSelectedList([]);
-  //       })();
-  // }, [open, isLoading]);
 
   useEffect(() => {
     // 3s关闭提示

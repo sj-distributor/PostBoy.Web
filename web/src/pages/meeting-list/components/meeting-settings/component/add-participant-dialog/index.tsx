@@ -4,22 +4,12 @@ import TextField from "@mui/material/TextField";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import List from "@mui/material/List";
-import Collapse from "@mui/material/Collapse";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import Divider from "@mui/material/Divider";
 import Autocomplete from "@mui/material/Autocomplete";
-import Checkbox from "@mui/material/Checkbox";
 import useAction from "./hook";
 import styles from "./index.module.scss";
 import {
-  ClickType,
-  DepartmentAndUserType,
   ITargetDialogProps,
-  IDepartmentAndUserListValue,
+  SelectPersonnelTitle,
   SelectPersonnelType,
 } from "../../../../../../dtos/meeting-seetings";
 import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
@@ -27,37 +17,6 @@ import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
 import TreeViewSelector from "../../../../../../components/treeViewSelector";
 import { SourceType } from "../../../../../../components/treeViewSelector/props";
-
-// const fiteringDeptAndUsers = (
-//   options: IDepartmentAndUserListValue[],
-//   state: FilterOptionsState<IDepartmentAndUserListValue>
-// ) => {
-//   if (state.inputValue !== "") {
-//     const array: IDepartmentAndUserListValue[] = [];
-//     const findArray = options.filter((item) =>
-//       item.name.toUpperCase().includes(state.inputValue.toUpperCase())
-//     );
-//     for (let i = 0; i < findArray.length; i++) {
-//       array.push(findArray[i]);
-//       const findParent = options.find(
-//         (item) => item.name === String(findArray[i].parentid)
-//       );
-//       if (!!findParent) {
-//         const index = array.findIndex(
-//           (item) => item.name === String(findArray[i].parentid)
-//         );
-//         if (index === -1) {
-//           const index = array.findIndex(
-//             (item) => item.parentid === Number(findParent.name)
-//           );
-//           array.splice(index, 0, findParent);
-//         }
-//       }
-//     }
-//     return array;
-//   }
-//   return options;
-// };
 
 const SelectTargetDialog = memo(
   (props: ITargetDialogProps) => {
@@ -80,7 +39,6 @@ const SelectTargetDialog = memo(
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
-      handleGetSelectData,
       settingSelectedList,
     } = props;
 
@@ -89,13 +47,9 @@ const SelectTargetDialog = memo(
       tagsValue,
       tipsObject,
       createLoading,
-      // handleDeptOrUserClick,
-      setSearchToDeptValue,
       setTagsValue,
-      handleTypeIsCanSelect,
       handleConfirm,
       handleCancel,
-      handleSelectDataCheck,
       setDepartmentSelectedList,
     } = useAction({
       open,
@@ -114,7 +68,6 @@ const SelectTargetDialog = memo(
       setOpenFunction,
       setDeptUserList,
       setOuterTagsValue,
-      handleGetSelectData,
       settingSelectedList,
     });
     const center = () =>
@@ -125,79 +78,6 @@ const SelectTargetDialog = memo(
             justifyContent: "center",
           }
         : {};
-
-    // const recursiveRenderDeptList = (
-    //   data: IDepartmentAndUserListValue[],
-    //   pl: number,
-    //   isDivider: boolean
-    // ) => {
-    //   const result = (
-    //     <List key={AppId} dense>
-    //       {data.map((deptUserData, index) => {
-    //         const insertData: IDepartmentAndUserListValue = {
-    //           id: deptUserData.id,
-    //           name: deptUserData.name,
-    //           type: deptUserData.type,
-    //           parentid: String(deptUserData.parentid),
-    //           selected: deptUserData.selected,
-    //           children: [],
-    //         };
-    //         return (
-    //           <div key={deptUserData.id}>
-    //             <ListItemButton
-    //               sx={{ pl, height: "2.2rem" }}
-    //               onClick={(e) => {
-    //                 e.stopPropagation();
-    //                 deptUserData.children.length > 0 &&
-    //                   handleDeptOrUserClick(
-    //                     ClickType.Collapse,
-    //                     Object.assign(insertData, {
-    //                       isCollapsed: deptUserData.isCollapsed,
-    //                     })
-    //                   );
-    //               }}
-    //             >
-    //               {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
-    //                 <Checkbox
-    //                   edge="start"
-    //                   checked={deptUserData.selected}
-    //                   tabIndex={-1}
-    //                   disableRipple
-    //                   onClick={(e) => {
-    //                     e.stopPropagation();
-    //                     handleDeptOrUserClick(ClickType.Select, insertData);
-    //                   }}
-    //                 />
-    //               )}
-    //               <ListItemText primary={deptUserData.name} />
-    //               {deptUserData.children.length > 0 &&
-    //                 (!!deptUserData.isCollapsed ? (
-    //                   <ExpandLess />
-    //                 ) : (
-    //                   <ExpandMore />
-    //                 ))}
-    //             </ListItemButton>
-    //             {deptUserData.children.length > 0 && (
-    //               <Collapse
-    //                 in={!!deptUserData.isCollapsed}
-    //                 timeout={0}
-    //                 unmountOnExit
-    //               >
-    //                 {recursiveRenderDeptList(
-    //                   deptUserData.children,
-    //                   pl + 2,
-    //                   index !== data.length - 1
-    //                 )}
-    //               </Collapse>
-    //             )}
-    //           </div>
-    //         );
-    //       })}
-    //       {isDivider && <Divider />}
-    //     </List>
-    //   );
-    //   return result;
-    // };
 
     return (
       <div>
@@ -210,7 +90,7 @@ const SelectTargetDialog = memo(
               height: "4rem",
             }}
           >
-            <>{clickName}</>
+            <>{SelectPersonnelTitle[clickName]}</>
           </DialogTitle>
           <DialogContent sx={{ width: "30rem" }}>
             {!isLoading ? (
@@ -255,59 +135,7 @@ const SelectTargetDialog = memo(
                   </div>
                 )}
 
-                {/* {flattenDepartmentList && (
-                  <Autocomplete
-                    id={"sreach-input" + clickName}
-                    disablePortal
-                    openOnFocus
-                    multiple
-                    disableCloseOnSelect
-                    size="small"
-                    sx={{
-                      margin: "1rem 0 calc(1rem - 4px)",
-                    }}
-                    componentsProps={{
-                      paper: { elevation: 3 },
-                      popper: {
-                        placement: "top",
-                      },
-                    }}
-                    value={departmentSelectedList}
-                    options={flattenDepartmentList}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) =>
-                      option.id === value.id
-                    }
-                    groupBy={(option) => option.parentid + ""}
-                    renderInput={(params) => (
-                      <TextField {...params} label={"部门与用户搜索"} />
-                    )}
-                    filterOptions={(options, state) => flattenDepartmentList}
-                    onChange={(e, value) =>
-                      value && setSearchToDeptValue(value)
-                    }
-                    renderGroup={(params) => {
-                      const { key, group, children } = params;
-                      return <div key={key}>{children}</div>;
-                    }}
-                    renderOption={(props, option, state) => {
-                      let style = Object.assign(
-                        option.type === DepartmentAndUserType.Department
-                          ? { color: "#666" }
-                          : { paddingLeft: "2rem" },
-                        { fontSize: "0.9rem" }
-                      );
-                      !handleTypeIsCanSelect(canSelect, option.type) &&
-                        (props.onClick = () => {});
-                      return (
-                        <li {...props} style={style}>
-                          {option.name}
-                        </li>
-                      );
-                    }}
-                  />
-                )} */}
-
+             
                 <>
                   <Autocomplete
                     id="tags-list"
