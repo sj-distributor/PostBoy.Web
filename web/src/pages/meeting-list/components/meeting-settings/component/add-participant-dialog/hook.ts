@@ -317,6 +317,7 @@ const useAction = (props: {
     ) {
       // setDepartmentSelectedList(loadSelectData);
     }
+    console.log(loadSelectData);
   }, [isLoading, loadSelectData]);
 
   useEffect(() => {
@@ -328,10 +329,6 @@ const useAction = (props: {
       // setDepartmentSelectedList(loadSelectData);
     }
   }, [clickName]);
-
-  useEffect(() => {
-    console.log(departmentSelectedList);
-  }, [open]);
 
   return {
     departmentSelectedList,

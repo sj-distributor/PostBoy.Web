@@ -87,8 +87,6 @@ const useAction = (props: MeetingSettingsProps) => {
     appId: corpAppValue?.appId,
   });
 
-  console.log(departmentAndUserList);
-
   // 获取的企业数组
   const [corpsList, setCorpsList] = useState<ICorpData[]>([]);
   // 获取的App数组
@@ -492,7 +490,60 @@ const useAction = (props: MeetingSettingsProps) => {
   });
 
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
-    console.log(valueList);
+    if (clickName === SelectPersonnelType.MeetingAttendees) {
+      setParticipantList([...valueList]);
+      setDepartmentAndUserList([
+        {
+          data: valueList.map((item) => {
+            return { ...item, selected: false, isCollapsed: false };
+          }),
+          key: corpAppValue.appId,
+        },
+      ]);
+      console.log(corpAppValue.appId);
+      const newAppointList = appointList?.filter((item) => {
+        return valueList.some((i) => i.id === item.id);
+      });
+
+      if (!newAppointList || newAppointList.length <= 0) {
+        setSettings((prev) => ({
+          ...prev,
+          remind_scope: MeetingCallReminder.NoRemind,
+        }));
+      }
+
+      if (
+        adminUser &&
+        adminUser.length &&
+        !!valueList.find((item) => item.id === adminUser[0].id)
+      ) {
+      }
+
+      setAppointList(newAppointList);
+
+      setHostList(
+        hostList?.filter((item) => {
+          return valueList.some((i) => i.id === item.id);
+        })
+      );
+    }
+
+    clickName === SelectPersonnelType.SpecifyReminderPersonnel &&
+      setAppointList(valueList);
+    clickName === SelectPersonnelType.Moderator && setHostList(valueList);
+
+    if (clickName === SelectPersonnelType.ConferenceAdministrator) {
+      setAdminUser(valueList);
+      // setParticipantList((prev) => {
+      //   let newArr = prev ? clone(prev) : [];
+
+      //   if (!newArr.find((item) => item.id === valueList[0].id)) {
+      //     newArr.push(valueList[0]);
+      //   }
+
+      //   return newArr;
+      // });
+    }
   };
 
   const loadSelectData = useMemo(() => {
@@ -506,7 +557,7 @@ const useAction = (props: MeetingSettingsProps) => {
         : clickName === SelectPersonnelType.ConferenceAdministrator
         ? adminUser
         : undefined;
-
+    console.log(result);
     return result as IDepartmentAndUserListValue[];
   }, [participantList, appointList, hostList, clickName, adminUser]);
 
@@ -543,52 +594,43 @@ const useAction = (props: MeetingSettingsProps) => {
 
   //获取选择人员
   const handleGetSelectData = (data: IDepartmentAndUserListValue[]) => {
-    if (clickName === SelectPersonnelType.MeetingAttendees) {
-      setParticipantList(data);
-
-      const newAppointList = appointList?.filter((item) => {
-        return data.some((i) => i.id === item.id);
-      });
-
-      if (!newAppointList || newAppointList.length <= 0) {
-        setSettings((prev) => ({
-          ...prev,
-          remind_scope: MeetingCallReminder.NoRemind,
-        }));
-      }
-
-      if (
-        adminUser &&
-        adminUser.length &&
-        !!data.find((item) => item.id === adminUser[0].id)
-      ) {
-      }
-
-      setAppointList(newAppointList);
-
-      setHostList(
-        hostList?.filter((item) => {
-          return data.some((i) => i.id === item.id);
-        })
-      );
-    }
-
-    clickName === SelectPersonnelType.SpecifyReminderPersonnel &&
-      setAppointList(data);
-    clickName === SelectPersonnelType.Moderator && setHostList(data);
-
-    if (clickName === SelectPersonnelType.ConferenceAdministrator) {
-      setAdminUser(data);
-      setParticipantList((prev) => {
-        let newArr = prev ? clone(prev) : [];
-
-        if (!newArr.find((item) => item.id === data[0].id)) {
-          newArr.push(data[0]);
-        }
-
-        return newArr;
-      });
-    }
+    // if (clickName === SelectPersonnelType.MeetingAttendees) {
+    //   setParticipantList(data);
+    //   const newAppointList = appointList?.filter((item) => {
+    //     return data.some((i) => i.id === item.id);
+    //   });
+    //   if (!newAppointList || newAppointList.length <= 0) {
+    //     setSettings((prev) => ({
+    //       ...prev,
+    //       remind_scope: MeetingCallReminder.NoRemind,
+    //     }));
+    //   }
+    //   if (
+    //     adminUser &&
+    //     adminUser.length &&
+    //     !!data.find((item) => item.id === adminUser[0].id)
+    //   ) {
+    //   }
+    //   setAppointList(newAppointList);
+    //   setHostList(
+    //     hostList?.filter((item) => {
+    //       return data.some((i) => i.id === item.id);
+    //     })
+    //   );
+    // }
+    // clickName === SelectPersonnelType.SpecifyReminderPersonnel &&
+    //   setAppointList(data);
+    // clickName === SelectPersonnelType.Moderator && setHostList(data);
+    // if (clickName === SelectPersonnelType.ConferenceAdministrator) {
+    //   setAdminUser(data);
+    //   setParticipantList((prev) => {
+    //     let newArr = prev ? clone(prev) : [];
+    //     if (!newArr.find((item) => item.id === data[0].id)) {
+    //       newArr.push(data[0]);
+    //     }
+    //     return newArr;
+    //   });
+    // }
   };
 
   const getUserChildrenList = (

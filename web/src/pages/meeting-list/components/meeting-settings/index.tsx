@@ -202,11 +202,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         flattenDepartmentList={searchKeyValue}
         isLoading={isTreeViewLoading}
         tagsList={tagsList}
-        canSelect={
-          clickName === SelectPersonnelType.MeetingAttendees
-            ? DeptUserCanSelectStatus.Both
-            : DeptUserCanSelectStatus.User
-        }
+        canSelect={DeptUserCanSelectStatus.Both}
         setOpenFunction={setIsShowDialog}
         setDeptUserList={setDepartmentAndUserList}
         outerTagsValue={tagsValue}

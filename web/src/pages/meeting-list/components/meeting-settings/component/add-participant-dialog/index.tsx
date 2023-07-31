@@ -234,7 +234,7 @@ const SelectTargetDialog = memo(
                           foldData: departmentKeyValue.data,
                           flattenData: flattenDepartmentList ?? [],
                         }}
-                        defaultSelectedList={departmentSelectedList}
+                        defaultSelectedList={loadSelectData}
                         settingSelectedList={(value) => {
                           settingSelectedList(value);
                         }}
