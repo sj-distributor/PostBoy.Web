@@ -95,6 +95,7 @@ const SelectTargetDialog = memo(
       handleTypeIsCanSelect,
       handleConfirm,
       handleCancel,
+      handleSelectDataCheck,
     } = useAction({
       open,
       AppId,
@@ -245,7 +246,8 @@ const SelectTargetDialog = memo(
                         }}
                         defaultSelectedList={loadSelectData}
                         settingSelectedList={(value) => {
-                          settingSelectedList(value);
+                          handleSelectDataCheck(value) &&
+                            settingSelectedList(value);
                         }}
                       ></TreeViewSelector>
                     )}

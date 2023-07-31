@@ -500,7 +500,7 @@ const useAction = (props: MeetingSettingsProps) => {
           key: corpAppValue.appId,
         },
       ]);
-      console.log(corpAppValue.appId);
+
       const newAppointList = appointList?.filter((item) => {
         return valueList.some((i) => i.id === item.id);
       });
@@ -557,7 +557,7 @@ const useAction = (props: MeetingSettingsProps) => {
         : clickName === SelectPersonnelType.ConferenceAdministrator
         ? adminUser
         : undefined;
-    console.log(result);
+
     return result as IDepartmentAndUserListValue[];
   }, [participantList, appointList, hostList, clickName, adminUser]);
 
@@ -858,6 +858,8 @@ const useAction = (props: MeetingSettingsProps) => {
       isMeetingCode: true,
       isMeetingLink: true,
     });
+
+    corpsList && setCorpsValue(corpsList[0]);
   };
 
   const [loading, loadingAction] = useBoolean(false);
@@ -1350,7 +1352,10 @@ const useAction = (props: MeetingSettingsProps) => {
 
   //创建会议前清空数据
   useEffect(() => {
-    meetingState === "create" && clearData();
+    meetingState === "create" &&
+      corpsList &&
+      corpsList.length > 0 &&
+      clearData();
   }, [meetingState]);
 
   return {

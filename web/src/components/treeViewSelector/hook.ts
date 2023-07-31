@@ -133,7 +133,6 @@ const useAction = ({
 
   useEffect(() => {
     // 同步外部selectedList
-    console.log(selectedList);
     settingSelectedList(selectedList);
   }, [selectedList]);
 

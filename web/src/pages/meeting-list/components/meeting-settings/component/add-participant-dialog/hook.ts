@@ -158,27 +158,32 @@ const useAction = (props: {
       : canSelect === DeptUserCanSelectStatus.User;
   };
 
-  const handleConfirm = () => {
-    // if (clickName === SelectPersonnelType.ConferenceAdministrator) {
-    //   const isUserArr = departmentSelectedList.filter(
-    //     (item) => typeof item.id !== "string"
-    //   );
-    //   if (isUserArr.length) {
-    //     setTipsObject({
-    //       show: true,
-    //       msg: "Administrators cannot select departments",
-    //     });
-    //     return;
-    //   }
-    //   if (departmentSelectedList.length > 1) {
-    //     setTipsObject({
-    //       show: true,
-    //       msg: "Administrators can only select one person",
-    //     });
-    //     return;
-    //   }
-    // }
+  const handleSelectDataCheck = (selectData: IDepartmentAndUserListValue[]) => {
+    let flg: boolean = true;
+    if (clickName === SelectPersonnelType.ConferenceAdministrator) {
+      console.log(loadSelectData);
+      const isUserArr = selectData.filter(
+        (item) => typeof item.id !== "string"
+      );
+      if (isUserArr.length) {
+        setTipsObject({
+          show: true,
+          msg: "Administrators cannot select departments",
+        });
+        flg = false;
+      }
+      if (selectData.length > 1) {
+        setTipsObject({
+          show: true,
+          msg: "Administrators can only select one person",
+        });
+        flg = false;
+      }
+    }
+    return flg;
+  };
 
+  const handleConfirm = () => {
     // if (
     //   clickName === SelectPersonnelType.Moderator &&
     //   departmentSelectedList.length > DefaultDisplay.hostList
@@ -317,7 +322,6 @@ const useAction = (props: {
     ) {
       // setDepartmentSelectedList(loadSelectData);
     }
-    console.log(loadSelectData);
   }, [isLoading, loadSelectData]);
 
   useEffect(() => {
@@ -344,6 +348,7 @@ const useAction = (props: {
     setSearchToDeptValue,
     handleConfirm,
     handleCancel,
+    handleSelectDataCheck,
   };
 };
 export default useAction;
