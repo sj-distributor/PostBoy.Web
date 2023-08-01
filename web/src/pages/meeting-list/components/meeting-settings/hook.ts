@@ -616,7 +616,12 @@ const useAction = (props: MeetingSettingsProps) => {
     }
   }, [isShowDialog]);
 
-  useEffect(() => {}, [isLoadStop]);
+  useEffect(() => {
+    if (isLoadStop) {
+      setDepartmentAndUserListBackups(departmentAndUserList);
+      setFlattenDepartmentListBackups(flattenDepartmentList);
+    }
+  }, [isLoadStop]);
 
   const clearData = () => {
     setAppointList([]);
