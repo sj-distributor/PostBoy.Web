@@ -77,7 +77,11 @@ const useAction = ({
       : clickedList[0];
 
     setSelectedList((prev) => {
-      if (prev.some((item) => item.id === clickedItem.id)) return prev;
+      if (
+        prev.some((item) => item.id === clickedItem.id) &&
+        !clickedItem.selected
+      )
+        return prev;
       return type === ClickType.Select
         ? clickedItem.selected
           ? remove(
@@ -145,7 +149,9 @@ const useAction = ({
         // 通用-通过idRoute修改对应数据
         const routeArr =
           (sourceType === SourceType.Part
-            ? topIndex && topIndex > -1 && selectedItem.idRoute?.slice(topIndex)
+            ? topIndex !== undefined &&
+              topIndex > -1 &&
+              selectedItem.idRoute?.slice(topIndex)
             : selectedItem.idRoute) || [];
 
         const innerItem: IDepartmentAndUserListValue | undefined =
