@@ -381,7 +381,7 @@ const useAction = (props: MeetingSettingsProps) => {
     if (clickName === SelectPersonnelType.MeetingAttendees) {
       setParticipantList([...valueList]);
 
-      setFlattenAndUserList([...valueList]);
+      setFlattenAndUserList(getFlattenDepartmentList(valueList, []));
       setAppointList([]);
 
       setHostList([]);
