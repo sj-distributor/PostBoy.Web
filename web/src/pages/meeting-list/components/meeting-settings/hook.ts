@@ -23,11 +23,9 @@ import {
   IDepartmentAndUserListValue,
   IDepartmentData,
   IDepartmentKeyControl,
-  IDeptAndUserList,
   ISearchList,
   ITagsList,
   MeetingGroup,
-  IDepartmentUsersData,
   MeetingRecording,
   GetAllMeetingsData,
   MeetingCallReminder,
@@ -38,19 +36,13 @@ import {
   GetCorpsList,
   GetDeptTreeList,
 } from "../../../../api/enterprise";
-import { clone, flatten } from "ramda";
+import { clone } from "ramda";
 import { createMeeting, updateMeeting } from "../../../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
 import useDeptUserData from "../../../../hooks/deptUserData";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-enum UpdateListType {
-  Fold,
-  Flatten,
-  All,
-}
 
 const useAction = (props: MeetingSettingsProps) => {
   const {
@@ -260,16 +252,12 @@ const useAction = (props: MeetingSettingsProps) => {
   //选择人员
   // 弹出选择对象框 boolean
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false);
-  // 部门和用户数组
-  // const [departmentAndUserList, setDepartmentAndUserList] = useState<
-  //   IDepartmentKeyControl[]
-  // >([]);
+
   const [appLoading, setAppLoading] = useState<boolean>(true);
+
   const [departmentAndUserListBackups, setDepartmentAndUserListBackups] =
     useState<IDepartmentKeyControl[]>([]);
-  // const [flattenDepartmentList, setFlattenDepartmentList] = useState<
-  //   ISearchList[]
-  // >([]);
+
   const [flattenDepartmentListBackups, setFlattenDepartmentListBackups] =
     useState<ISearchList[]>([]);
   // TreeView显示展开
@@ -342,21 +330,28 @@ const useAction = (props: MeetingSettingsProps) => {
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     if (clickName === SelectPersonnelType.MeetingAttendees) {
       setParticipantList([...valueList]);
-
-      const filterData = (valueList: IDepartmentAndUserListValue[]) => {
-        valueList.forEach((item, index) => {
-          item.selected = false;
-          item.isCollapsed = false;
-          valueList.some(
-            (cell, i) => cell.parentid === item.id && valueList.splice(i, 1)
-          );
-        });
-        console.log(valueList);
+      const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
+        const result: IDepartmentAndUserListValue[] = [];
+        for (const item of sourceData) {
+          if (item.type === DepartmentAndUserType.User) {
+            !sourceData
+              .filter((item) => item.type === DepartmentAndUserType.Department)
+              .some((cell) =>
+                cell.idRoute?.some((id) => item.idRoute?.includes(id))
+              ) && result.push(item);
+          } else {
+            !sourceData.some(
+              (cell) =>
+                item.id !== cell.id && item.idRoute?.includes(Number(cell.id))
+            ) && result.push(item);
+          }
+        }
+        return result;
       };
-      filterData(valueList);
+
       setDepartmentAndUserList([
         {
-          data: valueList,
+          data: deduplicationData(valueList),
           key: corpAppValue.appId,
         },
       ]);
@@ -394,15 +389,16 @@ const useAction = (props: MeetingSettingsProps) => {
 
     if (clickName === SelectPersonnelType.ConferenceAdministrator) {
       setAdminUser(valueList);
-      setParticipantList((prev) => {
-        let newArr = prev ? clone(prev) : [];
+      valueList.length > 0 &&
+        setParticipantList((prev) => {
+          let newArr = prev ? clone(prev) : [];
 
-        if (!newArr.find((item) => item.id === valueList[0].id)) {
-          newArr.push(valueList[0]);
-        }
+          if (!newArr.find((item) => item.id === valueList[0].id)) {
+            newArr.push(valueList[0]);
+          }
 
-        return newArr;
-      });
+          return newArr;
+        });
     }
   };
 
@@ -417,28 +413,52 @@ const useAction = (props: MeetingSettingsProps) => {
         : clickName === SelectPersonnelType.ConferenceAdministrator
         ? adminUser
         : undefined;
-    console.log(result);
+
     //切换折叠数据
     if (
       (clickName === SelectPersonnelType.Moderator ||
         clickName === SelectPersonnelType.SpecifyReminderPersonnel) &&
       participantList
     ) {
+      const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
+        const result: IDepartmentAndUserListValue[] = [];
+        for (const item of sourceData) {
+          item.selected = false;
+          item.isCollapsed = false;
+          if (item.type === DepartmentAndUserType.User) {
+            !sourceData
+              .filter((item) => item.type === DepartmentAndUserType.Department)
+              .some((cell) =>
+                cell.idRoute?.some((id) => item.idRoute?.includes(id))
+              ) && result.push(item);
+          } else {
+            !sourceData.some(
+              (cell) =>
+                item.id !== cell.id && item.idRoute?.includes(Number(cell.id))
+            ) && result.push(item);
+          }
+        }
+        return result;
+      };
       setDepartmentAndUserList([
         {
-          data: participantList.map((item) => ({ ...item, selected: false })),
+          data: deduplicationData(participantList),
           key: corpAppValue.appId,
         },
       ]);
       setFlattenDepartmentList([
         {
-          data: participantList.map((item) => ({ ...item, selected: false })),
+          data: deduplicationData(participantList),
           key: corpAppValue.appId,
         },
       ]);
     }
 
-    return result as IDepartmentAndUserListValue[];
+    return result?.map((item) => ({
+      ...item,
+      selected: false,
+      isCollapsed: false,
+    })) as IDepartmentAndUserListValue[];
   }, [participantList, appointList, hostList, clickName, adminUser]);
 
   const [participantPage, setParticipantPage] = useState<number>(1);
@@ -1103,7 +1123,6 @@ const useAction = (props: MeetingSettingsProps) => {
         return arr;
       });
 
-      console.log(flattenDepartmentList);
       setParticipantList((participant) => {
         let attendeesData: IDepartmentAndUserListValue[] = [];
 

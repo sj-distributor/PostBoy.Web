@@ -29,7 +29,6 @@ const SelectTargetDialog = memo(
       tagsList,
       flattenDepartmentList,
       departmentKeyValue,
-      canSelect,
       lastTagsValue,
       clickName,
       chatId,
@@ -135,7 +134,6 @@ const SelectTargetDialog = memo(
                   </div>
                 )}
 
-             
                 <>
                   <Autocomplete
                     id="tags-list"

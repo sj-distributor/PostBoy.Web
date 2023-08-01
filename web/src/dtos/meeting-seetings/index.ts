@@ -34,11 +34,11 @@ export enum SelectPersonnelType {
 }
 
 export const SelectPersonnelTitle = {
-  [SelectPersonnelType.MeetingAttendees]:'选择会议参与成员',
-  [SelectPersonnelType.ConferenceAdministrator]:'选择会议管理员',
-  [SelectPersonnelType.Moderator]:'选择会议主持人',
-  [SelectPersonnelType.SpecifyReminderPersonnel]:'选择指定提醒成员'
-}
+  [SelectPersonnelType.MeetingAttendees]: "选择会议参与成员",
+  [SelectPersonnelType.ConferenceAdministrator]: "选择会议管理员",
+  [SelectPersonnelType.Moderator]: "选择会议主持人",
+  [SelectPersonnelType.SpecifyReminderPersonnel]: "选择指定提醒成员",
+};
 
 export interface IDepartmentAndUserListValue {
   id: number | string;
@@ -47,6 +47,7 @@ export interface IDepartmentAndUserListValue {
   parentid: number;
   selected: boolean;
   isCollapsed: boolean;
+  idRoute?: number[];
   children: IDepartmentAndUserListValue[];
 }
 

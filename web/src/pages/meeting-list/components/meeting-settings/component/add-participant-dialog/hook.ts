@@ -82,7 +82,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     }
   };
 
-
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
     const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
@@ -152,7 +151,6 @@ const useAction = (props: AddParticipantDialogProps) => {
 
   const handleConfirm = () => {
     if (clickName === SelectPersonnelType.ConferenceAdministrator) {
-      console.log(departmentSelectedList);
       const isUserArr = departmentSelectedList.filter(
         (item) => typeof item.id !== "string"
       );
@@ -172,12 +170,11 @@ const useAction = (props: AddParticipantDialogProps) => {
         return;
       }
     }
-    console.log(departmentSelectedList);
+
     if (
       clickName === SelectPersonnelType.Moderator &&
       countArrayItems(departmentSelectedList) > DefaultDisplay.hostList
     ) {
-      console.log(countArrayItems(departmentSelectedList));
       tipsObject &&
         setTipsObject({
           show: true,
@@ -232,31 +229,6 @@ const useAction = (props: AddParticipantDialogProps) => {
       });
   }, [open]);
 
-  const handleData = (
-    prev: IDepartmentAndUserListValue[],
-    listData: IDepartmentKeyControl[]
-  ) => {
-    const newValue = loadSelectData
-      ? loadSelectData.filter((x) => x)
-      : prev.filter((x) => x);
-    const hasData = listData.find((x) => x.key === AppId);
-
-    if (hasData) {
-      loadSelectData
-        ? loadSelectData.forEach((item) => {
-            recursiveSeachDeptOrUser(hasData.data, (user) => {
-              user.selected = !!loadSelectData.find((e) => e.id === user.id);
-            });
-          })
-        : recursiveSeachDeptOrUser(hasData.data, (user) => {
-            user.selected = false;
-          });
-    }
-
-    return newValue;
-  };
-
-
   useEffect(() => {
     // 3s关闭提示
     const number = setTimeout(() => {
@@ -295,19 +267,9 @@ const useAction = (props: AddParticipantDialogProps) => {
       departmentAndUserList.length > 0 &&
       loadSelectData
     ) {
-      // setDepartmentSelectedList(loadSelectData);
+      setDepartmentSelectedList(loadSelectData);
     }
   }, [isLoading, loadSelectData]);
-
-  useEffect(() => {
-    if (
-      (clickName === SelectPersonnelType.SpecifyReminderPersonnel ||
-        clickName === SelectPersonnelType.Moderator) &&
-      loadSelectData
-    ) {
-      // setDepartmentSelectedList(loadSelectData);
-    }
-  }, [clickName]);
 
   return {
     departmentSelectedList,

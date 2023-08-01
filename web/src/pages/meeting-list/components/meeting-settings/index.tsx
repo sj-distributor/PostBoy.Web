@@ -22,7 +22,6 @@ import {
   MenuList,
   Paper,
   Popper,
-  Skeleton,
   Snackbar,
   TextField,
   Tooltip,
@@ -45,7 +44,6 @@ import SeetingsDialog from "./component/settingsDialog";
 import {
   DefaultDisplay,
   MeetingSettingsProps,
-  SelectPersonnelType,
 } from "../../../../dtos/meeting-seetings";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -75,7 +73,6 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     corpAppValue,
     corpsList,
     corpAppList,
-    isShowMoreParticipantList,
     isShowDialog,
     departmentAndUserList,
     departmentKeyValue,
