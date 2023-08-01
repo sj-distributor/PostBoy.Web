@@ -37,6 +37,7 @@ import * as wangEditor from "@wangeditor/editor";
 import { annexEditorConfig } from "../../../../uilts/wangEditor";
 import { useBoolean } from "ahooks";
 import useDeptUserData from "../../../../hooks/deptUserData";
+import { Preview } from "@mui/icons-material";
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void;
 
@@ -198,15 +199,17 @@ export const useAction = (props: SelectContentHookProps) => {
         const activeFlattenData = flattenDepartmentList.find(
           (item) => item.key === appId
         );
-
         activeFlattenData &&
-          setTargetSelectedList(
-            activeFlattenData.data.filter(
-              (item) =>
-                toParties?.some((cell) => cell === item.name) ||
-                toUsers?.some((cell) => cell === item.id)
-            )
-          );
+          setTargetSelectedList((prev) => {
+            return [
+              ...prev,
+              ...activeFlattenData.data.filter(
+                (item) =>
+                  toParties?.some((cell) => cell === item.name) ||
+                  toUsers?.some((cell) => cell === item.id)
+              ),
+            ];
+          });
       }
     }
   }, [isShowDialog, isLoadStop]);
