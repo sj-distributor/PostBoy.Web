@@ -327,6 +327,19 @@ const useAction = (props: MeetingSettingsProps) => {
     msg: "",
   });
 
+  const getFlattenDepartmentList = (
+    data: IDepartmentAndUserListValue[],
+    arr: IDepartmentAndUserListValue[]
+  ) => {
+    data.map((item) => {
+      arr.push(item);
+      if (item.children.length) {
+        getFlattenDepartmentList(item.children, arr);
+      }
+    });
+    return arr;
+  };
+
   const setFlattenAndUserList = (valueList: IDepartmentAndUserListValue[]) => {
     const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
       const result: IDepartmentAndUserListValue[] = [];
@@ -349,22 +362,6 @@ const useAction = (props: MeetingSettingsProps) => {
       return result;
     };
 
-    const getFlattenDepartmentList = (
-      data: IDepartmentAndUserListValue[],
-      arr: IDepartmentAndUserListValue[]
-    ) => {
-      data.map((item) => {
-        arr.push({
-          ...item,
-          children: [],
-        });
-        if (item.children.length) {
-          getFlattenDepartmentList(item.children, arr);
-        }
-      });
-      return arr;
-    };
-
     setDepartmentAndUserList([
       {
         data: deduplicationData(valueList),
@@ -384,10 +381,16 @@ const useAction = (props: MeetingSettingsProps) => {
     if (clickName === SelectPersonnelType.MeetingAttendees) {
       setParticipantList([...valueList]);
 
-      setFlattenAndUserList(valueList);
+      setFlattenAndUserList([...valueList]);
       setAppointList([]);
 
       setHostList([]);
+      setSettings((prev) => ({
+        ...prev,
+        hosts: undefined,
+        ring_users: undefined,
+        remind_scope: MeetingCallReminder.NoRemind,
+      }));
     }
 
     clickName === SelectPersonnelType.SpecifyReminderPersonnel &&
@@ -619,7 +622,12 @@ const useAction = (props: MeetingSettingsProps) => {
   useEffect(() => {
     if (isLoadStop) {
       setDepartmentAndUserListBackups(departmentAndUserList);
-      setFlattenDepartmentListBackups(flattenDepartmentList);
+      setFlattenDepartmentListBackups([
+        {
+          data: getFlattenDepartmentList(departmentAndUserList[0].data, []),
+          key: departmentAndUserList[0].key,
+        },
+      ]);
     }
   }, [isLoadStop]);
 
@@ -1108,7 +1116,7 @@ const useAction = (props: MeetingSettingsProps) => {
         let attendeesData: IDepartmentAndUserListValue[] = [];
 
         absentMember.length > 0 &&
-          absentMember.map((item) =>
+          [...new Set(absentMember)].map((item) =>
             attendeesData.push({
               id: item,
               name: item,
@@ -1164,6 +1172,20 @@ const useAction = (props: MeetingSettingsProps) => {
       setAppointList([]);
       setHostList([]);
       setAdminUser([]);
+      setSettings({
+        password: "",
+        enable_waiting_room: false,
+        allow_enter_before_host: true,
+        remind_scope: MeetingCallReminder.NoRemind,
+        enable_enter_mute: 0,
+        allow_external_user: true,
+        enable_screen_watermark: false,
+        hosts: undefined,
+        ring_users: undefined,
+        meetingRecordType: MeetingRecording.Disable,
+        enableCloudRecordSummary: false,
+        meetingSummaryDistributionEnabled: false,
+      });
     }
   }, [corpsValue]);
 
