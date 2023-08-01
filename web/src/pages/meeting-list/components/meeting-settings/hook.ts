@@ -340,7 +340,9 @@ const useAction = (props: MeetingSettingsProps) => {
     return arr;
   };
 
-  const setFlattenAndUserList = (valueList: IDepartmentAndUserListValue[]) => {
+  const initializeCollapseSearchData = (
+    valueList: IDepartmentAndUserListValue[]
+  ) => {
     const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
       const result: IDepartmentAndUserListValue[] = [];
       for (const item of sourceData) {
@@ -381,7 +383,7 @@ const useAction = (props: MeetingSettingsProps) => {
     if (clickName === SelectPersonnelType.MeetingAttendees) {
       setParticipantList([...valueList]);
 
-      setFlattenAndUserList(getFlattenDepartmentList(valueList, []));
+      initializeCollapseSearchData(valueList);
       setAppointList([]);
 
       setHostList([]);
@@ -430,7 +432,7 @@ const useAction = (props: MeetingSettingsProps) => {
         clickName === SelectPersonnelType.SpecifyReminderPersonnel) &&
       participantList
     ) {
-      setFlattenAndUserList(participantList);
+      initializeCollapseSearchData(participantList);
     }
 
     return result?.map((item) => ({
@@ -597,12 +599,6 @@ const useAction = (props: MeetingSettingsProps) => {
     ) {
       // 设置相对应key的数据为空
       setDepartmentAndUserList((prev) => {
-        const newValue = clone(prev);
-        const hasData = newValue.find((e) => e.key === corpAppValue.appId);
-        hasData && (hasData.data = []);
-        return newValue;
-      });
-      setFlattenDepartmentList((prev) => {
         const newValue = clone(prev);
         const hasData = newValue.find((e) => e.key === corpAppValue.appId);
         hasData && (hasData.data = []);
