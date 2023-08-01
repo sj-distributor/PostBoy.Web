@@ -327,60 +327,67 @@ const useAction = (props: MeetingSettingsProps) => {
     msg: "",
   });
 
+  const setFlattenAndUserList = (valueList: IDepartmentAndUserListValue[]) => {
+    const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
+      const result: IDepartmentAndUserListValue[] = [];
+      for (const item of sourceData) {
+        item.isCollapsed = false;
+        item.selected = false;
+        if (item.type === DepartmentAndUserType.User) {
+          !sourceData
+            .filter((item) => item.type === DepartmentAndUserType.Department)
+            .some((cell) =>
+              cell.idRoute?.some((id) => item.idRoute?.includes(id))
+            ) && result.push(item);
+        } else {
+          !sourceData.some(
+            (cell) =>
+              item.id !== cell.id && item.idRoute?.includes(Number(cell.id))
+          ) && result.push(item);
+        }
+      }
+      return result;
+    };
+
+    const getFlattenDepartmentList = (
+      data: IDepartmentAndUserListValue[],
+      arr: IDepartmentAndUserListValue[]
+    ) => {
+      data.map((item) => {
+        arr.push({
+          ...item,
+          children: [],
+        });
+        if (item.children.length) {
+          getFlattenDepartmentList(item.children, arr);
+        }
+      });
+      return arr;
+    };
+
+    setDepartmentAndUserList([
+      {
+        data: deduplicationData(valueList),
+        key: corpAppValue.appId,
+      },
+    ]);
+
+    setFlattenDepartmentList([
+      {
+        data: getFlattenDepartmentList(valueList, []),
+        key: corpAppValue.appId,
+      },
+    ]);
+  };
+
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     if (clickName === SelectPersonnelType.MeetingAttendees) {
       setParticipantList([...valueList]);
-      const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
-        const result: IDepartmentAndUserListValue[] = [];
-        for (const item of sourceData) {
-          if (item.type === DepartmentAndUserType.User) {
-            !sourceData
-              .filter((item) => item.type === DepartmentAndUserType.Department)
-              .some((cell) =>
-                cell.idRoute?.some((id) => item.idRoute?.includes(id))
-              ) && result.push(item);
-          } else {
-            !sourceData.some(
-              (cell) =>
-                item.id !== cell.id && item.idRoute?.includes(Number(cell.id))
-            ) && result.push(item);
-          }
-        }
-        return result;
-      };
 
-      setDepartmentAndUserList([
-        {
-          data: deduplicationData(valueList),
-          key: corpAppValue.appId,
-        },
-      ]);
+      setFlattenAndUserList(valueList);
+      setAppointList([]);
 
-      const newAppointList = appointList?.filter((item) => {
-        return valueList.some((i) => i.id === item.id);
-      });
-
-      if (!newAppointList || newAppointList.length <= 0) {
-        setSettings((prev) => ({
-          ...prev,
-          remind_scope: MeetingCallReminder.NoRemind,
-        }));
-      }
-
-      if (
-        adminUser &&
-        adminUser.length &&
-        !!valueList.find((item) => item.id === adminUser[0].id)
-      ) {
-      }
-
-      setAppointList(newAppointList);
-
-      setHostList(
-        hostList?.filter((item) => {
-          return valueList.some((i) => i.id === item.id);
-        })
-      );
+      setHostList([]);
     }
 
     clickName === SelectPersonnelType.SpecifyReminderPersonnel &&
@@ -420,38 +427,7 @@ const useAction = (props: MeetingSettingsProps) => {
         clickName === SelectPersonnelType.SpecifyReminderPersonnel) &&
       participantList
     ) {
-      const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
-        const result: IDepartmentAndUserListValue[] = [];
-        for (const item of sourceData) {
-          item.selected = false;
-          item.isCollapsed = false;
-          if (item.type === DepartmentAndUserType.User) {
-            !sourceData
-              .filter((item) => item.type === DepartmentAndUserType.Department)
-              .some((cell) =>
-                cell.idRoute?.some((id) => item.idRoute?.includes(id))
-              ) && result.push(item);
-          } else {
-            !sourceData.some(
-              (cell) =>
-                item.id !== cell.id && item.idRoute?.includes(Number(cell.id))
-            ) && result.push(item);
-          }
-        }
-        return result;
-      };
-      setDepartmentAndUserList([
-        {
-          data: deduplicationData(participantList),
-          key: corpAppValue.appId,
-        },
-      ]);
-      setFlattenDepartmentList([
-        {
-          data: deduplicationData(participantList),
-          key: corpAppValue.appId,
-        },
-      ]);
+      setFlattenAndUserList(participantList);
     }
 
     return result?.map((item) => ({
