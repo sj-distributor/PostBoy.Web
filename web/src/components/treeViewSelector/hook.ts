@@ -146,7 +146,6 @@ const useAction = ({
             )
           )
           .filter((flattenItem) => selectedItem.id === flattenItem.id);
-        console.log("repeatUserList", repeatUserList);
 
         // 提前判断顶层user数据选中并返回
         const userData = copySourceData.find(
@@ -181,8 +180,6 @@ const useAction = ({
             repeatItem.type === DepartmentAndUserType.Department
               ? innerItem
               : innerItem?.children.find((cell) => cell.id === repeatItem.id);
-
-          console.log("finalInnerItem", finalInnerItem);
 
           finalInnerItem &&
             (type !== ClickType.Collapse
