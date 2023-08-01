@@ -77,6 +77,7 @@ const useAction = ({
       : clickedList[0]
 
     setSelectedList((prev) => {
+      if (prev.some((item) => item.id === clickedItem.id)) return prev
       return type === ClickType.Select
         ? clickedItem.selected
           ? remove(
@@ -135,7 +136,6 @@ const useAction = ({
           type !== ClickType.Collapse
             ? (userData.selected = value ?? !userData.selected)
             : (userData.isCollapsed = !userData?.isCollapsed)
-          return
         }
         // 提取顶层department数据并剪裁idRoute
         const topLevelIdList = copySourceData.map((item) => Number(item.id))
