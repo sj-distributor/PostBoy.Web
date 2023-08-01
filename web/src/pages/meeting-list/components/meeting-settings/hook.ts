@@ -1151,10 +1151,21 @@ const useAction = (props: MeetingSettingsProps) => {
   //创建会议前清空数据
   useEffect(() => {
     meetingState === "create" &&
+      isOpenMeetingSettings &&
       corpsList &&
       corpsList.length > 0 &&
       clearData();
-  }, [meetingState]);
+  }, [meetingState, isOpenMeetingSettings]);
+
+  //创建会议时切换企业清空上个企业成员数据
+  useEffect(() => {
+    if (meetingState === "create") {
+      setParticipantList([]);
+      setAppointList([]);
+      setHostList([]);
+      setAdminUser([]);
+    }
+  }, [corpsValue]);
 
   return {
     editor,
