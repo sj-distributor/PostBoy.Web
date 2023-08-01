@@ -186,8 +186,15 @@ export const useAction = (props: SelectContentHookProps) => {
     loadDeptUsersFromWebWorker,
   } = useDeptUserData({ appId: corpAppValue?.appId });
 
+  const deduplicationArray = (list: IDepartmentAndUserListValue[]) => {
+    if (!Array.isArray(list)) return [];
+    return list.filter((item, index) => {
+      return index === list.findIndex((cell) => cell.id === item.id);
+    });
+  };
+
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
-    setTargetSelectedList(valueList);
+    setTargetSelectedList(deduplicationArray(valueList));
   };
 
   useEffect(() => {
@@ -200,15 +207,24 @@ export const useAction = (props: SelectContentHookProps) => {
           (item) => item.key === appId
         );
         activeFlattenData &&
+          console.log(
+            targetSelectedList,
+            activeFlattenData.data.filter(
+              (item) =>
+                toParties?.some((cell) => cell === item.name) ||
+                toUsers?.some((cell) => cell === item.id)
+            )
+          );
+        activeFlattenData &&
           setTargetSelectedList((prev) => {
-            return [
+            return deduplicationArray([
               ...prev,
               ...activeFlattenData.data.filter(
                 (item) =>
                   toParties?.some((cell) => cell === item.name) ||
                   toUsers?.some((cell) => cell === item.id)
               ),
-            ];
+            ]);
           });
       }
     }
