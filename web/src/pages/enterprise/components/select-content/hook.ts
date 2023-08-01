@@ -313,6 +313,7 @@ export const useAction = (props: SelectContentHookProps) => {
         corpAppResult && setCorpAppList(corpAppResult.filter((x) => x.display))
       })
     }
+    setTargetSelectedList([])
   }, [corpsValue?.id])
 
   // 获取Tags数组
@@ -338,6 +339,7 @@ export const useAction = (props: SelectContentHookProps) => {
           toParties: [],
         })
       }
+      setTargetSelectedList([])
     }
   }, [corpAppValue?.appId])
 
