@@ -372,7 +372,7 @@ const SelectTargetDialog = memo(
             clickName={"创建群组"}
             isUpdatedDeptUser={isUpdatedDeptUser}
             targetSelectedList={targetSelectedList}
-            settingSelectedList={(value) => setDepartmentSelectedList(value)}
+            settingSelectedList={settingSelectedList}
           />
         )}
 
