@@ -207,15 +207,6 @@ export const useAction = (props: SelectContentHookProps) => {
           (item) => item.key === appId
         );
         activeFlattenData &&
-          console.log(
-            targetSelectedList,
-            activeFlattenData.data.filter(
-              (item) =>
-                toParties?.some((cell) => cell === item.name) ||
-                toUsers?.some((cell) => cell === item.id)
-            )
-          );
-        activeFlattenData &&
           setTargetSelectedList((prev) => {
             return deduplicationArray([
               ...prev,
