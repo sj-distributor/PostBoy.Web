@@ -281,7 +281,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     handleTypeIsCanSelect,
     setIsShowDialog,
     setTagsValue,
-    // handleDeptOrUserClick,
     setSearchToDeptValue,
     handleConfirm,
     handleCancel,
