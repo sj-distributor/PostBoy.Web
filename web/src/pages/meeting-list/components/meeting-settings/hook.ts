@@ -348,14 +348,15 @@ const useAction = (props: MeetingSettingsProps) => {
       for (const item of sourceData) {
         item.isCollapsed = false;
         item.selected = false;
+        const departmentList = sourceData.filter(
+          (item) => item.type === DepartmentAndUserType.Department
+        );
         if (item.type === DepartmentAndUserType.User) {
-          !sourceData
-            .filter((item) => item.type === DepartmentAndUserType.Department)
-            .some((cell) =>
-              cell.idRoute?.some((id) => item.idRoute?.includes(id))
-            ) && result.push(item);
+          !departmentList.some((cell) =>
+            item.idRoute?.includes(Number(cell.id))
+          ) && result.push(item);
         } else {
-          !sourceData.some(
+          !departmentList.some(
             (cell) =>
               item.id !== cell.id && item.idRoute?.includes(Number(cell.id))
           ) && result.push(item);
