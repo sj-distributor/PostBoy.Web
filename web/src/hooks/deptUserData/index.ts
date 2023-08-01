@@ -39,6 +39,22 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     return dataList;
   };
 
+  const deduplicationArray = (
+    list: IDepartmentAndUserListValue[],
+    callback?: (
+      x: IDepartmentAndUserListValue,
+      y: IDepartmentAndUserListValue
+    ) => boolean
+  ) => {
+    if (!Array.isArray(list)) return [];
+    return list.filter((item, index) => {
+      return (
+        index ===
+        list.findIndex((x) => (callback ? callback(x, item) : x.id === item.id))
+      );
+    });
+  };
+
   const recursiveTransformList = (
     sourceList: IDeptAndUserList[],
     resultList: IDepartmentAndUserListValue[],
@@ -124,6 +140,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
     departmentKeyValue,
     searchKeyValue,
     setDepartmentAndUserList,
+    deduplicationArray,
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,

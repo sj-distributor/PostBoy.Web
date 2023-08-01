@@ -6,6 +6,7 @@ import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
+import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps, SourceType } from "./props";
 
 const useAction = ({
@@ -16,6 +17,8 @@ const useAction = ({
   sourceType,
   settingSelectedList,
 }: ITreeViewHookProps) => {
+  const { deduplicationArray } = useDeptUserData({ appId });
+
   const [selectedList, setSelectedList] = useState<
     IDepartmentAndUserListValue[]
   >(
@@ -132,6 +135,19 @@ const useAction = ({
 
     selectedList.length > 0 &&
       selectedList.forEach((selectedItem) => {
+        const topLevelIdList = copySourceData.map((item) => Number(item.id));
+        const repeatUserList = deduplicationArray(
+          flattenList.filter((x) => x.type === DepartmentAndUserType.Department)
+        )
+          .concat(
+            deduplicationArray(
+              flattenList.filter((x) => x.type === DepartmentAndUserType.User),
+              (x, y) => x.id === y.id && x.parentid === y.parentid
+            )
+          )
+          .filter((flattenItem) => selectedItem.id === flattenItem.id);
+        console.log("repeatUserList", repeatUserList);
+
         // 提前判断顶层user数据选中并返回
         const userData = copySourceData.find(
           (item) => item.id === selectedItem.id
@@ -141,35 +157,38 @@ const useAction = ({
             ? (userData.selected = value ?? !userData.selected)
             : (userData.isCollapsed = !userData?.isCollapsed);
         }
-        // 提取顶层department数据并剪裁idRoute
-        const topLevelIdList = copySourceData.map((item) => Number(item.id));
-        const topIndex = selectedItem.idRoute?.findIndex((id) =>
-          topLevelIdList.some((topId) => topId === id)
-        );
-        // 通用-通过idRoute修改对应数据
-        const routeArr =
-          (sourceType === SourceType.Part
-            ? topIndex !== undefined &&
-              topIndex > -1 &&
-              selectedItem.idRoute?.slice(topIndex)
-            : selectedItem.idRoute) || [];
+        for (const repeatItem of repeatUserList) {
+          // 提取顶层department数据并剪裁idRoute
+          const topIndex = repeatItem.idRoute?.findIndex((id) =>
+            topLevelIdList.some((topId) => topId === id)
+          );
+          // 通用-通过idRoute修改对应数据
+          const routeArr =
+            (sourceType === SourceType.Part
+              ? topIndex !== undefined &&
+                topIndex > -1 &&
+                repeatItem.idRoute?.slice(topIndex)
+              : repeatItem.idRoute) || [];
 
-        const innerItem: IDepartmentAndUserListValue | undefined =
-          copySourceData
-            .map((copySourceDataItem) => {
-              return findNodeByIdRoute(copySourceDataItem, routeArr);
-            })
-            .filter((x) => x)[0];
+          const innerItem: IDepartmentAndUserListValue | undefined =
+            copySourceData
+              .map((copySourceDataItem) => {
+                return findNodeByIdRoute(copySourceDataItem, routeArr);
+              })
+              .filter((x) => x)[0];
 
-        const finalInnerItem =
-          selectedItem.type === DepartmentAndUserType.Department
-            ? innerItem
-            : innerItem?.children.find((cell) => cell.id === selectedItem.id);
+          const finalInnerItem =
+            repeatItem.type === DepartmentAndUserType.Department
+              ? innerItem
+              : innerItem?.children.find((cell) => cell.id === repeatItem.id);
 
-        finalInnerItem &&
-          (type !== ClickType.Collapse
-            ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
-            : (finalInnerItem.isCollapsed = !finalInnerItem?.isCollapsed));
+          console.log("finalInnerItem", finalInnerItem);
+
+          finalInnerItem &&
+            (type !== ClickType.Collapse
+              ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
+              : (finalInnerItem.isCollapsed = !finalInnerItem?.isCollapsed));
+        }
       });
 
     return copySourceData;

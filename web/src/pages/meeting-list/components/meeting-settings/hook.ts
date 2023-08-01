@@ -72,6 +72,7 @@ const useAction = (props: MeetingSettingsProps) => {
   const {
     departmentAndUserList,
     flattenDepartmentList,
+    recursiveSearchDeptOrUser,
     setFlattenDepartmentList,
     setDepartmentAndUserList,
     loadDeptUsersFromWebWorker,
@@ -344,10 +345,9 @@ const useAction = (props: MeetingSettingsProps) => {
     valueList: IDepartmentAndUserListValue[]
   ) => {
     const deduplicationData = (sourceData: IDepartmentAndUserListValue[]) => {
+      // 合并父数据
       const result: IDepartmentAndUserListValue[] = [];
       for (const item of sourceData) {
-        item.isCollapsed = false;
-        item.selected = false;
         const departmentList = sourceData.filter(
           (item) => item.type === DepartmentAndUserType.Department
         );
@@ -362,6 +362,8 @@ const useAction = (props: MeetingSettingsProps) => {
           ) && result.push(item);
         }
       }
+      // 递归重置选择为false
+      recursiveSearchDeptOrUser(result, (item) => (item.selected = false));
       return result;
     };
 

@@ -184,14 +184,8 @@ export const useAction = (props: SelectContentHookProps) => {
     setFlattenDepartmentList,
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
+    deduplicationArray,
   } = useDeptUserData({ appId: corpAppValue?.appId });
-
-  const deduplicationArray = (list: IDepartmentAndUserListValue[]) => {
-    if (!Array.isArray(list)) return [];
-    return list.filter((item, index) => {
-      return index === list.findIndex((cell) => cell.id === item.id);
-    });
-  };
 
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     setTargetSelectedList(deduplicationArray(valueList));
