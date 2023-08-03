@@ -111,7 +111,6 @@ const SelectTargetDialog = memo(
                     {departmentSelectedList && (
                       <TreeViewSelector
                         appId={AppId}
-                        inputValue={""}
                         sourceType={
                           clickName === SelectPersonnelType.MeetingAttendees ||
                           clickName ===
