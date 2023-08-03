@@ -5,7 +5,6 @@ import {
   DepartmentAndUserType,
   ITagsList,
   IDepartmentKeyControl,
-  ClickType,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
   IFirstState,
@@ -119,12 +118,6 @@ const useAction = (props: AddParticipantDialogProps) => {
       : canSelect === DeptUserCanSelectStatus.User;
   };
 
-  const handleSelectDataCheck = (selectData: IDepartmentAndUserListValue[]) => {
-    let flg: boolean = true;
-
-    return flg;
-  };
-
   const countArrayItems = (
     departmentSelectedList: IDepartmentAndUserListValue[]
   ) => {
@@ -134,19 +127,17 @@ const useAction = (props: AddParticipantDialogProps) => {
       if (!children || children.length === 0) {
         return 1;
       } else {
-        let childCount = 0;
-        for (let i = 0; i < children.length; i++) {
-          childCount += countChildren(children[i].children);
-        }
+        const childCount: number = children.reduce(
+          (count, child) => count + countChildren(child.children),
+          0
+        );
         return childCount;
       }
     };
 
-    for (let i = 0; i < departmentSelectedList.length; i++) {
-      count += countChildren(departmentSelectedList[i].children);
-    }
-
-    return count;
+    return departmentSelectedList.reduce((count, department) => {
+      return count + countChildren(department.children);
+    }, 0);
   };
 
   const handleConfirm = () => {
@@ -284,7 +275,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     setSearchToDeptValue,
     handleConfirm,
     handleCancel,
-    handleSelectDataCheck,
     setDepartmentSelectedList,
   };
 };

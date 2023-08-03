@@ -127,7 +127,7 @@ const SelectTargetDialog = memo(
                         settingSelectedList={(value) => {
                           setDepartmentSelectedList(value);
                         }}
-                      ></TreeViewSelector>
+                      />
                     )}
                   </div>
                 )}
