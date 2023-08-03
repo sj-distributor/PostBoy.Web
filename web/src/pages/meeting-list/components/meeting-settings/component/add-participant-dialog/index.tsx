@@ -104,8 +104,6 @@ const SelectTargetDialog = memo(
                   }}
                 >
                   {!departmentKeyValue && <div>No Data</div>}
-                  {/* {departmentKeyValue?.data.length > 0 &&
-                    recursiveRenderDeptList(departmentKeyValue.data, 0, true)} */}
                 </div>
 
                 {departmentKeyValue && departmentKeyValue.key && (
