@@ -12,7 +12,7 @@ import {
   SelectPersonnelTitle,
   SelectPersonnelType,
 } from "../../../../../../dtos/meeting-seetings";
-import { CircularProgress, Snackbar, FilterOptionsState } from "@mui/material";
+import { CircularProgress, Snackbar } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { memo } from "react";
 import TreeViewSelector from "../../../../../../components/treeViewSelector";

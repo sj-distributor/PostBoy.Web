@@ -2,10 +2,7 @@ import { clone } from "ramda";
 import { useEffect, useState } from "react";
 import {
   IDepartmentAndUserListValue,
-  DepartmentAndUserType,
   ITagsList,
-  IDepartmentKeyControl,
-  DeptUserCanSelectStatus,
   SendObjOrGroup,
   IFirstState,
   DefaultDisplay,
@@ -16,7 +13,6 @@ import { AddParticipantDialogProps } from "./props";
 const useAction = (props: AddParticipantDialogProps) => {
   const {
     departmentAndUserList,
-    departmentKeyValue,
     AppId,
     open,
     isLoading,
@@ -45,78 +41,6 @@ const useAction = (props: AddParticipantDialogProps) => {
   });
   const [firstState, setFirstState] = useState<IFirstState>();
   const [createLoading, setCreateLoading] = useState(false);
-
-  const recursiveSeachDeptOrUser = (
-    hasData: IDepartmentAndUserListValue[],
-    callback: (e: IDepartmentAndUserListValue) => void
-  ) => {
-    for (const key in hasData) {
-      callback(hasData[key]);
-      hasData[key].children.length > 0 &&
-        recursiveSeachDeptOrUser(hasData[key].children, callback);
-    }
-    return hasData;
-  };
-
-  const recursiveDeptList = (
-    hasData: IDepartmentAndUserListValue[],
-    changeList: IDepartmentAndUserListValue[]
-  ) => {
-    for (const key in hasData) {
-      const e = hasData[key];
-      const hasItemIndex = changeList.findIndex((item) => item.id === e.id);
-      e.selected
-        ? hasItemIndex <= -1 &&
-          changeList.push({
-            id: e.id,
-            name: e.name,
-            type: DepartmentAndUserType.User,
-            parentid: e.parentid,
-            selected: e.selected,
-            children: [],
-            isCollapsed: e.isCollapsed,
-          })
-        : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1);
-      e.children.length > 0 && recursiveDeptList(e.children, changeList);
-    }
-  };
-
-  // 搜索框变化时同步到部门列表
-  const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
-    const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
-      const newValue = prev.filter((e) => !!e);
-
-      const activeData = newValue.find(
-        (e) => e.key === departmentKeyValue?.key
-      );
-      if (activeData) {
-        valueArr.length > 0
-          ? valueArr.forEach((item) => {
-              recursiveSeachDeptOrUser(activeData.data, (user) => {
-                user.selected = !!valueArr.find((e) => e.id === user.id);
-              });
-            })
-          : recursiveSeachDeptOrUser(
-              activeData.data,
-              (user) => (user.selected = false)
-            );
-      }
-      return newValue;
-    };
-    setDepartmentSelectedList(valueArr);
-    setDeptUserList(handleDataUpdate);
-  };
-
-  // 处理部门列表能否被选择
-  const handleTypeIsCanSelect = (
-    canSelect: DeptUserCanSelectStatus,
-    type: DepartmentAndUserType
-  ) => {
-    if (canSelect === DeptUserCanSelectStatus.Both) return true;
-    return type === DepartmentAndUserType.Department
-      ? canSelect === DeptUserCanSelectStatus.Department
-      : canSelect === DeptUserCanSelectStatus.User;
-  };
 
   const countArrayItems = (
     departmentSelectedList: IDepartmentAndUserListValue[]
@@ -185,18 +109,6 @@ const useAction = (props: AddParticipantDialogProps) => {
     clearSelected();
   };
 
-  useEffect(() => {
-    // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
-
-    !isLoading &&
-      departmentKeyValue?.data.length > 0 &&
-      setDepartmentSelectedList((prev) => {
-        const newValue = prev.filter((e) => !!e);
-        recursiveDeptList(departmentKeyValue.data, newValue);
-        return newValue;
-      });
-  }, [departmentAndUserList]);
-
   const clearSelected = () => {
     if (firstState) {
       setTagsValue(firstState.tagsValue);
@@ -245,14 +157,6 @@ const useAction = (props: AddParticipantDialogProps) => {
   }, [tagsList, lastTagsValue]);
 
   useEffect(() => {
-    const hasData = departmentAndUserList.find((x) => x.key === AppId);
-    hasData &&
-      recursiveSeachDeptOrUser(hasData.data, (user) => {
-        user.selected = false;
-      });
-  }, [AppId, CorpId]);
-
-  useEffect(() => {
     if (
       departmentAndUserList &&
       departmentAndUserList.length > 0 &&
@@ -269,10 +173,8 @@ const useAction = (props: AddParticipantDialogProps) => {
     tipsObject,
     createLoading,
     setCreateLoading,
-    handleTypeIsCanSelect,
     setIsShowDialog,
     setTagsValue,
-    setSearchToDeptValue,
     handleConfirm,
     handleCancel,
     setDepartmentSelectedList,
