@@ -1,4 +1,4 @@
-import { memo, useState } from "react"
+import { memo, useState } from "react";
 import {
   Button,
   FormControl,
@@ -9,30 +9,30 @@ import {
   Paper,
   Select,
   TextField,
-} from "@mui/material"
-import Autocomplete from "@mui/material/Autocomplete"
-import styles from "./index.module.scss"
-import { SelectContentProps } from "./props"
-import { useAction } from "./hook"
-import SelectTargetDialog from "../select-target-dialog"
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
+import styles from "./index.module.scss";
+import { SelectContentProps } from "./props";
+import { useAction } from "./hook";
+import SelectTargetDialog from "../select-target-dialog";
 import {
   messageTypeList,
   sendTypeList,
   timeZone,
-} from "../../../../dtos/send-message-job"
+} from "../../../../dtos/send-message-job";
 import {
   DeptUserCanSelectStatus,
   FileObject,
   MessageDataFileType,
   MessageJobSendType,
   PictureText,
-} from "../../../../dtos/enterprise"
-import HighlightOffIcon from "@mui/icons-material/HighlightOff"
-import TimeSelector from "../time-selector"
-import DateSelector from "../date-selector"
-import { Editor, Toolbar } from "@wangeditor/editor-for-react"
-import * as wangEditor from "@wangeditor/editor"
-import { MentionsInput, Mention } from "react-mentions"
+} from "../../../../dtos/enterprise";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import TimeSelector from "../time-selector";
+import DateSelector from "../date-selector";
+import { Editor, Toolbar } from "@wangeditor/editor-for-react";
+import * as wangEditor from "@wangeditor/editor";
+import { MentionsInput, Mention } from "react-mentions";
 
 const SelectContent = memo(
   (props: SelectContentProps) => {
@@ -46,7 +46,7 @@ const SelectContent = memo(
       clearData,
       isFromNoticeSetting = false,
       setIsShowPage,
-    } = props
+    } = props;
 
     const {
       corpsValue,
@@ -132,7 +132,7 @@ const SelectContent = memo(
       showErrorPrompt,
       clearData,
       setIsShowPage,
-    })
+    });
 
     const fileOrImage = (file: FileObject, state: string) => {
       if ((!!file.fileContent || !!file.fileUrl) && !!file.fileName)
@@ -158,7 +158,7 @@ const SelectContent = memo(
                   </div>
                 </div>
               </div>
-            )
+            );
           }
           default: {
             return (
@@ -187,10 +187,10 @@ const SelectContent = memo(
                   </div>
                 </div>
               </div>
-            )
+            );
           }
         }
-    }
+    };
 
     const customMentionsList = (children: React.ReactNode) => (
       <Paper>
@@ -201,7 +201,7 @@ const SelectContent = memo(
           {children}
         </List>
       </Paper>
-    )
+    );
 
     const pictureImage = (pictureText: PictureText[], state: string) => {
       return (
@@ -227,8 +227,8 @@ const SelectContent = memo(
             </div>
           </div>
         )
-      )
-    }
+      );
+    };
 
     const displayByType = (
       state: string,
@@ -241,8 +241,8 @@ const SelectContent = memo(
           : !!pictureText && pictureImage(pictureText, state)
         : messageTypeValue.title !== "推文"
         ? !!file && fileOrImage(file, state)
-        : !!pictureText && pictureImage(pictureText, state)
-    }
+        : !!pictureText && pictureImage(pictureText, state);
+    };
 
     const toolbarConfig: Partial<wangEditor.IToolbarConfig> = {
       toolbarKeys: [
@@ -269,7 +269,7 @@ const SelectContent = memo(
         "undo",
         "uploadImage",
       ],
-    }
+    };
 
     return (isNewOrUpdate === "new" && corpsList.length > 0 && !appLoading) ||
       isNewOrUpdate !== "new" ? (
@@ -295,7 +295,7 @@ const SelectContent = memo(
               />
             )}
             onChange={(e, value) => {
-              setCorpsValue(value)
+              setCorpsValue(value);
             }}
           />
           <Autocomplete
@@ -310,7 +310,7 @@ const SelectContent = memo(
             getOptionLabel={(option) => option.name}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             onChange={(e, value) => {
-              setCorpAppValue(value)
+              setCorpAppValue(value);
             }}
             renderInput={(params) => (
               <TextField
@@ -358,10 +358,10 @@ const SelectContent = memo(
                   </p>
                   <span>{params.children}</span>
                 </div>
-              )
+              );
             }}
             onChange={(e, value) => {
-              setMessageTypeValue(value)
+              setMessageTypeValue(value);
             }}
           />
           <FormControl
@@ -375,7 +375,7 @@ const SelectContent = memo(
               value={sendTypeValue}
               label="发送类型"
               onChange={(e) => {
-                setSendTypeValue(Number(e.target.value))
+                setSendTypeValue(Number(e.target.value));
               }}
             >
               {sendTypeList.map((item, key) => (
@@ -395,8 +395,8 @@ const SelectContent = memo(
             }}
             variant="contained"
             onClick={() => {
-              setIsShowDialog(true)
-              setClickName("选择发送目标")
+              setIsShowDialog(true);
+              setClickName("选择发送目标");
             }}
           >
             选择发送目标
@@ -467,8 +467,8 @@ const SelectContent = memo(
                       type="button"
                       label="发送目标"
                       onClick={() => {
-                        setIsShowDialog(true)
-                        setClickName("选择发送目标")
+                        setIsShowDialog(true);
+                        setClickName("选择发送目标");
                       }}
                     />
                   )}
@@ -508,7 +508,9 @@ const SelectContent = memo(
                       内容
                     </div>
                     <MentionsInput
-                      className={styles.MentionsInput}
+                      className={`${styles.MentionsInput} ${
+                        !isFocusing || styles.borderColor
+                      }`}
                       value={content}
                       allowSuggestionsAboveCursor
                       customSuggestionsContainer={(children) =>
@@ -523,10 +525,10 @@ const SelectContent = memo(
                         detectMentionToDelete(
                           (e.target as HTMLTextAreaElement).value,
                           e.key
-                        )
+                        );
                       }}
                       onChange={(event, _, newPlainTextValue) => {
-                        setContent(newPlainTextValue)
+                        setContent(newPlainTextValue);
                       }}
                     >
                       <Mention
@@ -539,7 +541,7 @@ const SelectContent = memo(
                             <ListItemButton id={`${entry.id}`}>
                               {entry.id}
                             </ListItemButton>
-                          )
+                          );
                         }}
                       />
                     </MentionsInput>
@@ -567,8 +569,8 @@ const SelectContent = memo(
                       value={html}
                       onCreated={setEditor}
                       onChange={(editor) => {
-                        setHtmlText(editor.getText())
-                        setHtml(editor.getHtml())
+                        setHtmlText(editor.getText());
+                        setHtml(editor.getHtml());
                       }}
                       mode="default"
                       style={{ height: "25rem" }}
@@ -661,7 +663,7 @@ const SelectContent = memo(
                   value={timeZoneValue}
                   label="时区"
                   onChange={(e) => {
-                    switchTimeZone(Number(e.target.value))
+                    switchTimeZone(Number(e.target.value));
                   }}
                 >
                   {timeZone
@@ -696,14 +698,14 @@ const SelectContent = memo(
       </div>
     ) : (
       <></>
-    )
+    );
   },
   (prevProps, nextProps) => {
     return (
       prevProps.sendData === nextProps.sendData &&
       JSON.stringify(prevProps) === JSON.stringify(nextProps)
-    )
+    );
   }
-)
+);
 
-export default SelectContent
+export default SelectContent;

@@ -120,7 +120,8 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                               );
                             })}
                           </div>
-                          {hostList.length > 1 && `等${hostList.length}人`}
+                          {hostList.length > 1 &&
+                            `等${hostList.length}人(部门)`}
                           <ArrowForwardIosIcon
                             sx={{ fontSize: "0.6rem", marginLeft: "0.3rem" }}
                           />
@@ -190,7 +191,8 @@ const SeetingsDialog = (props: SettingDialogProps) => {
                             );
                           })}
                         </div>
-                        {appointList.length > 1 && `等${appointList.length}人`}
+                        {appointList.length > 1 &&
+                          `等${appointList.length}人(部门)`}
                         <ArrowForwardIosIcon
                           sx={{ fontSize: "0.6rem", marginLeft: "0.3rem" }}
                         />

@@ -8,6 +8,7 @@ import {
   MembershipRestrictions,
   MutewhenJoining,
   RecordWatermark,
+  SelectPersonnelType,
   SettingDialogProps,
   WorkWeChatMeetingSettingDto,
   WorkWeChatMeetingUserDto,
@@ -195,7 +196,7 @@ const useAction = (props: SettingDialogProps) => {
 
   const onAppint = () => {
     setOpenAddDialog(true);
-    setClickName && setClickName("选择指定提醒人员");
+    setClickName && setClickName(SelectPersonnelType.SpecifyReminderPersonnel);
   };
 
   const onIsOption = (checked: boolean, index: number) => {
@@ -232,7 +233,7 @@ const useAction = (props: SettingDialogProps) => {
   };
 
   const onSelectHost = () => {
-    setClickName && setClickName("选择指定主持人");
+    setClickName && setClickName(SelectPersonnelType.Moderator);
     setOpenAddDialog(true);
   };
 

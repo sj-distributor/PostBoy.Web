@@ -1,18 +1,18 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction } from "react";
 
 export interface ICorpData {
-  corpName: string
-  corpId: string
-  id: string
+  corpName: string;
+  corpId: string;
+  id: string;
 }
 
 export interface ICorpAppData {
-  appId: string
-  id: string
-  name: string
-  workWeChatCorpId: string
-  display: boolean
-  agentId: number
+  appId: string;
+  id: string;
+  name: string;
+  workWeChatCorpId: string;
+  display: boolean;
+  agentId: number;
 }
 
 export enum DepartmentAndUserType {
@@ -26,50 +26,65 @@ export enum DeptUserCanSelectStatus {
   Both,
 }
 
+export enum SelectPersonnelType {
+  MeetingAttendees, //会议参会人
+  Moderator, //会议主持人
+  SpecifyReminderPersonnel, //会议开始时提醒人员
+  ConferenceAdministrator, //会议管理员
+}
+
+export const SelectPersonnelTitle = {
+  [SelectPersonnelType.MeetingAttendees]: "选择会议参与成员",
+  [SelectPersonnelType.ConferenceAdministrator]: "选择会议管理员",
+  [SelectPersonnelType.Moderator]: "选择会议主持人",
+  [SelectPersonnelType.SpecifyReminderPersonnel]: "选择指定提醒成员",
+};
+
 export interface IDepartmentAndUserListValue {
-  id: number | string
-  name: string
-  type: DepartmentAndUserType
-  parentid: string | number[]
-  selected: boolean
-  isCollapsed?: boolean
-  children: IDepartmentAndUserListValue[]
+  id: number | string;
+  name: string;
+  type: DepartmentAndUserType;
+  parentid: number;
+  selected: boolean;
+  isCollapsed: boolean;
+  idRoute?: number[];
+  children: IDepartmentAndUserListValue[];
 }
 
 export interface IDepartmentData {
-  department_leader: []
-  id: number
-  name: string
-  name_en: null
-  order: number
-  parentid: number
-  departmentUserList: IDepartmentUsersData[]
-  selected: boolean
+  department_leader: [];
+  id: number;
+  name: string;
+  name_en: null;
+  order: number;
+  parentid: number;
+  departmentUserList: IDepartmentUsersData[];
+  selected: boolean;
 }
 
 export interface IDepartmentKeyControl {
-  data: IDepartmentAndUserListValue[]
-  key: string
+  data: IDepartmentAndUserListValue[];
+  key: string;
 }
 
 export interface IDeptAndUserList {
-  department: IDepartmentData
-  users: IDepartmentUsersData[]
+  department: IDepartmentData;
+  users: IDepartmentUsersData[];
 }
 
 export interface ISearchList {
-  key: string
-  data: IDepartmentAndUserListValue[]
+  key: string;
+  data: IDepartmentAndUserListValue[];
 }
 
 export interface ITagsList {
-  tagId: number
-  tagName: string
+  tagId: number;
+  tagName: string;
 }
 
 export interface IWorkCorpAppGroup {
-  chatId: string
-  chatName: string
+  chatId: string;
+  chatName: string;
 }
 
 export enum SendObjOrGroup {
@@ -78,11 +93,11 @@ export enum SendObjOrGroup {
 }
 
 export interface IDepartmentUsersData {
-  name: string
-  userid: string
-  department: number
-  open_userid: string
-  selected: boolean
+  name: string;
+  userid: string;
+  department: number;
+  open_userid: string;
+  selected: boolean;
 }
 
 export enum ClickType {
@@ -91,52 +106,54 @@ export enum ClickType {
 }
 
 export interface IWorkGroupCreate {
-  appId: string
-  name: string
-  owner?: string
-  chatId?: string
-  userList: string[]
+  appId: string;
+  name: string;
+  owner?: string;
+  chatId?: string;
+  userList: string[];
 }
 
 export interface IFirstState {
-  chatId: string
-  deptUserList: IDepartmentKeyControl[]
-  tagsValue: ITagsList[]
-  sendType: SendObjOrGroup
+  chatId: string;
+  deptUserList: IDepartmentKeyControl[];
+  tagsValue: ITagsList[];
+  sendType: SendObjOrGroup;
 }
 
 export interface ITargetDialogProps {
-  open: boolean
-  departmentAndUserList: IDepartmentKeyControl[]
-  departmentKeyValue: IDepartmentKeyControl
-  flattenDepartmentList: IDepartmentAndUserListValue[]
-  AppId: string
-  CorpId: string
-  isLoading: boolean
-  tagsList: ITagsList[]
-  lastTagsValue?: string[] | undefined
-  clickName: string
-  canSelect: DeptUserCanSelectStatus
-  chatId: string
-  outerTagsValue?: ITagsList[]
-  setChatId?: React.Dispatch<React.SetStateAction<string>>
-  setOpenFunction: (open: boolean) => void
-  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
-  setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
-  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void
-  loadSelectData?: IDepartmentAndUserListValue[]
+  open: boolean;
+  departmentAndUserList: IDepartmentKeyControl[];
+  departmentKeyValue: IDepartmentKeyControl;
+  flattenDepartmentList: IDepartmentAndUserListValue[];
+  AppId: string;
+  CorpId: string;
+  isLoading: boolean;
+  tagsList: ITagsList[];
+  lastTagsValue?: string[] | undefined;
+  clickName: SelectPersonnelType;
+  canSelect: DeptUserCanSelectStatus;
+  chatId: string;
+  outerTagsValue?: ITagsList[];
+  setChatId?: React.Dispatch<React.SetStateAction<string>>;
+  setOpenFunction: (open: boolean) => void;
+  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
+  setDeptUserList: React.Dispatch<
+    React.SetStateAction<IDepartmentKeyControl[]>
+  >;
+  loadSelectData?: IDepartmentAndUserListValue[];
+  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }
 
 export interface DateTimeProps {
-  date: string
-  time: string
-  setDate: React.Dispatch<React.SetStateAction<string>>
-  setTime: React.Dispatch<React.SetStateAction<string>>
+  date: string;
+  time: string;
+  setDate: React.Dispatch<React.SetStateAction<string>>;
+  setTime: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface DateTimeData {
-  date: string
-  time: string
+  date: string;
+  time: string;
 }
 
 export enum SelectType {
@@ -145,14 +162,8 @@ export enum SelectType {
 }
 
 export interface SelectDataType {
-  value: number
-  lable: string
-}
-
-export enum CalendarSelectData {
-  CalendarForMARS = 1, //mars的日历
-  CalendarForELK = 2, //elk的日历
-  CalendarForJKL = 3, //jkl的日历
+  value: number;
+  lable: string;
 }
 
 //会议开始提醒时间
@@ -205,11 +216,11 @@ export enum MembershipRestrictions {
 }
 
 export interface SelectGroupType {
-  title: string
-  key: string
-  value: string | number
-  data: SelectDataType[]
-  isIcon?: boolean
+  title: string;
+  key: string;
+  value: string | number;
+  data: SelectDataType[];
+  isIcon?: boolean;
 }
 
 export enum DefaultDisplay {
@@ -239,155 +250,157 @@ export enum MeetingPasswordLimitation {
 }
 
 export interface SettingDialogProps {
-  open: boolean
-  setDialog: (value: boolean) => void
-  openAddDialog: boolean
-  setOpenAddDialog: (value: boolean) => void
-  setClickName?: Dispatch<SetStateAction<string>>
-  appointList?: IDepartmentAndUserListValue[]
-  hostList?: IDepartmentAndUserListValue[]
-  handleGetSettingData?: (data: WorkWeChatMeetingSettingDto) => void
-  settings: WorkWeChatMeetingSettingDto
-  setSettings: React.Dispatch<React.SetStateAction<WorkWeChatMeetingSettingDto>>
+  open: boolean;
+  setDialog: (value: boolean) => void;
+  openAddDialog: boolean;
+  setOpenAddDialog: (value: boolean) => void;
+  setClickName?: Dispatch<SetStateAction<SelectPersonnelType>>;
+  appointList?: IDepartmentAndUserListValue[];
+  hostList?: IDepartmentAndUserListValue[];
+  handleGetSettingData?: (data: WorkWeChatMeetingSettingDto) => void;
+  settings: WorkWeChatMeetingSettingDto;
+  setSettings: React.Dispatch<
+    React.SetStateAction<WorkWeChatMeetingSettingDto>
+  >;
 }
 
 export interface MeetingSettingsProps {
-  isOpenMeetingSettings: boolean
-  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>
-  meetingData?: GetAllMeetingsData | null
-  getMeetingList: () => void
-  meetingState: string
+  isOpenMeetingSettings: boolean;
+  setIsOpenMeetingSettings: React.Dispatch<React.SetStateAction<boolean>>;
+  meetingData?: GetAllMeetingsData | null;
+  getMeetingList: () => void;
+  meetingState: string;
 }
 
 export interface MeetingSettingList {
-  title: string
-  border: boolean
-  optionType?: "checkbox" | "input" | "dailog" //checkbox:会议设置列表右边显示复选框，input：显示密码输入框，dailog：点击打开弹出
-  isOption: boolean
-  optionData?: number
-  optionList?: SelectDataType[]
-  icon?: boolean
-  password?: string
-  key?: string
+  title: string;
+  border: boolean;
+  optionType?: "checkbox" | "input" | "dailog"; //checkbox:会议设置列表右边显示复选框，input：显示密码输入框，dailog：点击打开弹出
+  isOption: boolean;
+  optionData?: number;
+  optionList?: SelectDataType[];
+  icon?: boolean;
+  password?: string;
+  key?: string;
 }
 
 export interface WorkWeChatMeetingUserDto {
-  userid: string[]
+  userid: string[];
 }
 
 export interface WorkWeChatMeetingReminderDto {
-  is_repeat: number
-  repeat_type: number
-  repeat_until: number
-  repeat_interval: number
-  remind_before: number[] | number
+  is_repeat: number;
+  repeat_type: number;
+  repeat_until: number;
+  repeat_interval: number;
+  remind_before: number[] | number;
 }
 
 export interface WorkWeChatMeetingSettingDto {
-  password: string
-  enable_waiting_room: boolean
-  allow_enter_before_host: boolean
-  remind_scope: number
-  enable_enter_mute: number
-  allow_external_user: boolean
-  enable_screen_watermark: boolean
-  meetingRecordType: MeetingRecording
-  enableCloudRecordSummary: boolean
-  meetingSummaryDistributionEnabled: boolean
-  hosts?: WorkWeChatMeetingUserDto
-  auto_record_type?: string
-  ring_users?: WorkWeChatMeetingUserDto
+  password: string;
+  enable_waiting_room: boolean;
+  allow_enter_before_host: boolean;
+  remind_scope: number;
+  enable_enter_mute: number;
+  allow_external_user: boolean;
+  enable_screen_watermark: boolean;
+  meetingRecordType: MeetingRecording;
+  enableCloudRecordSummary: boolean;
+  meetingSummaryDistributionEnabled: boolean;
+  hosts?: WorkWeChatMeetingUserDto;
+  auto_record_type?: string;
+  ring_users?: WorkWeChatMeetingUserDto;
 }
 
 export interface CreateOrUpdateWorkWeChatMeetingDto {
-  appId: string
-  admin_userid: string
-  title: string
-  meeting_start: number
-  meeting_duration: number
-  description?: string
-  location?: string
-  invitees?: WorkWeChatMeetingUserDto
-  meetingid?: string
-  cal_id?: string
-  settings?: Partial<WorkWeChatMeetingSettingDto>
-  reminders?: Partial<WorkWeChatMeetingReminderDto>
+  appId: string;
+  admin_userid: string;
+  title: string;
+  meeting_start: number;
+  meeting_duration: number;
+  description?: string;
+  location?: string;
+  invitees?: WorkWeChatMeetingUserDto;
+  meetingid?: string;
+  cal_id?: string;
+  settings?: Partial<WorkWeChatMeetingSettingDto>;
+  reminders?: Partial<WorkWeChatMeetingReminderDto>;
 }
 
 export interface CreateWorkWeChatMeeting {
-  createWorkWeChatMeeting: CreateOrUpdateWorkWeChatMeetingDto
+  createWorkWeChatMeeting: CreateOrUpdateWorkWeChatMeetingDto;
 }
 
 export interface CreateMeetingResponse {
-  errcode: number
-  errormsg: string
-  meetingid: string
-  excessUsers: string[]
+  errcode: number;
+  errormsg: string;
+  meetingid: string;
+  excessUsers: string[];
 }
 
 export interface MeetingAttendeesUserData {
-  userid: string
-  status: number
-  firstJoinTime: number
-  lastQuitTime: number
-  totalJoinCount: number
-  cumulativeTime: number
+  userid: string;
+  status: number;
+  firstJoinTime: number;
+  lastQuitTime: number;
+  totalJoinCount: number;
+  cumulativeTime: number;
 }
 
 export interface MeetingAttendees {
-  member: MeetingAttendeesUserData[]
-  tmpExternalUser: MeetingAttendeesUserData[]
+  member: MeetingAttendeesUserData[];
+  tmpExternalUser: MeetingAttendeesUserData[];
 }
 
 export interface GetAllMeetingsData {
-  id: string
-  workWeChatCorpApplicationId: string
-  workWeChatCorpId: string
-  meetingId: string
-  adminUserId: string
-  title: string
-  meetingCode: string
-  meetingLink: string
-  meetingStart: number
-  meetingDuration: number
-  description: string
-  location: string
-  presentMember: string[]
-  absentMember: string[]
-  mainDepartment: number
-  status: MeetingStatus
-  agentId: number
-  calId: string
-  password: string
-  enableWaitingRoom: boolean
-  allowEnterBeforeHost: boolean
-  remindScope: number
-  enableEnterMute: number
-  allowExternalUser: boolean
-  enableScreenWatermark: boolean
-  hosts: string
-  ringUsers: string
-  isRepeat: number
-  repeatType: number
-  repeatUntil: number
-  repeatInterval: number
-  remindBefore: string
-  createdDate: string
-  isDelete: boolean
-  meetingRecordType: MeetingRecording
-  enableCloudRecordSummary: boolean
-  meetingSummaryDistributionEnabled: boolean
+  id: string;
+  workWeChatCorpApplicationId: string;
+  workWeChatCorpId: string;
+  meetingId: string;
+  adminUserId: string;
+  title: string;
+  meetingCode: string;
+  meetingLink: string;
+  meetingStart: number;
+  meetingDuration: number;
+  description: string;
+  location: string;
+  presentMember: string[];
+  absentMember: string[];
+  mainDepartment: number;
+  status: MeetingStatus;
+  agentId: number;
+  calId: string;
+  password: string;
+  enableWaitingRoom: boolean;
+  allowEnterBeforeHost: boolean;
+  remindScope: number;
+  enableEnterMute: number;
+  allowExternalUser: boolean;
+  enableScreenWatermark: boolean;
+  hosts: string;
+  ringUsers: string;
+  isRepeat: number;
+  repeatType: number;
+  repeatUntil: number;
+  repeatInterval: number;
+  remindBefore: string;
+  createdDate: string;
+  isDelete: boolean;
+  meetingRecordType: MeetingRecording;
+  enableCloudRecordSummary: boolean;
+  meetingSummaryDistributionEnabled: boolean;
 }
 
 export interface GetAllMeetingDto {
-  PageIndex: number
-  PageSize: number
-  KeyWord: string
+  PageIndex: number;
+  PageSize: number;
+  KeyWord: string;
 }
 
 export interface GetAllMeetingResponse {
-  meetings: GetAllMeetingsData[]
-  rowCount: 13
+  meetings: GetAllMeetingsData[];
+  rowCount: 13;
 }
 
 //会议状态
@@ -405,41 +418,41 @@ export const MeetingType = {
   [MeetingStatus.Ended]: "已结束",
   [MeetingStatus.Canceled]: "已取消",
   [MeetingStatus.Expired]: "已过期",
-}
+};
 
 export interface CancelWorkWeChatMeetingDto {
   cancelWorkWeChatMeeting: {
-    appId: string
-    meetingid: string
-  }
+    appId: string;
+    meetingid: string;
+  };
 }
 
 export interface CancelMeetingResponse {
-  errcode: number
-  errmsg: string
+  errcode: number;
+  errmsg: string;
 }
 
 export interface UpdateMeetingResponse {
-  errcode: number
-  errmsg: string
-  excess_users: []
+  errcode: number;
+  errmsg: string;
+  excess_users: [];
 }
 
 export interface GetAllMeetingsData {
-  meetingId: string
-  corpId: string
-  appId: string
+  meetingId: string;
+  corpId: string;
+  appId: string;
 }
 
 export interface CandelDto {
-  meetingId: string
-  workWeChatCorpApplicationId: string
-  workWeChatCorpId: string
+  meetingId: string;
+  workWeChatCorpApplicationId: string;
+  workWeChatCorpId: string;
 }
 
 export interface MeetingGroup {
-  isCreateGroup: boolean
-  isMeetingCode: boolean
-  isMeetingLink: boolean
-  content: string
+  isCreateGroup: boolean;
+  isMeetingCode: boolean;
+  isMeetingLink: boolean;
+  content: string;
 }
