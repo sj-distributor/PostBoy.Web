@@ -107,6 +107,13 @@
             border: 0.01rem solid #b8b8b8;
             border-radius: 0.25rem;
           }
+
+          &.borderColor {
+            :global(textarea) {
+              outline: #2c75cf auto 0.01rem;
+              border-radius: 0.25rem;
+            }
+          }
         }
       }
 

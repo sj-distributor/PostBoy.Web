@@ -1,7 +1,6 @@
-import { debounce } from "@material-ui/core";
-import { useDebounceEffect, useDebounceFn } from "ahooks";
+import { useDebounceEffect } from "ahooks";
 import { clone, uniq } from "ramda";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GetWeChatWorkCorpAppGroups,
   PostWeChatWorkGroupCreate,
@@ -11,7 +10,6 @@ import {
   DepartmentAndUserType,
   ITagsList,
   IDepartmentKeyControl,
-  ClickType,
   DeptUserCanSelectStatus,
   IWorkGroupCreate,
   SendObjOrGroup,
@@ -34,6 +32,7 @@ const useAction = (props: {
   isUpdatedDeptUser: boolean;
   sendType?: SendObjOrGroup;
   CorpId: string;
+  targetSelectedList: IDepartmentAndUserListValue[];
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>;
   setOpenFunction: (open: boolean) => void;
   setChatId?: React.Dispatch<React.SetStateAction<string>>;
@@ -43,6 +42,7 @@ const useAction = (props: {
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
   setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>;
+  settingSelectedList: (valueList: IDepartmentAndUserListValue[]) => void;
 }) => {
   const {
     departmentAndUserList,
@@ -59,6 +59,7 @@ const useAction = (props: {
     lastTagsValue,
     sendType,
     CorpId,
+    targetSelectedList,
     setSendType,
     setChatId,
     setChatName,
@@ -66,22 +67,21 @@ const useAction = (props: {
     setDeptUserList,
     setOuterTagsValue,
     setGroupList,
+    settingSelectedList,
   } = props;
 
   const defaultGroupOwner = {
     id: "-1",
     name: "随机群主",
     type: DepartmentAndUserType.User,
-    parentid: "",
+    parentid: -1,
     selected: false,
+    isCollapsed: false,
     children: [],
   };
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
-    IDepartmentAndUserListValue[]
-  >([]);
-  const [groupDeptUserSelectedList, setGroupDeptUserSelectedList] = useState<
-    IDepartmentAndUserListValue[]
-  >([]);
+    IDepartmentAndUserListValue[] | undefined
+  >();
   const [tagsValue, setTagsValue] = useState<ITagsList[]>([]);
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [groupOwner, setGroupOwner] =
@@ -113,111 +113,6 @@ const useAction = (props: {
     null
   );
 
-  const recursiveSeachDeptOrUser = (
-    hasData: IDepartmentAndUserListValue[],
-    callback: (e: IDepartmentAndUserListValue) => void
-  ) => {
-    for (const key in hasData) {
-      callback(hasData[key]);
-      hasData[key].children.length > 0 &&
-        recursiveSeachDeptOrUser(hasData[key].children, callback);
-    }
-    return hasData;
-  };
-
-  const recursiveDeptList = (
-    hasData: IDepartmentAndUserListValue[],
-    changeList: IDepartmentAndUserListValue[]
-  ) => {
-    for (const key in hasData) {
-      const e = hasData[key];
-      const hasItemIndex = changeList.findIndex((item) => item.id === e.id);
-      e.selected
-        ? hasItemIndex <= -1 &&
-          changeList.push({
-            id: e.id,
-            name: e.name,
-            type: DepartmentAndUserType.User,
-            parentid: String(e.parentid),
-            selected: e.selected,
-            children: [],
-          })
-        : hasItemIndex > -1 && changeList.splice(hasItemIndex, 1);
-      e.children.length > 0 && recursiveDeptList(e.children, changeList);
-    }
-  };
-
-  // 处理部门列表点击选择或者展开
-  const handleDeptOrUserClick = (
-    type: ClickType,
-    clickedItem: IDepartmentAndUserListValue
-  ) => {
-    clickName === "选择发送目标"
-      ? setDeptUserList((prev) => {
-          const newValue = prev.filter((e) => !!e);
-          const activeData = newValue.find(
-            (e) => e.key === departmentKeyValue.key
-          );
-          activeData &&
-            recursiveSeachDeptOrUser(activeData.data, (e) => {
-              e.id === clickedItem.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected));
-            });
-          return newValue;
-        })
-      : setGroupDeptUserList((prev) => {
-          const newValue = prev.filter((e) => !!e);
-          const activeData = newValue.find(
-            (e) => e.key === departmentKeyValue.key
-          );
-          activeData &&
-            recursiveSeachDeptOrUser(activeData.data, (e) => {
-              e.id === clickedItem.id &&
-                (type === ClickType.Collapse
-                  ? (e.isCollapsed = !e.isCollapsed)
-                  : (e.selected = !e.selected));
-            });
-          return newValue;
-        });
-  };
-
-  // 搜索框变化时同步到部门列表
-  const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
-    const handleDataUpdate = (prev: IDepartmentKeyControl[]) => {
-      const newValue = prev.filter((e) => !!e);
-      const activeData = newValue.find((e) => e.key === departmentKeyValue.key);
-      if (activeData) {
-        valueArr.length > 0
-          ? valueArr.forEach((item) => {
-              recursiveSeachDeptOrUser(activeData.data, (user) => {
-                user.selected = !!valueArr.find((e) => e.id === user.id);
-              });
-            })
-          : recursiveSeachDeptOrUser(
-              activeData.data,
-              (user) => (user.selected = false)
-            );
-      }
-      return newValue;
-    };
-    if (clickName === "创建群组") {
-      setGroupDeptUserSelectedList(valueArr);
-      // 如果选择的department User list没有当前的用户之后置空群主选择
-      setGroupOwner((prev) => {
-        if (valueArr.some((item) => item.id === prev.id)) {
-          return prev;
-        }
-        return defaultGroupOwner;
-      });
-      setGroupDeptUserList(handleDataUpdate);
-    } else {
-      setDepartmentSelectedList(valueArr);
-      setDeptUserList(handleDataUpdate);
-    }
-  };
-
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
     canSelect: DeptUserCanSelectStatus,
@@ -234,7 +129,7 @@ const useAction = (props: {
     let requestData: IWorkGroupCreate;
     !groupName
       ? setTipsObject({ show: true, msg: "Please input a valid group name" })
-      : groupDeptUserSelectedList.length <= 1
+      : (departmentSelectedList ?? []).length <= 1
       ? setTipsObject({
           show: true,
           msg: "Please select 2 or more valid users",
@@ -247,7 +142,7 @@ const useAction = (props: {
             appId: AppId,
             name: groupName,
             owner: groupOwner.id as string,
-            userList: groupDeptUserSelectedList.map(
+            userList: (departmentSelectedList ?? []).map(
               (item) => item.id as string
             ),
           };
@@ -259,15 +154,7 @@ const useAction = (props: {
               setTipsObject({ msg: "创建成功", show: true });
               setCreateLoading(false);
               // 清空数据
-              setGroupDeptUserList((prev) => {
-                const newValue = prev.filter((x) => x);
-                const hasData = newValue.find((x) => x.key === AppId);
-                hasData &&
-                  recursiveSeachDeptOrUser(hasData.data, (e) => {
-                    e.selected = false;
-                  });
-                return newValue;
-              });
+              setDepartmentSelectedList([]);
               setGroupOwner(defaultGroupOwner);
               setGroupName("");
               GetWeChatWorkCorpAppGroups(CorpId).then((result) => {
@@ -283,6 +170,7 @@ const useAction = (props: {
   const handleConfirm = () => {
     setOpenFunction(false);
     setOuterTagsValue(tagsValue);
+    departmentSelectedList && settingSelectedList(departmentSelectedList);
     setFirstState(undefined);
   };
 
@@ -319,30 +207,6 @@ const useAction = (props: {
   );
 
   useEffect(() => {
-    // 限制条件下群组部门列表变化同步到群组搜索选择列表
-    !isLoading &&
-      !!groupDeptUserList &&
-      groupDeptUserList.length > 0 &&
-      setGroupDeptUserSelectedList((prev) => {
-        const newValue = prev.filter((e) => !!e);
-        const activeData = groupDeptUserList.find((x) => x.key === AppId);
-        activeData && recursiveDeptList(activeData.data, newValue);
-        return newValue;
-      });
-  }, [groupDeptUserList]);
-
-  useEffect(() => {
-    // 限制条件下发送列表部门列表变化同步到发送搜索选择列表
-    !isLoading &&
-      departmentKeyValue?.data.length > 0 &&
-      setDepartmentSelectedList((prev) => {
-        const newValue = prev.filter((e) => !!e);
-        recursiveDeptList(departmentKeyValue.data, newValue);
-        return newValue;
-      });
-  }, [departmentAndUserList]);
-
-  useEffect(() => {
     // 当第一次拿到选择目标部门列表复制给群组部门列表
     departmentKeyValue &&
       departmentAndUserList.length > 0 &&
@@ -355,7 +219,6 @@ const useAction = (props: {
   const clearSelected = () => {
     if (firstState) {
       setTagsValue(firstState.tagsValue);
-      setDeptUserList(firstState.deptUserList);
       setChatId && setChatId(firstState.chatId);
       setChatName && setChatName(firstState.chatName);
       setSendType && setSendType(firstState.sendType);
@@ -375,6 +238,10 @@ const useAction = (props: {
   }, [chatName, chatId, isShowDialog]);
 
   useEffect(() => {
+    isUpdatedDeptUser && setDepartmentSelectedList(targetSelectedList);
+  }, [isUpdatedDeptUser, open, targetSelectedList]);
+
+  useEffect(() => {
     open &&
       isUpdatedDeptUser &&
       setFirstState({
@@ -387,33 +254,7 @@ const useAction = (props: {
   }, [open, isUpdatedDeptUser]);
 
   useEffect(() => {
-    const handleData = (
-      prev: IDepartmentAndUserListValue[],
-      listData: IDepartmentKeyControl[]
-    ) => {
-      const newValue = prev.filter((x) => x);
-      const hasData = listData.find((x) => x.key === AppId);
-      hasData &&
-        recursiveSeachDeptOrUser(hasData.data, (e) => {
-          e.selected && newValue.push(e);
-        });
-      return newValue;
-    };
-    // 打开时load上次选中的数据
-    open
-      ? clickName === "选择发送目标"
-        ? setDepartmentSelectedList((prev) =>
-            handleData(prev, departmentAndUserList)
-          )
-        : setGroupDeptUserSelectedList((prev) =>
-            handleData(prev, groupDeptUserList)
-          )
-      : // 关闭时清空上次选中数据
-        (() => {
-          setDepartmentSelectedList([]);
-          setGroupDeptUserSelectedList([]);
-          setGroupIsNoData(false);
-        })();
+    !open && setGroupIsNoData(false);
   }, [open]);
 
   useEffect(() => {
@@ -447,7 +288,6 @@ const useAction = (props: {
     groupOwner,
     groupName,
     tipsObject,
-    groupDeptUserSelectedList,
     defaultGroupOwner,
     groupDeptUserList,
     createLoading,
@@ -460,19 +300,16 @@ const useAction = (props: {
     setKeyword,
     setGroupIsNoData,
     setCreateLoading,
-    setGroupDeptUserList,
-    setGroupDeptUserSelectedList,
     setGroupName,
     setGroupOwner,
     handleTypeIsCanSelect,
     setIsShowDialog,
     setTagsValue,
-    handleDeptOrUserClick,
-    setSearchToDeptValue,
     handleCreateGroup,
     handleConfirm,
     handleCancel,
     onListBoxScrolling,
+    setDepartmentSelectedList,
   };
 };
 export default useAction;

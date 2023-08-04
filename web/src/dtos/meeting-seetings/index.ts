@@ -26,13 +26,28 @@ export enum DeptUserCanSelectStatus {
   Both,
 }
 
+export enum SelectPersonnelType {
+  MeetingAttendees, //会议参会人
+  Moderator, //会议主持人
+  SpecifyReminderPersonnel, //会议开始时提醒人员
+  ConferenceAdministrator, //会议管理员
+}
+
+export const SelectPersonnelTitle = {
+  [SelectPersonnelType.MeetingAttendees]: "选择会议参与成员",
+  [SelectPersonnelType.ConferenceAdministrator]: "选择会议管理员",
+  [SelectPersonnelType.Moderator]: "选择会议主持人",
+  [SelectPersonnelType.SpecifyReminderPersonnel]: "选择指定提醒成员",
+};
+
 export interface IDepartmentAndUserListValue {
   id: number | string;
   name: string;
   type: DepartmentAndUserType;
-  parentid: string | number[];
+  parentid: number;
   selected: boolean;
-  isCollapsed?: boolean;
+  isCollapsed: boolean;
+  idRoute?: number[];
   children: IDepartmentAndUserListValue[];
 }
 
@@ -80,7 +95,7 @@ export enum SendObjOrGroup {
 export interface IDepartmentUsersData {
   name: string;
   userid: string;
-  department: number[];
+  department: number;
   open_userid: string;
   selected: boolean;
 }
@@ -115,7 +130,7 @@ export interface ITargetDialogProps {
   isLoading: boolean;
   tagsList: ITagsList[];
   lastTagsValue?: string[] | undefined;
-  clickName: string;
+  clickName: SelectPersonnelType;
   canSelect: DeptUserCanSelectStatus;
   chatId: string;
   outerTagsValue?: ITagsList[];
@@ -125,8 +140,8 @@ export interface ITargetDialogProps {
   setDeptUserList: React.Dispatch<
     React.SetStateAction<IDepartmentKeyControl[]>
   >;
-  handleGetSelectData?: (data: IDepartmentAndUserListValue[]) => void;
   loadSelectData?: IDepartmentAndUserListValue[];
+  settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }
 
 export interface DateTimeProps {
@@ -149,12 +164,6 @@ export enum SelectType {
 export interface SelectDataType {
   value: number;
   lable: string;
-}
-
-export enum CalendarSelectData {
-  CalendarForMARS = 1, //mars的日历
-  CalendarForELK = 2, //elk的日历
-  CalendarForJKL = 3, //jkl的日历
 }
 
 //会议开始提醒时间
@@ -245,7 +254,7 @@ export interface SettingDialogProps {
   setDialog: (value: boolean) => void;
   openAddDialog: boolean;
   setOpenAddDialog: (value: boolean) => void;
-  setClickName?: Dispatch<SetStateAction<string>>;
+  setClickName?: Dispatch<SetStateAction<SelectPersonnelType>>;
   appointList?: IDepartmentAndUserListValue[];
   hostList?: IDepartmentAndUserListValue[];
   handleGetSettingData?: (data: WorkWeChatMeetingSettingDto) => void;
