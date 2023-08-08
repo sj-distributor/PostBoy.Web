@@ -1,5 +1,6 @@
-import { clone, difference, remove } from "ramda";
-import { useEffect, useState } from "react";
+import { useMap, useThrottleEffect } from "ahooks";
+import { clone, difference, flatten, remove } from "ramda";
+import { SetStateAction, useEffect, useState, useTransition } from "react";
 import {
   ClickType,
   DepartmentAndUserType,
@@ -36,6 +37,19 @@ const useAction = ({
     clone(flattenData)
   );
 
+  const [limitTags, setLimitTags] = useState<number>(0);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const map = new Map();
+
+  flattenList.forEach((value) => map.set(value.id, value));
+
+  const [foldMap, { set: foldMapSetter, get: foldMapGetter }] = useMap<
+    string | number,
+    IDepartmentAndUserListValue
+  >(map);
+
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
     canSelect: DeptUserCanSelectStatus,
@@ -69,44 +83,98 @@ const useAction = ({
     return undefined;
   }
 
+  const setAllChildrenById = (
+    id: string | number,
+    childrenList: IDepartmentAndUserListValue[]
+  ) => {
+    const mapItem = foldMapGetter(id);
+    mapItem &&
+      mapItem.children.forEach((item) => {
+        const innerItem = foldMapGetter(item.id);
+        if (innerItem) {
+          foldMapSetter(innerItem.id, { ...innerItem, selected: true });
+          childrenList.push(innerItem);
+          innerItem.children.length > 0 &&
+            setAllChildrenById(innerItem.id, childrenList);
+        }
+      });
+    return childrenList;
+  };
+
+  const updateDropDownFromTree = () => {
+    const list: IDepartmentAndUserListValue[] = [];
+    for (let value of foldMap.values()) {
+      value.selected && list.push(value);
+    }
+    if (list.length > 500) {
+      setLoading(true);
+      const stepSize = 100;
+      const totalSteps = Math.ceil(list.length / stepSize);
+      let currentStep = 0;
+      function updateDataStepByStep() {
+        const startIndex = currentStep * stepSize;
+        const endIndex = Math.min((currentStep + 1) * stepSize, list.length);
+        setLimitTags(endIndex);
+
+        // 在此处执行数据更新的逻辑，从startIndex到endIndex之间的数据更新
+        setSelectedList((prev) => [
+          ...prev,
+          ...list.slice(startIndex, endIndex),
+        ]);
+
+        // 更新步骤数，并在还有剩余数据需要更新时请求下一帧
+        currentStep++;
+        if (currentStep < totalSteps) {
+          window.requestAnimationFrame(updateDataStepByStep);
+        }
+      }
+      window.requestAnimationFrame(updateDataStepByStep);
+    } else setSelectedList(list);
+  };
+
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
     clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
-    value?: boolean
+    toSelect?: boolean
   ) => {
-    const clickedItem = !Array.isArray(clickedList)
-      ? clickedList
-      : clickedList[0];
-
-    setSelectedList((prev) => {
-      if (
-        prev.some((item) => item.id === clickedItem.id) &&
-        !clickedItem.selected
-      )
-        return prev;
-      return type === ClickType.Select
-        ? clickedItem.selected
-          ? remove(
-              prev.findIndex((item) => item.id === clickedItem.id),
-              1,
-              prev
-            )
-          : [...prev, clickedItem]
-        : prev;
-    });
-
-    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
-      (item) => ({ ...item })
-    );
-
-    const copyClickedList = Array.isArray(clickedList)
+    const clickedItem = Array.isArray(clickedList)
       ? clickedList
       : [clickedList];
 
-    setFoldList(
-      handleSelectDataSync(copyFoldList, copyClickedList, value, type)
-    );
+    for (const value of clickedItem) {
+      console.log(foldMapGetter(value.id), value, type !== ClickType.Collapse);
+
+      const mapItem = foldMapGetter(value.id);
+
+      !mapItem?.selected &&
+        type !== ClickType.Collapse &&
+        setSelectedList((prev) => [
+          ...prev,
+          ...setAllChildrenById(value.id, []),
+        ]);
+
+      mapItem &&
+        foldMapSetter(
+          value.id,
+          type !== ClickType.Collapse
+            ? { ...mapItem, selected: toSelect ?? !mapItem.selected }
+            : { ...mapItem, isCollapsed: !mapItem.isCollapsed }
+        );
+
+      mapItem &&
+        setSelectedList((prev) => {
+          return type === ClickType.Select
+            ? mapItem.selected
+              ? remove(
+                  prev.findIndex((item) => item.id === mapItem.id),
+                  1,
+                  prev
+                )
+              : [...prev, mapItem]
+            : prev;
+        });
+    }
   };
 
   // 搜索框变化时同步到部门列表
@@ -198,20 +266,28 @@ const useAction = ({
 
   useEffect(() => {
     // 初始化已选择的item到foldList中
-    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
-      (item) => ({ ...item })
-    );
-
-    setFoldList(handleSelectDataSync(copyFoldList, selectedList));
+    // const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
+    //   (item) => ({ ...item })
+    // );
+    // setFoldList(handleSelectDataSync(copyFoldList, selectedList));
   }, []);
+
+  useEffect(() => {
+    if (limitTags === selectedList.length) setLoading(false);
+  }, [limitTags]);
 
   return {
     foldList,
     flattenList,
     selectedList,
+    limitTags,
+    loading,
+    setLoading,
+    setLimitTags,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,
+    foldMapGetter,
   };
 };
 

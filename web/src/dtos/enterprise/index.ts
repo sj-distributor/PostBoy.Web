@@ -1,66 +1,67 @@
 export interface IResponseMsg {
-  errcode: number
-  errmsg: string
+  errcode: number;
+  errmsg: string;
 }
 
 export interface ICorpData {
-  corpName: string
-  corpId: string
-  id: string
-  order?: number
+  corpName: string;
+  corpId: string;
+  id: string;
+  order?: number;
 }
 
 export interface ICorpAppData {
-  appId: string
-  id: string
-  name: string
-  workWeChatCorpId: string
-  display: boolean
-  agentId: number
+  appId: string;
+  id: string;
+  name: string;
+  workWeChatCorpId: string;
+  display: boolean;
+  agentId: number;
 }
 
 export interface ICorpAppListApiData {
-  CorpId: string
+  CorpId: string;
 }
 
 export interface IDepartmentListApiData {
-  Id?: number
-  AppId: string
+  Id?: number;
+  AppId: string;
 }
 
 export interface IDepartmentUsersListApiData {
-  DepartmentId: number
-  AppId: string
+  DepartmentId: number;
+  AppId: string;
 }
 
 export interface IDepartmentKeyControl {
-  data: IDepartmentAndUserListValue[]
-  key: string
+  data: IDepartmentAndUserListValue[];
+  key: string;
 }
 
 export interface IDepartmentData {
-  department_leader: []
-  id: number
-  name: string
-  name_en: string | null
-  order: number
-  parentid: number
+  department_leader: [];
+  id: number;
+  name: string;
+  name_en: string | null;
+  order: number;
+  parentid: number;
 }
 
 export interface IDepartmentUsersData {
-  userid: string
-  department: number
+  userid: string;
+  department: number;
 }
 
 export interface IDepartmentAndUserListValue {
-  id: number | string
-  name: string
-  type: DepartmentAndUserType
-  parentid: number
-  selected: boolean
-  isCollapsed: boolean
-  idRoute?: number[]
-  children: IDepartmentAndUserListValue[]
+  id: number | string;
+  name: string;
+  type: DepartmentAndUserType;
+  parentid: number;
+  selected: boolean;
+  isCollapsed: boolean;
+  idRoute?: number[];
+  indeterminate?: boolean;
+  children: IDepartmentAndUserListValue[];
 }
 
 export enum DepartmentAndUserType {
@@ -69,21 +70,21 @@ export enum DepartmentAndUserType {
 }
 
 export interface IDepartmentResponse extends IResponseMsg {
-  department: IDepartmentData[]
+  department: IDepartmentData[];
 }
 
 export interface IDepartmentUsersResonse extends IResponseMsg {
-  userlist: IDepartmentUsersData[]
+  userlist: IDepartmentUsersData[];
 }
 
 export interface ICreateGroupResonse extends IResponseMsg {
-  chatid: string
+  chatid: string;
 }
 
 export interface IMessageTypeData {
-  title: string
-  groupBy: string
-  type: MessageDataFileType
+  title: string;
+  groupBy: string;
+  type: MessageDataFileType;
 }
 
 export enum MessageDataFileType {
@@ -95,40 +96,42 @@ export enum MessageDataFileType {
 }
 
 export interface FileObject {
-  fileContent?: string
-  fileName: string
-  fileType: MessageDataFileType
-  fileUrl?: string
+  fileContent?: string;
+  fileName: string;
+  fileType: MessageDataFileType;
+  fileUrl?: string;
 }
 
 export interface ITargetDialogProps {
-  open: boolean
-  departmentAndUserList: IDepartmentKeyControl[]
-  departmentKeyValue: IDepartmentKeyControl
-  flattenDepartmentList: IDepartmentAndUserListValue[]
-  AppId: string
-  CorpId: string
-  isLoading: boolean
-  tagsList: ITagsList[]
-  lastTagsValue?: string[] | undefined
-  clickName: string
-  groupList: IWorkCorpAppGroup[]
-  canSelect: DeptUserCanSelectStatus
-  groupDeptUserSelectedList?: IDepartmentAndUserListValue[]
-  chatId: string
-  chatName: string
-  sendType?: SendObjOrGroup
-  outerTagsValue?: ITagsList[]
-  isUpdatedDeptUser: boolean
-  targetSelectedList: IDepartmentAndUserListValue[]
-  setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>
-  setChatId?: React.Dispatch<React.SetStateAction<string>>
-  setChatName?: React.Dispatch<React.SetStateAction<string>>
-  setOpenFunction: (open: boolean) => void
-  setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>
-  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>
-  setDeptUserList: React.Dispatch<React.SetStateAction<IDepartmentKeyControl[]>>
-  settingSelectedList: (valueList: IDepartmentAndUserListValue[]) => void
+  open: boolean;
+  departmentAndUserList: IDepartmentKeyControl[];
+  departmentKeyValue: IDepartmentKeyControl;
+  flattenDepartmentList: IDepartmentAndUserListValue[];
+  AppId: string;
+  CorpId: string;
+  isLoading: boolean;
+  tagsList: ITagsList[];
+  lastTagsValue?: string[] | undefined;
+  clickName: string;
+  groupList: IWorkCorpAppGroup[];
+  canSelect: DeptUserCanSelectStatus;
+  groupDeptUserSelectedList?: IDepartmentAndUserListValue[];
+  chatId: string;
+  chatName: string;
+  sendType?: SendObjOrGroup;
+  outerTagsValue?: ITagsList[];
+  isUpdatedDeptUser: boolean;
+  targetSelectedList: IDepartmentAndUserListValue[];
+  setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>;
+  setChatId?: React.Dispatch<React.SetStateAction<string>>;
+  setChatName?: React.Dispatch<React.SetStateAction<string>>;
+  setOpenFunction: (open: boolean) => void;
+  setGroupList: React.Dispatch<React.SetStateAction<IWorkCorpAppGroup[]>>;
+  setOuterTagsValue: React.Dispatch<React.SetStateAction<ITagsList[]>>;
+  setDeptUserList: React.Dispatch<
+    React.SetStateAction<IDepartmentKeyControl[]>
+  >;
+  settingSelectedList: (valueList: IDepartmentAndUserListValue[]) => void;
 }
 
 export enum DeptUserCanSelectStatus {
@@ -138,8 +141,8 @@ export enum DeptUserCanSelectStatus {
 }
 
 export interface ITargetDialogValue {
-  deptAndUserValueList: IDepartmentData[]
-  tagsValue: ITagsList[]
+  deptAndUserValueList: IDepartmentData[];
+  tagsValue: ITagsList[];
 }
 
 export enum MessageWidgetShowStatus {
@@ -149,55 +152,55 @@ export enum MessageWidgetShowStatus {
 }
 
 export interface ITagsListResponse extends IResponseMsg {
-  taglist: ITagsList[]
+  taglist: ITagsList[];
 }
 
 export interface ISearchList {
-  key: string
-  data: IDepartmentAndUserListValue[]
+  key: string;
+  data: IDepartmentAndUserListValue[];
 }
 
 export interface ITagsList {
-  tagId: number
-  tagName: string
+  tagId: number;
+  tagName: string;
 }
 
 export interface IMessageJobDto {
-  count: number
-  messageJobs: IMessageJob[]
+  count: number;
+  messageJobs: IMessageJob[];
 }
 
 export interface IMessageJob extends IMessageJobBase {
   emailNotification?: {
-    senderId: string
-    subject: string
-    body: string
-    to: string[]
-    cc: string[]
-  }
-  sendHttpRequest?: SendHttpRequestDto
+    senderId: string;
+    subject: string;
+    body: string;
+    to: string[];
+    cc: string[];
+  };
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface IMessageJobBase {
-  id: string
-  jobId: string
-  createdDate: string
-  correlationId: string
-  userAccountId: string
-  isDelete: boolean
-  jobType: MessageJobSendType
-  jobSettingJson: string
-  jobCronExpressionDesc: string
-  destination: MessageJobDestination
-  workWeChatAppNotification: IWorkWeChatAppNotificationDto
-  hasException: boolean
+  id: string;
+  jobId: string;
+  createdDate: string;
+  correlationId: string;
+  userAccountId: string;
+  isDelete: boolean;
+  jobType: MessageJobSendType;
+  jobSettingJson: string;
+  jobCronExpressionDesc: string;
+  destination: MessageJobDestination;
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto;
+  hasException: boolean;
   metadata: {
-    id: string
-    createDate: string
-    messageJobId: string
-    key: string
-    value: string
-  }[]
+    id: string;
+    createDate: string;
+    messageJobId: string;
+    key: string;
+    value: string;
+  }[];
 }
 
 export enum MessageJobSendType {
@@ -213,16 +216,16 @@ export enum MessageJobDestination {
 }
 
 export interface IMessageJobRecord extends IMessageJobRecordSame {
-  responseJson: string
-  target: string
-  exception: string
+  responseJson: string;
+  target: string;
+  exception: string;
 }
 
 export interface IMessageJobRecordSame {
-  id: string
-  createdDate: string
-  correlationId: string
-  result: MessageSendResult
+  id: string;
+  createdDate: string;
+  correlationId: string;
+  result: MessageSendResult;
 }
 
 export enum MessageSendResult {
@@ -233,52 +236,52 @@ export enum MessageSendResult {
 export const messageSendResultType = {
   [MessageSendResult.Ok]: "已发送",
   [MessageSendResult.Failed]: "异常",
-}
+};
 
 export interface ISendMessageCommand {
-  jobSetting?: IJobSettingDto
-  metadata?: { key: string; value: string }[]
+  jobSetting?: IJobSettingDto;
+  metadata?: { key: string; value: string }[];
   emailNotification?: {
-    senderId: string
-    subject: string
-    body: string
-    to: string[]
-    cc: string[]
+    senderId: string;
+    subject: string;
+    body: string;
+    to: string[];
+    cc: string[];
     attachments?: {
-      fileName: string
-      fileOriginalName: string
-      fileUrl: string
-      fileContent: string
-    }[]
-  }
-  workWeChatAppNotification?: IWorkWeChatAppNotificationDto
-  sendHttpRequest?: SendHttpRequestDto
+      fileName: string;
+      fileOriginalName: string;
+      fileUrl: string;
+      fileContent: string;
+    }[];
+  };
+  workWeChatAppNotification?: IWorkWeChatAppNotificationDto;
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface IUpdateMessageCommand {
-  messageJobId: string
-  jobSetting: IJobSettingDto
-  metadata: { key: string; value: string }[]
+  messageJobId: string;
+  jobSetting: IJobSettingDto;
+  metadata: { key: string; value: string }[];
   emailNotification?: {
-    senderId: string
-    subject: string
-    body: string
-    to: string[]
-    cc: string[]
-  }
-  workWeChatAppNotification?: IWorkWeChatAppNotificationDto
-  sendHttpRequest?: SendHttpRequestDto
+    senderId: string;
+    subject: string;
+    body: string;
+    to: string[];
+    cc: string[];
+  };
+  workWeChatAppNotification?: IWorkWeChatAppNotificationDto;
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface IJobSettingDto {
-  timezone: string
+  timezone: string;
   delayedJob?: {
-    enqueueAt: string
-  }
+    enqueueAt: string;
+  };
   recurringJob?: {
-    cronExpression: string
-    endDate?: string
-  }
+    cronExpression: string;
+    endDate?: string;
+  };
 }
 
 export interface IWorkWeChatAppNotificationDto
@@ -286,23 +289,23 @@ export interface IWorkWeChatAppNotificationDto
     SendData {}
 
 export interface SendParameter {
-  appId: string
-  chatId?: string
-  toTags?: string[]
-  toUsers?: string[]
-  toParties?: string[]
+  appId: string;
+  chatId?: string;
+  toTags?: string[];
+  toUsers?: string[];
+  toParties?: string[];
 }
 
 export interface SendData {
-  text?: TextDto
-  file?: FileObject
+  text?: TextDto;
+  file?: FileObject;
   mpNews?: {
-    articles: PictureText[]
-  }
+    articles: PictureText[];
+  };
 }
 
 export interface TextDto {
-  content: string
+  content: string;
 }
 
 export enum TimeType {
@@ -311,49 +314,49 @@ export enum TimeType {
 }
 
 export interface IDtoExtend {
-  loading: boolean
-  rowCount: number
-  pageSize: number
-  page: number
-  messageJobs: ILastShowTableData[]
+  loading: boolean;
+  rowCount: number;
+  pageSize: number;
+  page: number;
+  messageJobs: ILastShowTableData[];
 }
 
 export interface ILastShowTableData extends IMessageJob {
-  title: string
-  cleanContent: string
-  content?: string
-  sendType: string
-  groupName?: string
-  groupId?: string
-  enterprise: ICorpData
-  app: ICorpAppData
-  sendHttpRequest?: SendHttpRequestDto
+  title: string;
+  cleanContent: string;
+  content?: string;
+  sendType: string;
+  groupName?: string;
+  groupId?: string;
+  enterprise: ICorpData;
+  app: ICorpAppData;
+  sendHttpRequest?: SendHttpRequestDto;
 }
 
 export interface ILastShowTableEmailData {
-  title: string
-  content?: string
-  sendType: string
-  createdDate: string
-  correlationId: string
+  title: string;
+  content?: string;
+  sendType: string;
+  createdDate: string;
+  correlationId: string;
 }
 
 export interface ISendRecordDto extends IMessageJobRecordSame {
-  sendTheObject: string
-  errorSendtheobject: string
-  state: string
+  sendTheObject: string;
+  errorSendtheobject: string;
+  state: string;
 }
 
 export interface SendTypeCustomListDto {
-  title: string
-  value: MessageJobSendType
+  title: string;
+  value: MessageJobSendType;
 }
 
 export interface TimeZoneCustomListDto {
-  title: string
-  value: TimeType
-  disable: boolean
-  convertTimeZone: string
+  title: string;
+  value: TimeType;
+  disable: boolean;
+  convertTimeZone: string;
 }
 
 export enum ClickType {
@@ -362,46 +365,46 @@ export enum ClickType {
 }
 
 export interface SendObject {
-  toUsers: string[]
-  toParties: string[]
+  toUsers: string[];
+  toParties: string[];
 }
 
 export interface PictureText {
-  title: string
-  content: string
-  fileContent?: string
-  fileName: string
-  contentSourceUrl?: string
-  fileUrl?: string
+  title: string;
+  content: string;
+  fileContent?: string;
+  fileName: string;
+  contentSourceUrl?: string;
+  fileUrl?: string;
 }
 
 export const messageJobSendType = {
   [MessageJobSendType.Fire]: "即时发送",
   [MessageJobSendType.Delayed]: "定时发送",
   [MessageJobSendType.Recurring]: "周期发送",
-}
+};
 
 export interface IWorkGroupCreate {
-  appId: string
-  name: string
-  owner?: string
-  chatId?: string
-  userList: string[]
+  appId: string;
+  name: string;
+  owner?: string;
+  chatId?: string;
+  userList: string[];
 }
 
 export interface IWorkCorpAppGroup {
-  chatId: string
-  chatName: string
+  chatId: string;
+  chatName: string;
 }
 
 export interface IGetDeptAndUsersResponse {
-  workWeChatUnits: IDeptAndUserList[]
+  workWeChatUnits: IDeptAndUserList[];
 }
 
 export interface IDeptAndUserList {
-  department: IDepartmentData
-  users: IDepartmentUsersData[]
-  childrens: IDeptAndUserList[]
+  department: IDepartmentData;
+  users: IDepartmentUsersData[];
+  childrens: IDeptAndUserList[];
 }
 
 export enum SendObjOrGroup {
@@ -410,73 +413,73 @@ export enum SendObjOrGroup {
 }
 
 export interface UploadAttachmentResponseData {
-  id: string
-  createdDate: string
-  fileUrl: string
-  fileName: string
-  fileSize: number
-  filePath: string
+  id: string;
+  createdDate: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  filePath: string;
 }
 
 export interface IFirstState {
-  chatId: string
-  chatName: string
-  deptUserList: IDepartmentKeyControl[]
-  tagsValue: ITagsList[]
-  sendType: SendObjOrGroup
+  chatId: string;
+  chatName: string;
+  deptUserList: IDepartmentKeyControl[];
+  tagsValue: ITagsList[];
+  sendType: SendObjOrGroup;
 }
 
 export interface IGroupDetail {
-  chatId: string
-  name: string
-  owner: string
-  userlist: string[]
+  chatId: string;
+  name: string;
+  owner: string;
+  userlist: string[];
 }
 
 export interface IGroupDetailResponse extends IResponseMsg {
-  chat_info: IGroupDetail
+  chat_info: IGroupDetail;
 }
 
 export interface IGroupUserResponse {
-  userId: string
-  openUserId: string
-  name: string
-  englishName: string
-  alias: string
-  mainDepartment: number
-  department: number[]
-  order: number[]
-  directLeader: string[]
-  leaderInWhichDept: number[]
-  position: string
-  phoneNumber: string
-  email: string
-  bizMail: string
-  avatar: string
-  thumbAvatar: string
-  address: string
-  status: number
+  userId: string;
+  openUserId: string;
+  name: string;
+  englishName: string;
+  alias: string;
+  mainDepartment: number;
+  department: number[];
+  order: number[];
+  directLeader: string[];
+  leaderInWhichDept: number[];
+  position: string;
+  phoneNumber: string;
+  email: string;
+  bizMail: string;
+  avatar: string;
+  thumbAvatar: string;
+  address: string;
+  status: number;
 }
 
 export interface IMentionList {
-  id: string
-  display: string
+  id: string;
+  display: string;
 }
 
 export interface SendHttpRequestDto {
-  headers?: SendHttpRequestHeaderDto[]
-  jsonBody?: string
-  method?: string
-  url?: string
+  headers?: SendHttpRequestHeaderDto[];
+  jsonBody?: string;
+  method?: string;
+  url?: string;
 }
 
 export interface SendHttpRequestHeaderDto {
-  key: string
-  value: string
+  key: string;
+  value: string;
 }
 
 export interface IDeptUserDataHookProp {
-  appId?: string
+  appId?: string;
 }
 
 export enum UpdateListType {

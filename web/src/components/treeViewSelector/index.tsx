@@ -7,18 +7,18 @@ import {
   ListItemButton,
   ListItemText,
   TextField,
-} from "@mui/material"
-import { onFilterDeptAndUsers } from "./fitler"
-import useAction from "./hook"
-import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props"
-import styles from "./index.module.scss"
-import { ExpandLess, ExpandMore } from "@mui/icons-material"
+} from "@mui/material";
+import { onFilterDeptAndUsers } from "./fitler";
+import useAction from "./hook";
+import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props";
+import styles from "./index.module.scss";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
-} from "../../dtos/enterprise"
+} from "../../dtos/enterprise";
 
 const TreeViewSelector = ({
   appId,
@@ -37,19 +37,23 @@ const TreeViewSelector = ({
   const { foldData, flattenData } = sourceData ?? {
     foldData: [],
     flattenData: [],
-  }
+  };
 
-  displayMode = displayMode ?? TreeViewDisplayMode.Both
+  displayMode = displayMode ?? TreeViewDisplayMode.Both;
 
-  const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both
+  const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both;
 
   const {
     foldList,
     flattenList,
     selectedList,
+    limitTags,
+    loading,
+    setLoading,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,
+    foldMapGetter,
   } = useAction({
     appId,
     defaultSelectedList,
@@ -57,7 +61,7 @@ const TreeViewSelector = ({
     flattenData,
     sourceType: sourceType ?? SourceType.Full,
     settingSelectedList,
-  })
+  });
 
   const center = () =>
     !foldData
@@ -66,7 +70,7 @@ const TreeViewSelector = ({
           alignItems: "center",
           justifyContent: "center",
         }
-      : {}
+      : {};
 
   const recursiveRenderDeptList = (
     data: IDepartmentAndUserListValue[],
@@ -75,58 +79,61 @@ const TreeViewSelector = ({
   ) => {
     const result = (
       <List key={appId} dense>
-        {data.map((deptUserData, index) => {
+        {data.map((deptUser, index) => {
+          const deptUserData = foldMapGetter(deptUser.id);
           return (
-            <div key={deptUserData.name}>
-              <ListItemButton
-                sx={{ pl, height: "2.2rem" }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  deptUserData.children.length > 0 &&
-                    handleDeptOrUserClick(ClickType.Collapse, deptUserData)
-                }}
-              >
-                {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
-                  <Checkbox
-                    edge="start"
-                    checked={deptUserData.selected}
-                    tabIndex={-1}
-                    disableRipple
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDeptOrUserClick(ClickType.Select, deptUserData)
-                    }}
-                  />
-                )}
-                <ListItemText primary={deptUserData.name} />
-                {deptUserData.children.length > 0 &&
-                  (!!deptUserData.isCollapsed ? (
-                    <ExpandLess />
-                  ) : (
-                    <ExpandMore />
-                  ))}
-              </ListItemButton>
-              {deptUserData.children.length > 0 && (
-                <Collapse
-                  in={!!deptUserData.isCollapsed}
-                  timeout={0}
-                  unmountOnExit
+            !deptUserData || (
+              <div key={deptUserData.name}>
+                <ListItemButton
+                  sx={{ pl, height: "2.2rem" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deptUserData.children.length > 0 &&
+                      handleDeptOrUserClick(ClickType.Collapse, deptUserData);
+                  }}
                 >
-                  {recursiveRenderDeptList(
-                    deptUserData.children,
-                    pl + 2,
-                    index !== data.length - 1
+                  {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
+                    <Checkbox
+                      edge="start"
+                      checked={deptUserData.selected}
+                      tabIndex={-1}
+                      disableRipple
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeptOrUserClick(ClickType.Select, deptUserData);
+                      }}
+                    />
                   )}
-                </Collapse>
-              )}
-            </div>
-          )
+                  <ListItemText primary={deptUserData.name} />
+                  {deptUserData.children.length > 0 &&
+                    (!!deptUserData.isCollapsed ? (
+                      <ExpandLess />
+                    ) : (
+                      <ExpandMore />
+                    ))}
+                </ListItemButton>
+                {deptUserData.children.length > 0 && (
+                  <Collapse
+                    in={!!deptUserData.isCollapsed}
+                    timeout={0}
+                    unmountOnExit
+                  >
+                    {recursiveRenderDeptList(
+                      deptUserData.children,
+                      pl + 2,
+                      index !== data.length - 1
+                    )}
+                  </Collapse>
+                )}
+              </div>
+            )
+          );
         })}
         {isDivider && <Divider />}
       </List>
-    )
-    return result
-  }
+    );
+    return result;
+  };
 
   return (
     <>
@@ -155,14 +162,14 @@ const TreeViewSelector = ({
             multiple
             disableCloseOnSelect
             size="small"
+            limitTags={20}
             value={selectedList}
             options={flattenList}
+            loading={loading}
             filterOptions={(options, state) =>
               onFilterDeptAndUsers(options, state)
             }
-            getOptionLabel={(option: IDepartmentAndUserListValue) =>
-              option.name
-            }
+            getOptionLabel={(option) => option.name}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => String(option.parentid)}
             componentsProps={{
@@ -180,14 +187,14 @@ const TreeViewSelector = ({
                   ? { color: "#666" }
                   : { paddingLeft: "2rem" },
                 { fontSize: "0.9rem" }
-              )
+              );
               !handleTypeIsCanSelect(canSelect, option.type) &&
-                (props.onClick = () => {})
+                (props.onClick = () => {});
               return (
                 <li {...props} style={style}>
                   {option.name}
                 </li>
-              )
+              );
             }}
             onChange={(e, value) => value && setSearchToDeptValue(value)}
             renderInput={(params) => (
@@ -205,7 +212,7 @@ const TreeViewSelector = ({
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default TreeViewSelector
+export default TreeViewSelector;
