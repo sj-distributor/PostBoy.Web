@@ -143,8 +143,6 @@ const useAction = ({
       : [clickedList];
 
     for (const value of clickedItem) {
-      console.log(foldMapGetter(value.id), value, type !== ClickType.Collapse);
-
       const mapItem = foldMapGetter(value.id);
 
       !mapItem?.selected &&

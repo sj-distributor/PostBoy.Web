@@ -4,3 +4,16 @@
     cursor: pointer;
   }
 }
+
+.mask {
+  position: relative;
+  &::after {
+    content: "";
+    display: block;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    border-radius: 3px;
+    background-color: rgba($color: #b6d5f0, $alpha: 0.5);
+  }
+}
