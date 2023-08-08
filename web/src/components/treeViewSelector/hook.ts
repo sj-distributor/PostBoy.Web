@@ -1,6 +1,6 @@
-import { useMap, useThrottleEffect } from "ahooks";
-import { clone, difference, flatten, remove } from "ramda";
-import { SetStateAction, useEffect, useState, useTransition } from "react";
+import { useMap, useThrottle, useThrottleEffect } from "ahooks";
+import { clone, difference, remove } from "ramda";
+import { useEffect, useState, useTransition, startTransition } from "react";
 import {
   ClickType,
   DepartmentAndUserType,
@@ -40,6 +40,10 @@ const useAction = ({
   const [limitTags, setLimitTags] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  const throttledValue = useThrottle(searchValue, { wait: 500 });
 
   const map = new Map();
 
@@ -175,16 +179,65 @@ const useAction = ({
     }
   };
 
+  const handleFlattenToTree = (
+    selectItem: IDepartmentAndUserListValue,
+    selected: boolean
+  ) => {
+    const result: IDepartmentAndUserListValue[] = [];
+
+    for (const flattenItem of flattenList) {
+      if (selectItem.type === DepartmentAndUserType.Department) {
+        const flag = selectItem.idRoute?.every(
+          (item, index) => item === flattenItem.idRoute?.[index]
+        );
+        if (flag) {
+          foldMapSetter(flattenItem.id, { ...flattenItem, selected });
+          result.push(flattenItem);
+        }
+      } else {
+        if (selectItem.id === flattenItem.id) {
+          foldMapSetter(flattenItem.id, { ...flattenItem, selected });
+          !result.some((item) => item.id === flattenItem.id) &&
+            result.push(flattenItem);
+        }
+      }
+    }
+    return result;
+  };
+
+  const handleClear = (
+    valueArr: IDepartmentAndUserListValue[],
+    reason: string
+  ) => {
+    if (reason === "clear") {
+      setSelectedList([]);
+      flattenList.forEach((item) =>
+        foldMapSetter(item.id, { ...item, selected: false })
+      );
+    } else {
+      for (const selectedItem of selectedList) {
+        const existItem = valueArr.find((item) => item.id === selectedItem.id);
+        if (!existItem) {
+          foldMapSetter(selectedItem.id, { ...selectedItem, selected: false });
+          setSelectedList(valueArr);
+        }
+      }
+    }
+  };
+
   // 搜索框变化时同步到部门列表
-  const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
-    const diff = difference(valueArr, selectedList);
-    const diffReverse = difference(selectedList, valueArr);
-
-    diff.length > 0 && handleDeptOrUserClick(ClickType.Select, diff, true);
-    diffReverse.length > 0 &&
-      handleDeptOrUserClick(ClickType.Select, diffReverse, false);
-
-    setSelectedList(valueArr);
+  const setSearchToDeptValue = (value: IDepartmentAndUserListValue) => {
+    if (!foldMapGetter(value.id)?.selected) {
+      startTransition(() => {
+        setSelectedList((prev) => [
+          ...prev,
+          ...handleFlattenToTree(value, true),
+        ]);
+      });
+    } else {
+      foldMapSetter(value.id, { ...value, selected: false });
+      setSelectedList((prev) => prev.filter((item) => item.id !== value.id));
+    }
   };
 
   const handleSelectDataSync = (
@@ -280,7 +333,10 @@ const useAction = ({
     selectedList,
     limitTags,
     loading,
+    throttledValue,
+    setSearchValue,
     setLoading,
+    handleClear,
     setLimitTags,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,

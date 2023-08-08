@@ -49,7 +49,10 @@ const TreeViewSelector = ({
     selectedList,
     limitTags,
     loading,
+    throttledValue,
     setLoading,
+    setSearchValue,
+    handleClear,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
     setSearchToDeptValue,
@@ -188,20 +191,23 @@ const TreeViewSelector = ({
                   : { paddingLeft: "2rem" },
                 { fontSize: "0.9rem" }
               );
-              !handleTypeIsCanSelect(canSelect, option.type) &&
-                (props.onClick = () => {});
+              props.onClick = () => {
+                handleTypeIsCanSelect(canSelect, option.type) &&
+                  setSearchToDeptValue(option);
+              };
               return (
                 <li {...props} style={style}>
                   {option.name}
                 </li>
               );
             }}
-            onChange={(e, value) => value && setSearchToDeptValue(value)}
+            onChange={(e, value, reason) => {
+              handleClear(value, reason);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 size="small"
-                value={inputValue}
                 className={styles.InputButton}
                 margin="dense"
                 type="text"
