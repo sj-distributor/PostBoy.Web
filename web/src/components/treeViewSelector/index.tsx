@@ -85,13 +85,18 @@ const TreeViewSelector = ({
         {data.map((deptUser, index) => {
           const deptUserData = foldMapGetter(deptUser.id);
           deptUserData &&
-            (deptUserData.indeterminate = selectedList.some(
-              (item) =>
-                item.id !== deptUser.id &&
+            (deptUserData.indeterminate = selectedList.some((item) => {
+              const level =
+                item.idRoute &&
+                deptUser.idRoute &&
+                item.idRoute.length > deptUser.idRoute.length;
+              return (
+                level &&
                 (deptUser.type === DepartmentAndUserType.Department
                   ? item.idRoute?.includes(Number(deptUser.id))
                   : item.idRoute?.includes(deptUser.parentid))
-            ));
+              );
+            }));
           return (
             !deptUserData || (
               <div key={deptUserData.name}>
