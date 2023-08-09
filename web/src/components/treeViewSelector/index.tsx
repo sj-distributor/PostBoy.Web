@@ -84,10 +84,19 @@ const TreeViewSelector = ({
       <List key={appId} dense>
         {data.map((deptUser, index) => {
           const deptUserData = foldMapGetter(deptUser.id);
+          deptUserData &&
+            (deptUserData.indeterminate = selectedList.some(
+              (item) =>
+                item.id !== deptUser.id &&
+                (deptUser.type === DepartmentAndUserType.Department
+                  ? item.idRoute?.includes(Number(deptUser.id))
+                  : item.idRoute?.includes(deptUser.parentid))
+            ));
           return (
             !deptUserData || (
               <div key={deptUserData.name}>
                 <ListItemButton
+                  className={`${!deptUserData.indeterminate || styles.mask}`}
                   sx={{ pl, height: "2.2rem" }}
                   onClick={(e) => {
                     e.stopPropagation();
