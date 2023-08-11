@@ -84,19 +84,6 @@ const TreeViewSelector = ({
       <List key={appId} dense>
         {data.map((deptUser, index) => {
           const deptUserData = foldMapGetter(deptUser.id);
-          deptUserData &&
-            (deptUserData.indeterminate = selectedList.some((item) => {
-              const level =
-                item.idRoute &&
-                deptUser.idRoute &&
-                item.idRoute.length > deptUser.idRoute.length;
-              return (
-                level &&
-                (deptUser.type === DepartmentAndUserType.Department
-                  ? item.idRoute?.includes(Number(deptUser.id))
-                  : item.idRoute?.includes(deptUser.parentid))
-              );
-            }));
           return (
             !deptUserData || (
               <div key={deptUserData.name}>
@@ -186,6 +173,18 @@ const TreeViewSelector = ({
             filterOptions={(options, state) =>
               onFilterDeptAndUsers(options, state)
             }
+            className={selectedList.length > 20 ? "limiting" : ""}
+            sx={{
+              "& .MuiInputBase-root.MuiOutlinedInput-root": {
+                maxHeight: "20rem",
+                overflowY: "auto",
+              },
+              "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderBottomColor: "transparent",
+                borderLeftColor: "transparent",
+                borderRightColor: "transparent",
+              },
+            }}
             getOptionLabel={(option) => option.name}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => String(option.parentid)}
