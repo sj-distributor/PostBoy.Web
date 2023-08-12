@@ -45,9 +45,13 @@ const useAction = ({
 
   const throttledValue = useThrottle(searchValue, { wait: 500 });
 
+  const getUniqueId = (value: IDepartmentAndUserListValue): string => {
+    return `${value.id}${value.idRoute?.join("")}`;
+  };
+
   const map = new Map();
 
-  flattenList.forEach((value) => map.set(value.id, value));
+  flattenList.forEach((value) => map.set(getUniqueId(value), value));
 
   const [foldMap, { set: foldMapSetter, get: foldMapGetter }] = useMap<
     string | number,
@@ -94,9 +98,9 @@ const useAction = ({
     const mapItem = foldMapGetter(id);
     mapItem &&
       mapItem.children.forEach((item) => {
-        const innerItem = foldMapGetter(item.id);
+        const innerItem = foldMapGetter(getUniqueId(item));
         if (innerItem) {
-          foldMapSetter(innerItem.id, { ...innerItem, selected: true });
+          foldMapSetter(getUniqueId(item), { ...innerItem, selected: true });
           childrenList.push(innerItem);
           innerItem.children.length > 0 &&
             setAllChildrenById(innerItem.id, childrenList);
@@ -147,13 +151,13 @@ const useAction = ({
       : [clickedList];
 
     for (const value of clickedItem) {
-      const mapItem = foldMapGetter(value.id);
+      const mapItem = foldMapGetter(getUniqueId(value));
 
       !mapItem?.selected &&
         type !== ClickType.Collapse &&
         setSelectedList((prev) => [
           ...prev,
-          ...setAllChildrenById(value.id, []),
+          ...setAllChildrenById(getUniqueId(value), []),
         ]);
 
       mapItem &&
@@ -169,7 +173,7 @@ const useAction = ({
           return type === ClickType.Select
             ? mapItem.selected
               ? remove(
-                  prev.findIndex((item) => item.id === mapItem.id),
+                  prev.findIndex((item) => getUniqueId(item) === mapItem.id),
                   1,
                   prev
                 )
@@ -191,12 +195,12 @@ const useAction = ({
           (item, index) => item === flattenItem.idRoute?.[index]
         );
         if (flag) {
-          foldMapSetter(flattenItem.id, { ...flattenItem, selected });
+          foldMapSetter(getUniqueId(flattenItem), { ...flattenItem, selected });
           result.push(flattenItem);
         }
       } else {
         if (selectItem.id === flattenItem.id) {
-          foldMapSetter(flattenItem.id, { ...flattenItem, selected });
+          foldMapSetter(getUniqueId(flattenItem), { ...flattenItem, selected });
           !result.some((item) => item.id === flattenItem.id) &&
             result.push(flattenItem);
         }
@@ -235,8 +239,10 @@ const useAction = ({
         ]);
       });
     } else {
-      foldMapSetter(value.id, { ...value, selected: false });
-      setSelectedList((prev) => prev.filter((item) => item.id !== value.id));
+      foldMapSetter(getUniqueId(value), { ...value, selected: false });
+      setSelectedList((prev) =>
+        prev.filter((item) => getUniqueId(item) !== getUniqueId(value))
+      );
     }
   };
 
@@ -342,6 +348,8 @@ const useAction = ({
     handleTypeIsCanSelect,
     setSearchToDeptValue,
     foldMapGetter,
+    foldMapSetter,
+    getUniqueId,
   };
 };
 

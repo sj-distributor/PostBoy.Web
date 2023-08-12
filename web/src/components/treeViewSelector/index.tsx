@@ -19,6 +19,8 @@ import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
+import TagsComponent from "./tags";
+import { useDeferredValue } from "react";
 
 const TreeViewSelector = ({
   appId,
@@ -57,6 +59,7 @@ const TreeViewSelector = ({
     handleTypeIsCanSelect,
     setSearchToDeptValue,
     foldMapGetter,
+    getUniqueId,
   } = useAction({
     appId,
     defaultSelectedList,
@@ -65,6 +68,8 @@ const TreeViewSelector = ({
     sourceType: sourceType ?? SourceType.Full,
     settingSelectedList,
   });
+
+  const deferValue = useDeferredValue(flattenList);
 
   const center = () =>
     !foldData
@@ -83,7 +88,7 @@ const TreeViewSelector = ({
     const result = (
       <List key={appId} dense>
         {data.map((deptUser, index) => {
-          const deptUserData = foldMapGetter(deptUser.id);
+          const deptUserData = foldMapGetter(getUniqueId(deptUser));
           return (
             !deptUserData || (
               <div key={deptUserData.name}>
@@ -92,7 +97,7 @@ const TreeViewSelector = ({
                   sx={{ pl, height: "2.2rem" }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    deptUserData.children.length > 0 &&
+                    deptUser.children.length > 0 &&
                       handleDeptOrUserClick(ClickType.Collapse, deptUserData);
                   }}
                 >
@@ -109,21 +114,21 @@ const TreeViewSelector = ({
                     />
                   )}
                   <ListItemText primary={deptUserData.name} />
-                  {deptUserData.children.length > 0 &&
+                  {deptUser.children.length > 0 &&
                     (!!deptUserData.isCollapsed ? (
                       <ExpandLess />
                     ) : (
                       <ExpandMore />
                     ))}
                 </ListItemButton>
-                {deptUserData.children.length > 0 && (
+                {deptUser.children.length > 0 && (
                   <Collapse
                     in={!!deptUserData.isCollapsed}
                     timeout={0}
                     unmountOnExit
                   >
                     {recursiveRenderDeptList(
-                      deptUserData.children,
+                      deptUser.children,
                       pl + 2,
                       index !== data.length - 1
                     )}
@@ -170,9 +175,10 @@ const TreeViewSelector = ({
             value={selectedList}
             options={flattenList}
             loading={loading}
-            filterOptions={(options, state) =>
-              onFilterDeptAndUsers(options, state)
-            }
+            filterOptions={(options, state) => {
+              // console.log(options, state);
+              return onFilterDeptAndUsers(options, state);
+            }}
             className={selectedList.length > 20 ? "limiting" : ""}
             sx={{
               "& .MuiInputBase-root.MuiOutlinedInput-root": {
@@ -186,6 +192,14 @@ const TreeViewSelector = ({
               },
             }}
             getOptionLabel={(option) => option.name}
+            renderTags={(value) => {
+              return (
+                <TagsComponent
+                  selectedList={value}
+                  limit={selectedList.length}
+                />
+              );
+            }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => String(option.parentid)}
             componentsProps={{
