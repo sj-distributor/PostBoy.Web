@@ -103,7 +103,7 @@ const useAction = ({
           foldMapSetter(getUniqueId(item), { ...innerItem, selected: true });
           childrenList.push(innerItem);
           innerItem.children.length > 0 &&
-            setAllChildrenById(innerItem.id, childrenList);
+            setAllChildrenById(getUniqueId(innerItem), childrenList);
         }
       });
     return childrenList;
@@ -162,7 +162,7 @@ const useAction = ({
 
       mapItem &&
         foldMapSetter(
-          value.id,
+          getUniqueId(value),
           type !== ClickType.Collapse
             ? { ...mapItem, selected: toSelect ?? !mapItem.selected }
             : { ...mapItem, isCollapsed: !mapItem.isCollapsed }
@@ -183,6 +183,7 @@ const useAction = ({
     }
   };
 
+  //点击选择列表同步到 输入框和部门列表
   const handleFlattenToTree = (
     selectItem: IDepartmentAndUserListValue,
     selected: boolean
@@ -216,13 +217,14 @@ const useAction = ({
     if (reason === "clear") {
       setSelectedList([]);
       flattenList.forEach((item) =>
-        foldMapSetter(item.id, { ...item, selected: false })
+        foldMapSetter(getUniqueId(item), { ...item, selected: false })
       );
     } else {
       for (const selectedItem of selectedList) {
         const existItem = valueArr.find((item) => item.id === selectedItem.id);
+        console.log(existItem)
         if (!existItem) {
-          foldMapSetter(selectedItem.id, { ...selectedItem, selected: false });
+          foldMapSetter(getUniqueId(selectedItem), { ...selectedItem, selected: false });
           setSelectedList(valueArr);
         }
       }
@@ -231,7 +233,7 @@ const useAction = ({
 
   // 搜索框变化时同步到部门列表
   const setSearchToDeptValue = (value: IDepartmentAndUserListValue) => {
-    if (!foldMapGetter(value.id)?.selected) {
+    if (!foldMapGetter(getUniqueId(value))?.selected) {
       startTransition(() => {
         setSelectedList((prev) => [
           ...prev,

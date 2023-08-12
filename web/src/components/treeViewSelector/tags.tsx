@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { IDepartmentAndUserListValue } from "../../dtos/enterprise";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+
 interface ITagsProps {
   selectedList: IDepartmentAndUserListValue[];
   limit: number;
+  handleClear?: (
+    valueArr: IDepartmentAndUserListValue[],
+    reason: string
+  ) => void;
 }
 
-const TagsComponent = ({ selectedList, limit }: ITagsProps) => {
+const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
   const [reselectList, setReselectList] = useState<
     IDepartmentAndUserListValue[]
   >([]);
@@ -32,13 +37,6 @@ const TagsComponent = ({ selectedList, limit }: ITagsProps) => {
       setReselectList(selectedList);
     }
 
-    console.log(
-      "kk",
-      reselectList.filter(
-        (item) =>
-          `${item.id}${item.idRoute?.join("")}` === "EDDY.M1478479480911483"
-      )
-    );
     return () => {
       clearInterval(timer);
     };
@@ -47,8 +45,6 @@ const TagsComponent = ({ selectedList, limit }: ITagsProps) => {
   return (
     <>
       {reselectList.map((item) => {
-        item.idRoute?.join("") === "1478479480911483" &&
-          console.log(item.id + `${item.idRoute?.join("")}`);
         return (
           <span
             style={{
@@ -70,6 +66,7 @@ const TagsComponent = ({ selectedList, limit }: ITagsProps) => {
             >
               {item.name}
               <ClearOutlinedIcon
+                // onClick={handleClear(item)}
                 sx={{
                   cursor: "pointer",
                   bgcolor: "#aeaeae",

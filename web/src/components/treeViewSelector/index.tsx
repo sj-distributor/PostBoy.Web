@@ -197,6 +197,7 @@ const TreeViewSelector = ({
                 <TagsComponent
                   selectedList={value}
                   limit={selectedList.length}
+                  handleClear={handleClear}
                 />
               );
             }}
@@ -229,6 +230,7 @@ const TreeViewSelector = ({
               );
             }}
             onChange={(e, value, reason) => {
+              console.log(value);
               handleClear(value, reason);
             }}
             renderInput={(params) => (
