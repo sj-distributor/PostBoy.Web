@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IDepartmentAndUserListValue } from "../../dtos/enterprise";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import { difference } from "ramda";
 
 interface ITagsProps {
   selectedList: IDepartmentAndUserListValue[];
@@ -66,7 +67,13 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
             >
               {item.name}
               <ClearOutlinedIcon
-                // onClick={handleClear(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const list = difference(selectedList, [item]);
+                  console.log(list);
+
+                  handleClear && handleClear(list, "removeOption");
+                }}
                 sx={{
                   cursor: "pointer",
                   bgcolor: "#aeaeae",

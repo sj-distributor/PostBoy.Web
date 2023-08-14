@@ -101,7 +101,10 @@ const useAction = ({
         const innerItem = foldMapGetter(getUniqueId(item));
         if (innerItem) {
           foldMapSetter(getUniqueId(item), { ...innerItem, selected: true });
-          childrenList.push(innerItem);
+          const flattenItem = flattenList.find(
+            (x) => getUniqueId(x) === getUniqueId(innerItem)
+          );
+          flattenItem && childrenList.push(flattenItem);
           innerItem.children.length > 0 &&
             setAllChildrenById(getUniqueId(innerItem), childrenList);
         }
@@ -222,9 +225,11 @@ const useAction = ({
     } else {
       for (const selectedItem of selectedList) {
         const existItem = valueArr.find((item) => item.id === selectedItem.id);
-        console.log(existItem)
         if (!existItem) {
-          foldMapSetter(getUniqueId(selectedItem), { ...selectedItem, selected: false });
+          foldMapSetter(getUniqueId(selectedItem), {
+            ...selectedItem,
+            selected: false,
+          });
           setSelectedList(valueArr);
         }
       }

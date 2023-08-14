@@ -230,7 +230,6 @@ const TreeViewSelector = ({
               );
             }}
             onChange={(e, value, reason) => {
-              console.log(value);
               handleClear(value, reason);
             }}
             renderInput={(params) => (
