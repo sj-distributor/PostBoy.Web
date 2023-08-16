@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { IDepartmentAndUserListValue } from "../../dtos/enterprise";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { difference } from "ramda";
+import styles from "./index.module.scss";
 
 interface ITagsProps {
   selectedList: IDepartmentAndUserListValue[];
   limit: number;
-  handleClear?: (
+  handleClear: (
     valueArr: IDepartmentAndUserListValue[],
     reason: string
   ) => void;
@@ -32,6 +33,8 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
             ...selectedList.slice(index, index + 500),
           ]);
           setIndex((prev) => prev + 500);
+        } else {
+          clearInterval(timer);
         }
       }, 500);
     } else {
@@ -48,14 +51,7 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
       {reselectList.map((item) => {
         return (
           <span
-            style={{
-              backgroundColor: "#ebebeb",
-              borderRadius: "0.8rem",
-              fontSize: "0.14rem",
-              padding: "0 0.5rem",
-              margin: "0.2rem 0.2rem 0.2rem 0",
-              display: "inline-block",
-            }}
+            className={styles.selectedTags}
             key={`${item.id}${item.idRoute?.join("")}`}
           >
             <div
@@ -67,19 +63,23 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
             >
               {item.name}
               <ClearOutlinedIcon
+                className={styles.clearIcon}
                 onClick={(e) => {
                   e.stopPropagation();
-                  const list = difference(selectedList, [item]);
-                  console.log(list);
-
-                  handleClear && handleClear(list, "removeOption");
+                  const newValueArr = reselectList.filter(
+                    (value) => value.id !== item.id
+                  );
+                  setReselectList(newValueArr);
+                  handleClear(newValueArr, "removeOption");
                 }}
                 sx={{
-                  cursor: "pointer",
-                  bgcolor: "#aeaeae",
+                  bgcolor: "rgba(174,174,174,0.7)",
+                  padding: "0.1rem",
+                  boxSizing: "border-box",
                   borderRadius: "50%",
                   fontSize: "1rem",
                   marginLeft: "0.5rem",
+                  color: "white",
                 }}
               />
             </div>

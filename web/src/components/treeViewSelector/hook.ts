@@ -104,7 +104,9 @@ const useAction = ({
           const flattenItem = flattenList.find(
             (x) => getUniqueId(x) === getUniqueId(innerItem)
           );
-          flattenItem && childrenList.push(flattenItem);
+          !selectedList.some((item) => item.id === innerItem.id) &&
+            flattenItem &&
+            childrenList.push(flattenItem);
           innerItem.children.length > 0 &&
             setAllChildrenById(getUniqueId(innerItem), childrenList);
         }

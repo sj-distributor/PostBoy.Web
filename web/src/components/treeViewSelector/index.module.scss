@@ -17,3 +17,17 @@
     background-color: rgba($color: #b6d5f0, $alpha: 0.5);
   }
 }
+
+.selectedTags {
+  background-color: #ebebeb;
+  border-radius: 0.8rem;
+  font-size: 0.14rem;
+  padding: 0 0.5rem;
+  margin: 0.2rem 0.2rem 0.2rem 0;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.clearIcon:hover {
+  background-color: #8d8d8d;
+}

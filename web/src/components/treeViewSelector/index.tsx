@@ -20,7 +20,6 @@ import {
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
 import TagsComponent from "./tags";
-import { useDeferredValue } from "react";
 
 const TreeViewSelector = ({
   appId,
@@ -68,8 +67,6 @@ const TreeViewSelector = ({
     sourceType: sourceType ?? SourceType.Full,
     settingSelectedList,
   });
-
-  const deferValue = useDeferredValue(flattenList);
 
   const center = () =>
     !foldData
@@ -176,7 +173,6 @@ const TreeViewSelector = ({
             options={flattenList}
             loading={loading}
             filterOptions={(options, state) => {
-              // console.log(options, state);
               return onFilterDeptAndUsers(options, state);
             }}
             className={selectedList.length > 20 ? "limiting" : ""}
