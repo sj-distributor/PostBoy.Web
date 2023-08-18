@@ -201,10 +201,17 @@ const useAction = ({
     for (const value of clickedItem) {
       const mapItem = foldMapGetter(getUniqueId(value));
 
+      // 折叠
+      mapItem &&
+        type === ClickType.Collapse &&
+        foldMapSetter(getUniqueId(value), {
+          ...mapItem,
+          isCollapsed: !mapItem.isCollapsed,
+        });
+
       /*
         一、先统一当前项和当前项的所有子数据在同一个列表
-        二、然后set给SelectedList.
-           当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个列表,set入indeterminateList
+        二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个列表
         三、最后在promise的状态改变后调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
       */
 
@@ -217,11 +224,6 @@ const useAction = ({
       //       ])
       //     : setAllChildrenById(getUniqueId(value), [], false);
       // } else {
-      //   mapItem &&
-      //     foldMapSetter(getUniqueId(value), {
-      //       ...mapItem,
-      //       isCollapsed: !mapItem.isCollapsed,
-      //     });
       // }
 
       // 选中点击项
