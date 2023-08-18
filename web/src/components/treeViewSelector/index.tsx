@@ -90,7 +90,7 @@ const TreeViewSelector = ({
             !deptUserData || (
               <div key={deptUserData.name}>
                 <ListItemButton
-                  className={`${!deptUserData.indeterminate || styles.mask}`}
+                  // className={`${!deptUserData.indeterminate || styles.mask}`}
                   sx={{ pl, height: "2.2rem" }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -104,6 +104,7 @@ const TreeViewSelector = ({
                       checked={deptUserData.selected}
                       tabIndex={-1}
                       disableRipple
+                      indeterminate={deptUserData.indeterminate}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeptOrUserClick(ClickType.Select, deptUserData);

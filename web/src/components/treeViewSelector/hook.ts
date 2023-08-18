@@ -93,14 +93,32 @@ const useAction = ({
 
   const setAllChildrenById = (
     id: string | number,
-    childrenList: IDepartmentAndUserListValue[]
+    childrenList: IDepartmentAndUserListValue[],
+    isSelected: boolean
   ) => {
+    console.log(isSelected);
     const mapItem = foldMapGetter(id);
+    //向上
+    // for (const value of foldMap.values()) {
+    //   mapItem?.type === DepartmentAndUserType.Department &&
+    //     mapItem.id !== value.id &&
+    //     mapItem?.idRoute?.includes(Number(value.id)) &&
+    //     foldMapSetter(getUniqueId(value), {
+    //       ...value,
+    //       // indeterminate: true,
+    //     });
+    // }
+
+    //向下
     mapItem &&
       mapItem.children.forEach((item) => {
         const innerItem = foldMapGetter(getUniqueId(item));
         if (innerItem) {
-          foldMapSetter(getUniqueId(item), { ...innerItem, selected: true });
+          foldMapSetter(getUniqueId(item), {
+            ...innerItem,
+            selected: isSelected,
+            indeterminate: !isSelected,
+          });
           const flattenItem = flattenList.find(
             (x) => getUniqueId(x) === getUniqueId(innerItem)
           );
@@ -108,9 +126,14 @@ const useAction = ({
             flattenItem &&
             childrenList.push(flattenItem);
           innerItem.children.length > 0 &&
-            setAllChildrenById(getUniqueId(innerItem), childrenList);
+            setAllChildrenById(
+              getUniqueId(innerItem),
+              childrenList,
+              isSelected
+            );
         }
       });
+
     return childrenList;
   };
 
@@ -158,33 +181,54 @@ const useAction = ({
     for (const value of clickedItem) {
       const mapItem = foldMapGetter(getUniqueId(value));
 
-      !mapItem?.selected &&
-        type !== ClickType.Collapse &&
-        setSelectedList((prev) => [
-          ...prev,
-          ...setAllChildrenById(getUniqueId(value), []),
-        ]);
+      if (type !== ClickType.Collapse) {
+        mapItem?.indeterminate || !mapItem?.selected
+          ? setSelectedList((prev) => [
+              ...prev,
+              ...setAllChildrenById(getUniqueId(value), [], true),
+            ])
+          : setAllChildrenById(getUniqueId(value), [], false);
+      } else {
+        mapItem &&
+          foldMapSetter(getUniqueId(value), {
+            ...mapItem,
+            isCollapsed: !mapItem.isCollapsed,
+          });
+      }
+
+      // mapItem &&
+      // foldMapSetter(
+      //   getUniqueId(value),
+      //   type !== ClickType.Collapse
+      //     ? { ...mapItem, selected: toSelect ?? !mapItem.selected }
+      //     : { ...mapItem, isCollapsed: !mapItem.isCollapsed }
+      // );
 
       mapItem &&
+        type !== ClickType.Collapse &&
         foldMapSetter(
           getUniqueId(value),
-          type !== ClickType.Collapse
-            ? { ...mapItem, selected: toSelect ?? !mapItem.selected }
-            : { ...mapItem, isCollapsed: !mapItem.isCollapsed }
+          mapItem.indeterminate
+            ? {
+                ...mapItem,
+                selected: true,
+                indeterminate: false,
+              }
+            : { ...mapItem, selected: toSelect ?? !mapItem.selected }
         );
 
-      mapItem &&
-        setSelectedList((prev) => {
-          return type === ClickType.Select
-            ? mapItem.selected
-              ? remove(
-                  prev.findIndex((item) => getUniqueId(item) === mapItem.id),
-                  1,
-                  prev
-                )
-              : [...prev, mapItem]
-            : prev;
-        });
+      // mapItem &&
+      //   setSelectedList((prev) => {
+      //     return type === ClickType.Select
+      //       ? mapItem.selected
+      //         ? remove(
+      //             prev.findIndex((item) => getUniqueId(item) === mapItem.id),
+      //             1,
+      //             prev
+      //           )
+      //         : [...prev, mapItem]
+      //       : prev;
+      //   });
     }
   };
 
