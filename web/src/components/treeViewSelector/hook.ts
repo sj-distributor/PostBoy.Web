@@ -100,7 +100,6 @@ const useAction = ({
     childrenList: IDepartmentAndUserListValue[],
     isSelected: boolean
   ) => {
-    console.log(isSelected);
     const mapItem = foldMapGetter(id);
     //向上
     // for (const value of foldMap.values()) {
@@ -118,11 +117,11 @@ const useAction = ({
       mapItem.children.forEach((item) => {
         const innerItem = foldMapGetter(getUniqueId(item));
         if (innerItem) {
-          foldMapSetter(getUniqueId(item), {
-            ...innerItem,
-            selected: isSelected,
-            indeterminate: !isSelected,
-          });
+          // foldMapSetter(getUniqueId(item), {
+          //   ...innerItem,
+          //   selected: isSelected,
+          //   indeterminate: !isSelected,
+          // });
           const flattenItem = flattenList.find(
             (x) => getUniqueId(x) === getUniqueId(innerItem)
           );
@@ -183,8 +182,17 @@ const useAction = ({
     */
   };
 
-  const handleMapUpdate = () => {
-    for (const value of foldMap) {
+  const handleMapUpdate = (
+    selectedList: IDepartmentAndUserListValue[],
+    indeterminateList: IDepartmentAndUserListValue[]
+  ) => {
+    for (const value of foldMap.values()) {
+      const selectedListItem = selectedList.find((item) => item.id === value.id);
+      selectedListItem &&
+        foldMapSetter(getUniqueId(selectedListItem), { ...value, selected: true });
+      const indeterminateListItem = indeterminateList.find((item) => item.id === value.id)
+      indeterminateListItem &&
+        foldMapSetter(getUniqueId(indeterminateListItem), { ...value, indeterminate: true });
     }
   };
 
@@ -208,6 +216,17 @@ const useAction = ({
           ...mapItem,
           isCollapsed: !mapItem.isCollapsed,
         });
+
+      if (type === ClickType.Select) {
+        const unsubmittedList = [
+          ...setAllChildrenById(getUniqueId(value), [], true),
+          ...clickedItem,
+        ];
+      }
+
+
+
+      // setIndeterminateList(handleIndeterminateList(value))
 
       /*
         一、先统一当前项和当前项的所有子数据在同一个列表
