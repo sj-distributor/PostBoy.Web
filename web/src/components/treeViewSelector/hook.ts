@@ -29,6 +29,10 @@ const useAction = ({
     })) ?? []
   );
 
+  const [indeterminateList, setIndeterminateList] = useState<
+    IDepartmentAndUserListValue[]
+  >([]);
+
   const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
     clone(foldData)
   );
@@ -168,6 +172,22 @@ const useAction = ({
     } else setSelectedList(list);
   };
 
+  const handleIndeterminateList = (
+    clickedItem: IDepartmentAndUserListValue
+  ) => {
+    /*
+      处理indeterminateList横杠列表的方法
+      找出所有父数据的children是否全选中/全不选中(直接对比selectedList即可) 或 有杠 (此处处理顺序必须从点击项开始往上)
+      只要数据符合条件便set入resultList
+      return一个resultList
+    */
+  };
+
+  const handleMapUpdate = () => {
+    for (const value of foldMap) {
+    }
+  };
+
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
@@ -181,42 +201,44 @@ const useAction = ({
     for (const value of clickedItem) {
       const mapItem = foldMapGetter(getUniqueId(value));
 
-      if (type !== ClickType.Collapse) {
-        mapItem?.indeterminate || !mapItem?.selected
-          ? setSelectedList((prev) => [
-              ...prev,
-              ...setAllChildrenById(getUniqueId(value), [], true),
-            ])
-          : setAllChildrenById(getUniqueId(value), [], false);
-      } else {
-        mapItem &&
-          foldMapSetter(getUniqueId(value), {
-            ...mapItem,
-            isCollapsed: !mapItem.isCollapsed,
-          });
-      }
+      /*
+        一、先统一当前项和当前项的所有子数据在同一个列表
+        二、然后set给SelectedList.
+           当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个列表,set入indeterminateList
+        三、最后在promise的状态改变后调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
+      */
 
+      // 全选子数据或者打开关闭折叠
+      // if (type !== ClickType.Collapse) {
+      //   mapItem?.indeterminate || !mapItem?.selected
+      //     ? setSelectedList((prev) => [
+      //         ...prev,
+      //         ...setAllChildrenById(getUniqueId(value), [], true),
+      //       ])
+      //     : setAllChildrenById(getUniqueId(value), [], false);
+      // } else {
+      //   mapItem &&
+      //     foldMapSetter(getUniqueId(value), {
+      //       ...mapItem,
+      //       isCollapsed: !mapItem.isCollapsed,
+      //     });
+      // }
+
+      // 选中点击项
       // mapItem &&
-      // foldMapSetter(
-      //   getUniqueId(value),
-      //   type !== ClickType.Collapse
-      //     ? { ...mapItem, selected: toSelect ?? !mapItem.selected }
-      //     : { ...mapItem, isCollapsed: !mapItem.isCollapsed }
-      // );
+      //   type !== ClickType.Collapse &&
+      //   foldMapSetter(
+      //     getUniqueId(value),
+      //     mapItem.indeterminate
+      //       ? {
+      //           ...mapItem,
+      //           selected: true,
+      //           indeterminate: false,
+      //         }
+      //       : { ...mapItem, selected: toSelect ?? !mapItem.selected }
+      //   );
 
-      mapItem &&
-        type !== ClickType.Collapse &&
-        foldMapSetter(
-          getUniqueId(value),
-          mapItem.indeterminate
-            ? {
-                ...mapItem,
-                selected: true,
-                indeterminate: false,
-              }
-            : { ...mapItem, selected: toSelect ?? !mapItem.selected }
-        );
-
+      // 同步selectedList
       // mapItem &&
       //   setSelectedList((prev) => {
       //     return type === ClickType.Select
