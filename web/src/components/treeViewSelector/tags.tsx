@@ -9,7 +9,8 @@ interface ITagsProps {
   limit: number;
   handleClear: (
     valueArr: IDepartmentAndUserListValue[],
-    reason: string
+    reason: string,
+    clickItem?: IDepartmentAndUserListValue
   ) => void;
 }
 
@@ -20,9 +21,6 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
   const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
-    // console.log("dd", reselectList.length);
-    // console.log(index);
-    // console.log(reselectList);
     let timer: any = null;
 
     if (limit > 500) {
@@ -70,7 +68,7 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
                     (value) => value.id !== item.id
                   );
                   setReselectList(newValueArr);
-                  handleClear(newValueArr, "removeOption");
+                  handleClear(newValueArr, "removeOption", item);
                 }}
                 sx={{
                   bgcolor: "rgba(174,174,174,0.7)",

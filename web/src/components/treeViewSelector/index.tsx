@@ -56,7 +56,7 @@ const TreeViewSelector = ({
     handleClear,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
-    setSearchToDeptValue,
+    // setSearchToDeptValue,
     foldMapGetter,
     getUniqueId,
   } = useAction({
@@ -218,7 +218,7 @@ const TreeViewSelector = ({
               );
               props.onClick = () => {
                 handleTypeIsCanSelect(canSelect, option.type) &&
-                  setSearchToDeptValue(option);
+                  handleDeptOrUserClick(ClickType.Select, option);
               };
               return (
                 <li {...props} style={style}>
