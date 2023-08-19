@@ -138,7 +138,10 @@ const useAction = ({
         };
 
         const activeIndex = resultList.findIndex((x) => x.id === mapItem.id);
-
+        determine.allSelected &&
+          !determine.allNotSelected &&
+          !selectedList.some((item) => item.id === mapItem.id) &&
+          selectedList.push(mapItem);
         determine.someIndeterminate ||
         (!determine.allSelected && !determine.allNotSelected)
           ? activeIndex === -1 && resultList.push(mapItem)
@@ -200,10 +203,9 @@ const useAction = ({
           ];
 
           let newSelectedList = mapItem.selected
-            ? differenceWith(
-                (a, b) => a.id === b.id,
-                selectedList,
-                updateSelectedList
+            ? selectedList.filter(
+                (value) =>
+                  !updateSelectedList.some((item) => item.id === value.id)
               )
             : [...selectedList, ...updateSelectedList];
 
@@ -226,33 +228,6 @@ const useAction = ({
     }
   };
 
-  //点击选择列表同步到 输入框和部门列表
-  const handleFlattenToTree = (
-    selectItem: IDepartmentAndUserListValue,
-    selected: boolean
-  ) => {
-    const result: IDepartmentAndUserListValue[] = [];
-
-    for (const flattenItem of flattenList) {
-      if (selectItem.type === DepartmentAndUserType.Department) {
-        const flag = selectItem.idRoute?.every(
-          (item, index) => item === flattenItem.idRoute?.[index]
-        );
-        if (flag) {
-          foldMapSetter(getUniqueId(flattenItem), { ...flattenItem, selected });
-          result.push(flattenItem);
-        }
-      } else {
-        if (selectItem.id === flattenItem.id) {
-          foldMapSetter(getUniqueId(flattenItem), { ...flattenItem, selected });
-          !result.some((item) => item.id === flattenItem.id) &&
-            result.push(flattenItem);
-        }
-      }
-    }
-    return result;
-  };
-
   const handleClear = (
     valueArr: IDepartmentAndUserListValue[],
     reason: string,
@@ -267,7 +242,6 @@ const useAction = ({
       clickItem && handleDeptOrUserClick(ClickType.Select, clickItem);
     }
   };
-
 
   useEffect(() => {
     // 同步外部selectedList
