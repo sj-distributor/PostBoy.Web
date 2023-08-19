@@ -1,5 +1,5 @@
 import { useMap, useThrottle, useThrottleEffect } from "ahooks";
-import { clone, difference, remove } from "ramda";
+import { clone, difference, differenceWith, remove } from "ramda";
 import { useEffect, useState, useTransition, startTransition } from "react";
 import {
   ClickType,
@@ -101,27 +101,12 @@ const useAction = ({
     isSelected: boolean
   ) => {
     const mapItem = foldMapGetter(id);
-    //向上
-    // for (const value of foldMap.values()) {
-    //   mapItem?.type === DepartmentAndUserType.Department &&
-    //     mapItem.id !== value.id &&
-    //     mapItem?.idRoute?.includes(Number(value.id)) &&
-    //     foldMapSetter(getUniqueId(value), {
-    //       ...value,
-    //       // indeterminate: true,
-    //     });
-    // }
 
     //向下
     mapItem &&
       mapItem.children.forEach((item) => {
         const innerItem = foldMapGetter(getUniqueId(item));
         if (innerItem) {
-          // foldMapSetter(getUniqueId(item), {
-          //   ...innerItem,
-          //   selected: isSelected,
-          //   indeterminate: !isSelected,
-          // });
           const flattenItem = flattenList.find(
             (x) => getUniqueId(x) === getUniqueId(innerItem)
           );
@@ -182,33 +167,39 @@ const useAction = ({
       只要数据符合条件便set入resultList
       return一个resultList
     */
-    const resultList: IDepartmentAndUserListValue[] = [];
+    const resultList: IDepartmentAndUserListValue[] = [...indeterminateList];
+    const idRouteList = clickedItem.idRoute?.slice().reverse();
 
-    clickedItem.idRoute?.forEach((item, index, idRoute) => {
+    idRouteList?.forEach((item) => {
+      const idIndex = (item: number) =>
+        clickedItem.idRoute?.findIndex((x) => x === item) ?? 0;
       const mapItem = foldMapGetter(
-        `${item}${idRoute.slice(0, index + 1).join("")}`
+        `${item}${clickedItem.idRoute?.slice(0, idIndex(item) + 1).join("")}`
       );
-      const idSelectedList = selectedList.map((x) => x.id);
-      const idIndeterminateList = indeterminateList.map((x) => x.id);
-      const determine = {
-        allSelected: mapItem?.children.every((child) =>
-          idSelectedList.includes(child.id)
-        ),
-        allNotSelected: mapItem?.children.every(
-          (child) => !idSelectedList.includes(child.id)
-        ),
-        someIndeterminate: mapItem?.children.some((child) =>
-          idIndeterminateList.includes(child.id)
-        ),
-      };
-      mapItem &&
-        (determine.someIndeterminate ||
-          (!determine.allSelected &&
-            !determine.allNotSelected &&
-            resultList.push(mapItem)));
-    });
 
-    console.log(resultList);
+      if (mapItem) {
+        const idSelectedList = selectedList.map((x) => x.id);
+        const idIndeterminateList = resultList.map((x) => x.id);
+        const determine = {
+          allSelected: mapItem?.children.every((child) =>
+            idSelectedList.includes(child.id)
+          ),
+          allNotSelected: mapItem?.children.every(
+            (child) => !idSelectedList.includes(child.id)
+          ),
+          someIndeterminate: mapItem?.children.some((child) =>
+            idIndeterminateList.includes(child.id)
+          ),
+        };
+
+        const activeIndex = resultList.findIndex((x) => x.id === mapItem.id);
+
+        determine.someIndeterminate ||
+        (!determine.allSelected && !determine.allNotSelected)
+          ? activeIndex === -1 && resultList.push(mapItem)
+          : activeIndex > -1 && resultList.splice(activeIndex, 1);
+      }
+    });
 
     return resultList;
   };
@@ -217,23 +208,18 @@ const useAction = ({
     selectedList: IDepartmentAndUserListValue[],
     indeterminateList: IDepartmentAndUserListValue[]
   ) => {
-    for (const value of foldMap.values()) {
+    for (const [key, value] of foldMap.entries()) {
       const selectedListItem = selectedList.find(
         (item) => item.id === value.id
       );
-      selectedListItem &&
-        foldMapSetter(getUniqueId(selectedListItem), {
-          ...value,
-          selected: true,
-        });
       const indeterminateListItem = indeterminateList.find(
         (item) => item.id === value.id
       );
-      indeterminateListItem &&
-        foldMapSetter(getUniqueId(indeterminateListItem), {
-          ...value,
-          indeterminate: true,
-        });
+      foldMapSetter(key, {
+        ...value,
+        selected: !!selectedListItem,
+        indeterminate: !!indeterminateListItem,
+      });
     }
   };
 
@@ -243,6 +229,11 @@ const useAction = ({
     clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
     toSelect?: boolean
   ) => {
+    /*
+      一、先统一当前项和当前项的所有子数据在同一个列表
+      二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个横杠列表
+      三、最后在promise的状态改变后调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
+    */
     const clickedItem = Array.isArray(clickedList)
       ? clickedList
       : [clickedList];
@@ -250,70 +241,40 @@ const useAction = ({
     for (const value of clickedItem) {
       const mapItem = foldMapGetter(getUniqueId(value));
 
-      // 折叠
-      mapItem &&
-        type === ClickType.Collapse &&
-        foldMapSetter(getUniqueId(value), {
-          ...mapItem,
-          isCollapsed: !mapItem.isCollapsed,
-        });
+      if (mapItem) {
+        if (type === ClickType.Collapse) {
+          // 折叠
+          foldMapSetter(getUniqueId(value), {
+            ...mapItem,
+            isCollapsed: !mapItem.isCollapsed,
+          });
+        } else {
+          const updateSelectedList = [
+            ...setAllChildrenById(getUniqueId(value), [], true),
+            ...clickedItem,
+          ];
 
-      if (type === ClickType.Select) {
-        const unsubmittedList = [
-          ...setAllChildrenById(getUniqueId(value), [], true),
-          ...clickedItem,
-        ];
+          const newSelectedList = mapItem.selected
+            ? differenceWith(
+                (a, b) => a.id === b.id,
+                selectedList,
+                updateSelectedList
+              )
+            : [...selectedList, ...updateSelectedList];
 
-        mapItem &&
-          handleIndeterminateList(mapItem, unsubmittedList, indeterminateList);
+          console.log(mapItem.selected, selectedList, updateSelectedList);
+
+          const newIndeterminateList = handleIndeterminateList(
+            mapItem,
+            newSelectedList,
+            indeterminateList
+          );
+
+          setSelectedList(newSelectedList);
+          setIndeterminateList(newIndeterminateList);
+          handleMapUpdate(newSelectedList, newIndeterminateList);
+        }
       }
-
-      // setIndeterminateList(handleIndeterminateList(value))
-
-      /*
-        一、先统一当前项和当前项的所有子数据在同一个列表
-        二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个横杠列表
-        三、最后在promise的状态改变后调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
-      */
-
-      // 全选子数据或者打开关闭折叠
-      // if (type !== ClickType.Collapse) {
-      //   mapItem?.indeterminate || !mapItem?.selected
-      //     ? setSelectedList((prev) => [
-      //         ...prev,
-      //         ...setAllChildrenById(getUniqueId(value), [], true),
-      //       ])
-      //     : setAllChildrenById(getUniqueId(value), [], false);
-      // } else {
-      // }
-
-      // 选中点击项
-      // mapItem &&
-      //   type !== ClickType.Collapse &&
-      //   foldMapSetter(
-      //     getUniqueId(value),
-      //     mapItem.indeterminate
-      //       ? {
-      //           ...mapItem,
-      //           selected: true,
-      //           indeterminate: false,
-      //         }
-      //       : { ...mapItem, selected: toSelect ?? !mapItem.selected }
-      //   );
-
-      // 同步selectedList
-      // mapItem &&
-      //   setSelectedList((prev) => {
-      //     return type === ClickType.Select
-      //       ? mapItem.selected
-      //         ? remove(
-      //             prev.findIndex((item) => getUniqueId(item) === mapItem.id),
-      //             1,
-      //             prev
-      //           )
-      //         : [...prev, mapItem]
-      //       : prev;
-      //   });
     }
   };
 
