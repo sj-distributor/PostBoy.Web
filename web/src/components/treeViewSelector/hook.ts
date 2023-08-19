@@ -172,7 +172,9 @@ const useAction = ({
   };
 
   const handleIndeterminateList = (
-    clickedItem: IDepartmentAndUserListValue
+    clickedItem: IDepartmentAndUserListValue,
+    selectedList: IDepartmentAndUserListValue[],
+    indeterminateList: IDepartmentAndUserListValue[]
   ) => {
     /*
       处理indeterminateList横杠列表的方法
@@ -180,6 +182,35 @@ const useAction = ({
       只要数据符合条件便set入resultList
       return一个resultList
     */
+    const resultList: IDepartmentAndUserListValue[] = [];
+
+    clickedItem.idRoute?.forEach((item, index, idRoute) => {
+      const mapItem = foldMapGetter(
+        `${item}${idRoute.slice(0, index + 1).join("")}`
+      );
+      const idSelectedList = selectedList.map((x) => x.id);
+      const idIndeterminateList = indeterminateList.map((x) => x.id);
+      const determine = {
+        allSelected: mapItem?.children.every((child) =>
+          idSelectedList.includes(child.id)
+        ),
+        allNotSelected: mapItem?.children.every(
+          (child) => !idSelectedList.includes(child.id)
+        ),
+        someIndeterminate: mapItem?.children.some((child) =>
+          idIndeterminateList.includes(child.id)
+        ),
+      };
+      mapItem &&
+        (determine.someIndeterminate ||
+          (!determine.allSelected &&
+            !determine.allNotSelected &&
+            resultList.push(mapItem)));
+    });
+
+    console.log(resultList);
+
+    return resultList;
   };
 
   const handleMapUpdate = (
@@ -187,12 +218,22 @@ const useAction = ({
     indeterminateList: IDepartmentAndUserListValue[]
   ) => {
     for (const value of foldMap.values()) {
-      const selectedListItem = selectedList.find((item) => item.id === value.id);
+      const selectedListItem = selectedList.find(
+        (item) => item.id === value.id
+      );
       selectedListItem &&
-        foldMapSetter(getUniqueId(selectedListItem), { ...value, selected: true });
-      const indeterminateListItem = indeterminateList.find((item) => item.id === value.id)
+        foldMapSetter(getUniqueId(selectedListItem), {
+          ...value,
+          selected: true,
+        });
+      const indeterminateListItem = indeterminateList.find(
+        (item) => item.id === value.id
+      );
       indeterminateListItem &&
-        foldMapSetter(getUniqueId(indeterminateListItem), { ...value, indeterminate: true });
+        foldMapSetter(getUniqueId(indeterminateListItem), {
+          ...value,
+          indeterminate: true,
+        });
     }
   };
 
@@ -222,15 +263,16 @@ const useAction = ({
           ...setAllChildrenById(getUniqueId(value), [], true),
           ...clickedItem,
         ];
+
+        mapItem &&
+          handleIndeterminateList(mapItem, unsubmittedList, indeterminateList);
       }
-
-
 
       // setIndeterminateList(handleIndeterminateList(value))
 
       /*
         一、先统一当前项和当前项的所有子数据在同一个列表
-        二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个列表
+        二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个横杠列表
         三、最后在promise的状态改变后调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
       */
 
