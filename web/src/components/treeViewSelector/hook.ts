@@ -211,9 +211,8 @@ const useAction = ({
       for (const [key, value] of foldMap.entries()) {
         foldMapSetter(key, value);
       }
+      worker.terminate();
     };
-
-    // worker.terminate();
 
     // for (const value of clickedItem) {
     //   const mapItem = foldMapGetter(getUniqueId(value));

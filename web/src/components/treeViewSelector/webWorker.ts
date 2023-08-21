@@ -186,9 +186,6 @@ export const MyWorker = () => {
         }
       }
     };
-    this.terminate()
-    // this.postMessage()
-    // this.terminate()
   }
   const myWorker = new WebWorker(workerCode);
   return myWorker;
