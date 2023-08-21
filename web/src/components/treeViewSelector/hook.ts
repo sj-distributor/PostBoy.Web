@@ -58,7 +58,7 @@ const useAction = ({
 
   flattenList.forEach((value) => map.set(getUniqueId(value), value));
 
-  const [foldMap, { set: foldMapSetter, get: foldMapGetter }] = useMap<
+  const [foldMap, { set: foldMapSetter, get: foldMapGetter, setAll }] = useMap<
     string | number,
     IDepartmentAndUserListValue
   >(map);
@@ -208,9 +208,8 @@ const useAction = ({
       const { newSelectedList, newIndeterminateList, foldMap } = event.data;
       newSelectedList && setSelectedList(newSelectedList);
       newIndeterminateList && setIndeterminateList(newIndeterminateList);
-      for (const [key, value] of foldMap.entries()) {
-        foldMapSetter(key, value);
-      }
+      setAll(foldMap);
+      console.log(123, newSelectedList);
       worker.terminate();
     };
 
