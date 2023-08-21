@@ -18,7 +18,6 @@ export const MyWorker = () => {
     }
 
     this.onmessage = (event: { data: IWebWorkerEventRecive }) => {
-      // console.log(event);
       const {
         type,
         clickedItem,
@@ -27,7 +26,6 @@ export const MyWorker = () => {
         indeterminateList,
         foldMap,
       } = event.data;
-      console.log(event.data);
 
       const getUniqueId = (value: IDepartmentAndUserListValue): string => {
         return `${value.id}${value.idRoute?.join("")}`;
