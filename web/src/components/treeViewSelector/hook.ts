@@ -57,7 +57,7 @@ const useAction = ({
 
   flattenList.forEach((value) => map.set(getUniqueId(value), value));
 
-  const [foldMap, { set: foldMapSetter, get: foldMapGetter }] = useMap<
+  const [foldMap, { set: foldMapSetter, get: foldMapGetter, setAll }] = useMap<
     string | number,
     IDepartmentAndUserListValue
   >(map);
@@ -156,19 +156,21 @@ const useAction = ({
     selectedList: IDepartmentAndUserListValue[],
     indeterminateList: IDepartmentAndUserListValue[]
   ) => {
-    for (const [key, value] of foldMap.entries()) {
+    const cloneData = clone(foldMap);
+    for (const [key, value] of cloneData.entries()) {
       const selectedListItem = selectedList.find(
         (item) => item.id === value.id
       );
       const indeterminateListItem = indeterminateList.find(
         (item) => item.id === value.id
       );
-      foldMapSetter(key, {
+      cloneData.set(key, {
         ...value,
         selected: !!selectedListItem,
         indeterminate: !!indeterminateListItem,
       });
     }
+    setAll(cloneData);
   };
 
   // 处理部门列表点击选择或者展开
