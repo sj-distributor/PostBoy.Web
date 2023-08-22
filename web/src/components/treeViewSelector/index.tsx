@@ -88,7 +88,9 @@ const TreeViewSelector = ({
           const deptUserData = foldMapGetter(getUniqueId(deptUser));
           return (
             !deptUserData || (
-              <div key={deptUserData.name}>
+              <div
+                key={deptUserData.name + `${deptUserData.idRoute?.join("")}`}
+              >
                 <ListItemButton
                   // className={`${!deptUserData.indeterminate || styles.mask}`}
                   sx={{ pl, height: "2.2rem" }}
@@ -189,15 +191,15 @@ const TreeViewSelector = ({
               },
             }}
             getOptionLabel={(option) => option.name}
-            renderTags={(value) => {
-              return (
-                <TagsComponent
-                  selectedList={value}
-                  limit={selectedList.length}
-                  handleClear={handleClear}
-                />
-              );
-            }}
+            // renderTags={(value) => {
+            //   return (
+            //     <TagsComponent
+            //       selectedList={value}
+            //       limit={selectedList.length}
+            //       handleClear={handleClear}
+            //     />
+            //   );
+            // }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => String(option.parentid)}
             componentsProps={{
