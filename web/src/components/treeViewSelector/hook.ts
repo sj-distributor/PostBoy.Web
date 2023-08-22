@@ -175,7 +175,7 @@ const useAction = ({
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
-    clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
+    clickedItem: IDepartmentAndUserListValue,
     toSelect?: boolean
   ) => {
     /*
@@ -183,9 +183,6 @@ const useAction = ({
       二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个横杠列表
       三、最后在调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
     */
-    const clickedItem = Array.isArray(clickedList)
-      ? clickedList
-      : [clickedList];
 
     const worker = MyWorker();
 
@@ -273,6 +270,7 @@ const useAction = ({
   useEffect(() => {
     // 同步外部selectedList
     settingSelectedList(selectedList);
+    // console.log(123);
   }, [selectedList]);
 
   useEffect(() => {

@@ -42,6 +42,8 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
     return () => {
       clearInterval(timer);
     };
+
+    console.log(reselectList);
   }, [reselectList, selectedList]);
 
   return (

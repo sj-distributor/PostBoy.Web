@@ -10,7 +10,7 @@ export const MyWorker = () => {
 
     interface IWebWorkerEventRecive {
       type: ClickType;
-      clickedItem: IDepartmentAndUserListValue[];
+      clickedItem: IDepartmentAndUserListValue;
       selectedList: IDepartmentAndUserListValue[];
       flattenList: IDepartmentAndUserListValue[];
       indeterminateList: IDepartmentAndUserListValue[];
@@ -135,52 +135,52 @@ export const MyWorker = () => {
         }
       };
 
-      for (const value of clickedItem) {
-        const mapItem = foldMap.get(getUniqueId(value));
+      const mapItem = foldMap.get(getUniqueId(clickedItem));
 
-        if (mapItem) {
-          if (type === ClickType.Collapse) {
-            // 折叠
-            foldMap.set(getUniqueId(value), {
-              ...mapItem,
-              isCollapsed: !mapItem.isCollapsed,
-            });
-            this.postMessage({
-              foldMap,
-            });
-          } else {
-            const updateSelectedList = [
-              ...setAllChildrenById(getUniqueId(value), [], true),
-              ...clickedItem,
-            ];
+      if (mapItem) {
+        if (type === ClickType.Collapse) {
+          // 折叠
+          foldMap.set(getUniqueId(clickedItem), {
+            ...mapItem,
+            isCollapsed: !mapItem.isCollapsed,
+          });
+          this.postMessage({
+            foldMap,
+          });
+        } else {
+          const updateSelectedList = [
+            ...setAllChildrenById(getUniqueId(clickedItem), [], true),
+            clickedItem,
+          ];
 
-            let newSelectedList = mapItem.selected
-              ? selectedList.filter(
-                  (value) =>
-                    !updateSelectedList.some((item) => item.id === value.id)
-                )
-              : [...selectedList, ...updateSelectedList];
+          let newSelectedList = mapItem.selected
+            ? selectedList.filter(
+                (value) =>
+                  !updateSelectedList.some((item) => item.id === value.id)
+              )
+            : [...selectedList, ...updateSelectedList];
 
-            const newIndeterminateList = handleIndeterminateList(
-              mapItem,
-              newSelectedList,
-              indeterminateList
-            );
+          const newIndeterminateList = handleIndeterminateList(
+            mapItem,
+            newSelectedList,
+            indeterminateList
+          );
 
-            newSelectedList = newSelectedList.filter(
-              (value) =>
-                !newIndeterminateList.some((item) => item.id === value.id)
-            );
+          newSelectedList = newSelectedList.filter(
+            (value, index, arr) =>
+              !newIndeterminateList.some((item) => item.id === value.id) &&
+              arr.findIndex((x) => getUniqueId(x) === getUniqueId(value)) ===
+                index
+          );
 
-            // setSelectedList(newSelectedList);
-            // setIndeterminateList(newIndeterminateList);
-            handleMapUpdate(newSelectedList, newIndeterminateList);
-            this.postMessage({
-              newSelectedList,
-              newIndeterminateList,
-              foldMap,
-            });
-          }
+          // setSelectedList(newSelectedList);
+          // setIndeterminateList(newIndeterminateList);
+          handleMapUpdate(newSelectedList, newIndeterminateList);
+          this.postMessage({
+            newSelectedList,
+            newIndeterminateList,
+            foldMap,
+          });
         }
       }
     };

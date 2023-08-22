@@ -189,15 +189,15 @@ const TreeViewSelector = ({
               },
             }}
             getOptionLabel={(option) => option.name}
-            renderTags={(value) => {
-              return (
-                <TagsComponent
-                  selectedList={value}
-                  limit={selectedList.length}
-                  handleClear={handleClear}
-                />
-              );
-            }}
+            // renderTags={(value) => {
+            //   return (
+            //     <TagsComponent
+            //       selectedList={value}
+            //       limit={selectedList.length}
+            //       handleClear={handleClear}
+            //     />
+            //   );
+            // }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => String(option.parentid)}
             componentsProps={{
