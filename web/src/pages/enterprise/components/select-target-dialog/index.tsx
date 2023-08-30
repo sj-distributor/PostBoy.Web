@@ -1,22 +1,29 @@
-import Button from "@mui/material/Button"
-import Dialog from "@mui/material/Dialog"
-import TextField from "@mui/material/TextField"
-import DialogTitle from "@mui/material/DialogTitle"
-import DialogActions from "@mui/material/DialogActions"
-import DialogContent from "@mui/material/DialogContent"
-import Autocomplete from "@mui/material/Autocomplete"
-import useAction from "./hook"
-import styles from "./index.module.scss"
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import TextField from "@mui/material/TextField";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import Autocomplete from "@mui/material/Autocomplete";
+import useAction from "./hook";
+import styles from "./index.module.scss";
 
 import {
   ITargetDialogProps,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
-} from "../../../../dtos/enterprise"
-import { CircularProgress, Snackbar } from "@mui/material"
-import { LoadingButton } from "@mui/lab"
-import TreeViewSelector from "../../../../components/treeViewSelector"
-import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props"
+} from "../../../../dtos/enterprise";
+import {
+  CircularProgress,
+  FormControlLabel,
+  Radio,
+  Snackbar,
+  Tab,
+  Tabs,
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import TreeViewSelector from "../../../../components/treeViewSelector";
+import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props";
 
 const SelectTargetDialog = (props: ITargetDialogProps) => {
   const {
@@ -46,7 +53,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     setDeptUserList,
     setOuterTagsValue,
     settingSelectedList,
-  } = props
+  } = props;
 
   const {
     departmentSelectedList,
@@ -60,6 +67,10 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     sendList,
     keyword,
     searchValue,
+    schemaType,
+    isDirectTeamMembers,
+    setIsDirectTeamMembers,
+    setSchemaType,
     setSearchValue,
     setGroupPage,
     setKeyword,
@@ -97,7 +108,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     setOuterTagsValue,
     setGroupList,
     settingSelectedList,
-  })
+  });
 
   return (
     <div>
@@ -120,6 +131,28 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
         <DialogContent sx={{ width: "30rem" }}>
           {!isLoading ? (
             <>
+              <Tabs
+                value={schemaType}
+                aria-label="basic tabs example"
+                onChange={(e, value) => {
+                  setSchemaType(value);
+                }}
+              >
+                <Tab label="企业微信架构" />
+                <Tab label="人员层级架构" />
+              </Tabs>
+              <div className={styles.directTeamMembers}>
+                <span
+                  className={styles.radioLabel}
+                  onClick={() => setIsDirectTeamMembers.toggle()}
+                >
+                  <Radio
+                    checked={isDirectTeamMembers}
+                    name="radio-direct-team-members"
+                  />
+                  直属组员
+                </span>
+              </div>
               {departmentKeyValue && departmentKeyValue.key && (
                 <div>
                   {departmentSelectedList && (
@@ -211,13 +244,13 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                             (e.target as HTMLElement).scrollHeight,
                             (e.target as HTMLElement).scrollTop,
                             (e.target as HTMLElement).clientHeight
-                          )
+                          );
                         },
                       }}
                       clearOnBlur={false}
                       onInputChange={(_, value) => {
-                        setKeyword(value)
-                        setGroupPage(1)
+                        setKeyword(value);
+                        setGroupPage(1);
                       }}
                       renderInput={(params) => (
                         <TextField
@@ -230,9 +263,9 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                         />
                       )}
                       onChange={(e, value) => {
-                        setChatId && setChatId(value ? value.chatId : "")
-                        setChatName && setChatName(value ? value.chatName : "")
-                        setSearchValue(value)
+                        setChatId && setChatId(value ? value.chatId : "");
+                        setChatName && setChatName(value ? value.chatName : "");
+                        setSearchValue(value);
                       }}
                     />
                   )}
@@ -310,7 +343,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                       />
                     )}
                     onChange={(e, value) => {
-                      setGroupOwner(value)
+                      setGroupOwner(value);
                     }}
                   />
                 </>
@@ -338,7 +371,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
             onClick={() => {
               clickName !== "选择发送目标"
                 ? handleCreateGroup()
-                : handleConfirm()
+                : handleConfirm();
             }}
           >
             {clickName === "选择发送目标" ? "确定" : "创建"}
@@ -383,7 +416,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default SelectTargetDialog
+export default SelectTargetDialog;
