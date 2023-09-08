@@ -189,7 +189,7 @@ const TreeViewSelector = ({
                 </li>
               )
             }}
-            onChange={(e, value) => value && setSearchToDeptValue(value)}
+            onChange={(e, value) => value && setSearchToDeptValue(value as IDepartmentAndUserListValue[])}
             renderInput={(params) => (
               <TextField
                 {...params}

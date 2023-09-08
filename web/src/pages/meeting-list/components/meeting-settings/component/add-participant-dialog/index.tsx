@@ -8,6 +8,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import useAction from "./hook";
 import styles from "./index.module.scss";
 import {
+  ITagsList,
   ITargetDialogProps,
   SelectPersonnelTitle,
   SelectPersonnelType,
@@ -158,7 +159,7 @@ const SelectTargetDialog = memo(
                         label="标签列表"
                       />
                     )}
-                    onChange={(e, value) => setTagsValue(value)}
+                    onChange={(e, value) => setTagsValue(value as ITagsList[])}
                   />
                 </>
               </>

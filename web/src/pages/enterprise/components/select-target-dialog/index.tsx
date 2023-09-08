@@ -12,6 +12,7 @@ import {
   ITargetDialogProps,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
+  ITagsList,
 } from "../../../../dtos/enterprise"
 import { CircularProgress, Snackbar } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
@@ -263,7 +264,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                           label="标签列表"
                         />
                       )}
-                      onChange={(e, value) => setTagsValue(value)}
+                      onChange={(e, value) => setTagsValue(value as ITagsList[])}
                     />
                   )}
                 </>
