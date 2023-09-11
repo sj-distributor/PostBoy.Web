@@ -420,29 +420,28 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [isShowDialog]);
 
-  useEffect(() => {
-    const loadDepartment = async (AppId: string) => {
-      setIsTreeViewLoading(true);
-      const deptListResponse = await GetDeptTreeList(AppId, schemaType);
-      console.log(deptListResponse, schemaType);
-      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
-        setIsTreeViewLoading(false);
+  const loadDepartment = async (AppId: string) => {
+    setIsTreeViewLoading(true);
+    const deptListResponse = await GetDeptTreeList(AppId, schemaType);
+    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+      setIsTreeViewLoading(false);
 
-      !!deptListResponse &&
-        loadDeptUsersFromWebWorker({
-          AppId,
-          workWeChatUnits: deptListResponse.workWeChatUnits,
-        }).then(() => {
-          setIsTreeViewLoading(false);
-          setIsLoadStop(true);
-        });
-    };
+    !!deptListResponse &&
+      loadDeptUsersFromWebWorker({
+        AppId,
+        workWeChatUnits: deptListResponse.workWeChatUnits,
+      }).then(() => {
+        setIsTreeViewLoading(false);
+        setIsLoadStop(true);
+      });
+  };
+
+  useEffect(() => {
     if (
       isShowDialog &&
-      !!corpAppValue
-      // !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
+      !!corpAppValue &&
+      !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
-      console.log("first");
       // 设置相对应key的数据为空
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev);
@@ -469,7 +468,7 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [corpAppValue?.appId, isShowDialog, schemaType]);
 
   useEffect(() => {
-    console.log(schemaType);
+    corpAppValue.appId && loadDepartment(corpAppValue.appId);
   }, [schemaType]);
 
   // 判断文件大小

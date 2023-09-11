@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DepartmentAndUserType,
   IDepartmentAndUserListValue,
@@ -19,8 +19,13 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find((e) => e.key === appId);
+    // console.log(result, departmentAndUserList);
     return result as IDepartmentKeyControl;
   }, [departmentAndUserList, appId]);
+
+  useEffect(() => {
+    console.log(departmentAndUserList);
+  }, [departmentAndUserList]);
 
   const searchKeyValue = useMemo(() => {
     const result = flattenDepartmentList.find((e) => e.key === appId);
@@ -112,6 +117,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
       flattenList,
       []
     );
+
     return new Promise((resolve) => {
       const foldData = findActiveData(data.AppId, departmentAndUserList);
       const flattenData = findActiveData(data.AppId, flattenDepartmentList);
@@ -130,6 +136,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
               data: flattenList,
             },
           ]);
+
       resolve(true);
     });
   };
