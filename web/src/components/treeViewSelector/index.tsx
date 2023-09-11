@@ -229,7 +229,7 @@ const TreeViewSelector = ({
               );
             }}
             onChange={(e, value, reason) => {
-              handleClear(value, reason);
+              handleClear(value as IDepartmentAndUserListValue[], reason);
             }}
             renderInput={(params) => (
               <TextField

@@ -12,6 +12,7 @@ import {
   ITargetDialogProps,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
+  ITagsList,
 } from "../../../../dtos/enterprise";
 import {
   CircularProgress,
@@ -21,9 +22,10 @@ import {
   Tab,
   Tabs,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import TreeViewSelector from "../../../../components/treeViewSelector";
 import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props";
+
+import { LoadingButton } from "@mui/lab";
 
 const SelectTargetDialog = (props: ITargetDialogProps) => {
   const {
@@ -296,7 +298,9 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                           label="标签列表"
                         />
                       )}
-                      onChange={(e, value) => setTagsValue(value)}
+                      onChange={(e, value) =>
+                        setTagsValue(value as ITagsList[])
+                      }
                     />
                   )}
                 </>
