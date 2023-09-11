@@ -39,6 +39,7 @@ import { clone } from "ramda";
 import { createMeeting, updateMeeting } from "../../../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
 import useDeptUserData from "../../../../hooks/deptUserData";
+import { WorkWeChatTreeStructureType } from "../../../../dtos/enterprise";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -336,6 +337,11 @@ const useAction = (props: MeetingSettingsProps) => {
   });
 
   const [participantPage, setParticipantPage] = useState<number>(1);
+
+  //层级结构类型
+  const [schemaType, setSchemaType] = useState<WorkWeChatTreeStructureType>(
+    WorkWeChatTreeStructureType.WeChatStructure
+  );
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
@@ -1049,7 +1055,7 @@ const useAction = (props: MeetingSettingsProps) => {
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
       setIsTreeViewLoading(true);
-      const deptListResponse = await GetDeptTreeList(AppId);
+      const deptListResponse = await GetDeptTreeList(AppId, schemaType);
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false);
 
@@ -1196,6 +1202,8 @@ const useAction = (props: MeetingSettingsProps) => {
     participantList,
     tipsObject,
     appLoading,
+    schemaType,
+    setSchemaType,
     setCorpsValue,
     setIsShowDialog,
     setDepartmentAndUserList,

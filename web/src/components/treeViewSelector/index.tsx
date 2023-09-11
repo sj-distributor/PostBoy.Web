@@ -6,6 +6,9 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Radio,
+  Tab,
+  Tabs,
   TextField,
 } from "@mui/material";
 import { onFilterDeptAndUsers } from "./fitler";
@@ -34,6 +37,8 @@ const TreeViewSelector = ({
   foldSelectorProps,
   flattenSelectorProps,
   settingSelectedList,
+  schemaType,
+  setSchemaType,
 }: ITreeViewProps) => {
   const { foldData, flattenData } = sourceData ?? {
     foldData: [],
@@ -59,6 +64,8 @@ const TreeViewSelector = ({
     // setSearchToDeptValue,
     foldMapGetter,
     getUniqueId,
+    isDirectTeamMembers,
+    setIsDirectTeamMembers,
   } = useAction({
     appId,
     defaultSelectedList,
@@ -146,6 +153,28 @@ const TreeViewSelector = ({
 
   return (
     <>
+      <Tabs
+        value={schemaType}
+        aria-label="basic tabs example"
+        onChange={(e, value) => {
+          setSchemaType(value);
+        }}
+      >
+        <Tab label="企业微信架构" />
+        <Tab label="人员层级架构" />
+      </Tabs>
+      <div className={styles.directTeamMembers}>
+        <span
+          className={styles.radioLabel}
+          onClick={() => setIsDirectTeamMembers.toggle()}
+        >
+          <Radio
+            checked={isDirectTeamMembers}
+            name="radio-direct-team-members"
+          />
+          直属组员
+        </span>
+      </div>
       {displayMode !== TreeViewDisplayMode.Dropdown && (
         <div
           {...foldSelectorProps}

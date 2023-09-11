@@ -70,11 +70,6 @@ const useAction = (props: {
     settingSelectedList,
   } = props;
 
-  enum Schema {
-    EnterpriseWeChat,
-    PersonnelLevel,
-  }
-
   const defaultGroupOwner = {
     id: "-1",
     name: "随机群主",
@@ -117,10 +112,6 @@ const useAction = (props: {
   const [searchValue, setSearchValue] = useState<IWorkCorpAppGroup | null>(
     null
   );
-
-  const [schemaType, setSchemaType] = useState<Schema>(Schema.EnterpriseWeChat);
-
-  const [isDirectTeamMembers, setIsDirectTeamMembers] = useBoolean(false);
 
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
@@ -304,10 +295,6 @@ const useAction = (props: {
     keyword,
     groupPage,
     searchValue,
-    schemaType,
-    isDirectTeamMembers,
-    setIsDirectTeamMembers,
-    setSchemaType,
     setSearchValue,
     setGroupPage,
     setKeyword,

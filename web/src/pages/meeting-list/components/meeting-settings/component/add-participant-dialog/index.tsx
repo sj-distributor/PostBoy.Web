@@ -35,6 +35,8 @@ const SelectTargetDialog = memo(
       chatId,
       outerTagsValue,
       loadSelectData,
+      schemaType,
+      setSchemaType,
       setChatId,
       setOpenFunction,
       setDeptUserList,
@@ -127,6 +129,8 @@ const SelectTargetDialog = memo(
                         settingSelectedList={(value) => {
                           setDepartmentSelectedList(value);
                         }}
+                        schemaType={schemaType}
+                        setSchemaType={setSchemaType}
                       />
                     )}
                   </div>

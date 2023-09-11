@@ -29,6 +29,7 @@ import {
   SendObject,
   SendObjOrGroup,
   SendParameter,
+  WorkWeChatTreeStructureType,
 } from "../../../../dtos/enterprise";
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job";
 import { convertBase64 } from "../../../../uilts/convert-base64";
@@ -174,6 +175,10 @@ export const useAction = (props: SelectContentHookProps) => {
   const [targetSelectedList, setTargetSelectedList] = useState<
     IDepartmentAndUserListValue[]
   >([]);
+
+  const [schemaType, setSchemaType] = useState<WorkWeChatTreeStructureType>(
+    WorkWeChatTreeStructureType.WeChatStructure
+  );
 
   const {
     departmentAndUserList,
@@ -418,7 +423,8 @@ export const useAction = (props: SelectContentHookProps) => {
   useEffect(() => {
     const loadDepartment = async (AppId: string) => {
       setIsTreeViewLoading(true);
-      const deptListResponse = await GetDeptTreeList(AppId);
+      const deptListResponse = await GetDeptTreeList(AppId, schemaType);
+      console.log(deptListResponse, schemaType);
       if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
         setIsTreeViewLoading(false);
 
@@ -433,9 +439,10 @@ export const useAction = (props: SelectContentHookProps) => {
     };
     if (
       isShowDialog &&
-      !!corpAppValue &&
-      !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
+      !!corpAppValue
+      // !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
     ) {
+      console.log("first");
       // 设置相对应key的数据为空
       setDepartmentAndUserList((prev) => {
         const newValue = clone(prev);
@@ -459,7 +466,11 @@ export const useAction = (props: SelectContentHookProps) => {
       setIsLoadStop(false);
       corpAppValue.appId && loadDepartment(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId, isShowDialog]);
+  }, [corpAppValue?.appId, isShowDialog, schemaType]);
+
+  useEffect(() => {
+    console.log(schemaType);
+  }, [schemaType]);
 
   // 判断文件大小
   const judgingFileSize = (
@@ -1125,5 +1136,7 @@ export const useAction = (props: SelectContentHookProps) => {
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
     settingSelectedList,
+    schemaType,
+    setSchemaType,
   };
 };

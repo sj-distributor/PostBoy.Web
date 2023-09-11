@@ -47,6 +47,8 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     outerTagsValue,
     isUpdatedDeptUser,
     targetSelectedList,
+    schemaType,
+    setSchemaType,
     setSendType,
     setChatId,
     setChatName,
@@ -69,10 +71,6 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     sendList,
     keyword,
     searchValue,
-    schemaType,
-    isDirectTeamMembers,
-    setIsDirectTeamMembers,
-    setSchemaType,
     setSearchValue,
     setGroupPage,
     setKeyword,
@@ -133,28 +131,6 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
         <DialogContent sx={{ width: "30rem" }}>
           {!isLoading ? (
             <>
-              <Tabs
-                value={schemaType}
-                aria-label="basic tabs example"
-                onChange={(e, value) => {
-                  setSchemaType(value);
-                }}
-              >
-                <Tab label="企业微信架构" />
-                <Tab label="人员层级架构" />
-              </Tabs>
-              <div className={styles.directTeamMembers}>
-                <span
-                  className={styles.radioLabel}
-                  onClick={() => setIsDirectTeamMembers.toggle()}
-                >
-                  <Radio
-                    checked={isDirectTeamMembers}
-                    name="radio-direct-team-members"
-                  />
-                  直属组员
-                </span>
-              </div>
               {departmentKeyValue && departmentKeyValue.key && (
                 <div>
                   {departmentSelectedList && (
@@ -185,6 +161,8 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                           ? TreeViewDisplayMode.Tree
                           : TreeViewDisplayMode.Both
                       }
+                      schemaType={schemaType}
+                      setSchemaType={setSchemaType}
                     >
                       {clickName === "选择发送目标" && (
                         <Autocomplete
@@ -407,6 +385,8 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
           isUpdatedDeptUser={isUpdatedDeptUser}
           targetSelectedList={targetSelectedList}
           settingSelectedList={settingSelectedList}
+          schemaType={schemaType}
+          setSchemaType={setSchemaType}
         />
       )}
 

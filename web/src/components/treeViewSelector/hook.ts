@@ -1,4 +1,4 @@
-import { useMap, useThrottle, useThrottleEffect } from "ahooks";
+import { useBoolean, useMap, useThrottle, useThrottleEffect } from "ahooks";
 import { clone, difference, differenceWith, remove } from "ramda";
 import { useEffect, useState, useTransition, startTransition } from "react";
 import {
@@ -6,6 +6,7 @@ import {
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
+  WorkWeChatTreeStructureType,
 } from "../../dtos/enterprise";
 import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps, SourceType } from "./props";
@@ -52,6 +53,8 @@ const useAction = ({
   const getUniqueId = (value: IDepartmentAndUserListValue): string => {
     return `${value.id}${value.idRoute?.join("")}`;
   };
+
+  const [isDirectTeamMembers, setIsDirectTeamMembers] = useBoolean(false);
 
   const map = new Map();
 
@@ -261,6 +264,8 @@ const useAction = ({
     limitTags,
     loading,
     throttledValue,
+    isDirectTeamMembers,
+    setIsDirectTeamMembers,
     setSearchValue,
     setLoading,
     handleClear,

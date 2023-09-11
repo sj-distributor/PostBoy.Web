@@ -122,6 +122,10 @@ export interface ITargetDialogProps {
   outerTagsValue?: ITagsList[];
   isUpdatedDeptUser: boolean;
   targetSelectedList: IDepartmentAndUserListValue[];
+  schemaType: WorkWeChatTreeStructureType;
+  setSchemaType: React.Dispatch<
+    React.SetStateAction<WorkWeChatTreeStructureType>
+  >;
   setSendType?: React.Dispatch<React.SetStateAction<SendObjOrGroup>>;
   setChatId?: React.Dispatch<React.SetStateAction<string>>;
   setChatName?: React.Dispatch<React.SetStateAction<string>>;
@@ -486,4 +490,9 @@ export enum UpdateListType {
   Fold,
   Flatten,
   All,
+}
+
+export enum WorkWeChatTreeStructureType {
+  WeChatStructure,
+  PersonnelLevelStructure,
 }
