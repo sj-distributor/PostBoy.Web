@@ -1,12 +1,12 @@
-import { useBoolean } from "ahooks"
-import { clone } from "ramda"
-import { useEffect, useRef, useState } from "react"
+import { useBoolean } from "ahooks";
+import { clone } from "ramda";
+import { useEffect, useRef, useState } from "react";
 import {
   GetMessageJob,
   GetMessageJobRecords,
   PostMessageJobDelete,
   PostMessageJobUpdate,
-} from "../../api/enterprise"
+} from "../../api/enterprise";
 import {
   IDtoExtend,
   ILastShowTableData,
@@ -19,38 +19,44 @@ import {
   messageJobSendType,
   MessageJobSendType,
   messageSendResultType,
-} from "../../dtos/enterprise"
-import { ModalBoxRef } from "../../dtos/modal"
-import { convertType } from "../../uilts/convert-type"
-import { parameterJudgment } from "../../uilts/parameter-judgment"
-import { judgeDataIsCorrect } from "../request/hook"
+} from "../../dtos/enterprise";
+import { ModalBoxRef } from "../../dtos/modal";
+import { convertType } from "../../uilts/convert-type";
+import { parameterJudgment } from "../../uilts/parameter-judgment";
+import { judgeDataIsCorrect } from "../request/hook";
 
 const judgeContent = (
   workWeChatAppNotification: IWorkWeChatAppNotificationDto,
   cleanContent: string
 ) => {
   if (cleanContent !== undefined && !!cleanContent) {
-    return cleanContent
-  } else if (workWeChatAppNotification.text !== null) {
-    return workWeChatAppNotification.text?.content.replace(/<.*?>/g, "")
-  } else if (workWeChatAppNotification.mpNews !== null) {
+    return cleanContent;
+  } else if (
+    workWeChatAppNotification !== null &&
+    workWeChatAppNotification.text !== null
+  ) {
+    return workWeChatAppNotification.text?.content.replace(/<.*?>/g, "");
+  } else if (
+    workWeChatAppNotification !== null &&
+    workWeChatAppNotification.mpNews !== null
+  ) {
     return workWeChatAppNotification.mpNews?.articles[0].content.replace(
       /<.*?>/g,
       ""
-    )
+    );
   } else {
-    return "文件"
+    return "文件";
   }
-}
+};
 
 // 转换数组类型返回
 const messageJobConvertType = (
   arr: IMessageJob[],
   recordType: MessageJobDestination
 ) => {
-  const isRecordTypeEmail = recordType === MessageJobDestination.Email
+  const isRecordTypeEmail = recordType === MessageJobDestination.Email;
 
-  const array: ILastShowTableData[] = []
+  const array: ILastShowTableData[] = [];
   if (arr.length > 0) {
     arr.forEach((item) => {
       const data = {
@@ -118,23 +124,23 @@ const messageJobConvertType = (
         sendHttpRequest: item.sendHttpRequest
           ? item.sendHttpRequest
           : undefined,
-      }
+      };
 
       isRecordTypeEmail
         ? item.emailNotification && array.push(data)
-        : array.push(data)
-    })
+        : array.push(data);
+    });
   }
 
-  return array
-}
+  return array;
+};
 
 export const useAction = (recordType: MessageJobDestination) => {
-  const noticeSettingRef = useRef<ModalBoxRef>(null)
-  const sendRecordRef = useRef<ModalBoxRef>(null)
-  const deleteConfirmRef = useRef<ModalBoxRef>(null)
+  const noticeSettingRef = useRef<ModalBoxRef>(null);
+  const sendRecordRef = useRef<ModalBoxRef>(null);
+  const deleteConfirmRef = useRef<ModalBoxRef>(null);
 
-  const [showEmail, setShowEmail] = useState(false)
+  const [showEmail, setShowEmail] = useState(false);
 
   const [dto, setDto] = useState<IDtoExtend>({
     loading: true,
@@ -142,138 +148,138 @@ export const useAction = (recordType: MessageJobDestination) => {
     rowCount: 0,
     pageSize: 10,
     page: 0,
-  })
+  });
 
-  const [deleteId, setDeleteId] = useState<string>("")
-  const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([])
-  const [alertShow, setAlertShow] = useBoolean(false)
-  const [deleteShow, setDeleteShow] = useBoolean(false)
-  const [loading, setLoading] = useBoolean(false)
+  const [deleteId, setDeleteId] = useState<string>("");
+  const [sendRecordList, setSendRecordList] = useState<ISendRecordDto[]>([]);
+  const [alertShow, setAlertShow] = useBoolean(false);
+  const [deleteShow, setDeleteShow] = useBoolean(false);
+  const [loading, setLoading] = useBoolean(false);
 
-  const [promptText, setPromptText] = useState<string>("")
+  const [promptText, setPromptText] = useState<string>("");
 
-  const [openError, openErrorAction] = useBoolean(false)
+  const [openError, openErrorAction] = useBoolean(false);
 
-  const [failSend, failSendAction] = useBoolean(false)
+  const [failSend, failSendAction] = useBoolean(false);
 
   const [updateMessageJobInformation, setUpdateMessageJobInformation] =
-    useState<ILastShowTableData>()
+    useState<ILastShowTableData>();
 
   const [emailUpdateData, setEmailUpdateData] =
-    useState<() => IUpdateMessageCommand | undefined>()
+    useState<() => IUpdateMessageCommand | undefined>();
 
-  const [recordRowLoading, setRecordRowLoading] = useState(false)
+  const [recordRowLoading, setRecordRowLoading] = useState(false);
 
-  const [showRequest, setShowRequest] = useState<boolean>(false)
+  const [showRequest, setShowRequest] = useState<boolean>(false);
 
   const [requestUpdateData, setRequestUpdateData] =
-    useState<() => IUpdateMessageCommand | undefined>()
+    useState<() => IUpdateMessageCommand | undefined>();
 
   const onNoticeCancel = () => {
-    noticeSettingRef.current?.close()
-  }
+    noticeSettingRef.current?.close();
+  };
 
   const onSendCancel = () => {
-    sendRecordRef.current?.close()
-  }
+    sendRecordRef.current?.close();
+  };
 
   const onSetting = (item: ILastShowTableData) => {
     if (item.jobType !== MessageJobSendType.Fire) {
-      setUpdateMessageJobInformation(item)
-      noticeSettingRef.current?.open()
-      return
+      setUpdateMessageJobInformation(item);
+      noticeSettingRef.current?.open();
+      return;
     }
     if (item.isDelete) {
-      setDeleteShow.setTrue()
-      return
+      setDeleteShow.setTrue();
+      return;
     }
-    setAlertShow.setTrue()
-  }
+    setAlertShow.setTrue();
+  };
 
   const onEmailSetting = (item: ILastShowTableData) => {
     if (item.jobType === MessageJobSendType.Fire) {
-      setAlertShow.setTrue()
-      return
+      setAlertShow.setTrue();
+      return;
     }
-    setUpdateMessageJobInformation(item)
-    setShowEmail(true)
-  }
+    setUpdateMessageJobInformation(item);
+    setShowEmail(true);
+  };
 
   const onRequestSetting = (item: ILastShowTableData) => {
     if (item.jobType === MessageJobSendType.Fire) {
-      setAlertShow.setTrue()
-      return
+      setAlertShow.setTrue();
+      return;
     }
 
-    setUpdateMessageJobInformation(item)
-    setShowRequest(true)
-  }
+    setUpdateMessageJobInformation(item);
+    setShowRequest(true);
+  };
 
   const outterGetUpdateData = (
     callback: () => IUpdateMessageCommand | undefined
   ) => {
-    setEmailUpdateData(() => callback)
-  }
+    setEmailUpdateData(() => callback);
+  };
 
   const handleEmailConfirm = () => {
-    const data = emailUpdateData && emailUpdateData()
+    const data = emailUpdateData && emailUpdateData();
     data &&
       PostMessageJobUpdate(
         Object.assign(data, {
           messageJobId: updateMessageJobInformation?.id,
         })
       ).then((data) => {
-        data && getMessageJob()
-      })
-    data && handleEmailCancel()
-  }
+        data && getMessageJob();
+      });
+    data && handleEmailCancel();
+  };
 
   const updateRequestData = (
     callback: () => IUpdateMessageCommand | undefined
   ) => {
-    setRequestUpdateData(() => callback)
-  }
+    setRequestUpdateData(() => callback);
+  };
 
   const handleRequestConfirm = () => {
-    const data = requestUpdateData && requestUpdateData()
+    const data = requestUpdateData && requestUpdateData();
     if (data) {
       PostMessageJobUpdate(data as IUpdateMessageCommand).then((res) => {
-        getMessageJob()
-        handleRequestState(false)
-      })
+        getMessageJob();
+        handleRequestState(false);
+      });
     }
-  }
+  };
 
   const handleEmailCancel = () => {
-    setShowEmail(false)
-  }
+    setShowEmail(false);
+  };
 
   const handleRequestState = (state: boolean) => {
-    setShowRequest(state)
-  }
+    setShowRequest(state);
+  };
 
   // 弹出警告
   const showErrorPrompt = (text: string) => {
-    setPromptText(text)
-    openErrorAction.setTrue()
-  }
+    setPromptText(text);
+    openErrorAction.setTrue();
+  };
 
   const messageRecordConvertType = (
     arr: IMessageJobRecord[],
     toObject: string
   ) => {
-    const sendRecordArray: ISendRecordDto[] = []
+    const sendRecordArray: ISendRecordDto[] = [];
     arr.length > 0 &&
       arr.forEach((item) => {
         const sendToEmailNotification = dto.messageJobs.find((cellItem) => {
-          return cellItem.correlationId === item.correlationId
-        })?.emailNotification
+          return cellItem.correlationId === item.correlationId;
+        })?.emailNotification;
         const sendTo = sendToEmailNotification
           ? sendToEmailNotification?.to?.join(";") +
             (!!sendToEmailNotification?.cc?.join(";")
               ? ", " + sendToEmailNotification?.cc?.join(";")
               : "")
-          : ""
+          : "";
         sendRecordArray.push({
           id: item.id,
           createdDate: item.createdDate,
@@ -293,124 +299,124 @@ export const useAction = (recordType: MessageJobDestination) => {
                 JSON.parse(item.responseJson).invaliduser !== undefined
               ? "未发送成功的对象:" + JSON.parse(item.responseJson).invaliduser
               : "",
-        })
-      })
-    return sendRecordArray
-  }
+        });
+      });
+    return sendRecordArray;
+  };
 
   const onSend = async (toObject: string, id: string) => {
-    sendRecordRef.current?.open()
-    setRecordRowLoading(true)
+    sendRecordRef.current?.open();
+    setRecordRowLoading(true);
     await GetMessageJobRecords(id).then((res) => {
       if (!!res) {
-        setRecordRowLoading(false)
-        setSendRecordList(messageRecordConvertType(res, toObject))
+        setRecordRowLoading(false);
+        setSendRecordList(messageRecordConvertType(res, toObject));
       } else {
-        setRecordRowLoading(false)
+        setRecordRowLoading(false);
       }
-    })
-  }
+    });
+  };
 
   const onDeleteMessageJob = (id: string) => {
-    deleteConfirmRef.current?.close()
+    deleteConfirmRef.current?.close();
     PostMessageJobDelete({
       MessageJobId: id,
     })
       .then((res) => {
-        getMessageJob()
+        getMessageJob();
       })
       .catch((err) => {
-        throw Error(err)
-      })
-  }
+        throw Error(err);
+      });
+  };
 
   const onUpdateMessageJob = (data: IUpdateMessageCommand) => {
-    const cloneData = clone(data)
+    const cloneData = clone(data);
     cloneData.workWeChatAppNotification =
       cloneData.workWeChatAppNotification &&
-      convertType(cloneData.workWeChatAppNotification)
+      convertType(cloneData.workWeChatAppNotification);
     if (parameterJudgment(cloneData, showErrorPrompt)) {
       PostMessageJobUpdate(cloneData)
         .then(() => {
-          noticeSettingRef.current?.close()
+          noticeSettingRef.current?.close();
           setTimeout(() => {
-            getMessageJob()
-          }, 500)
+            getMessageJob();
+          }, 500);
         })
         .catch((err) => {
-          failSendAction.setTrue()
-          throw Error(err)
-        })
+          failSendAction.setTrue();
+          throw Error(err);
+        });
     }
-  }
+  };
 
   // 获取MessageJob 数组
   const getMessageJob = () => {
-    updateData("loading", true)
+    updateData("loading", true);
     GetMessageJob(dto.page + 1, dto.pageSize, recordType)
       .then((res) => {
         if (!!res) {
           setTimeout(() => {
-            updateData("rowCount", res.count)
+            updateData("rowCount", res.count);
             updateData(
               "messageJobs",
               messageJobConvertType(res.messageJobs, recordType)
-            )
-            updateData("loading", false)
-          }, 500)
+            );
+            updateData("loading", false);
+          }, 500);
         }
       })
       .catch((err) => {
         setTimeout(() => {
-          updateData("rowCount", 0)
-          updateData("messageJobs", [])
-          updateData("loading", false)
-        }, 500)
-      })
-  }
+          updateData("rowCount", 0);
+          updateData("messageJobs", []);
+          updateData("loading", false);
+        }, 500);
+      });
+  };
 
   useEffect(() => {
-    getMessageJob()
-  }, [dto.page, dto.pageSize])
+    getMessageJob();
+  }, [dto.page, dto.pageSize]);
 
   // 更新MessageJob table参数
   const updateData = (k: keyof IDtoExtend, v: any) => {
-    setDto((prev) => ({ ...prev, [k]: v }))
-  }
+    setDto((prev) => ({ ...prev, [k]: v }));
+  };
 
   const onDeleteMessageJobConfirm = (id: string, isDelete: boolean) => {
     if (isDelete) {
-      setDeleteShow.setTrue()
-      return
+      setDeleteShow.setTrue();
+      return;
     }
-    deleteConfirmRef.current?.open()
-    setDeleteId(id)
-  }
+    deleteConfirmRef.current?.open();
+    setDeleteId(id);
+  };
 
   useEffect(() => {
     if (alertShow) {
       setTimeout(() => {
-        setAlertShow.setFalse()
-      }, 1200)
+        setAlertShow.setFalse();
+      }, 1200);
     }
-  }, [alertShow])
+  }, [alertShow]);
 
   useEffect(() => {
     if (deleteShow) {
       setTimeout(() => {
-        setDeleteShow.setFalse()
-      }, 1200)
+        setDeleteShow.setFalse();
+      }, 1200);
     }
-  }, [deleteShow])
+  }, [deleteShow]);
 
   // 延迟关闭警告提示
   useEffect(() => {
     if (openError) {
       setTimeout(() => {
-        openErrorAction.setFalse()
-      }, 3000)
+        openErrorAction.setFalse();
+      }, 3000);
     }
-  }, [openError])
+  }, [openError]);
 
   return {
     noticeSettingRef,
@@ -450,5 +456,5 @@ export const useAction = (recordType: MessageJobDestination) => {
     handleRequestConfirm,
     setRequestUpdateData,
     updateRequestData,
-  }
-}
+  };
+};

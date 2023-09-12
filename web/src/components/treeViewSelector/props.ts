@@ -40,6 +40,7 @@ export interface ITreeViewHookProps {
   foldData: IDepartmentAndUserListValue[];
   flattenData: IDepartmentAndUserListValue[];
   sourceType?: SourceType;
+  schemaType: WorkWeChatTreeStructureType;
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }
 

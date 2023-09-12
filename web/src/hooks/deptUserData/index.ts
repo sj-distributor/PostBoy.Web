@@ -19,13 +19,9 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find((e) => e.key === appId);
-    // console.log(result, departmentAndUserList);
+    console.log(appId, departmentAndUserList);
     return result as IDepartmentKeyControl;
   }, [departmentAndUserList, appId]);
-
-  useEffect(() => {
-    console.log(departmentAndUserList);
-  }, [departmentAndUserList]);
 
   const searchKeyValue = useMemo(() => {
     const result = flattenDepartmentList.find((e) => e.key === appId);
@@ -136,7 +132,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
               data: flattenList,
             },
           ]);
-
+      console.log(dataList);
       resolve(true);
     });
   };

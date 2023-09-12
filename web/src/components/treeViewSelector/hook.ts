@@ -1,15 +1,14 @@
-import { useBoolean, useMap, useThrottle, useThrottleEffect } from "ahooks";
-import { clone, difference, differenceWith, remove } from "ramda";
-import { useEffect, useState, useTransition, startTransition } from "react";
+import { useBoolean, useMap, useThrottle } from "ahooks";
+import { clone } from "ramda";
+import { useEffect, useState } from "react";
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
-  WorkWeChatTreeStructureType,
 } from "../../dtos/enterprise";
 import useDeptUserData from "../../hooks/deptUserData";
-import { ITreeViewHookProps, SourceType } from "./props";
+import { ITreeViewHookProps } from "./props";
 
 const useAction = ({
   appId,
@@ -17,6 +16,7 @@ const useAction = ({
   flattenData,
   foldData,
   sourceType,
+  schemaType,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const { deduplicationArray } = useDeptUserData({ appId });
@@ -29,7 +29,6 @@ const useAction = ({
       idRoute: flattenData.find((cell) => cell.id === item.id)?.idRoute,
     })) ?? []
   );
-
   const [indeterminateList, setIndeterminateList] = useState<
     IDepartmentAndUserListValue[]
   >([]);
@@ -216,18 +215,31 @@ const useAction = ({
 
           const newIndeterminateList = handleIndeterminateList(
             mapItem,
-            newSelectedList,
+            !toSelect ? newSelectedList : selectedList,
             indeterminateList
           );
 
-          newSelectedList = newSelectedList.filter(
-            (value) =>
-              !newIndeterminateList.some((item) => item.id === value.id)
+          const uniqueArray = (arr: IDepartmentAndUserListValue[]) => {
+            const set: IDepartmentAndUserListValue[] = [];
+            arr.map((item) => {
+              !set.find((cItem) => item.id === cItem.id) && set.push(item);
+            });
+            return set;
+          };
+
+          newSelectedList = uniqueArray(
+            newSelectedList.filter(
+              (value) =>
+                !newIndeterminateList.some((item) => item.id === value.id)
+            )
           );
 
-          setSelectedList(newSelectedList);
+          !toSelect && setSelectedList(newSelectedList);
           setIndeterminateList(newIndeterminateList);
-          handleMapUpdate(newSelectedList, newIndeterminateList);
+          handleMapUpdate(
+            !toSelect ? newSelectedList : selectedList,
+            newIndeterminateList
+          );
         }
       }
     }
@@ -256,6 +268,32 @@ const useAction = ({
   useEffect(() => {
     if (limitTags === selectedList.length) setLoading(false);
   }, [limitTags]);
+
+  useEffect(() => {
+    // 1.找圈選中的父級，刪除子級，2select框只顯示全部選中的都部門，最後再拿子層數據
+    function filterChildren(arr: IDepartmentAndUserListValue[]) {
+      // 遍歷數組中的每個對象
+      arr.forEach((item) => {
+        if (item.children.length) {
+          // 檢查item的children是否都存在於數組中
+          const allChildrenExist = item.children.every((child) =>
+            arr.some((obj) => obj.id === child.id)
+          );
+
+          // 如果所有children都存在，則刪除數組中所有爲item的children
+          if (allChildrenExist) {
+            arr = arr.filter(
+              (obj) => !item.children.find((item) => item.id === obj.id)
+            );
+          }
+        }
+      });
+
+      return arr;
+    }
+    // 调用勾选逻辑
+    handleDeptOrUserClick(ClickType.Select, filterChildren(selectedList), true);
+  }, [schemaType]);
 
   return {
     foldList,

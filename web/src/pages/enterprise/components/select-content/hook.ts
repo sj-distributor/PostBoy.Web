@@ -421,6 +421,7 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isShowDialog]);
 
   const loadDepartment = async (AppId: string) => {
+    console.log("1111111");
     setIsTreeViewLoading(true);
     const deptListResponse = await GetDeptTreeList(AppId, schemaType);
     if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
@@ -465,10 +466,11 @@ export const useAction = (props: SelectContentHookProps) => {
       setIsLoadStop(false);
       corpAppValue.appId && loadDepartment(corpAppValue.appId);
     }
-  }, [corpAppValue?.appId, isShowDialog, schemaType]);
+  }, [corpAppValue?.appId, isShowDialog]);
 
   useEffect(() => {
     corpAppValue.appId && loadDepartment(corpAppValue.appId);
+    console.log(departmentAndUserList);
   }, [schemaType]);
 
   // 判断文件大小

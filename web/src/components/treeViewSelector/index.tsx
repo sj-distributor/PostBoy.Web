@@ -72,6 +72,7 @@ const TreeViewSelector = ({
     foldData,
     flattenData,
     sourceType: sourceType ?? SourceType.Full,
+    schemaType,
     settingSelectedList,
   });
 
