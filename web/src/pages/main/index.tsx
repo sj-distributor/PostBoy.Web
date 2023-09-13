@@ -35,8 +35,10 @@ const Main = () => {
                 clickMainIndex === index ? styles.itemClick : styles.itemNone
               }
             >
-              <span className={item.icons} />
-              {item.head}
+              <div className={styles.iconTitleContainer}>
+                {item.icons}
+                <span className={styles.title}>{item.head}</span>
+              </div>
             </Link>
           )}
         </div>

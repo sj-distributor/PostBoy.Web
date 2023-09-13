@@ -3,7 +3,7 @@ import { ReactElement } from "react"
 export interface RouteItem {
   path: string
   head: string
-  icons: string
+  icons?: JSX.Element
   element: ReactElement
   children?: ChildProps[]
 }

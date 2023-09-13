@@ -34,9 +34,15 @@ $aClickColor: #30cea3;
           text-decoration: none;
         }
 
-        span {
+        .iconTitleContainer {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .title {
+          margin-left: 0.4rem;
           font-size: 1rem;
-          margin-right: 0.3rem;
         }
       }
     }
