@@ -1,15 +1,15 @@
-import Home from "../pages/home"
-import Enterprise from "../pages/enterprise"
-import SendEmail from "../pages/email"
-import Manager from "../pages/app-manager"
-import User from "../pages/user"
-import { RouteItem } from "../dtos/route-type"
-import MeetingList from "../pages/meeting-list"
-import { SendRequest } from "../pages/request"
+import Home from "../pages/home";
+import Enterprise from "../pages/enterprise";
+import SendEmail from "../pages/email";
+import Manager from "../pages/app-manager";
+import User from "../pages/user";
+import { RouteItem } from "../dtos/route-type";
+import MeetingList from "../pages/meeting-list";
+import { SendRequest } from "../pages/request";
 
-import EmailIcon from "@mui/icons-material/Email"
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"
-import SettingsIcon from "@mui/icons-material/Settings"
+import EmailIcon from "@mui/icons-material/Email";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export const routerArray: RouteItem[] = [
   {
@@ -52,4 +52,4 @@ export const routerArray: RouteItem[] = [
     head: "",
     element: <MeetingList />,
   },
-]
+];
