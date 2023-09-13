@@ -3,7 +3,7 @@ import Enterprise from "../pages/enterprise";
 import SendEmail from "../pages/email";
 import Manager from "../pages/app-manager";
 import User from "../pages/user";
-import { RouteItem } from "../dtos/route-type";
+import { RouteItem } from "../dtos/route";
 import MeetingList from "../pages/meeting-list";
 import { SendRequest } from "../pages/request";
 

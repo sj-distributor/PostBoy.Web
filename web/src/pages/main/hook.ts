@@ -2,7 +2,7 @@ import { useBoolean } from "ahooks";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { GetAuthUser } from "../../api/user-management";
-import { RouteItem } from "../../dtos/route-type";
+import { RouteItem } from "../../dtos/route";
 import { IUserResponse } from "../../dtos/user-management";
 import { routerArray } from "../../router/elementRoute";
 

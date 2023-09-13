@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
 import useMainAction from "./hook";
 import UserInformation from "./components/user-information";
-import { RouteItem } from "../../dtos/route-type";
+import { RouteItem } from "../../dtos/route";
 import { createContext } from "react";
 
 interface AdministratorContextType {
