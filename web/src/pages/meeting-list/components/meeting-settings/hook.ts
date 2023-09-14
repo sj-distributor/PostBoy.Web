@@ -909,6 +909,7 @@ const useAction = (props: MeetingSettingsProps) => {
             selected: false,
             isCollapsed: false,
             children: [],
+            department_leader: [],
           })
         );
         return hostData;
@@ -925,6 +926,7 @@ const useAction = (props: MeetingSettingsProps) => {
             selected: false,
             isCollapsed: false,
             children: [],
+            department_leader: [],
           })
         );
         return apponintData;
@@ -959,6 +961,7 @@ const useAction = (props: MeetingSettingsProps) => {
               selected: false,
               isCollapsed: false,
               children: [],
+              department_leader: [],
             })
           );
 
@@ -974,6 +977,7 @@ const useAction = (props: MeetingSettingsProps) => {
           selected: true,
           isCollapsed: false,
           children: [],
+          department_leader: [],
         },
       ]);
       setAppLoading(false);

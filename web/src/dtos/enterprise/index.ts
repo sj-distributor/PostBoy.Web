@@ -48,6 +48,7 @@ export interface IDepartmentData {
 }
 
 export interface IDepartmentUsersData {
+  department_leader: [] | [string];
   userid: string;
   department: number;
 }
@@ -62,6 +63,7 @@ export interface IDepartmentAndUserListValue {
   idRoute?: number[];
   indeterminate?: boolean;
   children: IDepartmentAndUserListValue[];
+  department_leader: [] | [string];
 }
 
 export enum DepartmentAndUserType {
@@ -484,6 +486,7 @@ export interface SendHttpRequestHeaderDto {
 
 export interface IDeptUserDataHookProp {
   appId?: string;
+  schemaType?: WorkWeChatTreeStructureType;
 }
 
 export enum UpdateListType {

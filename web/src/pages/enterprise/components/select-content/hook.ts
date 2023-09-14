@@ -190,7 +190,7 @@ export const useAction = (props: SelectContentHookProps) => {
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
     deduplicationArray,
-  } = useDeptUserData({ appId: corpAppValue?.appId });
+  } = useDeptUserData({ appId: corpAppValue?.appId, schemaType });
 
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     setTargetSelectedList(deduplicationArray(valueList));
@@ -421,7 +421,6 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isShowDialog]);
 
   const loadDepartment = async (AppId: string) => {
-    console.log("1111111");
     setIsTreeViewLoading(true);
     const deptListResponse = await GetDeptTreeList(AppId, schemaType);
     if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
@@ -470,7 +469,6 @@ export const useAction = (props: SelectContentHookProps) => {
 
   useEffect(() => {
     corpAppValue.appId && loadDepartment(corpAppValue.appId);
-    console.log(departmentAndUserList);
   }, [schemaType]);
 
   // 判断文件大小

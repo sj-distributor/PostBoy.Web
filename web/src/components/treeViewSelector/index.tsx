@@ -11,6 +11,7 @@ import {
   Tabs,
   TextField,
 } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
 import { onFilterDeptAndUsers } from "./fitler";
 import useAction from "./hook";
 import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props";
@@ -65,7 +66,7 @@ const TreeViewSelector = ({
     foldMapGetter,
     getUniqueId,
     isDirectTeamMembers,
-    setIsDirectTeamMembers,
+    handleGetAllTeamMembers,
   } = useAction({
     appId,
     defaultSelectedList,
@@ -165,12 +166,9 @@ const TreeViewSelector = ({
         <Tab label="人员层级架构" />
       </Tabs>
       <div className={styles.directTeamMembers}>
-        <span
-          className={styles.radioLabel}
-          onClick={() => setIsDirectTeamMembers.toggle()}
-        >
+        <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
           <Radio
-            checked={isDirectTeamMembers}
+            checked={!isDirectTeamMembers}
             name="radio-direct-team-members"
           />
           直属组员
@@ -221,17 +219,19 @@ const TreeViewSelector = ({
               },
             }}
             getOptionLabel={(option) => option.name}
-            // renderTags={(value) => {
-            //   return (
-            //     <TagsComponent
-            //       selectedList={value}
-            //       limit={selectedList.length}
-            //       handleClear={handleClear}
-            //     />
-            //   );
-            // }}
+            renderTags={(value) => {
+              return (
+                <TagsComponent
+                  selectedList={value}
+                  limit={selectedList.length}
+                  handleClear={handleClear}
+                />
+              );
+            }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            groupBy={(option) => String(option.parentid)}
+            groupBy={(option) => {
+              return String(uuidv4());
+            }}
             componentsProps={{
               paper: { elevation: 3 },
               popper: {

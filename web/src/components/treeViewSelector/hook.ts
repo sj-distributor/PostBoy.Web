@@ -1,6 +1,7 @@
 import { useBoolean, useMap, useThrottle } from "ahooks";
 import { clone } from "ramda";
 import { useEffect, useState } from "react";
+
 import {
   ClickType,
   DepartmentAndUserType,
@@ -53,7 +54,7 @@ const useAction = ({
     return `${value.id}${value.idRoute?.join("")}`;
   };
 
-  const [isDirectTeamMembers, setIsDirectTeamMembers] = useBoolean(false);
+  const [isDirectTeamMembers, setIsDirectTeamMembers] = useBoolean(true);
 
   const map = new Map();
 
@@ -127,6 +128,7 @@ const useAction = ({
       if (mapItem) {
         const idSelectedList = selectedList.map((x) => x.id);
         const idIndeterminateList = resultList.map((x) => x.id);
+
         const determine = {
           allSelected: mapItem?.children.every((child) =>
             idSelectedList.includes(child.id)
@@ -161,10 +163,10 @@ const useAction = ({
     const cloneData = clone(foldMap);
     for (const [key, value] of cloneData.entries()) {
       const selectedListItem = selectedList.find(
-        (item) => item.id === value.id
+        (item) => item.name === value.name
       );
       const indeterminateListItem = indeterminateList.find(
-        (item) => item.id === value.id
+        (item) => item.name === value.name
       );
       cloneData.set(key, {
         ...value,
@@ -215,7 +217,7 @@ const useAction = ({
 
           const newIndeterminateList = handleIndeterminateList(
             mapItem,
-            !toSelect ? newSelectedList : selectedList,
+            newSelectedList,
             indeterminateList
           );
 
@@ -234,12 +236,9 @@ const useAction = ({
             )
           );
 
-          !toSelect && setSelectedList(newSelectedList);
+          setSelectedList(newSelectedList);
           setIndeterminateList(newIndeterminateList);
-          handleMapUpdate(
-            !toSelect ? newSelectedList : selectedList,
-            newIndeterminateList
-          );
+          handleMapUpdate(newSelectedList, newIndeterminateList);
         }
       }
     }
@@ -260,9 +259,93 @@ const useAction = ({
     }
   };
 
+  const setFilterChildren = (arr: IDepartmentAndUserListValue[]) => {
+    // 遍歷數組中的每個對象
+    arr.forEach((item) => {
+      if (item.children.length) {
+        // 檢查item的children是否都存在於數組中
+        const allChildrenExist = item.children.every((child) =>
+          arr.some((obj) => obj.name === child.name)
+        );
+
+        // 如果所有children都存在，則刪除數組中所有爲item的children
+        if (allChildrenExist) {
+          arr = arr.filter(
+            (obj) => !item.children.find((item) => item.name === obj.name)
+          );
+        }
+      }
+    });
+
+    return arr;
+  };
+
+  const handleGetAllTeamMembers = () => {
+    isDirectTeamMembers
+      ? setIsDirectTeamMembers.setFalse()
+      : setIsDirectTeamMembers.setTrue();
+
+    if (isDirectTeamMembers) {
+      let teamMembers = getUserTeamMembers();
+      console.log(teamMembers);
+
+      handleDeptOrUserClick(
+        ClickType.Select,
+        selectedList.length
+          ? teamMembers.filter(
+              (itemA) =>
+                !selectedList.some((itemB) => itemA.name === itemB.name)
+            )
+          : teamMembers
+      );
+    } else {
+      setSelectedList([]);
+      flattenList.forEach((item) =>
+        foldMapSetter(getUniqueId(item), { ...item, selected: false })
+      );
+    }
+  };
+
+  const getUserTeamMembers = () => {
+    const teamMembers = schemaType
+      ? flattenList.find((item) => item.name === "TED.F")?.children
+      : flattenList.filter(
+          (item) =>
+            item.department_leader &&
+            item.department_leader.length &&
+            item.department_leader[0] === "TED.F" &&
+            item.id === item.name
+        );
+
+    const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
+      let len = teamMembers.length;
+      for (let i = 0; i < len; i++) {
+        for (let j = i + 1; j < len; j++) {
+          if (teamMembers[i].name === teamMembers[j].name) {
+            teamMembers.splice(j, 1);
+            len--;
+            j--;
+          }
+        }
+      }
+      return teamMembers;
+    };
+    return removeDuplicate(teamMembers ?? []);
+  };
+
   useEffect(() => {
     // 同步外部selectedList
     settingSelectedList(selectedList);
+
+    const teamMembers = getUserTeamMembers();
+    console.log(teamMembers, selectedList);
+    teamMembers.every((tItem) =>
+      selectedList
+        .filter((item) => item.id === item.name || item.name === "TED.F")
+        .find((item) => tItem.name)
+    ) && teamMembers.length < selectedList.length
+      ? setIsDirectTeamMembers.setFalse()
+      : setIsDirectTeamMembers.setTrue();
   }, [selectedList]);
 
   useEffect(() => {
@@ -271,28 +354,9 @@ const useAction = ({
 
   useEffect(() => {
     // 1.找圈選中的父級，刪除子級，2select框只顯示全部選中的都部門，最後再拿子層數據
-    function filterChildren(arr: IDepartmentAndUserListValue[]) {
-      // 遍歷數組中的每個對象
-      arr.forEach((item) => {
-        if (item.children.length) {
-          // 檢查item的children是否都存在於數組中
-          const allChildrenExist = item.children.every((child) =>
-            arr.some((obj) => obj.id === child.id)
-          );
-
-          // 如果所有children都存在，則刪除數組中所有爲item的children
-          if (allChildrenExist) {
-            arr = arr.filter(
-              (obj) => !item.children.find((item) => item.id === obj.id)
-            );
-          }
-        }
-      });
-
-      return arr;
-    }
     // 调用勾选逻辑
-    handleDeptOrUserClick(ClickType.Select, filterChildren(selectedList), true);
+    const newSelectData = setFilterChildren(selectedList);
+    newSelectData && handleDeptOrUserClick(ClickType.Select, newSelectData);
   }, [schemaType]);
 
   return {
@@ -303,7 +367,7 @@ const useAction = ({
     loading,
     throttledValue,
     isDirectTeamMembers,
-    setIsDirectTeamMembers,
+    handleGetAllTeamMembers,
     setSearchValue,
     setLoading,
     handleClear,

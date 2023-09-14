@@ -70,7 +70,7 @@ const useAction = (props: {
     settingSelectedList,
   } = props;
 
-  const defaultGroupOwner = {
+  const defaultGroupOwner: IDepartmentAndUserListValue = {
     id: "-1",
     name: "随机群主",
     type: DepartmentAndUserType.User,
@@ -78,6 +78,7 @@ const useAction = (props: {
     selected: false,
     isCollapsed: false,
     children: [],
+    department_leader: [],
   };
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
     IDepartmentAndUserListValue[] | undefined
