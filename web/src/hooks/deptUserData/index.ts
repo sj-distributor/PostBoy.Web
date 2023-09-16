@@ -68,7 +68,9 @@ const useDeptUserData = ({ appId, schemaType }: IDeptUserDataHookProp) => {
       const department: IDepartmentAndUserListValue = {
         id: source.department.id,
         name: source.department.name.toLocaleUpperCase(),
-        type: DepartmentAndUserType.Department,
+        type: source.childrens.length
+          ? DepartmentAndUserType.Department
+          : DepartmentAndUserType.User,
         parentid: source.department.parentid,
         selected: false,
         isCollapsed: false,

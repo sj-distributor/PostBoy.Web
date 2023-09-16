@@ -1,7 +1,7 @@
 import { useBoolean, useMap, useThrottle } from "ahooks";
 import { clone } from "ramda";
 import { useEffect, useState } from "react";
-
+import { validate as uuidValidate } from "uuid";
 import {
   ClickType,
   DepartmentAndUserType,
@@ -51,7 +51,7 @@ const useAction = ({
   const throttledValue = useThrottle(searchValue, { wait: 500 });
 
   const getUniqueId = (value: IDepartmentAndUserListValue): string => {
-    return `${value.id}${value.idRoute?.join("")}`;
+    return schemaType ? value.name : `${value.id}${value.idRoute?.join("")}`;
   };
 
   const [isDirectTeamMembers, setIsDirectTeamMembers] = useBoolean(true);
@@ -158,22 +158,70 @@ const useAction = ({
 
   const handleMapUpdate = (
     selectedList: IDepartmentAndUserListValue[],
-    indeterminateList: IDepartmentAndUserListValue[]
+    indeterminateList: IDepartmentAndUserListValue[],
+    oldSelectData?: IDepartmentAndUserListValue[]
   ) => {
+    const updateSelectedList = [
+      ...setAllChildrenById(getUniqueId(selectedList[0]), [], true),
+      selectedList[0],
+    ];
+
     const cloneData = clone(foldMap);
+
+    let newArr = [];
+
     for (const [key, value] of cloneData.entries()) {
-      const selectedListItem = selectedList.find(
+      const selectedListItem = updateSelectedList.find(
         (item) => item.name === value.name
       );
-      const indeterminateListItem = indeterminateList.find(
-        (item) => item.name === value.name
-      );
-      cloneData.set(key, {
-        ...value,
-        selected: !!selectedListItem,
-        indeterminate: !!indeterminateListItem,
-      });
+
+      console.log(updateSelectedList);
+      selectedListItem &&
+        key === getUniqueId(selectedListItem) &&
+        cloneData.set(key, {
+          ...value,
+          selected:
+            updateSelectedList.length > 1 ? value.selected : !value.selected,
+        });
+
+      if (
+        selectedList[0].idRoute &&
+        value.idRoute?.slice(0, selectedList[0].idRoute.length).join("") ===
+          selectedList[0].idRoute
+            ?.slice(0, selectedList[0].idRoute.length)
+            .join("")
+      ) {
+        newArr.push(cloneData.get(key));
+      }
     }
+
+    const arr: IDepartmentAndUserListValue = cloneData.get(
+      getUniqueId(
+        newArr.filter(
+          (item) => item?.name !== item?.id
+        )[0] as IDepartmentAndUserListValue
+      )
+    ) as IDepartmentAndUserListValue;
+
+    console.log(newArr);
+    cloneData.set(
+      getUniqueId(
+        newArr.filter(
+          (item) => item?.name !== item?.id
+        )[0] as IDepartmentAndUserListValue
+      ),
+      {
+        ...arr,
+        selected: newArr.every((item) => item?.selected),
+        indeterminate: newArr
+          .filter((item) => item?.name === item?.id)
+          .every((item) => !item?.selected)
+          ? false
+          : !newArr
+              .filter((item) => item?.name === item?.id)
+              .every((item) => item?.selected),
+      }
+    );
     setAll(cloneData);
   };
 
@@ -193,53 +241,43 @@ const useAction = ({
       : [clickedList];
 
     for (const value of clickedItem) {
-      const mapItem = foldMapGetter(getUniqueId(value));
-
-      if (mapItem) {
-        if (type === ClickType.Collapse) {
-          // 折叠
-          foldMapSetter(getUniqueId(value), {
-            ...mapItem,
-            isCollapsed: !mapItem.isCollapsed,
+      if (type === ClickType.Collapse) {
+        // 折叠
+        foldMapSetter(getUniqueId(value), {
+          ...value,
+          isCollapsed: !value.isCollapsed,
+        });
+      } else {
+        let newSelectedList = value.selected
+          ? selectedList.filter((item) => item.name !== value.name)
+          : [...selectedList, value];
+        const uniqueArray = (arr: IDepartmentAndUserListValue[]) => {
+          const set: IDepartmentAndUserListValue[] = [];
+          arr.map((item) => {
+            !set.find((cItem) => item.id === cItem.id) && set.push(item);
           });
-        } else {
-          const updateSelectedList = [
-            ...setAllChildrenById(getUniqueId(value), [], true),
-            ...clickedItem,
-          ];
 
-          let newSelectedList = mapItem.selected
-            ? selectedList.filter(
-                (value) =>
-                  !updateSelectedList.some((item) => item.id === value.id)
-              )
-            : [...selectedList, ...updateSelectedList];
+          return schemaType
+            ? set.filter((item) => isNaN(Number(item.id)))
+            : set;
+        };
 
-          const newIndeterminateList = handleIndeterminateList(
-            mapItem,
-            newSelectedList,
-            indeterminateList
-          );
-
-          const uniqueArray = (arr: IDepartmentAndUserListValue[]) => {
-            const set: IDepartmentAndUserListValue[] = [];
-            arr.map((item) => {
-              !set.find((cItem) => item.id === cItem.id) && set.push(item);
-            });
-            return set;
-          };
-
-          newSelectedList = uniqueArray(
+        let newIndeterminateList = handleIndeterminateList(
+          value,
+          newSelectedList,
+          indeterminateList
+        );
+        newSelectedList.length &&
+          (newSelectedList = uniqueArray(
             newSelectedList.filter(
               (value) =>
                 !newIndeterminateList.some((item) => item.id === value.id)
             )
-          );
-
-          setSelectedList(newSelectedList);
-          setIndeterminateList(newIndeterminateList);
-          handleMapUpdate(newSelectedList, newIndeterminateList);
-        }
+          ));
+        console.log(newSelectedList);
+        setSelectedList(newSelectedList);
+        setIndeterminateList(newIndeterminateList);
+        handleMapUpdate([value], newIndeterminateList, selectedList);
       }
     }
   };
@@ -280,32 +318,38 @@ const useAction = ({
     return arr;
   };
 
+  //指数组员按钮逻辑
   const handleGetAllTeamMembers = () => {
     isDirectTeamMembers
       ? setIsDirectTeamMembers.setFalse()
       : setIsDirectTeamMembers.setTrue();
 
-    if (isDirectTeamMembers) {
-      let teamMembers = getUserTeamMembers();
-      console.log(teamMembers);
+    let teamMembers = getUserTeamMembers();
 
+    if (isDirectTeamMembers) {
+      let newData: IDepartmentAndUserListValue[] = [];
+      teamMembers.map((item) => {
+        !selectedList.find((nItem) => nItem.name === item.name) &&
+          newData.push(item);
+      });
+
+      handleDeptOrUserClick(ClickType.Select, newData);
+    } else {
       handleDeptOrUserClick(
         ClickType.Select,
-        selectedList.length
-          ? teamMembers.filter(
-              (itemA) =>
-                !selectedList.some((itemB) => itemA.name === itemB.name)
-            )
-          : teamMembers
+        selectedList.filter((item) =>
+          teamMembers.find((tItem) => item.name === tItem.name)
+        )
       );
-    } else {
-      setSelectedList([]);
-      flattenList.forEach((item) =>
-        foldMapSetter(getUniqueId(item), { ...item, selected: false })
+      flattenList.forEach(
+        (item) =>
+          teamMembers.some((tItem) => tItem.name === item.name) &&
+          foldMapSetter(getUniqueId(item), { ...item, selected: false })
       );
     }
   };
 
+  //获取组员
   const getUserTeamMembers = () => {
     const teamMembers = schemaType
       ? flattenList.find((item) => item.name === "TED.F")?.children
@@ -328,6 +372,7 @@ const useAction = ({
           }
         }
       }
+
       return teamMembers;
     };
     return removeDuplicate(teamMembers ?? []);
@@ -338,12 +383,10 @@ const useAction = ({
     settingSelectedList(selectedList);
 
     const teamMembers = getUserTeamMembers();
-    console.log(teamMembers, selectedList);
+    console.log(selectedList);
     teamMembers.every((tItem) =>
-      selectedList
-        .filter((item) => item.id === item.name || item.name === "TED.F")
-        .find((item) => tItem.name)
-    ) && teamMembers.length < selectedList.length
+      selectedList.map((item) => item.name).includes(tItem.name)
+    ) && teamMembers.length <= selectedList.length
       ? setIsDirectTeamMembers.setFalse()
       : setIsDirectTeamMembers.setTrue();
   }, [selectedList]);
@@ -355,7 +398,9 @@ const useAction = ({
   useEffect(() => {
     // 1.找圈選中的父級，刪除子級，2select框只顯示全部選中的都部門，最後再拿子層數據
     // 调用勾选逻辑
+    const teamMembers = getUserTeamMembers();
     const newSelectData = setFilterChildren(selectedList);
+    console.log(newSelectData);
     newSelectData && handleDeptOrUserClick(ClickType.Select, newSelectData);
   }, [schemaType]);
 
