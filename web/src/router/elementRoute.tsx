@@ -59,17 +59,17 @@ export const routerArray: RouteItem[] = [
     element: <RolePermission />,
     children: [
       {
-        path: "/roles/usersList",
+        path: "/roles/userList",
         title: "",
         elementChild: <UserList />,
       },
       {
-        path: "/roles/editRoles",
+        path: "/roles/editRole",
         title: "",
         elementChild: <RoleFrom />,
       },
       {
-        path: "/roles/rolesList",
+        path: "/roles/roleList",
         title: "",
         elementChild: <RolePermissions />,
       },
