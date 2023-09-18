@@ -25,15 +25,13 @@ export const UserList = () => {
       headerName: "操作",
       width: 150,
       renderCell: (params) => (
-        <div>
-          <Button
-            variant="text"
-            color="secondary"
-            onClick={() => handleDelete(params.row.name)}
-          >
-            移除
-          </Button>
-        </div>
+        <Button
+          variant="text"
+          color="secondary"
+          onClick={() => handleDelete(params.row.name)}
+        >
+          移除
+        </Button>
       ),
     },
   ];
@@ -77,7 +75,7 @@ export const UserList = () => {
           rows={rows}
           hideFooter
           checkboxSelection
-          // rowSelection={false}
+          disableColumnMenu
         />
       </div>
       <div className={styles.footer}>

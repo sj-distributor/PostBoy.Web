@@ -15,11 +15,13 @@ export const useAction = () => {
 
   const selectStyles = { marginLeft: "0.3rem", flex: 1 };
 
+  const formStyles = { flexBasis: "25%" };
+
   const [selectedValue, setSelectedValue] = useState<number>(0);
 
   const handleChange = (event: SelectChangeEvent<number>) => {
     setSelectedValue(event.target.value as number);
   };
 
-  return { inputStyles, selectStyles, selectedValue, handleChange };
+  return { inputStyles, selectStyles, formStyles, selectedValue, handleChange };
 };

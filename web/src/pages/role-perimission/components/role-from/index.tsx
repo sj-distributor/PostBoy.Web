@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 
 export const RoleFrom = () => {
-  const { inputStyles, selectStyles, selectedValue, handleChange } =
+  const { inputStyles, selectStyles, formStyles, selectedValue, handleChange } =
     useAction();
 
   return (
@@ -77,7 +77,7 @@ export const RoleFrom = () => {
               <div className={styles.itemPermission}>
                 <div className={styles.itemPermissionTitle}>功能權限</div>
                 <div className={styles.itemPerssionsForm}>
-                  <FormGroup sx={{ flexBasis: "25%" }}>
+                  <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
                       label="創建群組"
@@ -85,7 +85,7 @@ export const RoleFrom = () => {
                     <FormControlLabel control={<Checkbox />} label="新增角色" />
                   </FormGroup>
 
-                  <FormGroup sx={{ flexBasis: "25%" }}>
+                  <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
                       label="添加群組成員"
@@ -93,7 +93,7 @@ export const RoleFrom = () => {
                     <FormControlLabel control={<Checkbox />} label="分配" />
                   </FormGroup>
 
-                  <FormGroup sx={{ flexBasis: "25%" }}>
+                  <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
                       label="發送通知"
@@ -101,7 +101,7 @@ export const RoleFrom = () => {
                     <FormControlLabel control={<Checkbox />} label="編輯" />
                   </FormGroup>
 
-                  <FormGroup sx={{ flexBasis: "25%" }}>
+                  <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
                       label="發送紀錄"
