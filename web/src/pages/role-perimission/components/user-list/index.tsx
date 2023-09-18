@@ -12,12 +12,12 @@ export const UserList = () => {
   const columns: GridColDef[] = [
     {
       field: "name",
-      headerName: "用户名",
+      headerName: "用戶名",
       width: 300,
     },
     {
       field: "date",
-      headerName: "更新时间",
+      headerName: "更新時間",
       width: 600,
     },
     {
@@ -25,11 +25,7 @@ export const UserList = () => {
       headerName: "操作",
       width: 150,
       renderCell: (params) => (
-        <Button
-          variant="text"
-          color="secondary"
-          onClick={() => handleDelete(params.row.name)}
-        >
+        <Button variant="text" onClick={() => handleDelete(params.row.id)}>
           移除
         </Button>
       ),
@@ -39,13 +35,13 @@ export const UserList = () => {
   return (
     <div className={styles.container}>
       <div className={styles.nav}>
-        <div className={styles.navTitle}>用户列表</div>
+        <div className={styles.navTitle}>用戶列表</div>
         <div className={styles.navSearch}>
           <TextField
             className={styles.navInput}
             size="small"
             variant="outlined"
-            placeholder="搜索用户名"
+            placeholder="搜索用戶名"
             fullWidth
             autoComplete="off"
             value={inputVal}
@@ -59,7 +55,7 @@ export const UserList = () => {
         </div>
         <div className={styles.navBtn}>
           <Button className={styles.btn} variant="contained">
-            添加用户
+            添加用戶
           </Button>
           <Button className={styles.btnDel} variant="contained">
             批量移除
