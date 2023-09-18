@@ -10,6 +10,8 @@ import { SendRequest } from "../pages/request";
 import EmailIcon from "@mui/icons-material/Email";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { RolePermission } from "../pages/role-perimission";
 
 export const routerArray: RouteItem[] = [
   {
@@ -46,6 +48,12 @@ export const routerArray: RouteItem[] = [
     head: "应用管理",
     icons: <SettingsIcon />,
     element: <Manager />,
+  },
+  {
+    path: "/roles",
+    head: "角色权限",
+    icons: <PersonOutlineIcon />,
+    element: <RolePermission />,
   },
   {
     path: "/meeting",
