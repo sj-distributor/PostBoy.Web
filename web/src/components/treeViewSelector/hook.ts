@@ -122,7 +122,7 @@ const useAction = ({
       const idIndex = (item: number) =>
         clickedItem.idRoute?.findIndex((x) => x === item) ?? 0;
       const mapItem = foldMapGetter(
-        `${item}${clickedItem.idRoute?.slice(0, idIndex(item) + 1).join("")}`
+        `${item}${clickedItem.idRoute?.slice(0, idIndex(+item) + 1).join("")}`
       );
 
       if (mapItem) {
@@ -161,67 +161,76 @@ const useAction = ({
     indeterminateList: IDepartmentAndUserListValue[],
     oldSelectData?: IDepartmentAndUserListValue[]
   ) => {
-    const updateSelectedList = [
+    const cloneData = clone(foldMap);
+
+    let fItem: IDepartmentAndUserListValue | undefined = undefined;
+    cloneData.forEach((item) => {
+      item.id === selectedList[0].parentid && (fItem = item);
+    });
+
+    let sItem: IDepartmentAndUserListValue | undefined = undefined;
+    cloneData.forEach((item) => {
+      item.name === selectedList[0].name && (sItem = item);
+    });
+
+    let flg =
+      (sItem as unknown as IDepartmentAndUserListValue)?.indeterminate ?? false;
+
+    let updateSelectedList = [
       ...setAllChildrenById(getUniqueId(selectedList[0]), [], true),
       selectedList[0],
     ];
 
-    const cloneData = clone(foldMap);
-
-    let newArr = [];
-
+    console.log(updateSelectedList);
     for (const [key, value] of cloneData.entries()) {
       const selectedListItem = updateSelectedList.find(
         (item) => item.name === value.name
       );
 
-      console.log(updateSelectedList);
       selectedListItem &&
-        key === getUniqueId(selectedListItem) &&
         cloneData.set(key, {
           ...value,
-          selected:
-            updateSelectedList.length > 1 ? value.selected : !value.selected,
+          selected: flg ? true : !value.selected,
         });
-
-      if (
-        selectedList[0].idRoute &&
-        value.idRoute?.slice(0, selectedList[0].idRoute.length).join("") ===
-          selectedList[0].idRoute
-            ?.slice(0, selectedList[0].idRoute.length)
-            .join("")
-      ) {
-        newArr.push(cloneData.get(key));
-      }
     }
 
-    const arr: IDepartmentAndUserListValue = cloneData.get(
-      getUniqueId(
-        newArr.filter(
-          (item) => item?.name !== item?.id
-        )[0] as IDepartmentAndUserListValue
-      )
-    ) as IDepartmentAndUserListValue;
+    flg &&
+      sItem &&
+      cloneData.set(
+        getUniqueId(sItem as unknown as IDepartmentAndUserListValue),
+        {
+          ...(cloneData.get(getUniqueId(sItem)) as IDepartmentAndUserListValue),
+          selected: true,
+          indeterminate: false,
+        }
+      );
 
-    console.log(newArr);
-    cloneData.set(
-      getUniqueId(
-        newArr.filter(
-          (item) => item?.name !== item?.id
-        )[0] as IDepartmentAndUserListValue
-      ),
-      {
-        ...arr,
-        selected: newArr.every((item) => item?.selected),
-        indeterminate: newArr
-          .filter((item) => item?.name === item?.id)
-          .every((item) => !item?.selected)
-          ? false
-          : !newArr
-              .filter((item) => item?.name === item?.id)
-              .every((item) => item?.selected),
+    if (fItem) {
+      let arr: IDepartmentAndUserListValue = cloneData.get(
+        getUniqueId(fItem)
+      ) as IDepartmentAndUserListValue;
+
+      console.log(arr);
+      if (
+        arr &&
+        arr.children.find((item) => item.name === selectedList[0].name)
+      ) {
+        let childrenList: IDepartmentAndUserListValue[] = [];
+        cloneData.forEach((item) => {
+          if (item.parentid === selectedList[0].parentid) {
+            childrenList.push(item);
+          }
+        });
+
+        cloneData.set(getUniqueId(fItem), {
+          ...arr,
+          selected: childrenList.every((item) => item?.selected === true),
+          indeterminate: childrenList.every((item) => !item?.selected)
+            ? false
+            : !childrenList.every((item) => item?.selected),
+        });
       }
-    );
+    }
     setAll(cloneData);
   };
 
@@ -274,11 +283,36 @@ const useAction = ({
                 !newIndeterminateList.some((item) => item.id === value.id)
             )
           ));
-        console.log(newSelectedList);
-        setSelectedList(newSelectedList);
+
+        if (!schemaType) {
+          setSelectedList(newSelectedList);
+          handleMapUpdate([value], newIndeterminateList, selectedList);
+        }
         setIndeterminateList(newIndeterminateList);
-        handleMapUpdate([value], newIndeterminateList, selectedList);
       }
+    }
+
+    if (schemaType) {
+      const getAllChildrenList = (
+        data: IDepartmentAndUserListValue[],
+        newData: IDepartmentAndUserListValue[]
+      ) => {
+        data.map((item) => {
+          if (item.children.length) {
+            getAllChildrenList(item.children, newData);
+          } else {
+            newData.push(item);
+          }
+        });
+        console.log(newData);
+        return newData;
+      };
+      console.log(clickedItem);
+      setSelectedList(getAllChildrenList(clickedItem, []));
+
+      getAllChildrenList(selectedList, []).map((item) => {
+        handleMapUpdate([item], []);
+      });
     }
   };
 
@@ -383,7 +417,7 @@ const useAction = ({
     settingSelectedList(selectedList);
 
     const teamMembers = getUserTeamMembers();
-    console.log(selectedList);
+
     teamMembers.every((tItem) =>
       selectedList.map((item) => item.name).includes(tItem.name)
     ) && teamMembers.length <= selectedList.length
@@ -400,9 +434,9 @@ const useAction = ({
     // 调用勾选逻辑
     const teamMembers = getUserTeamMembers();
     const newSelectData = setFilterChildren(selectedList);
-    console.log(newSelectData);
+
     newSelectData && handleDeptOrUserClick(ClickType.Select, newSelectData);
-  }, [schemaType]);
+  }, []);
 
   return {
     foldList,
