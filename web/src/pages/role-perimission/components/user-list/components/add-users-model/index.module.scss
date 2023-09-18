@@ -2,16 +2,67 @@
   width: 50rem;
   height: 40rem;
   display: flex;
+  margin: 2rem;
 
   .leftGroupBox {
     width: 25rem;
+    border-right: 0.1rem solid #e0e0df;
+
+    .listTitle {
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    .search {
+      width: 80%;
+      height: 0.5rem;
+      border-color: #d0d0d0;
+    }
+
+    .folder {
+      color: #1990ff;
+      padding-top: 0.2rem;
+      padding-right: 0.6rem;
+    }
+
+    .arrowRight {
+      font-size: 2rem;
+      color: #888888;
+    }
   }
 
   .rightGroupBox {
+    margin-left: 2.5rem;
     width: 25rem;
 
+    .countBox {
+      height: 37.5rem;
+      .selectTitleWrap {
+        display: flex;
+        font-size: 1.1rem;
+        font-weight: bold;
+        justify-content: space-between;
+
+        .cancel {
+          font-size: 1.8rem;
+          color: #90908f;
+        }
+      }
+
+      .selectListWrap {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        margin-top: 2rem;
+
+        .delete {
+          font-size: 1rem;
+          color: #90908f;
+        }
+      }
+    }
+
     .buttonBox {
-      margin-right: 2rem;
       float: right;
 
       .button {
@@ -19,16 +70,6 @@
         width: 5rem;
         height: 2.2rem;
         text-align: center;
-      }
-    }
-
-    .selectListWrap {
-      height: 33rem;
-      display: flex;
-      justify-content: space-between;
-
-      .cancel {
-        width: 5rem;
       }
     }
   }

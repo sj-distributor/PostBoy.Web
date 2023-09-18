@@ -5,29 +5,50 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Typography,
+  TextField,
 } from "@mui/material";
 import styles from "./index.module.scss";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FolderIcon from "@mui/icons-material/Folder";
+import CloseIcon from "@mui/icons-material/Close";
+import { useAction } from "./hook";
+import { ModalBoxRef } from "../../../../../../dtos/modal";
+import { RefObject } from "react";
 
-export const AddUsersModel = () => {
+export const AddUsersModel = (props: {
+  addUsersRef: RefObject<ModalBoxRef>;
+}) => {
+  const { addUsersRef } = props;
+
+  const { alreadySelectData } = useAction();
+
   return (
     <div className={styles.wrap}>
       <div className={styles.leftGroupBox}>
+        <TextField
+          sx={{
+            input: {
+              height: 24,
+              paddingX: 1,
+              paddingY: 0.3,
+              borderColor: "grey.500",
+              fontSize: 13,
+              lineHeight: 12,
+            },
+          }}
+          type="search"
+          className={styles.search}
+          placeholder="搜索"
+          size="small"
+        />
         <div>
-          <input type="search" className="mui-input-clear" placeholder="" />
-        </div>
-        <div>
-          <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-            OPERATION INC.
-          </Typography>
+          <div className={styles.listTitle}>OPERATION INC.</div>
           <List>
             <ListItem>
               <Checkbox defaultChecked />
               <ListItemIcon>
-                <ArrowRightIcon />
-                <FolderIcon />
+                <ArrowRightIcon className={styles.arrowRight} />
+                <FolderIcon className={styles.folder} />
               </ListItemIcon>
               <ListItemText primary="Single-line item" />
             </ListItem>
@@ -35,16 +56,38 @@ export const AddUsersModel = () => {
         </div>
       </div>
       <div className={styles.rightGroupBox}>
-        <div>已选一个用户</div>
-        <div className={styles.selectListWrap}>
-          <div>AAAAAAAAA.A</div>
-          <div className={styles.cancel}>x</div>
+        <div className={styles.countBox}>
+          <div className={styles.selectTitleWrap}>
+            <div>已選{alreadySelectData.length}個用戶</div>
+            <CloseIcon
+              className={styles.cancel}
+              onClick={() => {
+                addUsersRef.current?.close();
+              }}
+            />
+          </div>
+          <div>
+            {alreadySelectData.map((selectItems: string, index: number) => {
+              return (
+                <div className={styles.selectListWrap} key={index}>
+                  <div>{selectItems}</div>
+                  <CloseIcon className={styles.delete} />
+                </div>
+              );
+            })}
+          </div>
         </div>
         <div className={styles.buttonBox}>
           <Button variant="contained" className={styles.button}>
-            确认
+            確認
           </Button>
-          <Button variant="outlined" className={styles.button}>
+          <Button
+            variant="outlined"
+            className={styles.button}
+            onClick={() => {
+              addUsersRef.current?.close();
+            }}
+          >
             取消
           </Button>
         </div>

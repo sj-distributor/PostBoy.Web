@@ -69,8 +69,12 @@ export const UserList = () => {
           </div>
         </div>
         <div className={styles.navBtn}>
-          <ModalBox ref={addUsersRef} onCancel={onAddUsersCancel}>
-            <AddUsersModel />
+          <ModalBox
+            ref={addUsersRef}
+            onCancel={onAddUsersCancel}
+            headComponent={<></>}
+          >
+            <AddUsersModel addUsersRef={addUsersRef} />
           </ModalBox>
           <Button
             className={styles.btn}
