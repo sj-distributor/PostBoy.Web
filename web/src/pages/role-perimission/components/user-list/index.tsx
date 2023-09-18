@@ -1,13 +1,51 @@
 import styles from "./index.module.scss";
 
-import { Button, TextField, IconButton } from "@mui/material";
+import { Button, IconButton, Pagination, TextField } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import ModalBox from "../../../../components/modal/modal";
 import { AddUsersModel } from "./components/add-users-model";
 
 export const UserList = () => {
-  const { handleSearch, addUsersRef, onAddUsersCancel } = useAction();
+  const {
+    rows,
+    inputVal,
+    addUsersRef,
+    onAddUsersCancel,
+    handleInputChange,
+    handleSearch,
+    handleDelete,
+  } = useAction();
+
+  const columns: GridColDef[] = [
+    {
+      field: "name",
+      headerName: "用户名",
+      width: 300,
+    },
+    {
+      field: "date",
+      headerName: "更新时间",
+      width: 600,
+    },
+    {
+      field: "actions",
+      headerName: "操作",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          <Button
+            variant="text"
+            color="secondary"
+            onClick={() => handleDelete(params.row.name)}
+          >
+            移除
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className={styles.container}>
@@ -20,6 +58,9 @@ export const UserList = () => {
             variant="outlined"
             placeholder="搜索用户名"
             fullWidth
+            autoComplete="off"
+            value={inputVal}
+            onChange={handleInputChange}
           />
           <div className={styles.navIcon}>
             <IconButton aria-label="Search" onClick={handleSearch}>
@@ -48,8 +89,18 @@ export const UserList = () => {
           </Button>
         </div>
       </div>
-      <div className={styles.content}>内容</div>
-      <div className={styles.footer}>底部</div>
+      <div className={styles.content}>
+        <DataGrid
+          columns={columns}
+          rows={rows}
+          hideFooter
+          checkboxSelection
+          // rowSelection={false}
+        />
+      </div>
+      <div className={styles.footer}>
+        <Pagination count={10} shape="rounded" color="primary" />
+      </div>
     </div>
   );
 };
