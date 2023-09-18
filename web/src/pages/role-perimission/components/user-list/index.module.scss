@@ -56,11 +56,11 @@
   .content {
     display: flex;
     flex: 1;
-    background: aqua;
   }
 
   .footer {
-    height: 3rem;
-    background-color: greenyellow;
+    display: flex;
+    margin: 1rem 0;
+    justify-content: end;
   }
 }
