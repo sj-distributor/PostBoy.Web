@@ -1,14 +1,9 @@
 import { ChangeEvent, useRef, useState } from "react";
+import { IUserTableDto } from "../../../../dtos/role";
 import { ModalBoxRef } from "../../../../dtos/modal";
 
-interface RowDto {
-  id: number;
-  name: string;
-  date: string;
-}
-
 export const useAction = () => {
-  const initData: RowDto[] = [
+  const initData: IUserTableDto[] = [
     {
       id: 1,
       name: "xxx",
@@ -18,7 +13,7 @@ export const useAction = () => {
 
   const [inputVal, setInputVal] = useState<string>("");
 
-  const [rows, setRows] = useState<any>(initData);
+  const [rows, setRows] = useState<IUserTableDto[]>(initData);
 
   const addUsersRef = useRef<ModalBoxRef>(null);
 
@@ -32,8 +27,8 @@ export const useAction = () => {
     console.log("Search content:", inputVal);
   };
 
-  const handleDelete = (name: string) => {
-    const updatedRows = rows.filter((row: RowDto) => row.name !== name);
+  const handleDelete = (id: number) => {
+    const updatedRows = rows.filter((row: IUserTableDto) => row.id !== id);
 
     setRows(updatedRows);
   };

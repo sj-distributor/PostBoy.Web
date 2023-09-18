@@ -12,6 +12,9 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { RolePermission } from "../pages/role-perimission";
+import { RoleFrom } from "../pages/role-perimission/components/role-from";
+import { UserList } from "../pages/role-perimission/components/user-list";
+import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
 
 export const routerArray: RouteItem[] = [
   {
@@ -54,6 +57,23 @@ export const routerArray: RouteItem[] = [
     head: "角色权限",
     icons: <PersonOutlineIcon />,
     element: <RolePermission />,
+    children: [
+      {
+        path: "/roles/userList",
+        title: "",
+        elementChild: <UserList />,
+      },
+      {
+        path: "/roles/editRole",
+        title: "",
+        elementChild: <RoleFrom />,
+      },
+      {
+        path: "/roles/roleList",
+        title: "",
+        elementChild: <RolePermissions />,
+      },
+    ],
   },
   {
     path: "/meeting",

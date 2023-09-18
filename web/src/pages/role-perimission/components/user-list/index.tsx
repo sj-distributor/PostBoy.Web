@@ -21,12 +21,12 @@ export const UserList = () => {
   const columns: GridColDef[] = [
     {
       field: "name",
-      headerName: "用户名",
+      headerName: "用戶名",
       width: 300,
     },
     {
       field: "date",
-      headerName: "更新时间",
+      headerName: "更新時間",
       width: 600,
     },
     {
@@ -34,15 +34,9 @@ export const UserList = () => {
       headerName: "操作",
       width: 150,
       renderCell: (params) => (
-        <div>
-          <Button
-            variant="text"
-            color="secondary"
-            onClick={() => handleDelete(params.row.name)}
-          >
-            移除
-          </Button>
-        </div>
+        <Button variant="text" onClick={() => handleDelete(params.row.id)}>
+          移除
+        </Button>
       ),
     },
   ];
@@ -50,13 +44,13 @@ export const UserList = () => {
   return (
     <div className={styles.container}>
       <div className={styles.nav}>
-        <div className={styles.navTitle}>用户列表</div>
+        <div className={styles.navTitle}>用戶列表</div>
         <div className={styles.navSearch}>
           <TextField
             className={styles.navInput}
             size="small"
             variant="outlined"
-            placeholder="搜索用户名"
+            placeholder="搜索用戶名"
             fullWidth
             autoComplete="off"
             value={inputVal}
@@ -99,7 +93,7 @@ export const UserList = () => {
           rows={rows}
           hideFooter
           checkboxSelection
-          // rowSelection={false}
+          disableColumnMenu
         />
       </div>
       <div className={styles.footer}>
