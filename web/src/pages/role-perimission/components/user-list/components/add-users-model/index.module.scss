@@ -1,0 +1,35 @@
+.wrap {
+  width: 50rem;
+  height: 40rem;
+  display: flex;
+
+  .leftGroupBox {
+    width: 25rem;
+  }
+
+  .rightGroupBox {
+    width: 25rem;
+
+    .buttonBox {
+      margin-right: 2rem;
+      float: right;
+
+      .button {
+        margin: 0.5rem;
+        width: 5rem;
+        height: 2.2rem;
+        text-align: center;
+      }
+    }
+
+    .selectListWrap {
+      height: 33rem;
+      display: flex;
+      justify-content: space-between;
+
+      .cancel {
+        width: 5rem;
+      }
+    }
+  }
+}

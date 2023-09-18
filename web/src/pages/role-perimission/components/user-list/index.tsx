@@ -3,9 +3,11 @@ import styles from "./index.module.scss";
 import { Button, TextField, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
+import ModalBox from "../../../../components/modal/modal";
+import { AddUsersModel } from "./components/add-users-model";
 
 export const UserList = () => {
-  const { handleSearch } = useAction();
+  const { handleSearch, addUsersRef, onAddUsersCancel } = useAction();
 
   return (
     <div className={styles.container}>
@@ -26,7 +28,16 @@ export const UserList = () => {
           </div>
         </div>
         <div className={styles.navBtn}>
-          <Button className={styles.btn} variant="contained">
+          <ModalBox ref={addUsersRef} onCancel={onAddUsersCancel}>
+            <AddUsersModel />
+          </ModalBox>
+          <Button
+            className={styles.btn}
+            variant="contained"
+            onClick={() => {
+              addUsersRef.current?.open();
+            }}
+          >
             添加用户
           </Button>
           <Button className={styles.btnDel} variant="contained">
