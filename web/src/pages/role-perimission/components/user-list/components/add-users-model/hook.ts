@@ -6,5 +6,6 @@ export const useAction = () => {
     "AAAAAAAAA.A",
     "AAAAAAAAA.A",
   ];
+
   return { alreadySelectData };
 };
