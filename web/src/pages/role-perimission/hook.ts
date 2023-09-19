@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { routerArray } from "../../router/elementRoute";
 
@@ -10,11 +10,12 @@ const useAction = () => {
   useEffect(() => {
     setClick(
       routerArray
-        .find((x) => x.path === "/home")
+        .find((x) => x.path === "/roles")
         ?.children?.findIndex((x) => x.path === location.pathname)
     );
   }, [location.pathname]);
-  console.log(routerArray);
+
+  console.log(click);
 
   return {
     click,
