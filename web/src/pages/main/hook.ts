@@ -7,8 +7,11 @@ import { routerArray } from "../../router/elementRoute";
 
 const useMainAction = () => {
   const mainLocation = useLocation();
+
   const [clickMainIndex, setMainClickIndex] = useState<number>();
+
   const [haveAdministrator, haveAdministratorAction] = useBoolean(false);
+
   const [userData, setUserData] = useState<IUserResponse>();
 
   useEffect(() => {
