@@ -4,11 +4,14 @@ import { Button, IconButton, Pagination, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
+import ModalBox from "../../../../components/modal/modal";
+import { AddUsersModel } from "./components/add-users-model";
 
 export const UserList = () => {
   const {
     rows,
     inputVal,
+    addUsersRef,
     selectedRows,
     navigate,
     handleInputChange,
@@ -63,8 +66,21 @@ export const UserList = () => {
           </div>
         </div>
         <div className={styles.navBtn}>
-          <Button className={styles.btn} variant="contained">
-            添加用戶
+          <ModalBox
+            ref={addUsersRef}
+            onCancel={() => addUsersRef.current?.close()}
+            headComponent={<></>}
+          >
+            <AddUsersModel addUsersRef={addUsersRef} />
+          </ModalBox>
+          <Button
+            className={styles.btn}
+            variant="contained"
+            onClick={() => {
+              addUsersRef.current?.open();
+            }}
+          >
+            添加用户
           </Button>
           <Button
             className={styles.btnDel}

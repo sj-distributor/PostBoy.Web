@@ -6,6 +6,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import { UserRoleEnum } from "../../../../dtos/role";
 import ModalBox from "../../../../components/modal/modal";
+import ErrorIcon from "@mui/icons-material/Error";
 
 export const RolePermissions = () => {
   const {
@@ -111,25 +112,37 @@ export const RolePermissions = () => {
       <div className={styles.footer}>
         <Pagination count={10} shape="rounded" color="primary" />
       </div>
-
-      {/* <ModalBox
+      <ModalBox
         ref={confirmTipsRef}
         onCancel={() => confirmTipsRef.current?.close()}
-        title=""
+        headComponent={<></>}
       >
-        <div>
-          <div>確認刪除角色</div>
-          <div>
-            <Button variant="outlined">取消</Button>
+        <div className={styles.deleteBox}>
+          <div className={styles.confirmBox}>
+            <ErrorIcon sx={{ color: "red", fontSize: 26 }} />
+            <div className={styles.title}>確認刪除角色?</div>
+          </div>
+          <div className={styles.buttonBox}>
+            <Button
+              variant="outlined"
+              onClick={() => confirmTipsRef.current?.close()}
+              className={styles.cancelButton}
+            >
+              取消
+            </Button>
             <Button
               variant="contained"
-              onClick={() => rowId && handleDelete(rowId)}
+              onClick={() => {
+                rowId && handleDelete(rowId);
+                confirmTipsRef.current?.close();
+              }}
+              className={styles.confirmButton}
             >
               確定刪除
             </Button>
           </div>
         </div>
-      </ModalBox> */}
+      </ModalBox>
     </div>
   );
 };

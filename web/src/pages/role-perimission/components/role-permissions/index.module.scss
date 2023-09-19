@@ -53,4 +53,38 @@
     margin: 1rem 0;
     justify-content: end;
   }
+
+  .deleteBox {
+    width: 18rem;
+    height: 6rem;
+    margin: 1.5rem;
+
+    .confirmBox {
+      display: flex;
+      height: 4.5rem;
+
+      .title {
+        margin-top: 0.2rem;
+        margin-left: 0.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    .buttonBox {
+      display: flex;
+      justify-content: end;
+
+      .cancelButton {
+        height: 1.7rem;
+        font-size: 0.9rem;
+      }
+
+      .confirmButton {
+        margin-left: 1rem;
+        width: 5.8rem;
+        height: 1.7rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
 }

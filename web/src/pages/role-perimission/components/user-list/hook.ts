@@ -1,4 +1,5 @@
-import { ChangeEvent, SetStateAction, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
+import { ModalBoxRef } from "../../../../dtos/modal";
 import { IUserTableDto } from "../../../../dtos/role";
 import { useNavigate } from "react-router-dom";
 
@@ -14,6 +15,8 @@ export const useAction = () => {
   const [inputVal, setInputVal] = useState<string>("");
 
   const [rows, setRows] = useState<IUserTableDto[]>(initData);
+
+  const addUsersRef = useRef<ModalBoxRef>(null);
 
   const navigate = useNavigate();
 
@@ -53,6 +56,7 @@ export const useAction = () => {
   return {
     rows,
     inputVal,
+    addUsersRef,
     selectedRows,
     navigate,
     handleInputChange,
