@@ -14,7 +14,6 @@ const useAction = () => {
         ?.children?.findIndex((x) => x.path === location.pathname)
     );
   }, [location.pathname]);
-  console.log(routerArray);
 
   return {
     click,
