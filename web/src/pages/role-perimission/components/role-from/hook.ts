@@ -1,5 +1,6 @@
 import { SelectChangeEvent } from "@mui/material/Select";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const useAction = () => {
   const inputStyles = {
@@ -19,9 +20,18 @@ export const useAction = () => {
 
   const [selectedValue, setSelectedValue] = useState<number>(0);
 
+  const navigate = useNavigate();
+
   const handleChange = (event: SelectChangeEvent<number>) => {
     setSelectedValue(event.target.value as number);
   };
 
-  return { inputStyles, selectStyles, formStyles, selectedValue, handleChange };
+  return {
+    inputStyles,
+    selectStyles,
+    formStyles,
+    selectedValue,
+    navigate,
+    handleChange,
+  };
 };

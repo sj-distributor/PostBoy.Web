@@ -15,8 +15,14 @@ import {
 } from "@mui/material";
 
 export const RoleFrom = () => {
-  const { inputStyles, selectStyles, formStyles, selectedValue, handleChange } =
-    useAction();
+  const {
+    inputStyles,
+    selectStyles,
+    formStyles,
+    selectedValue,
+    navigate,
+    handleChange,
+  } = useAction();
 
   return (
     <div className={styles.container}>
@@ -24,10 +30,18 @@ export const RoleFrom = () => {
         <div className={styles.nav}>
           <div className={styles.navTitle}>新增角色</div>
           <div className={styles.navBtn}>
-            <Button className={styles.navButton} variant="contained">
+            <Button
+              className={styles.navButton}
+              variant="contained"
+              onClick={() => navigate("/roles/roleList")}
+            >
               確認
             </Button>
-            <Button className={styles.navButton} variant="outlined">
+            <Button
+              className={styles.navButton}
+              variant="outlined"
+              onClick={() => navigate("/roles/roleList")}
+            >
               返回
             </Button>
           </div>

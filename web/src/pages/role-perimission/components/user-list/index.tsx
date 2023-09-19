@@ -12,9 +12,13 @@ export const UserList = () => {
     rows,
     inputVal,
     addUsersRef,
+    selectedRows,
+    navigate,
     handleInputChange,
     handleSearch,
     handleDelete,
+    handleRowSelection,
+    handleBulkDelete,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -78,10 +82,18 @@ export const UserList = () => {
           >
             添加用户
           </Button>
-          <Button className={styles.btnDel} variant="contained">
+          <Button
+            className={styles.btnDel}
+            variant="contained"
+            onClick={() => handleBulkDelete()}
+          >
             批量移除
           </Button>
-          <Button className={styles.btn} variant="outlined">
+          <Button
+            className={styles.btn}
+            variant="outlined"
+            onClick={() => navigate("/roles/roleList")}
+          >
             返回
           </Button>
         </div>
@@ -93,6 +105,8 @@ export const UserList = () => {
           hideFooter
           checkboxSelection
           disableColumnMenu
+          onSelectionModelChange={handleRowSelection}
+          selectionModel={selectedRows}
         />
       </div>
       <div className={styles.footer}>

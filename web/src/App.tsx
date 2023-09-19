@@ -17,8 +17,6 @@ const App = () => {
           path={item.path}
           element={<IsAuthUser>{item.element}</IsAuthUser>}
         >
-          <Route path="" element={<Navigate to="/home/enterprise" />} />
-
           {item.children?.map((childrenItem, childrenIndex) => {
             return (
               <Route
