@@ -7,8 +7,6 @@ import { useAction } from "./hook";
 import { UserRoleEnum } from "../../../../dtos/role";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
-import { grey } from "@mui/material/colors";
-import { title } from "process";
 
 export const RolePermissions = () => {
   const {
