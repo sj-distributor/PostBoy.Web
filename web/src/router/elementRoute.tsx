@@ -15,6 +15,7 @@ import { RolePermission } from "../pages/role-perimission";
 import { RoleFrom } from "../pages/role-perimission/components/role-from";
 import { UserList } from "../pages/role-perimission/components/user-list";
 import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
+import { Navigate } from "react-router-dom";
 
 export const routerArray: RouteItem[] = [
   {
@@ -23,6 +24,11 @@ export const routerArray: RouteItem[] = [
     icons: <EmailIcon />,
     element: <Home />,
     children: [
+      {
+        path: "",
+        title: "",
+        elementChild: <Navigate to="/home/enterprise" />,
+      },
       {
         path: "/home/enterprise",
         title: "企业微信",
@@ -58,6 +64,11 @@ export const routerArray: RouteItem[] = [
     icons: <PersonOutlineIcon />,
     element: <RolePermission />,
     children: [
+      {
+        path: "",
+        title: "",
+        elementChild: <Navigate to={"/roles/roleList"} />,
+      },
       {
         path: "/roles/userList",
         title: "",

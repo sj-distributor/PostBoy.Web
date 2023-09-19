@@ -13,6 +13,7 @@ export const RolePermissions = () => {
     inputVal,
     rowId,
     confirmTipsRef,
+    navigate,
     setRowId,
     handleInputChange,
     handleSearch,
@@ -50,7 +51,7 @@ export const RolePermissions = () => {
             <Button variant="text" onClick={() => console.log("分配")}>
               分配
             </Button>
-            <Button variant="text" onClick={() => console.log("編輯")}>
+            <Button variant="text" onClick={() => navigate("/roles/editRole")}>
               編輯
             </Button>
             <Button
