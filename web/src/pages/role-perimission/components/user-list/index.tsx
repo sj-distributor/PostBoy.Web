@@ -6,8 +6,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 
 export const UserList = () => {
-  const { rows, inputVal, handleInputChange, handleSearch, handleDelete } =
-    useAction();
+  const {
+    rows,
+    inputVal,
+    selectedRows,
+    navigate,
+    handleInputChange,
+    handleSearch,
+    handleDelete,
+    handleRowSelection,
+    handleBulkDelete,
+  } = useAction();
 
   const columns: GridColDef[] = [
     {
@@ -57,10 +66,18 @@ export const UserList = () => {
           <Button className={styles.btn} variant="contained">
             添加用戶
           </Button>
-          <Button className={styles.btnDel} variant="contained">
+          <Button
+            className={styles.btnDel}
+            variant="contained"
+            onClick={() => handleBulkDelete()}
+          >
             批量移除
           </Button>
-          <Button className={styles.btn} variant="outlined">
+          <Button
+            className={styles.btn}
+            variant="outlined"
+            onClick={() => navigate("/roles/roleList")}
+          >
             返回
           </Button>
         </div>
@@ -72,6 +89,8 @@ export const UserList = () => {
           hideFooter
           checkboxSelection
           disableColumnMenu
+          onSelectionModelChange={handleRowSelection}
+          selectionModel={selectedRows}
         />
       </div>
       <div className={styles.footer}>

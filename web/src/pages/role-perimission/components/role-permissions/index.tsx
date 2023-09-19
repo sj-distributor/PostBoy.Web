@@ -38,17 +38,17 @@ export const RolePermissions = () => {
       renderCell: (params) => {
         return params.row.role === UserRoleEnum.SuperAdmin ? (
           <>
-            <Button variant="text" onClick={() => console.log("分配")}>
+            <Button variant="text" onClick={() => navigate("roles/userList")}>
               分配
             </Button>
           </>
         ) : params.row.role === UserRoleEnum.User ? (
-          <Button variant="text" onClick={() => console.log("編輯")}>
+          <Button variant="text" onClick={() => navigate("/roles/editRole")}>
             編輯
           </Button>
         ) : (
           <div>
-            <Button variant="text" onClick={() => console.log("分配")}>
+            <Button variant="text" onClick={() => navigate("/roles/userList")}>
               分配
             </Button>
             <Button variant="text" onClick={() => navigate("/roles/editRole")}>
@@ -91,7 +91,12 @@ export const RolePermissions = () => {
           </div>
         </div>
         <div className={styles.navBtn}>
-          <Button variant="contained">新增角色</Button>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/roles/editRole")}
+          >
+            新增角色
+          </Button>
         </div>
       </div>
       <div className={styles.content}>
