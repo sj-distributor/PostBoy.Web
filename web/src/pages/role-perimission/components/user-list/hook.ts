@@ -17,8 +17,6 @@ export const useAction = () => {
 
   const addUsersRef = useRef<ModalBoxRef>(null);
 
-  const onAddUsersCancel = () => addUsersRef.current?.close();
-
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputVal(event.target.value);
   };
@@ -37,7 +35,6 @@ export const useAction = () => {
     rows,
     inputVal,
     addUsersRef,
-    onAddUsersCancel,
     handleInputChange,
     handleSearch,
     handleDelete,

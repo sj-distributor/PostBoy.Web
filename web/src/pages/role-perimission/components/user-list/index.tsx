@@ -12,7 +12,6 @@ export const UserList = () => {
     rows,
     inputVal,
     addUsersRef,
-    onAddUsersCancel,
     handleInputChange,
     handleSearch,
     handleDelete,
@@ -65,7 +64,7 @@ export const UserList = () => {
         <div className={styles.navBtn}>
           <ModalBox
             ref={addUsersRef}
-            onCancel={onAddUsersCancel}
+            onCancel={() => addUsersRef.current?.close()}
             headComponent={<></>}
           >
             <AddUsersModel addUsersRef={addUsersRef} />

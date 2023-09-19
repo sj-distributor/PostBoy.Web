@@ -28,12 +28,12 @@ export const AddUsersModel = (props: {
         <TextField
           sx={{
             input: {
-              height: 24,
-              paddingX: 1,
-              paddingY: 0.3,
+              height: "1.5rem",
+              paddingX: ".5rem",
+              paddingY: ".15rem",
               borderColor: "grey.500",
-              fontSize: 13,
-              lineHeight: 12,
+              fontSize: "0.6rem",
+              lineHeight: "0.625rem",
             },
           }}
           type="search"
@@ -61,9 +61,7 @@ export const AddUsersModel = (props: {
             <div>已選{alreadySelectData.length}個用戶</div>
             <CloseIcon
               className={styles.cancel}
-              onClick={() => {
-                addUsersRef.current?.close();
-              }}
+              onClick={() => addUsersRef.current?.close()}
             />
           </div>
           <div>
@@ -84,9 +82,7 @@ export const AddUsersModel = (props: {
           <Button
             variant="outlined"
             className={styles.button}
-            onClick={() => {
-              addUsersRef.current?.close();
-            }}
+            onClick={() => addUsersRef.current?.close()}
           >
             取消
           </Button>
