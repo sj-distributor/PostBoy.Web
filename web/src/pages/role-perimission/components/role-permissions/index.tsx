@@ -39,7 +39,7 @@ export const RolePermissions = () => {
       renderCell: (params) => {
         return params.row.role === UserRoleEnum.SuperAdmin ? (
           <>
-            <Button variant="text" onClick={() => navigate("roles/userList")}>
+            <Button variant="text" onClick={() => navigate("/roles/userList")}>
               分配
             </Button>
           </>
