@@ -1,7 +1,7 @@
 import styles from "./index.module.scss";
 
 import { Button, IconButton, Pagination, TextField } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridSelectionModel } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import ModalBox from "../../../../components/modal/modal";
@@ -12,13 +12,12 @@ export const UserList = () => {
     rows,
     inputVal,
     addUsersRef,
-    selectedRows,
     navigate,
+    setSelectId,
     handleInputChange,
     handleSearch,
     handleDelete,
-    handleRowSelection,
-    handleBulkDelete,
+    batchDelete,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -85,7 +84,7 @@ export const UserList = () => {
           <Button
             className={styles.btnDel}
             variant="contained"
-            onClick={() => handleBulkDelete()}
+            onClick={batchDelete}
           >
             批量移除
           </Button>
@@ -105,8 +104,9 @@ export const UserList = () => {
           hideFooter
           checkboxSelection
           disableColumnMenu
-          onSelectionModelChange={handleRowSelection}
-          selectionModel={selectedRows}
+          onSelectionModelChange={(selectionModel: GridSelectionModel) =>
+            setSelectId(selectionModel)
+          }
         />
       </div>
       <div className={styles.footer}>

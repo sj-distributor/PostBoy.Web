@@ -75,7 +75,12 @@ export const routerArray: RouteItem[] = [
         elementChild: <UserList />,
       },
       {
-        path: "/roles/editRole",
+        path: "/roles/add",
+        title: "",
+        elementChild: <RoleFrom />,
+      },
+      {
+        path: "/roles/edit/:id",
         title: "",
         elementChild: <RoleFrom />,
       },

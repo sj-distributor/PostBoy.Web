@@ -20,6 +20,7 @@ export const RoleFrom = () => {
     selectStyles,
     formStyles,
     selectedValue,
+    location,
     navigate,
     handleChange,
   } = useAction();
@@ -28,7 +29,9 @@ export const RoleFrom = () => {
     <div className={styles.container}>
       <Stack spacing={5}>
         <div className={styles.nav}>
-          <div className={styles.navTitle}>新增角色</div>
+          <div className={styles.navTitle}>
+            {location.pathname === "/roles/add" ? "新增角色" : "編輯角色"}
+          </div>
           <div className={styles.navBtn}>
             <Button
               className={styles.navButton}

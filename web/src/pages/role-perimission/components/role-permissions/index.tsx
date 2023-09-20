@@ -10,6 +10,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 export const RolePermissions = () => {
   const {
+    userId,
     rows,
     inputVal,
     rowId,
@@ -38,13 +39,14 @@ export const RolePermissions = () => {
       width: 300,
       renderCell: (params) => {
         return params.row.role === UserRoleEnum.SuperAdmin ? (
-          <>
-            <Button variant="text" onClick={() => navigate("/roles/userList")}>
-              分配
-            </Button>
-          </>
+          <Button variant="text" onClick={() => navigate("/roles/userList")}>
+            分配
+          </Button>
         ) : params.row.role === UserRoleEnum.User ? (
-          <Button variant="text" onClick={() => navigate("/roles/editRole")}>
+          <Button
+            variant="text"
+            onClick={() => navigate(`/roles/edit/${userId}`)}
+          >
             編輯
           </Button>
         ) : (
@@ -52,7 +54,10 @@ export const RolePermissions = () => {
             <Button variant="text" onClick={() => navigate("/roles/userList")}>
               分配
             </Button>
-            <Button variant="text" onClick={() => navigate("/roles/editRole")}>
+            <Button
+              variant="text"
+              onClick={() => navigate(`/roles/edit/${userId}`)}
+            >
               編輯
             </Button>
             <Button
@@ -92,10 +97,7 @@ export const RolePermissions = () => {
           </div>
         </div>
         <div className={styles.navBtn}>
-          <Button
-            variant="contained"
-            onClick={() => navigate("/roles/editRole")}
-          >
+          <Button variant="contained" onClick={() => navigate(`/roles/add`)}>
             新增角色
           </Button>
         </div>

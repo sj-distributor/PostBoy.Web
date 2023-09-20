@@ -2,6 +2,7 @@ import { ChangeEvent, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { IUserTableDto } from "../../../../dtos/role";
 import { useNavigate } from "react-router-dom";
+import { GridSelectionModel } from "@mui/x-data-grid";
 
 export const useAction = () => {
   const initData: IUserTableDto[] = [
@@ -10,11 +11,33 @@ export const useAction = () => {
       name: "xxx",
       date: "2014-12-24 23:12:00",
     },
+    {
+      id: 2,
+      name: "xxx",
+      date: "2015-12-24 23:12:00",
+    },
+    {
+      id: 3,
+      name: "xxx",
+      date: "2016-12-24 23:12:00",
+    },
+    {
+      id: 4,
+      name: "xxx",
+      date: "2017-12-24 23:12:00",
+    },
+    {
+      id: 5,
+      name: "xxx",
+      date: "2018-12-24 23:12:00",
+    },
   ];
 
   const [inputVal, setInputVal] = useState<string>("");
 
   const [rows, setRows] = useState<IUserTableDto[]>(initData);
+
+  const [selectId, setSelectId] = useState<GridSelectionModel>([]);
 
   const addUsersRef = useRef<ModalBoxRef>(null);
 
@@ -33,36 +56,23 @@ export const useAction = () => {
 
     setRows(updatedRows);
   };
+  const batchDelete = () => {
+    const updatedRows = rows.filter(
+      (row: IUserTableDto) => !selectId.includes(row.id)
+    );
 
-  // ---
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
-  const handleRowSelection = (selection: any) => {
-    setSelectedRows(selection.selectionModel);
-  };
-
-  const handleBulkDelete = () => {
-    console.log(11);
-
-    const selectedIds = selectedRows
-      .map((index) => rows[index]?.id)
-      .filter(Boolean);
-    // 在这里执行实际的批量删除逻辑
-    console.log("Selected IDs for bulk delete:", selectedIds);
-    // 如果有实际的删除逻辑，你可以调用对应的删除函数，并传递选中的ids
-    // deleteSelectedRows(selectedIds);
+    setRows(updatedRows);
   };
 
   return {
     rows,
     inputVal,
     addUsersRef,
-    selectedRows,
     navigate,
+    setSelectId,
     handleInputChange,
     handleSearch,
     handleDelete,
-    handleRowSelection,
-    handleBulkDelete,
+    batchDelete,
   };
 };

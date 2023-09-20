@@ -29,6 +29,8 @@ export const useAction = () => {
     },
   ];
 
+  const userId = "225";
+
   const [inputVal, setInputVal] = useState<string>("");
 
   const [rows, setRows] = useState<IRoleTabltDto[]>(initData);
@@ -54,6 +56,7 @@ export const useAction = () => {
   };
 
   return {
+    userId,
     rows,
     inputVal,
     rowId,
