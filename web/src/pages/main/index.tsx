@@ -19,7 +19,7 @@ const Main = () => {
     useMainAction();
 
   const verifyPermissions = (item: RouteItem) =>
-    ["/user", "/manager"].includes(item.path) ? !!haveAdministrator : true;
+    !["/user", "/manager", "/roles"].includes(item.path) || !!haveAdministrator;
 
   const routerTabBar = () => {
     return routerArray.map((item, index) => {

@@ -10,6 +10,12 @@ import { SendRequest } from "../pages/request";
 import EmailIcon from "@mui/icons-material/Email";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { RolePermission } from "../pages/role-perimission";
+import { RoleFrom } from "../pages/role-perimission/components/role-from";
+import { UserList } from "../pages/role-perimission/components/user-list";
+import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
+import { Navigate } from "react-router-dom";
 
 export const routerArray: RouteItem[] = [
   {
@@ -18,6 +24,11 @@ export const routerArray: RouteItem[] = [
     icons: <EmailIcon />,
     element: <Home />,
     children: [
+      {
+        path: "",
+        title: "",
+        elementChild: <Navigate to="/home/enterprise" />,
+      },
       {
         path: "/home/enterprise",
         title: "企业微信",
@@ -46,6 +57,39 @@ export const routerArray: RouteItem[] = [
     head: "应用管理",
     icons: <SettingsIcon />,
     element: <Manager />,
+  },
+  {
+    path: "/roles",
+    head: "角色权限",
+    icons: <PersonOutlineIcon />,
+    element: <RolePermission />,
+    children: [
+      {
+        path: "",
+        title: "",
+        elementChild: <Navigate to={"/roles/roleList"} />,
+      },
+      {
+        path: "/roles/userList",
+        title: "",
+        elementChild: <UserList />,
+      },
+      {
+        path: "/roles/add",
+        title: "",
+        elementChild: <RoleFrom />,
+      },
+      {
+        path: "/roles/edit/:id",
+        title: "",
+        elementChild: <RoleFrom />,
+      },
+      {
+        path: "/roles/roleList",
+        title: "",
+        elementChild: <RolePermissions />,
+      },
+    ],
   },
   {
     path: "/meeting",
