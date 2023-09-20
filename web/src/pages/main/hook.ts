@@ -15,18 +15,11 @@ const useMainAction = () => {
   const [userData, setUserData] = useState<IUserResponse>();
 
   useEffect(() => {
-    const getMainClickIndex = () => {
-      const getMainIndex = routerArray.findIndex((item) =>
-        item?.children?.some((x) => x.path === mainLocation.pathname)
-      );
-      return getMainIndex >= 0 ? getMainIndex : 0;
-    };
-
-    setMainClickIndex(
-      routerArray.findIndex((item) => item.path === mainLocation.pathname) >= 0
-        ? routerArray.findIndex((item) => item.path === mainLocation.pathname)
-        : getMainClickIndex()
+    const indexInRouterArray = routerArray.findIndex((item) =>
+      mainLocation.pathname.includes(item.path)
     );
+
+    setMainClickIndex(indexInRouterArray);
   }, [mainLocation.pathname]);
 
   useEffect(() => {
