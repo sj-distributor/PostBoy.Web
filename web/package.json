@@ -35,6 +35,8 @@
     "react-mentions": "^4.4.7",
     "react-router-dom": "^6.5.0",
     "react-scripts": "5.0.1",
+    "react-virtualized": "^9.22.5",
+    "react-virtualized-tree": "^3.4.1",
     "sass-loader": "^13.2.0",
     "smart-cron": "^1.0.17",
     "typescript": "^4.9.4",

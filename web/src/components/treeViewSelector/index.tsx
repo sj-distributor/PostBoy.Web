@@ -25,6 +25,8 @@ import {
 } from "../../dtos/enterprise";
 import TagsComponent from "./tags";
 
+import TreeList from "./treeList";
+
 const TreeViewSelector = ({
   appId,
   sourceData,
@@ -92,64 +94,77 @@ const TreeViewSelector = ({
     isDivider: boolean
   ) => {
     const result = (
-      <List key={appId} dense>
-        {data.map((deptUser, index) => {
-          const deptUserData = foldMapGetter(getUniqueId(deptUser));
-          return (
-            !deptUserData || (
-              <div
-                key={deptUserData.name + `${deptUserData.idRoute?.join("")}`}
-              >
-                <ListItemButton
-                  // className={`${!deptUserData.indeterminate || styles.mask}`}
-                  sx={{ pl, height: "2.2rem" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deptUser.children.length > 0 &&
-                      handleDeptOrUserClick(ClickType.Collapse, deptUserData);
-                  }}
-                >
-                  {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
-                    <Checkbox
-                      edge="start"
-                      checked={deptUserData.selected}
-                      tabIndex={-1}
-                      disableRipple
-                      indeterminate={deptUserData.indeterminate}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeptOrUserClick(ClickType.Select, deptUserData);
-                      }}
-                    />
-                  )}
-                  <ListItemText primary={deptUserData.name} />
-                  {deptUser.children.length > 0 &&
-                    (!!deptUserData.isCollapsed ? (
-                      <ExpandLess />
-                    ) : (
-                      <ExpandMore />
-                    ))}
-                </ListItemButton>
-                {deptUser.children.length > 0 && (
-                  <Collapse
-                    in={!!deptUserData.isCollapsed}
-                    timeout={0}
-                    unmountOnExit
-                  >
-                    {recursiveRenderDeptList(
-                      deptUser.children,
-                      pl + 2,
-                      index !== data.length - 1
-                    )}
-                  </Collapse>
-                )}
-              </div>
-            )
-          );
-        })}
-        {isDivider && <Divider />}
-      </List>
+      // <List key={appId} dense>
+      //   {data.map((deptUser, index) => {
+      //     const deptUserData = foldMapGetter(getUniqueId(deptUser));
+      //     return (
+      //       !deptUserData || (
+      //         <div
+      //           key={deptUserData.name + `${deptUserData.idRoute?.join("")}`}
+      //         >
+      //           <ListItemButton
+      //             // className={`${!deptUserData.indeterminate || styles.mask}`}
+      //             sx={{ pl, height: "2.2rem" }}
+      //             onClick={(e) => {
+      //               e.stopPropagation();
+      //               deptUser.children.length > 0 &&
+      //                 handleDeptOrUserClick(ClickType.Collapse, deptUserData);
+      //             }}
+      //           >
+      //             {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
+      //               <Checkbox
+      //                 edge="start"
+      //                 checked={deptUserData.selected}
+      //                 tabIndex={-1}
+      //                 disableRipple
+      //                 indeterminate={deptUserData.indeterminate}
+      //                 onClick={(e) => {
+      //                   e.stopPropagation();
+      //                   handleDeptOrUserClick(ClickType.Select, deptUserData);
+      //                 }}
+      //               />
+      //             )}
+      //             <ListItemText primary={deptUserData.name} />
+      //             {deptUser.children.length > 0 &&
+      //               (!!deptUserData.isCollapsed ? (
+      //                 <ExpandLess />
+      //               ) : (
+      //                 <ExpandMore />
+      //               ))}
+      //           </ListItemButton>
+      //           {deptUser.children.length > 0 && (
+      //             <Collapse
+      //               in={!!deptUserData.isCollapsed}
+      //               timeout={0}
+      //               unmountOnExit
+      //             >
+      //               {recursiveRenderDeptList(
+      //                 deptUser.children,
+      //                 pl + 2,
+      //                 index !== data.length - 1
+      //               )}
+      //             </Collapse>
+      //           )}
+      //         </div>
+      //       )
+      //     );
+      //   })}
+      //   {isDivider && <Divider />}
+      // </List>
+      <TreeList data={data} handleDeptOrUserClick={handleDeptOrUserClick} />
     );
+    // data && (
+    //   <VariableSizeList
+    //     height={220}
+    //     width={"100%"}
+    //     itemSize={() => 50}
+    //     itemCount={foldList.length}
+    //     overscanCount={50}
+    //     itemData={data}
+    //   >
+    //     {renderRow}
+    //   </VariableSizeList>
+    // );
     return result;
   };
 

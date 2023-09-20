@@ -82,7 +82,6 @@ const useAction = ({
     isSelected: boolean
   ) => {
     const mapItem = foldMapGetter(id);
-
     //向下
     mapItem &&
       mapItem.children.forEach((item) => {
@@ -100,7 +99,6 @@ const useAction = ({
             );
         }
       });
-
     return childrenList;
   };
 
@@ -115,14 +113,16 @@ const useAction = ({
       只要数据符合条件便set入resultList
       return一个resultList
     */
+
     const resultList: IDepartmentAndUserListValue[] = [...indeterminateList];
     const idRouteList = clickedItem.idRoute?.slice().reverse();
 
     idRouteList?.forEach((item) => {
       const idIndex = (item: number) =>
         clickedItem.idRoute?.findIndex((x) => x === item) ?? 0;
+
       const mapItem = foldMapGetter(
-        `${item}${clickedItem.idRoute?.slice(0, idIndex(+item) + 1).join("")}`
+        `${clickedItem.id}${clickedItem.idRoute?.join("")}`
       );
 
       if (mapItem) {
@@ -158,81 +158,119 @@ const useAction = ({
 
   const handleMapUpdate = (
     selectedList: IDepartmentAndUserListValue[],
-    indeterminateList: IDepartmentAndUserListValue[],
-    oldSelectData?: IDepartmentAndUserListValue[]
+    indeterminateList?: IDepartmentAndUserListValue[]
   ) => {
     const cloneData = clone(foldMap);
+    console.log(selectedList);
+    selectedList.map((selectItem) => {
+      let fatherItem: IDepartmentAndUserListValue | undefined = undefined;
+      cloneData.forEach((item) => {
+        item.id === selectItem.parentid && (fatherItem = item);
+      });
 
-    let fItem: IDepartmentAndUserListValue | undefined = undefined;
-    cloneData.forEach((item) => {
-      item.id === selectedList[0].parentid && (fItem = item);
-    });
+      let clickItem: IDepartmentAndUserListValue | undefined = undefined;
+      cloneData.forEach((item) => {
+        item.name === selectItem.name && (clickItem = item);
+      });
 
-    let sItem: IDepartmentAndUserListValue | undefined = undefined;
-    cloneData.forEach((item) => {
-      item.name === selectedList[0].name && (sItem = item);
-    });
+      let isIndeterminate =
+        (clickItem as unknown as IDepartmentAndUserListValue)?.indeterminate ??
+        false;
 
-    let flg =
-      (sItem as unknown as IDepartmentAndUserListValue)?.indeterminate ?? false;
+      let updateSelectedList = [
+        ...setAllChildrenById(getUniqueId(selectItem), [], true),
+        selectItem,
+      ];
 
-    let updateSelectedList = [
-      ...setAllChildrenById(getUniqueId(selectedList[0]), [], true),
-      selectedList[0],
-    ];
+      for (const [key, value] of cloneData.entries()) {
+        const selectedListItem = updateSelectedList.find(
+          (item) => item.name === value.name
+        );
 
-    console.log(updateSelectedList);
-    for (const [key, value] of cloneData.entries()) {
-      const selectedListItem = updateSelectedList.find(
-        (item) => item.name === value.name
-      );
+        selectedListItem &&
+          cloneData.set(key, {
+            ...value,
+            selected: isIndeterminate ? true : !value.selected,
+          });
+      }
 
-      selectedListItem &&
-        cloneData.set(key, {
-          ...value,
-          selected: flg ? true : !value.selected,
-        });
-    }
+      isIndeterminate &&
+        clickItem &&
+        cloneData.set(
+          getUniqueId(clickItem as unknown as IDepartmentAndUserListValue),
+          {
+            ...(cloneData.get(
+              getUniqueId(clickItem)
+            ) as IDepartmentAndUserListValue),
+            selected: true,
+            indeterminate: false,
+          }
+        );
 
-    flg &&
-      sItem &&
-      cloneData.set(
-        getUniqueId(sItem as unknown as IDepartmentAndUserListValue),
-        {
-          ...(cloneData.get(getUniqueId(sItem)) as IDepartmentAndUserListValue),
-          selected: true,
-          indeterminate: false,
-        }
-      );
+      if (fatherItem) {
+        let arr: IDepartmentAndUserListValue = cloneData.get(
+          getUniqueId(fatherItem)
+        ) as IDepartmentAndUserListValue;
 
-    if (fItem) {
-      let arr: IDepartmentAndUserListValue = cloneData.get(
-        getUniqueId(fItem)
-      ) as IDepartmentAndUserListValue;
-
-      console.log(arr);
-      if (
-        arr &&
-        arr.children.find((item) => item.name === selectedList[0].name)
-      ) {
         let childrenList: IDepartmentAndUserListValue[] = [];
         cloneData.forEach((item) => {
-          if (item.parentid === selectedList[0].parentid) {
+          if (
+            item.parentid === selectItem.parentid &&
+            fatherItem?.name !== item.name
+          ) {
             childrenList.push(item);
           }
         });
 
-        cloneData.set(getUniqueId(fItem), {
-          ...arr,
-          selected: childrenList.every((item) => item?.selected === true),
-          indeterminate: childrenList.every((item) => !item?.selected)
-            ? false
-            : !childrenList.every((item) => item?.selected),
+        if (arr && arr.children.find((item) => item.name === selectItem.name)) {
+          cloneData.set(getUniqueId(fatherItem), {
+            ...arr,
+            selected: childrenList.every((item) => item?.selected === true),
+            indeterminate: childrenList.every((item) => !item?.selected)
+              ? false
+              : !childrenList.every((item) => item?.selected),
+          });
+        }
+
+        foldMap.forEach((item) => {
+          if (
+            arr.idRoute
+              ?.slice(
+                0,
+                arr.name !== arr.id
+                  ? arr.idRoute.length - 1
+                  : arr.idRoute.length
+              )
+              .find((rItem) => rItem === item.id)
+          ) {
+            cloneData.set(getUniqueId(item), {
+              ...item,
+              indeterminate: fatherItem
+                ? foldMapGetter(getUniqueId(fatherItem))?.selected ||
+                  foldMapGetter(getUniqueId(fatherItem))?.indeterminate
+                : false,
+            });
+          }
         });
       }
-    }
+    });
+
     setAll(cloneData);
   };
+
+  useEffect(() => {
+    let departmentItem: IDepartmentAndUserListValue[] = [];
+    foldMap.forEach((item) => {
+      if (
+        item.selected &&
+        !departmentItem.find((dItem) => item.name === dItem.name)
+      ) {
+        departmentItem.push(item);
+      }
+    });
+
+    setSelectedList(departmentItem);
+  }, [foldMap]);
 
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
@@ -252,14 +290,14 @@ const useAction = ({
     for (const value of clickedItem) {
       if (type === ClickType.Collapse) {
         // 折叠
-        foldMapSetter(getUniqueId(value), {
+
+        foldMapSetter(schemaType ? value.name : getUniqueId(value), {
           ...value,
           isCollapsed: !value.isCollapsed,
         });
       } else {
-        let newSelectedList = value.selected
-          ? selectedList.filter((item) => item.name !== value.name)
-          : [...selectedList, value];
+        let newSelectedList = [...selectedList, value];
+
         const uniqueArray = (arr: IDepartmentAndUserListValue[]) => {
           const set: IDepartmentAndUserListValue[] = [];
           arr.map((item) => {
@@ -285,34 +323,14 @@ const useAction = ({
           ));
 
         if (!schemaType) {
-          setSelectedList(newSelectedList);
-          handleMapUpdate([value], newIndeterminateList, selectedList);
+          handleMapUpdate([value], newIndeterminateList);
         }
         setIndeterminateList(newIndeterminateList);
       }
     }
 
-    if (schemaType) {
-      const getAllChildrenList = (
-        data: IDepartmentAndUserListValue[],
-        newData: IDepartmentAndUserListValue[]
-      ) => {
-        data.map((item) => {
-          if (item.children.length) {
-            getAllChildrenList(item.children, newData);
-          } else {
-            newData.push(item);
-          }
-        });
-        console.log(newData);
-        return newData;
-      };
-      console.log(clickedItem);
-      setSelectedList(getAllChildrenList(clickedItem, []));
-
-      getAllChildrenList(selectedList, []).map((item) => {
-        handleMapUpdate([item], []);
-      });
+    if (schemaType && type !== ClickType.Collapse) {
+      handleMapUpdate(clickedItem, []);
     }
   };
 
@@ -328,6 +346,9 @@ const useAction = ({
       );
     } else {
       clickItem && handleDeptOrUserClick(ClickType.Select, clickItem);
+      setSelectedList((prev) =>
+        prev.filter((item) => item.name !== clickItem?.name)
+      );
     }
   };
 
@@ -367,14 +388,37 @@ const useAction = ({
           newData.push(item);
       });
 
-      handleDeptOrUserClick(ClickType.Select, newData);
+      handleMapUpdate(newData, indeterminateList);
     } else {
-      handleDeptOrUserClick(
-        ClickType.Select,
-        selectedList.filter((item) =>
-          teamMembers.find((tItem) => item.name === tItem.name)
-        )
+      let newData: IDepartmentAndUserListValue[] = [];
+      teamMembers.map((item, index) => {
+        !selectedList.find((nItem) => nItem.name === item.name) &&
+          newData.splice(index, 1);
+      });
+
+      const cloneData = clone(foldMap);
+      cloneData.forEach((item) => {
+        cloneData.set(getUniqueId(item), {
+          ...item,
+          indeterminate: false,
+          selected: false,
+        });
+      });
+      setAll(cloneData);
+
+      handleMapUpdate(
+        schemaType
+          ? selectedList.filter((item) =>
+              teamMembers.find((tItem) => item.name === tItem.name)
+            )
+          : selectedList
+              .filter(
+                (item) => !teamMembers.find((tItem) => item.name === tItem.name)
+              )
+              .filter((item) => item.name === item.id),
+        indeterminateList
       );
+
       flattenList.forEach(
         (item) =>
           teamMembers.some((tItem) => tItem.name === item.name) &&
@@ -429,13 +473,31 @@ const useAction = ({
     if (limitTags === selectedList.length) setLoading(false);
   }, [limitTags]);
 
+  //初始化选中数据
   useEffect(() => {
-    // 1.找圈選中的父級，刪除子級，2select框只顯示全部選中的都部門，最後再拿子層數據
-    // 调用勾选逻辑
-    const teamMembers = getUserTeamMembers();
-    const newSelectData = setFilterChildren(selectedList);
-
-    newSelectData && handleDeptOrUserClick(ClickType.Select, newSelectData);
+    console.log(
+      setFilterChildren(
+        flattenList.filter((item) =>
+          selectedList
+            .filter((item) => item.name === item.id)
+            .some((clickItem) => clickItem.name === item.name)
+        )
+      )
+    );
+    !loading &&
+      handleMapUpdate(
+        schemaType
+          ? setFilterChildren(
+              flattenList.filter((item) =>
+                selectedList
+                  .filter((item) => item.name === item.id)
+                  .some((clickItem) => clickItem.name === item.name)
+              )
+            )
+          : flattenList.filter((item) =>
+              selectedList.some((clickItem) => clickItem.name === item.name)
+            )
+      );
   }, []);
 
   return {
