@@ -1,8 +1,15 @@
 import { SelectChangeEvent } from "@mui/material/Select";
+
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { IRoleOptions } from "../../../../dtos/role";
 
 export const useAction = () => {
+  const options: IRoleOptions[] = [
+    { value: 10, label: "选项1" },
+    { value: 20, label: "选项2" },
+    { value: 30, label: "选项3" },
+  ];
   const inputStyles = {
     border: 1,
     flex: 1,
@@ -18,23 +25,17 @@ export const useAction = () => {
 
   const formStyles = { flexBasis: "25%" };
 
-  const [selectedValue, setSelectedValue] = useState<number>(0);
-
   const location = useLocation();
 
   const navigate = useNavigate();
 
-  const handleChange = (event: SelectChangeEvent<number>) => {
-    setSelectedValue(event.target.value as number);
-  };
-
   return {
+    options,
     inputStyles,
     selectStyles,
     formStyles,
-    selectedValue,
+
     location,
     navigate,
-    handleChange,
   };
 };

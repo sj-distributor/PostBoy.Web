@@ -11,6 +11,11 @@ export interface IRoleTabltDto {
   role: UserRoleEnum;
 }
 
+export interface IRoleOptions {
+  value: number;
+  label: string;
+}
+
 export enum UserRoleEnum {
   SuperAdmin,
   Admin,

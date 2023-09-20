@@ -1,29 +1,27 @@
 import { useAction } from "./hook";
-
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
 
 import {
+  Autocomplete,
   Button,
   Card,
   Checkbox,
   FormControlLabel,
   FormGroup,
   Input,
-  MenuItem,
-  Select,
   Stack,
+  TextField,
 } from "@mui/material";
 
 export const RoleFrom = () => {
-  const {
-    inputStyles,
-    selectStyles,
-    formStyles,
-    selectedValue,
-    location,
-    navigate,
-    handleChange,
-  } = useAction();
+  const { options, inputStyles, selectStyles, formStyles, location, navigate } =
+    useAction();
+
+  const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+
+  const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
   return (
     <div className={styles.container}>
@@ -134,34 +132,60 @@ export const RoleFrom = () => {
             <div className={styles.item}>
               <div className={styles.itemSubTitle}>拉群功能：</div>
               <div className={styles.itemInput}>
-                <Select
+                <Autocomplete
                   size="small"
                   sx={selectStyles}
-                  value={selectedValue}
-                  onChange={handleChange}
-                >
-                  <MenuItem value={0}>請選擇</MenuItem>
-                  <MenuItem value={10}>选项1</MenuItem>
-                  <MenuItem value={20}>选项2</MenuItem>
-                  <MenuItem value={30}>选项3</MenuItem>
-                </Select>
+                  multiple
+                  id="checkboxes-tags-demo"
+                  options={options}
+                  disableCloseOnSelect
+                  getOptionLabel={(option) => option.label}
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={selected}
+                      />
+                      {option.label}
+                    </li>
+                  )}
+                  style={{ width: 500 }}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder="請選擇" />
+                  )}
+                />
               </div>
             </div>
 
             <div className={`${styles.item} ${styles.lastItem}`}>
               <div className={styles.itemSubTitle}>通知功能：</div>
               <div className={styles.itemInput}>
-                <Select
+                <Autocomplete
                   size="small"
                   sx={selectStyles}
-                  value={selectedValue}
-                  onChange={handleChange}
-                >
-                  <MenuItem value={0}>請選擇</MenuItem>
-                  <MenuItem value={10}>选项1</MenuItem>
-                  <MenuItem value={20}>选项2</MenuItem>
-                  <MenuItem value={30}>选项3</MenuItem>
-                </Select>
+                  multiple
+                  id="checkboxes-tags-demo"
+                  options={options}
+                  disableCloseOnSelect
+                  getOptionLabel={(option) => option.label}
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={selected}
+                      />
+                      {option.label}
+                    </li>
+                  )}
+                  style={{ width: 500 }}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder="請選擇" />
+                  )}
+                />
               </div>
             </div>
           </Stack>
