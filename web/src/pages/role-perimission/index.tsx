@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 
 export const RolePermission = () => {
   return (
-    <div className={styles.home}>
+    <div className={styles.container}>
       <Outlet />
     </div>
   );

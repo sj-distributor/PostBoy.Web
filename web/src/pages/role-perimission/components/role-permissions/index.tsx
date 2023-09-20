@@ -50,7 +50,7 @@ export const RolePermissions = () => {
             編輯
           </Button>
         ) : (
-          <div>
+          <>
             <Button variant="text" onClick={() => navigate("/roles/userList")}>
               分配
             </Button>
@@ -69,7 +69,7 @@ export const RolePermissions = () => {
             >
               刪除
             </Button>
-          </div>
+          </>
         );
       },
     },

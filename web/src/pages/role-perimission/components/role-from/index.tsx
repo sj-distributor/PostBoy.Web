@@ -63,7 +63,6 @@ export const RoleFrom = () => {
                 />
               </div>
             </div>
-
             <div className={styles.item}>
               <div className={styles.itemSubTitle}>角色描述：</div>
               <div className={styles.itemInput}>
@@ -101,7 +100,6 @@ export const RoleFrom = () => {
                     />
                     <FormControlLabel control={<Checkbox />} label="新增角色" />
                   </FormGroup>
-
                   <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
@@ -109,7 +107,6 @@ export const RoleFrom = () => {
                     />
                     <FormControlLabel control={<Checkbox />} label="分配" />
                   </FormGroup>
-
                   <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}

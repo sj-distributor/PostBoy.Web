@@ -56,6 +56,7 @@ export const useAction = () => {
 
     setRows(updatedRows);
   };
+
   const batchDelete = () => {
     const updatedRows = rows.filter(
       (row: IUserTableDto) => !selectId.includes(row.id)
