@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Checkbox,
   List,
@@ -11,9 +12,18 @@ import styles from "./index.module.scss";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FolderIcon from "@mui/icons-material/Folder";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
+import { FixedSizeList } from "react-window";
+
+interface TreeNode {
+  id: number;
+  idRoute: number[];
+  title: string;
+  children?: TreeNode[];
+}
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -21,6 +31,174 @@ export const AddUsersModel = (props: {
   const { addUsersRef } = props;
 
   const { alreadySelectData } = useAction();
+
+  const treeData: TreeNode[] = [
+    {
+      id: 1,
+      idRoute: [1],
+      title: "节点1",
+      children: [
+        {
+          id: 4,
+          idRoute: [1, 4],
+          title: "节点1-4",
+          children: [
+            {
+              id: 5,
+              idRoute: [1, 4, 5],
+              title: "节点1-4-5",
+              children: [
+                {
+                  id: 6,
+                  idRoute: [1, 4, 5, 6],
+                  title: "节点1-4-5-6",
+                  children: [],
+                },
+                {
+                  id: 9,
+                  idRoute: [1, 4, 5, 9],
+                  title: "节点1-4-5-9",
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      idRoute: [2],
+      title: "节点2",
+      children: [
+        {
+          id: 7,
+          idRoute: [2, 7],
+          title: "节点2-7",
+          children: [],
+        },
+      ],
+    },
+    {
+      id: 3,
+      idRoute: [3],
+      title: "节点3",
+      children: [
+        {
+          id: 8,
+          idRoute: [3, 8],
+          title: "节点3-8",
+          children: [],
+        },
+      ],
+    },
+  ];
+
+  const padding = 2;
+
+  const flattenTree = (
+    tree: TreeNode[],
+    expandedNodes: Set<string>
+  ): TreeNode[] => {
+    const sortedTree: TreeNode[] = [];
+
+    const sortAndFlatten = (
+      node: TreeNode,
+      parentRoute: number[] = []
+    ): void => {
+      const nodeRoute = [...parentRoute, ...node.idRoute];
+      sortedTree.push({ ...node, idRoute: nodeRoute });
+
+      if (expandedNodes.has(nodeRoute.toString()) && node.children) {
+        node.children.forEach((child) => {
+          sortAndFlatten(child, nodeRoute);
+        });
+      }
+    };
+
+    tree.forEach((node) => {
+      sortAndFlatten(node);
+    });
+
+    return sortedTree;
+  };
+
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
+
+  const toggleNode = (nodeRoute: number[]) => {
+    const nodeRouteStr = nodeRoute.toString();
+    const isSelected = selectedNodes.has(nodeRouteStr);
+
+    if (isSelected) {
+      selectedNodes.delete(nodeRouteStr);
+    } else {
+      selectedNodes.add(nodeRouteStr);
+    }
+
+    if (expandedNodes.has(nodeRouteStr)) {
+      expandedNodes.delete(nodeRouteStr);
+    } else {
+      expandedNodes.add(nodeRouteStr);
+    }
+
+    setExpandedNodes(new Set(expandedNodes));
+    setSelectedNodes(new Set(selectedNodes));
+  };
+
+  const flatData = flattenTree(treeData, expandedNodes);
+
+  const renderListItem: React.FC<{
+    index: number;
+  }> = ({ index }) => {
+    const item = flatData[index];
+    const hasChildren = item.children && item.children.length > 0;
+    const isSelected = selectedNodes.has(item.idRoute.toString());
+    const isExpanded = expandedNodes.has(item.idRoute.toString());
+
+    const paddingLeft = padding * (item.idRoute.length - 1);
+
+    return (
+      <div>
+        <ListItem
+          key={item.idRoute.toString()}
+          onClick={() => toggleNode(item.idRoute)}
+          style={{ paddingLeft: `${paddingLeft}px` }}
+        >
+          <ListItemIcon>
+            <Checkbox
+              checked={isSelected}
+              onChange={(e) => e.stopPropagation()}
+            />
+            {hasChildren ? (
+              isExpanded ? (
+                <>
+                  <ArrowDropDownIcon
+                    className={styles.arrowRight}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <FolderIcon className={styles.folder} />
+                </>
+              ) : (
+                <>
+                  <ArrowRightIcon
+                    className={styles.arrowRight}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <FolderIcon className={styles.folder} />
+                </>
+              )
+            ) : (
+              <>
+                <FolderIcon className={styles.folder} />
+              </>
+            )}
+          </ListItemIcon>
+          <ListItemText primary={item.title} />
+        </ListItem>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.wrap}>
@@ -43,7 +221,7 @@ export const AddUsersModel = (props: {
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <List>
+          {/* <List>
             <ListItem>
               <Checkbox defaultChecked />
               <ListItemIcon>
@@ -52,7 +230,17 @@ export const AddUsersModel = (props: {
               </ListItemIcon>
               <ListItemText primary="Single-line item" />
             </ListItem>
-          </List>
+          </List> */}
+          <Box sx={{ width: "100%", height: 400 }}>
+            <FixedSizeList
+              height={500}
+              itemCount={flatData.length}
+              itemSize={46}
+              width={360}
+            >
+              {renderListItem}
+            </FixedSizeList>
+          </Box>
         </div>
       </div>
       <div className={styles.rightGroupBox}>
