@@ -128,22 +128,24 @@ export const AddUsersModel = (props: {
 
   const toggleNode = (nodeRoute: number[]) => {
     const nodeRouteStr = nodeRoute.toString();
+    console.log(nodeRoute, "nodeRoute");
+    console.log(nodeRouteStr, "nodeRouteStr");
+
+    const expandSet = new Set(expandedNodes);
+    const selectSet = new Set(selectedNodes);
     const isSelected = selectedNodes.has(nodeRouteStr);
-
     if (isSelected) {
-      selectedNodes.delete(nodeRouteStr);
+      selectSet.delete(nodeRouteStr);
     } else {
-      selectedNodes.add(nodeRouteStr);
+      selectSet.add(nodeRouteStr);
     }
-
-    if (expandedNodes.has(nodeRouteStr)) {
-      expandedNodes.delete(nodeRouteStr);
+    if (expandSet.has(nodeRouteStr)) {
+      expandSet.delete(nodeRouteStr);
     } else {
-      expandedNodes.add(nodeRouteStr);
+      expandSet.add(nodeRouteStr);
     }
-
-    setExpandedNodes(new Set(expandedNodes));
-    setSelectedNodes(new Set(selectedNodes));
+    setExpandedNodes(expandSet);
+    setSelectedNodes(selectSet);
   };
 
   const handleCheckboxChange = (nodeRoute: number[], isChecked: boolean) => {
@@ -152,16 +154,15 @@ export const AddUsersModel = (props: {
     const nodeRouteStr = nodeRoute.toString();
 
     if (isChecked) {
-      updatedSelectedNodes.add(nodeRouteStr);
-      updatedExpandedNodes.add(nodeRouteStr);
-
-      // 选中所有以当前节点的开头的节点
-      flatData.forEach((node) => {
-        const currentNodeRouteStr = node.idRoute.toString();
-        if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
-          updatedSelectedNodes.add(currentNodeRouteStr);
-        }
-      });
+      // updatedSelectedNodes.add(nodeRouteStr);
+      // updatedExpandedNodes.add(nodeRouteStr);
+      // // 选中所有以当前节点的开头的节点
+      // flatData.forEach((node) => {
+      //   const currentNodeRouteStr = node.idRoute.toString();
+      //   if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
+      //     updatedSelectedNodes.add(currentNodeRouteStr);
+      //   }
+      // });
     } else {
       updatedSelectedNodes.delete(nodeRouteStr);
       updatedExpandedNodes.delete(nodeRouteStr);
@@ -180,6 +181,7 @@ export const AddUsersModel = (props: {
   };
 
   const flatData = flattenTree(treeData, expandedNodes);
+  console.log(flatData, "flatData");
 
   const renderListItem: React.FC<{
     index: number;
