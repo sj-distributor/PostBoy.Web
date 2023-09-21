@@ -13,7 +13,7 @@ const { getNodeRenderOptions } = selectors;
 const { Expandable } = Renderers;
 const SELECT = 2;
 const FootballPlayerRenderer = (props: any) => {
-  const { node, children, handleDeptOrUserClick, onChange, nodes, foldMap } =
+  const { node, children, handleDeptOrUserClick, onChange, setNodes, foldMap } =
     props;
   const { id, name, state: { selected } = false, indeterminate } = node;
 
@@ -22,45 +22,6 @@ const FootballPlayerRenderer = (props: any) => {
   useEffect(() => {
     props.measure();
   }, []);
-
-  const setIndeterminate = (node: any, indeterminate: boolean) => {
-    console.log(nodes);
-    const a = (data: any[]) => {
-      data.map((item: any) => {
-        // console.log(item);
-        if (
-          node.parents
-            ?.slice(
-              0,
-              node.parents.name !== node.id
-                ? node.parents.length - 1
-                : node.parents.length
-            )
-            .find((rItem: any) => rItem === item.id)
-        ) {
-          console.log(item);
-        }
-        item.children.length && a(item.children);
-      });
-    };
-
-    a(nodes);
-  };
-
-  // useEffect(() => {
-  //   foldMap.forEach((element: any) => {});
-
-  //   const a = (data: any[]) => {
-  //     data.map((item: any) => {
-  //       console.log(item);
-
-  //       item.children.length && a(item.children);
-  //     });
-
-  //     return data;
-  //   };
-  //   console.log(a(nodes));
-  // }, [foldMap]);
 
   return (
     <ListItemButton key={id + name}>
@@ -73,19 +34,18 @@ const FootballPlayerRenderer = (props: any) => {
         onClick={(e) => {
           e.stopPropagation();
 
-          onChange({
-            node: {
-              ...node,
-              state: {
-                ...(node.state || {}),
-                selected: !selected,
-              },
-              selected: !selected,
-              indeterminate: indeterminate,
-            },
-            type: SELECT,
-          });
-          setIndeterminate(node, indeterminate);
+          // onChange({
+          //   node: {
+          //     ...node,
+          //     state: {
+          //       ...(node.state || {}),
+          //       selected: !selected,
+          //     },
+          //     selected: !selected,
+          //     indeterminate: indeterminate,
+          //   },
+          //   type: SELECT,
+          // });
 
           handleDeptOrUserClick(ClickType.Select, node);
         }}
@@ -96,7 +56,6 @@ const FootballPlayerRenderer = (props: any) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          width: "80%",
         }}
       >
         <b>{name}</b>
@@ -116,52 +75,99 @@ const NodeMeasure = (props: {
   foldMap: Map<string | number, IDepartmentAndUserListValue>;
 }) => {
   const { data, handleDeptOrUserClick, foldMap } = props;
+
   const [nodes, setNodes] = useState<any>(data);
 
   const handleChange = (nodes: any) => {
     setNodes(nodes);
   };
 
-  const selectNodes = (nodes: any, selected: any) =>
-    nodes.map((n: any) => ({
-      ...n,
-      children: n.children ? selectNodes(n.children, selected) : [],
-      state: {
-        ...n.state,
-        selected,
-      },
-    }));
+  // const selectNodes = (nodes: any, selected: any) =>
+  //   nodes.map((n: any) => ({
+  //     ...n,
+  //     children: n.children ? selectNodes(n.children, selected) : [],
+  //     state: {
+  //       ...n.state,
+  //       selected,
+  //     },
+  //   }));
 
-  const nodeSelectionHandler = (nodes: any, updatedNode: any) =>
-    nodes.map((node: any) => {
-      if (node.name === updatedNode.name) {
-        return {
-          ...updatedNode,
-          children: node.children
-            ? selectNodes(node.children, updatedNode.state.selected)
-            : [],
+  // const nodeSelectionHandler = (nodes: any, updatedNode: any) =>
+  //   nodes.map((node: any) => {
+  //     if (node.name === updatedNode.name) {
+  //       return {
+  //         ...updatedNode,
+  //         children: node.children
+  //           ? selectNodes(node.children, updatedNode.state.selected)
+  //           : [],
+  //       };
+  //     }
+
+  //     if (node.children) {
+  //       return {
+  //         ...node,
+  //         children: nodeSelectionHandler(node.children, updatedNode),
+  //       };
+  //     }
+
+  //     return node;
+  //   });
+
+  useEffect(() => {
+    function array2Tree(
+      arr: IDepartmentAndUserListValue[]
+    ): IDepartmentAndUserListValue | null {
+      // 用于id和TreeNode的映射，map<key, value>，可通过id快速查找到树节点，时间复杂度为O(1)
+      const treeNode: Map<string, IDepartmentAndUserListValue> = new Map();
+      let root = null; // 树根节点
+      arr.forEach((item) => {
+        const { id, name, parentid, selected, isCollapsed, indeterminate } =
+          item; // 解构赋值
+        // 定义树节点tree node，并使用Map维持id与节点之间的关系
+        const node: IDepartmentAndUserListValue = {
+          id,
+          name,
+          type: 1,
+          parentid,
+          selected,
+          isCollapsed,
+          indeterminate,
+          children: [],
+          department_leader: [],
         };
-      }
-
-      if (node.children) {
-        return {
-          ...node,
-          children: nodeSelectionHandler(node.children, updatedNode),
-        };
-      }
-
-      return node;
-    });
+        treeNode.set(id + "", node);
+        // 使用parentId找出parentNode
+        const parentNode = treeNode.get(parentid + "");
+        if (parentNode) {
+          if (parentNode.children == null) {
+            parentNode.children = [];
+          }
+          // 找到父节点后，将当前数组项转换的节点添加到子节点列表中
+          parentNode.children.push(node);
+        }
+        // 在第一次循环中找到根节点，我们假定id=0的表示根节点
+        if (parentid + "" === "0") {
+          root = node;
+        }
+      });
+      return root;
+    }
+    const tree = array2Tree(
+      foldMap as unknown as IDepartmentAndUserListValue[]
+    ); // 需要定义arrs
+    console.log(foldMap);
+    tree && setNodes([tree]);
+  }, [foldMap]);
 
   return (
     <Tree
       nodes={nodes}
       onChange={handleChange}
-      extensions={{
-        updateTypeHandlers: {
-          [SELECT]: nodeSelectionHandler,
-        },
-      }}
+      // extensions={{
+      //   updateTypeHandlers: {
+      //     [SELECT]: nodeSelectionHandler,
+      //   },
+      // }}
     >
       {({ style, node, ...p }) => (
         <div style={style}>
@@ -169,7 +175,7 @@ const NodeMeasure = (props: {
             node={node}
             {...p}
             handleDeptOrUserClick={handleDeptOrUserClick}
-            nodes={nodes}
+            setNodes={setNodes}
             foldMap={foldMap}
           >
             <Expandable node={node} {...p} />

@@ -113,8 +113,8 @@ const useDeptUserData = ({ appId, schemaType }: IDeptUserDataHookProp) => {
             | [],
         }));
       }
-
       department.children.push(...users);
+
       flattenList.push({ ...department }, ...users);
       resultList.unshift(department);
       source.childrens.length > 0 &&
