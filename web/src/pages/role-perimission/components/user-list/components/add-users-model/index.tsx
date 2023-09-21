@@ -146,6 +146,39 @@ export const AddUsersModel = (props: {
     setSelectedNodes(new Set(selectedNodes));
   };
 
+  const handleCheckboxChange = (nodeRoute: number[], isChecked: boolean) => {
+    const updatedSelectedNodes = new Set(selectedNodes);
+    const updatedExpandedNodes = new Set(expandedNodes);
+    const nodeRouteStr = nodeRoute.toString();
+
+    if (isChecked) {
+      updatedSelectedNodes.add(nodeRouteStr);
+      updatedExpandedNodes.add(nodeRouteStr);
+
+      // 选中所有以当前节点的开头的节点
+      flatData.forEach((node) => {
+        const currentNodeRouteStr = node.idRoute.toString();
+        if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
+          updatedSelectedNodes.add(currentNodeRouteStr);
+        }
+      });
+    } else {
+      updatedSelectedNodes.delete(nodeRouteStr);
+      updatedExpandedNodes.delete(nodeRouteStr);
+
+      // 取消选中所有以当前节点的 idRoute 开头的节点
+      flatData.forEach((node) => {
+        const currentNodeRouteStr = node.idRoute.toString();
+        if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
+          updatedSelectedNodes.delete(currentNodeRouteStr);
+        }
+      });
+    }
+
+    setSelectedNodes(updatedSelectedNodes);
+    setExpandedNodes(updatedExpandedNodes);
+  };
+
   const flatData = flattenTree(treeData, expandedNodes);
 
   const renderListItem: React.FC<{
@@ -168,7 +201,10 @@ export const AddUsersModel = (props: {
           <ListItemIcon>
             <Checkbox
               checked={isSelected}
-              onChange={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleCheckboxChange(item.idRoute, !isSelected);
+              }}
             />
             {hasChildren ? (
               isExpanded ? (
