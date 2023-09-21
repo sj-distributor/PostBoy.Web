@@ -302,6 +302,7 @@ const NodeMeasure = (props: {
                 onChange={(e) => {
                   e.stopPropagation();
                   handleCheckboxChange(item.idRoute ?? [], !item.isCollapsed);
+                  handleDeptOrUserClick(ClickType.Select, item);
                 }}
               />
             </ListItemIcon>
