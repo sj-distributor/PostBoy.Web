@@ -96,6 +96,37 @@ export const AddUsersModel = (props: {
 
   const padding = 2;
 
+  const flattenTreeTotalList = (
+    tree: TreeNode[],
+    parentIdRoute: number[] = []
+  ): TreeNode[] => {
+    let flattenedList: TreeNode[] = [];
+
+    for (const node of tree) {
+      const idRoute = [...parentIdRoute, node.id];
+
+      flattenedList.push({
+        id: node.id,
+        idRoute: node.idRoute,
+        title: node.title,
+      });
+
+      if (node.children && node.children.length > 0) {
+        flattenedList = [
+          ...flattenedList,
+          ...flattenTreeTotalList(node.children, idRoute),
+        ];
+      }
+    }
+
+    return flattenedList;
+  };
+
+  const flatTreeTotalListData = flattenTreeTotalList(treeData);
+
+  // 打印平铺结构数据
+  console.log(flatTreeTotalListData, "flatTreeTotalListData");
+
   const flattenTree = (
     tree: TreeNode[],
     expandedNodes: Set<string>
@@ -130,22 +161,19 @@ export const AddUsersModel = (props: {
     const nodeRouteStr = nodeRoute.toString();
     console.log(nodeRoute, "nodeRoute");
     console.log(nodeRouteStr, "nodeRouteStr");
-
-    const expandSet = new Set(expandedNodes);
-    const selectSet = new Set(selectedNodes);
     const isSelected = selectedNodes.has(nodeRouteStr);
     if (isSelected) {
-      selectSet.delete(nodeRouteStr);
+      selectedNodes.delete(nodeRouteStr);
     } else {
-      selectSet.add(nodeRouteStr);
+      selectedNodes.add(nodeRouteStr);
     }
-    if (expandSet.has(nodeRouteStr)) {
-      expandSet.delete(nodeRouteStr);
+    if (expandedNodes.has(nodeRouteStr)) {
+      expandedNodes.delete(nodeRouteStr);
     } else {
-      expandSet.add(nodeRouteStr);
+      expandedNodes.add(nodeRouteStr);
     }
-    setExpandedNodes(expandSet);
-    setSelectedNodes(selectSet);
+    setExpandedNodes(new Set(expandedNodes));
+    setSelectedNodes(new Set(selectedNodes));
   };
 
   const handleCheckboxChange = (nodeRoute: number[], isChecked: boolean) => {
