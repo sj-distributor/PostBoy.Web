@@ -15,7 +15,7 @@ const SELECT = 2;
 const FootballPlayerRenderer = (props: any) => {
   const { node, children, handleDeptOrUserClick, onChange, setNodes, foldMap } =
     props;
-  const { id, name, state: { selected } = false, indeterminate } = node;
+  const { id, name,selected, indeterminate } = node;
 
   const { isExpanded } = getNodeRenderOptions(node);
 
@@ -47,7 +47,7 @@ const FootballPlayerRenderer = (props: any) => {
           //   type: SELECT,
           // });
 
-          handleDeptOrUserClick(ClickType.Select, node);
+          node&&  handleDeptOrUserClick(ClickType.Select, node);
         }}
       />
 
@@ -121,7 +121,7 @@ const NodeMeasure = (props: {
       const treeNode: Map<string, IDepartmentAndUserListValue> = new Map();
       let root = null; // 树根节点
       arr.forEach((item) => {
-        const { id, name, parentid, selected, isCollapsed, indeterminate } =
+        const { id, name, parentid, selected, isCollapsed, indeterminate,idRoute } =
           item; // 解构赋值
         // 定义树节点tree node，并使用Map维持id与节点之间的关系
         const node: IDepartmentAndUserListValue = {
@@ -129,6 +129,7 @@ const NodeMeasure = (props: {
           name,
           type: 1,
           parentid,
+          idRoute,
           selected,
           isCollapsed,
           indeterminate,
@@ -152,10 +153,11 @@ const NodeMeasure = (props: {
       });
       return root;
     }
+
     const tree = array2Tree(
       foldMap as unknown as IDepartmentAndUserListValue[]
     ); // 需要定义arrs
-    console.log(foldMap);
+    console.log(tree);
     tree && setNodes([tree]);
   }, [foldMap]);
 
