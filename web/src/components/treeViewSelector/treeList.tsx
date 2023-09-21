@@ -5,9 +5,24 @@ import Tree, {
   selectors,
 } from "react-virtualized-tree";
 import { ClickType, IDepartmentAndUserListValue } from "../../dtos/enterprise";
-import { Checkbox, ListItemButton } from "@mui/material";
+import {
+  Checkbox,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { ExpandLess } from "@mui/icons-material";
 import "material-icons/css/material-icons.css";
+import { Box, Button, List, TextField } from "@mui/material";
+import styles from "./index.module.scss";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import FolderIcon from "@mui/icons-material/Folder";
+import CloseIcon from "@mui/icons-material/Close";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+
+import { RefObject } from "react";
+import { FixedSizeList } from "react-window";
 
 const { getNodeRenderOptions } = selectors;
 const { Expandable } = Renderers;
@@ -153,30 +168,161 @@ const NodeMeasure = (props: {
       return node;
     });
 
-  return (
-    <Tree
-      nodes={nodes}
-      onChange={handleChange}
-      extensions={{
-        updateTypeHandlers: {
-          [SELECT]: nodeSelectionHandler,
-        },
-      }}
-    >
-      {({ style, node, ...p }) => (
-        <div style={style}>
-          <FootballPlayerRenderer
-            node={node}
-            {...p}
-            handleDeptOrUserClick={handleDeptOrUserClick}
-            nodes={nodes}
-            foldMap={foldMap}
+  interface TreeNode {
+    id: number;
+    idRoute: number[];
+    title: string;
+    children?: TreeNode[];
+  }
+
+  const treeData: IDepartmentAndUserListValue[] = data;
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
+
+  const toggleNode = (nodeRoute: number[]) => {
+    const nodeRouteStr = nodeRoute.toString();
+    console.log(nodeRoute, "nodeRoute");
+    console.log(nodeRouteStr, "nodeRouteStr");
+
+    const expandSet = new Set(expandedNodes);
+    const selectSet = new Set(selectedNodes);
+    const isSelected = selectedNodes.has(nodeRouteStr);
+    if (isSelected) {
+      selectSet.delete(nodeRouteStr);
+    } else {
+      selectSet.add(nodeRouteStr);
+    }
+    if (expandSet.has(nodeRouteStr)) {
+      expandSet.delete(nodeRouteStr);
+    } else {
+      expandSet.add(nodeRouteStr);
+    }
+    setExpandedNodes(expandSet);
+    setSelectedNodes(selectSet);
+  };
+
+  const handleCheckboxChange = (nodeRoute: number[], isChecked: boolean) => {
+    const updatedSelectedNodes = new Set(selectedNodes);
+    const updatedExpandedNodes = new Set(expandedNodes);
+    const nodeRouteStr = nodeRoute.toString();
+
+    if (isChecked) {
+      // updatedSelectedNodes.add(nodeRouteStr);
+      // updatedExpandedNodes.add(nodeRouteStr);
+      // // 选中所有以当前节点的开头的节点
+      // flatData.forEach((node) => {
+      //   const currentNodeRouteStr = node.idRoute.toString();
+      //   if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
+      //     updatedSelectedNodes.add(currentNodeRouteStr);
+      //   }
+      // });
+    } else {
+      updatedSelectedNodes.delete(nodeRouteStr);
+      updatedExpandedNodes.delete(nodeRouteStr);
+
+      // 取消选中所有以当前节点的 idRoute 开头的节点
+      flatData.forEach((node) => {
+        const currentNodeRouteStr = (node.idRoute ?? []).toString();
+        if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
+          updatedSelectedNodes.delete(currentNodeRouteStr);
+        }
+      });
+    }
+
+    setSelectedNodes(updatedSelectedNodes);
+    setExpandedNodes(updatedExpandedNodes);
+  };
+
+  const flattenTree = (
+    tree: IDepartmentAndUserListValue[],
+    expandedNodes: Set<string>
+  ): IDepartmentAndUserListValue[] => {
+    const sortedTree: IDepartmentAndUserListValue[] = [];
+
+    const sortAndFlatten = (
+      node: IDepartmentAndUserListValue,
+      parentRoute: number[] = []
+    ): void => {
+      const nodeRoute = [...parentRoute, ...(node.idRoute ?? [])];
+      sortedTree.push({
+        ...node,
+        idRoute: nodeRoute,
+      });
+
+      if (expandedNodes.has(nodeRoute.toString()) && node.children) {
+        node.children.forEach((child) => {
+          sortAndFlatten(child, nodeRoute);
+        });
+      }
+    };
+
+    tree.forEach((node) => {
+      sortAndFlatten(node);
+    });
+
+    return sortedTree;
+  };
+
+  const flatData = flattenTree(treeData, expandedNodes);
+  console.log(flatData, "flatData");
+
+  const renderListItem: React.FC<{
+    index: number;
+  }> = ({ index }) => {
+    const item = flatData[index];
+    const hasChildren = item.children && item.children.length > 0;
+    const isSelected = selectedNodes.has((item.idRoute ?? []).toString());
+    const isExpanded = expandedNodes.has((item.idRoute ?? []).toString());
+    const padding = 2;
+    const paddingLeft = padding * ((item.idRoute ?? []).length - 1);
+
+    return (
+      <div>
+        <ListItem
+          key={(item.idRoute ?? []).toString()}
+          onClick={() => toggleNode(item.idRoute ?? [])}
+          style={{
+            paddingLeft: `${paddingLeft}px`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            <Expandable node={node} {...p} />
-          </FootballPlayerRenderer>
-        </div>
-      )}
-    </Tree>
+            <ListItemIcon>
+              <Checkbox
+                checked={isSelected}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleCheckboxChange(item.idRoute ?? [], !isSelected);
+                }}
+              />
+            </ListItemIcon>
+            <ListItemText primary={item.name} />
+          </div>
+          <div>fff</div>
+        </ListItem>
+      </div>
+    );
+  };
+
+  return (
+    <Box sx={{ width: "100%", height: 400 }}>
+      <FixedSizeList
+        height={500}
+        itemCount={flatData.length}
+        itemSize={46}
+        width={360}
+      >
+        {renderListItem}
+      </FixedSizeList>
+    </Box>
   );
 };
 
