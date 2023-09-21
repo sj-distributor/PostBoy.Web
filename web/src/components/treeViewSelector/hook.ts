@@ -161,7 +161,7 @@ const useAction = ({
     indeterminateList?: IDepartmentAndUserListValue[]
   ) => {
     const cloneData = clone(foldMap);
-    console.log(selectedList);
+
     selectedList.map((selectItem) => {
       let fatherItem: IDepartmentAndUserListValue | undefined = undefined;
       cloneData.forEach((item) => {
@@ -475,15 +475,6 @@ const useAction = ({
 
   //初始化选中数据
   useEffect(() => {
-    console.log(
-      setFilterChildren(
-        flattenList.filter((item) =>
-          selectedList
-            .filter((item) => item.name === item.id)
-            .some((clickItem) => clickItem.name === item.name)
-        )
-      )
-    );
     !loading &&
       handleMapUpdate(
         schemaType
@@ -508,6 +499,7 @@ const useAction = ({
     loading,
     throttledValue,
     isDirectTeamMembers,
+    foldMap,
     handleGetAllTeamMembers,
     setSearchValue,
     setLoading,

@@ -67,6 +67,7 @@ const TreeViewSelector = ({
     // setSearchToDeptValue,
     foldMapGetter,
     getUniqueId,
+    foldMap,
     isDirectTeamMembers,
     handleGetAllTeamMembers,
   } = useAction({
@@ -151,7 +152,11 @@ const TreeViewSelector = ({
       //   })}
       //   {isDivider && <Divider />}
       // </List>
-      <TreeList data={data} handleDeptOrUserClick={handleDeptOrUserClick} />
+      <TreeList
+        data={data}
+        handleDeptOrUserClick={handleDeptOrUserClick}
+        foldMap={foldMap}
+      />
     );
     // data && (
     //   <VariableSizeList

@@ -7767,6 +7767,11 @@ material-icons@^0.1.0:
   resolved "https://registry.npmmirror.com/material-icons/-/material-icons-0.1.0.tgz#af3d9117767bd7cefd1f29493fdd7ab4a931cbc8"
   integrity sha512-xDTXrjrt03EiA+LL3nHttQs3DTGft/mV+JHSiVhQyl0Nk8SEwnNqB/fyu6REAz9mYoYCdr4vnhQzkTsGbx0BPg==
 
+material-icons@^1.13.11:
+  version "1.13.11"
+  resolved "https://registry.npmmirror.com/material-icons/-/material-icons-1.13.11.tgz#c625700dc714280e3682ad6ed664acdb31c899e9"
+  integrity sha512-kp2oAdaqo/Zp6hpTZW01rOgDPWmxBUszSdDzkRm1idCjjNvdUMnqu8qu58cll6CObo+o0cydOiPLdoSugLm+mQ==
+
 mdn-data@2.0.14:
   version "2.0.14"
   resolved "https://registry.npmmirror.com/mdn-data/-/mdn-data-2.0.14.tgz#7113fc4281917d63ce29b43446f701e68c25ba50"
