@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { ExpandLess } from "@mui/icons-material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import "material-icons/css/material-icons.css";
 import { Box, Button, List, TextField } from "@mui/material";
 import styles from "./index.module.scss";
@@ -297,16 +297,18 @@ const NodeMeasure = (props: {
           >
             <ListItemIcon>
               <Checkbox
-                checked={isSelected}
+                checked={item.selected}
+                indeterminate={item.indeterminate}
                 onChange={(e) => {
                   e.stopPropagation();
-                  handleCheckboxChange(item.idRoute ?? [], !isSelected);
+                  handleCheckboxChange(item.idRoute ?? [], !item.isCollapsed);
                 }}
               />
             </ListItemIcon>
             <ListItemText primary={item.name} />
           </div>
-          <div>fff</div>
+          {item.children.length > 0 &&
+            (!!item.isCollapsed ? <ExpandLess /> : <ExpandMore />)}
         </ListItem>
       </div>
     );
