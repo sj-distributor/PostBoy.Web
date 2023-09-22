@@ -20,7 +20,7 @@ const expandData = new Map();
 
 const FootballPlayerRenderer = (props: any) => {
   const { node, children, handleDeptOrUserClick } = props;
-  const { name, selected, indeterminate, idRoute } = node;
+  const { name, selected, indeterminate, idRoute, id } = node;
 
   const { isExpanded } = getNodeRenderOptions(node);
 
@@ -33,7 +33,10 @@ const FootballPlayerRenderer = (props: any) => {
       key={String(uuidv4())}
       className={`${!indeterminate || styles.mask}`}
       alignItems={"center"}
-      sx={{ height: "2.2rem", marginLeft: 2 * idRoute.length }}
+      sx={{
+        height: "2.2rem",
+        marginLeft: 2 * (name !== id ? idRoute.length - 1 : idRoute.length),
+      }}
     >
       <Checkbox
         edge="start"
@@ -88,6 +91,7 @@ const NodeMeasure = (props: {
 
   const handleChange = (nodes: any) => {
     setNodes(nodes);
+    console.log(data);
   };
 
   useEffect(() => {
