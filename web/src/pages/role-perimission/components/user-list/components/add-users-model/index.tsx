@@ -124,96 +124,75 @@ export const AddUsersModel = (props: {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
-  // 打印平铺结构数据
-  console.log(flatTreeTotalListData, "flatTreeTotalListData");
-
+  // console.log(flatTreeTotalListData, "flatTreeTotalListData");
   const flattenTree = (
-    tree: TreeNode[],
-    expandedNodes: Set<string>
+    flatTreeData: TreeNode[],
+    expandedNodes: Set<string>,
+    currentItem: TreeNode
   ): TreeNode[] => {
-    const sortedTree: TreeNode[] = [];
-
-    const sortAndFlatten = (
-      node: TreeNode,
-      parentRoute: number[] = []
-    ): void => {
-      const nodeRoute = [...parentRoute, ...node.idRoute];
-      sortedTree.push({ ...node, idRoute: nodeRoute });
-
-      if (expandedNodes.has(nodeRoute.toString()) && node.children) {
-        node.children.forEach((child) => {
-          sortAndFlatten(child, nodeRoute);
-        });
-      }
-    };
-
-    tree.forEach((node) => {
-      sortAndFlatten(node);
+    const displayflatTreeData = flatTreeData.filter((node) => {
+      if (node.idRoute.length === 1) return node;
     });
 
-    return sortedTree;
+    expandedNodes.forEach((expandedNodeId) => {
+      const expandedNodeIdNumber = Number(expandedNodeId);
+      flatTreeData.forEach((node) => {
+        const nodeRoute = node.idRoute;
+        if (
+          nodeRoute.length > 1 &&
+          nodeRoute[0] === expandedNodeIdNumber &&
+          !displayflatTreeData.some(
+            (n) => n.idRoute.join() === nodeRoute.join()
+          )
+        ) {
+          displayflatTreeData.push(node);
+        }
+      });
+    });
+
+    displayflatTreeData.sort((parentRoute, childRoute) => {
+      return parentRoute.idRoute
+        .join()
+        .localeCompare(childRoute.idRoute.join());
+    });
+
+    return displayflatTreeData;
   };
 
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
-  const toggleNode = (nodeRoute: number[]) => {
-    const nodeRouteStr = nodeRoute.toString();
-    console.log(nodeRoute, "nodeRoute");
-    console.log(nodeRouteStr, "nodeRouteStr");
+  const toggleNode = (nodeRoute: TreeNode) => {
+    const nodeRouteStr = nodeRoute.idRoute.toString();
+
     const isSelected = selectedNodes.has(nodeRouteStr);
     if (isSelected) {
       selectedNodes.delete(nodeRouteStr);
     } else {
       selectedNodes.add(nodeRouteStr);
     }
-    if (expandedNodes.has(nodeRouteStr)) {
-      expandedNodes.delete(nodeRouteStr);
-    } else {
+
+    if (!isSelected) {
       expandedNodes.add(nodeRouteStr);
+    } else {
+      expandedNodes.delete(nodeRouteStr);
     }
+
     setExpandedNodes(new Set(expandedNodes));
     setSelectedNodes(new Set(selectedNodes));
+
+    const flatData = flattenTree(
+      flatTreeTotalListData,
+      expandedNodes,
+      nodeRoute
+    );
   };
-
-  const handleCheckboxChange = (nodeRoute: number[], isChecked: boolean) => {
-    const updatedSelectedNodes = new Set(selectedNodes);
-    const updatedExpandedNodes = new Set(expandedNodes);
-    const nodeRouteStr = nodeRoute.toString();
-
-    if (isChecked) {
-      // updatedSelectedNodes.add(nodeRouteStr);
-      // updatedExpandedNodes.add(nodeRouteStr);
-      // // 选中所有以当前节点的开头的节点
-      // flatData.forEach((node) => {
-      //   const currentNodeRouteStr = node.idRoute.toString();
-      //   if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
-      //     updatedSelectedNodes.add(currentNodeRouteStr);
-      //   }
-      // });
-    } else {
-      updatedSelectedNodes.delete(nodeRouteStr);
-      updatedExpandedNodes.delete(nodeRouteStr);
-
-      // 取消选中所有以当前节点的 idRoute 开头的节点
-      flatData.forEach((node) => {
-        const currentNodeRouteStr = node.idRoute.toString();
-        if (currentNodeRouteStr.startsWith(nodeRouteStr)) {
-          updatedSelectedNodes.delete(currentNodeRouteStr);
-        }
-      });
-    }
-
-    setSelectedNodes(updatedSelectedNodes);
-    setExpandedNodes(updatedExpandedNodes);
-  };
-
-  const flatData = flattenTree(treeData, expandedNodes);
-  console.log(flatData, "flatData");
+  console.log(expandedNodes);
 
   const renderListItem: React.FC<{
     index: number;
   }> = ({ index }) => {
+    const flatData = flattenTree(flatTreeTotalListData, expandedNodes, item);
     const item = flatData[index];
     const hasChildren = item.children && item.children.length > 0;
     const isSelected = selectedNodes.has(item.idRoute.toString());
@@ -225,16 +204,13 @@ export const AddUsersModel = (props: {
       <div>
         <ListItem
           key={item.idRoute.toString()}
-          onClick={() => toggleNode(item.idRoute)}
-          style={{ paddingLeft: `${paddingLeft}px` }}
+          onClick={() => toggleNode(item)}
+          style={{ paddingLeft: `${paddingLeft}rem` }}
         >
           <ListItemIcon>
             <Checkbox
               checked={isSelected}
-              onChange={(e) => {
-                e.stopPropagation();
-                handleCheckboxChange(item.idRoute, !isSelected);
-              }}
+              onChange={(e) => e.stopPropagation()}
             />
             {hasChildren ? (
               isExpanded ? (
