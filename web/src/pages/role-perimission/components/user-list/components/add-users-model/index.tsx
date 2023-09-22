@@ -17,6 +17,7 @@ import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject, useState } from "react";
 import { FixedSizeList } from "react-window";
+import { log } from "console";
 
 interface TreeNode {
   id: number;
@@ -124,37 +125,41 @@ export const AddUsersModel = (props: {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
+  const [displayflatUpdateTreeData, setDisplayflatUpdateTreeData] = useState(
+    flatTreeTotalListData
+  );
   // console.log(flatTreeTotalListData, "flatTreeTotalListData");
-  const flattenTree = (
+  const displayTreeList = (
     flatTreeData: TreeNode[],
-    expandedNodes: Set<string>,
-    currentItem: TreeNode
+    currentClickItem: TreeNode
   ): TreeNode[] => {
     const displayflatTreeData = flatTreeData.filter((node) => {
       if (node.idRoute.length === 1) return node;
     });
 
-    expandedNodes.forEach((expandedNodeId) => {
-      const expandedNodeIdNumber = Number(expandedNodeId);
-      flatTreeData.forEach((node) => {
-        const nodeRoute = node.idRoute;
-        if (
-          nodeRoute.length > 1 &&
-          nodeRoute[0] === expandedNodeIdNumber &&
-          !displayflatTreeData.some(
-            (n) => n.idRoute.join() === nodeRoute.join()
-          )
-        ) {
-          displayflatTreeData.push(node);
-        }
-      });
+    const parentRoute = currentClickItem.idRoute;
+
+    const currentChildrenItem = flatTreeData.filter((node) => {
+      const nodeRoute = node.idRoute;
+      if (
+        nodeRoute.length === parentRoute.length + 1 &&
+        nodeRoute
+          .slice(0, parentRoute.length)
+          .every((value, index) => value === parentRoute[index])
+      )
+        return true;
+
+      return false;
     });
 
-    displayflatTreeData.sort((parentRoute, childRoute) => {
-      return parentRoute.idRoute
-        .join()
-        .localeCompare(childRoute.idRoute.join());
-    });
+    const parentIndex = displayflatTreeData.findIndex((node) =>
+      node.idRoute.every((value, index) => value === parentRoute[index])
+    );
+
+    if (parentIndex !== -1) {
+      displayflatTreeData.splice(parentIndex + 1, 0, ...currentChildrenItem);
+    }
+    console.log(displayflatTreeData, "displayflatTreeData");
 
     return displayflatTreeData;
   };
@@ -162,8 +167,13 @@ export const AddUsersModel = (props: {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
-  const toggleNode = (nodeRoute: TreeNode) => {
-    const nodeRouteStr = nodeRoute.idRoute.toString();
+  const toggleNode = (currentClickItem: TreeNode) => {
+    const nodeRouteStr = currentClickItem.idRoute.toString();
+
+    const currentLitstData = displayTreeList(
+      flatTreeTotalListData,
+      currentClickItem
+    );
 
     const isSelected = selectedNodes.has(nodeRouteStr);
     if (isSelected) {
@@ -180,20 +190,14 @@ export const AddUsersModel = (props: {
 
     setExpandedNodes(new Set(expandedNodes));
     setSelectedNodes(new Set(selectedNodes));
-
-    const flatData = flattenTree(
-      flatTreeTotalListData,
-      expandedNodes,
-      nodeRoute
-    );
+    setDisplayflatUpdateTreeData(currentLitstData);
   };
-  console.log(expandedNodes);
 
   const renderListItem: React.FC<{
     index: number;
   }> = ({ index }) => {
-    const flatData = flattenTree(flatTreeTotalListData, expandedNodes, item);
-    const item = flatData[index];
+    // const flatData = flattenTree(flatTreeTotalListData, expandedNodes, item);
+    const item = flatTreeTotalListData[index];
     const hasChildren = item.children && item.children.length > 0;
     const isSelected = selectedNodes.has(item.idRoute.toString());
     const isExpanded = expandedNodes.has(item.idRoute.toString());
@@ -276,7 +280,7 @@ export const AddUsersModel = (props: {
           <Box sx={{ width: "100%", height: 400 }}>
             <FixedSizeList
               height={500}
-              itemCount={flatData.length}
+              itemCount={flatTreeTotalListData.length}
               itemSize={46}
               width={360}
             >
