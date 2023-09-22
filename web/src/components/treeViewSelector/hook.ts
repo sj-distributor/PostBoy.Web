@@ -174,8 +174,9 @@ const useAction = ({
       });
 
       let isIndeterminate =
-        (clickItem as unknown as IDepartmentAndUserListValue)?.indeterminate ??
-        false;
+        clickItem && (clickItem as IDepartmentAndUserListValue).indeterminate
+          ? (clickItem as IDepartmentAndUserListValue).indeterminate
+          : false;
 
       let updateSelectedList = [
         ...setAllChildrenById(getUniqueId(selectItem), [], true),
@@ -196,16 +197,13 @@ const useAction = ({
 
       isIndeterminate &&
         clickItem &&
-        cloneData.set(
-          getUniqueId(clickItem as unknown as IDepartmentAndUserListValue),
-          {
-            ...(cloneData.get(
-              getUniqueId(clickItem)
-            ) as IDepartmentAndUserListValue),
-            selected: true,
-            indeterminate: false,
-          }
-        );
+        cloneData.set(getUniqueId(clickItem as IDepartmentAndUserListValue), {
+          ...(cloneData.get(
+            getUniqueId(clickItem)
+          ) as IDepartmentAndUserListValue),
+          selected: true,
+          indeterminate: false,
+        });
 
       if (fatherItem) {
         let arr: IDepartmentAndUserListValue = cloneData.get(

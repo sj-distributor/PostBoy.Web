@@ -15,9 +15,12 @@ import "material-icons/css/material-icons.css";
 
 const { getNodeRenderOptions } = selectors;
 const { Expandable } = Renderers;
+
+const expandData = new Map();
+
 const FootballPlayerRenderer = (props: any) => {
   const { node, children, handleDeptOrUserClick } = props;
-  const { name, selected, indeterminate } = node;
+  const { name, selected, indeterminate, idRoute } = node;
 
   const { isExpanded } = getNodeRenderOptions(node);
 
@@ -30,7 +33,7 @@ const FootballPlayerRenderer = (props: any) => {
       key={String(uuidv4())}
       className={`${!indeterminate || styles.mask}`}
       alignItems={"center"}
-      sx={{ height: "2.2rem" }}
+      sx={{ height: "2.2rem", marginLeft: 2 * idRoute.length }}
     >
       <Checkbox
         edge="start"
@@ -53,13 +56,15 @@ const FootballPlayerRenderer = (props: any) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          width: "100%",
+        }}
+        onClick={() => {
+          node.children.length &&
+            expandData.set(node.name, !node.state.expanded);
         }}
       >
         <span>{name}</span>
-        <div
-          onClick={() => handleDeptOrUserClick(ClickType.Collapse, node)}
-          style={{ position: "relative", marginLeft: 20, height: 24 }}
-        >
+        <div style={{ position: "relative", marginLeft: 20, height: 24 }}>
           {children}
         </div>
       </div>
@@ -82,10 +87,12 @@ const NodeMeasure = (props: {
   const [nodes, setNodes] = useState<any>(data);
 
   const handleChange = (nodes: any) => {
-    // setNodes(nodes);
+    setNodes(nodes);
   };
 
   useEffect(() => {
+    const expandArr = Array.from(expandData);
+
     const arrayToTree = (
       arr: IDepartmentAndUserListValue[]
     ): IDepartmentAndUserListValue | null => {
@@ -102,12 +109,14 @@ const NodeMeasure = (props: {
           indeterminate,
           idRoute,
         } = item; // 解构赋值
+
+        const isExpanded = expandArr.find((item) => item[0] === name);
         // 定义树节点tree node，并使用Map维持id与节点之间的关系
         const node: any = {
           id,
           name,
           type: 1,
-          state: { expanded: isCollapsed },
+          state: { expanded: isExpanded ? isExpanded[1] : isCollapsed },
           parentid,
           idRoute,
           selected,
@@ -144,11 +153,12 @@ const NodeMeasure = (props: {
   return (
     <Tree nodes={nodes} onChange={handleChange}>
       {({ style, node, ...p }) => (
-        <div style={{ ...style, width: "auto" }}>
+        <div style={{ ...style, marginLeft: 0 }}>
           <FootballPlayerRenderer
             node={node}
             {...p}
             handleDeptOrUserClick={handleDeptOrUserClick}
+            setNodes={setNodes}
           >
             <Expandable node={node} {...p} />
           </FootballPlayerRenderer>
