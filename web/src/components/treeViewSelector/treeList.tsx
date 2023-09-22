@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-
+import styles from "./index.module.scss";
+import { v4 as uuidv4 } from "uuid";
 import Tree, {
   renderers as Renderers,
   selectors,
@@ -16,7 +17,7 @@ const { getNodeRenderOptions } = selectors;
 const { Expandable } = Renderers;
 const FootballPlayerRenderer = (props: any) => {
   const { node, children, handleDeptOrUserClick } = props;
-  const { id, name, selected, indeterminate } = node;
+  const { name, selected, indeterminate } = node;
 
   const { isExpanded } = getNodeRenderOptions(node);
 
@@ -25,7 +26,12 @@ const FootballPlayerRenderer = (props: any) => {
   }, []);
 
   return (
-    <ListItemButton key={id + name}>
+    <ListItemButton
+      key={String(uuidv4())}
+      className={`${!indeterminate || styles.mask}`}
+      alignItems={"center"}
+      sx={{ height: "2.2rem" }}
+    >
       <Checkbox
         edge="start"
         checked={selected}
@@ -49,10 +55,10 @@ const FootballPlayerRenderer = (props: any) => {
           alignItems: "center",
         }}
       >
-        <b>{name}</b>
+        <span>{name}</span>
         <div
           onClick={() => handleDeptOrUserClick(ClickType.Collapse, node)}
-          style={{ position: "relative", marginLeft: 20 }}
+          style={{ position: "relative", marginLeft: 20, height: 24 }}
         >
           {children}
         </div>
@@ -138,7 +144,7 @@ const NodeMeasure = (props: {
   return (
     <Tree nodes={nodes} onChange={handleChange}>
       {({ style, node, ...p }) => (
-        <div style={style}>
+        <div style={{ ...style, width: "auto" }}>
           <FootballPlayerRenderer
             node={node}
             {...p}

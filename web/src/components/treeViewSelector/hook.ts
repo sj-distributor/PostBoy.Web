@@ -256,10 +256,12 @@ const useAction = ({
     });
 
     setAll(cloneData);
+    setSelectedList([]);
   };
 
   useEffect(() => {
     let departmentItem: IDepartmentAndUserListValue[] = [];
+
     foldMap.forEach((item) => {
       if (
         item.selected &&
@@ -268,8 +270,9 @@ const useAction = ({
         departmentItem.push(item);
       }
     });
-
-    setSelectedList(departmentItem);
+    setTimeout(() => {
+      setSelectedList(departmentItem);
+    }, 100);
   }, [foldMap]);
 
   // 处理部门列表点击选择或者展开
