@@ -38,7 +38,6 @@ const FootballPlayerRenderer = (props: any) => {
           node &&
             handleDeptOrUserClick(ClickType.Select, {
               ...node,
-              state: { expanded: isExpanded },
             });
         }}
       />
@@ -81,9 +80,9 @@ const NodeMeasure = (props: {
   };
 
   useEffect(() => {
-    function array2Tree(
+    const arrayToTree = (
       arr: IDepartmentAndUserListValue[]
-    ): IDepartmentAndUserListValue | null {
+    ): IDepartmentAndUserListValue | null => {
       const treeNode: Map<string, IDepartmentAndUserListValue> = new Map();
 
       let root: any = []; // 树根节点
@@ -130,30 +129,20 @@ const NodeMeasure = (props: {
       });
 
       return root;
-    }
-    const tree = array2Tree(Array.from(foldMap.values())); // 需要定义arrs
+    };
+    const tree = arrayToTree(Array.from(foldMap.values()));
 
     tree && setNodes(Array.isArray(tree) ? tree : [tree]);
   }, [foldMap]);
 
   return (
-    <Tree
-      nodes={nodes}
-      onChange={handleChange}
-      // extensions={{
-      //   updateTypeHandlers: {
-      //     [SELECT]: nodeSelectionHandler,
-      //   },
-      // }}
-    >
+    <Tree nodes={nodes} onChange={handleChange}>
       {({ style, node, ...p }) => (
         <div style={style}>
           <FootballPlayerRenderer
             node={node}
             {...p}
             handleDeptOrUserClick={handleDeptOrUserClick}
-            setNodes={setNodes}
-            foldMap={foldMap}
           >
             <Expandable node={node} {...p} />
           </FootballPlayerRenderer>
