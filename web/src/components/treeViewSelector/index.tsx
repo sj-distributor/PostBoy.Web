@@ -1,22 +1,9 @@
-import {
-  Autocomplete,
-  Checkbox,
-  Collapse,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemText,
-  Radio,
-  Tab,
-  Tabs,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Radio, Tab, Tabs, TextField } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import { onFilterDeptAndUsers } from "./fitler";
 import useAction from "./hook";
 import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props";
 import styles from "./index.module.scss";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   ClickType,
   DepartmentAndUserType,
@@ -56,17 +43,10 @@ const TreeViewSelector = ({
     foldList,
     flattenList,
     selectedList,
-    limitTags,
     loading,
-    throttledValue,
-    setLoading,
-    setSearchValue,
     handleClear,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
-    // setSearchToDeptValue,
-    foldMapGetter,
-    getUniqueId,
     foldMap,
     isDirectTeamMembers,
     handleGetAllTeamMembers,
@@ -95,81 +75,13 @@ const TreeViewSelector = ({
     isDivider: boolean
   ) => {
     const result = (
-      // <List key={appId} dense>
-      //   {data.map((deptUser, index) => {
-      //     const deptUserData = foldMapGetter(getUniqueId(deptUser));
-      //     return (
-      //       !deptUserData || (
-      //         <div
-      //           key={deptUserData.name + `${deptUserData.idRoute?.join("")}`}
-      //         >
-      //           <ListItemButton
-      //             // className={`${!deptUserData.indeterminate || styles.mask}`}
-      //             sx={{ pl, height: "2.2rem" }}
-      //             onClick={(e) => {
-      //               e.stopPropagation();
-      //               deptUser.children.length > 0 &&
-      //                 handleDeptOrUserClick(ClickType.Collapse, deptUserData);
-      //             }}
-      //           >
-      //             {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
-      //               <Checkbox
-      //                 edge="start"
-      //                 checked={deptUserData.selected}
-      //                 tabIndex={-1}
-      //                 disableRipple
-      //                 indeterminate={deptUserData.indeterminate}
-      //                 onClick={(e) => {
-      //                   e.stopPropagation();
-      //                   handleDeptOrUserClick(ClickType.Select, deptUserData);
-      //                 }}
-      //               />
-      //             )}
-      //             <ListItemText primary={deptUserData.name} />
-      //             {deptUser.children.length > 0 &&
-      //               (!!deptUserData.isCollapsed ? (
-      //                 <ExpandLess />
-      //               ) : (
-      //                 <ExpandMore />
-      //               ))}
-      //           </ListItemButton>
-      //           {deptUser.children.length > 0 && (
-      //             <Collapse
-      //               in={!!deptUserData.isCollapsed}
-      //               timeout={0}
-      //               unmountOnExit
-      //             >
-      //               {recursiveRenderDeptList(
-      //                 deptUser.children,
-      //                 pl + 2,
-      //                 index !== data.length - 1
-      //               )}
-      //             </Collapse>
-      //           )}
-      //         </div>
-      //       )
-      //     );
-      //   })}
-      //   {isDivider && <Divider />}
-      // </List>
       <TreeList
         data={data}
         handleDeptOrUserClick={handleDeptOrUserClick}
         foldMap={foldMap}
+        schemaType={schemaType}
       />
     );
-    // data && (
-    //   <VariableSizeList
-    //     height={220}
-    //     width={"100%"}
-    //     itemSize={() => 50}
-    //     itemCount={foldList.length}
-    //     overscanCount={50}
-    //     itemData={data}
-    //   >
-    //     {renderRow}
-    //   </VariableSizeList>
-    // );
     return result;
   };
 

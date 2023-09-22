@@ -186,7 +186,7 @@ const useAction = ({
         const selectedListItem = updateSelectedList.find(
           (item) => item.name === value.name
         );
-   
+
         selectedListItem &&
           cloneData.set(key, {
             ...value,
