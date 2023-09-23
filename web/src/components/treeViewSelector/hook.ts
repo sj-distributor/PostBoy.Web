@@ -232,26 +232,35 @@ const useAction = ({
             });
           }
 
-          foldMap.forEach((item) => {
-            if (
-              fatherMapData.idRoute
-                ?.slice(
-                  0,
-                  fatherMapData.name !== fatherMapData.id
-                    ? fatherMapData.idRoute.length - 1
-                    : fatherMapData.idRoute.length
-                )
-                .find((rItem) => rItem === item.id)
-            ) {
-              cloneData.set(getUniqueId(item), {
-                ...item,
-                indeterminate: fatherItem
-                  ? foldMapGetter(getUniqueId(fatherItem))?.selected ||
-                    foldMapGetter(getUniqueId(fatherItem))?.indeterminate
-                  : false,
-              });
-            }
-          });
+          const superiors =
+            fatherItem.children.length > 0
+              ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
+              : fatherItem.idRoute;
+
+          superiors &&
+            superiors.forEach((item) => {
+              const data = Array.from(cloneData.values()).find(
+                (cItem) => String(cItem.id) === String(item)
+              );
+              let childrenList: IDepartmentAndUserListValue[] = [];
+              data &&
+                cloneData.forEach((i) => {
+                  if (i.parentid === data.id && data?.name !== i.name) {
+                    childrenList.push(i);
+                  }
+                });
+              console.log(childrenList);
+              data &&
+                cloneData.set(getUniqueId(data), {
+                  ...data,
+                  selected: childrenList.every(
+                    (item) => item?.selected === true
+                  ),
+                  indeterminate: childrenList.every((item) => !item?.selected)
+                    ? false
+                    : !childrenList.every((item) => item?.selected),
+                });
+            });
         }
       }
     });
@@ -394,16 +403,16 @@ const useAction = ({
 
       handleMapUpdate(newData, indeterminateList);
     } else {
+      let newData: IDepartmentAndUserListValue[] = [];
+      teamMembers.map((item, index) => {
+        !selectedList.find((nItem) => nItem.name === item.name) &&
+          newData.splice(index, 1);
+      });
+
       handleMapUpdate(
-        schemaType
-          ? selectedList.filter((item) =>
-              teamMembers.find((tItem) => item.name === tItem.name)
-            )
-          : selectedList
-              .filter(
-                (item) => !teamMembers.find((tItem) => item.name === tItem.name)
-              )
-              .filter((item) => item.name === item.id),
+        selectedList.filter((item) =>
+          teamMembers.find((tItem) => item.name === tItem.name)
+        ),
         indeterminateList
       );
 
@@ -423,8 +432,7 @@ const useAction = ({
           (item) =>
             item.department_leader &&
             item.department_leader.length &&
-            item.department_leader[0] === "TED.F" &&
-            item.id === item.name
+            item.department_leader[0] === "TED.F"
         );
 
     const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
@@ -441,7 +449,10 @@ const useAction = ({
 
       return teamMembers;
     };
-    return removeDuplicate(teamMembers ?? []);
+    let data = removeDuplicate(teamMembers ?? []);
+    data = data.filter((item) => !data.some((i) => i.id === item.parentid));
+
+    return data;
   };
 
   useEffect(() => {

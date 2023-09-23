@@ -91,7 +91,6 @@ const NodeMeasure = (props: {
 
   const handleChange = (nodes: any) => {
     setNodes(nodes);
-    console.log(data);
   };
 
   useEffect(() => {
