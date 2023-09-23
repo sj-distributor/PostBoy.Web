@@ -163,20 +163,17 @@ const useAction = ({
     const cloneData = clone(foldMap);
 
     selectedList.map((selectItem) => {
-      let fatherItem: IDepartmentAndUserListValue | undefined = undefined;
-      cloneData.forEach((item) => {
-        item.id === selectItem.parentid && (fatherItem = item);
-      });
+      let fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
+        cloneData.values()
+      ).find((item) => item.id === selectItem.parentid);
 
-      let clickItem: IDepartmentAndUserListValue | undefined = undefined;
-      cloneData.forEach((item) => {
-        item.name === selectItem.name && (clickItem = item);
-      });
+      let clickItem: IDepartmentAndUserListValue | undefined = Array.from(
+        cloneData.values()
+      ).find((item) => item.name === selectItem.name);
 
-      let isIndeterminate =
-        clickItem && (clickItem as IDepartmentAndUserListValue).indeterminate
-          ? (clickItem as IDepartmentAndUserListValue).indeterminate
-          : false;
+      let isIndeterminate = clickItem?.indeterminate
+        ? clickItem.indeterminate
+        : false;
 
       let updateSelectedList = [
         ...setAllChildrenById(getUniqueId(selectItem), [], true),
@@ -192,12 +189,13 @@ const useAction = ({
           cloneData.set(key, {
             ...value,
             selected: isIndeterminate ? true : !value.selected,
+            indeterminate: false,
           });
       }
 
       isIndeterminate &&
         clickItem &&
-        cloneData.set(getUniqueId(clickItem as IDepartmentAndUserListValue), {
+        cloneData.set(getUniqueId(clickItem), {
           ...(cloneData.get(
             getUniqueId(clickItem)
           ) as IDepartmentAndUserListValue),
@@ -205,51 +203,56 @@ const useAction = ({
           indeterminate: false,
         });
 
-      if (fatherItem) {
-        let arr: IDepartmentAndUserListValue = cloneData.get(
-          getUniqueId(fatherItem)
-        ) as IDepartmentAndUserListValue;
+      if (!isIndeterminate) {
+        if (fatherItem) {
+          let fatherMapData: IDepartmentAndUserListValue = cloneData.get(
+            getUniqueId(fatherItem)
+          ) as IDepartmentAndUserListValue;
 
-        let childrenList: IDepartmentAndUserListValue[] = [];
-        cloneData.forEach((item) => {
-          if (
-            item.parentid === selectItem.parentid &&
-            fatherItem?.name !== item.name
-          ) {
-            childrenList.push(item);
-          }
-        });
-
-        if (arr && arr.children.find((item) => item.name === selectItem.name)) {
-          cloneData.set(getUniqueId(fatherItem), {
-            ...arr,
-            selected: childrenList.every((item) => item?.selected === true),
-            indeterminate: childrenList.every((item) => !item?.selected)
-              ? false
-              : !childrenList.every((item) => item?.selected),
+          let childrenList: IDepartmentAndUserListValue[] = [];
+          cloneData.forEach((item) => {
+            if (
+              item.parentid === selectItem.parentid &&
+              fatherItem?.name !== item.name
+            ) {
+              childrenList.push(item);
+            }
           });
-        }
 
-        foldMap.forEach((item) => {
           if (
-            arr.idRoute
-              ?.slice(
-                0,
-                arr.name !== arr.id
-                  ? arr.idRoute.length - 1
-                  : arr.idRoute.length
-              )
-              .find((rItem) => rItem === item.id)
+            fatherMapData &&
+            fatherMapData.children.find((item) => item.name === selectItem.name)
           ) {
-            cloneData.set(getUniqueId(item), {
-              ...item,
-              indeterminate: fatherItem
-                ? foldMapGetter(getUniqueId(fatherItem))?.selected ||
-                  foldMapGetter(getUniqueId(fatherItem))?.indeterminate
-                : false,
+            cloneData.set(getUniqueId(fatherItem), {
+              ...fatherMapData,
+              selected: childrenList.every((item) => item?.selected === true),
+              indeterminate: childrenList.every((item) => !item?.selected)
+                ? false
+                : !childrenList.every((item) => item?.selected),
             });
           }
-        });
+
+          foldMap.forEach((item) => {
+            if (
+              fatherMapData.idRoute
+                ?.slice(
+                  0,
+                  fatherMapData.name !== fatherMapData.id
+                    ? fatherMapData.idRoute.length - 1
+                    : fatherMapData.idRoute.length
+                )
+                .find((rItem) => rItem === item.id)
+            ) {
+              cloneData.set(getUniqueId(item), {
+                ...item,
+                indeterminate: fatherItem
+                  ? foldMapGetter(getUniqueId(fatherItem))?.selected ||
+                    foldMapGetter(getUniqueId(fatherItem))?.indeterminate
+                  : false,
+              });
+            }
+          });
+        }
       }
     });
 
@@ -391,22 +394,6 @@ const useAction = ({
 
       handleMapUpdate(newData, indeterminateList);
     } else {
-      let newData: IDepartmentAndUserListValue[] = [];
-      teamMembers.map((item, index) => {
-        !selectedList.find((nItem) => nItem.name === item.name) &&
-          newData.splice(index, 1);
-      });
-
-      const cloneData = clone(foldMap);
-      cloneData.forEach((item) => {
-        cloneData.set(getUniqueId(item), {
-          ...item,
-          indeterminate: false,
-          selected: false,
-        });
-      });
-      setAll(cloneData);
-
       handleMapUpdate(
         schemaType
           ? selectedList.filter((item) =>
