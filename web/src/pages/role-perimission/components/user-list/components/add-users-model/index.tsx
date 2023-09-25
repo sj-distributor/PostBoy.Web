@@ -15,7 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
-import { RefObject, useState } from "react";
+import React, { RefObject, useState } from "react";
 import { FixedSizeList } from "react-window";
 
 interface TreeNode {
@@ -101,6 +101,19 @@ export const AddUsersModel = (props: {
           id: 8,
           idRoute: [3, 8],
           title: "节点3-8",
+          children: [],
+        },
+      ],
+    },
+    {
+      id: 12,
+      idRoute: [12],
+      title: "节点12",
+      children: [
+        {
+          id: 13,
+          idRoute: [12, 13],
+          title: "节点12-13",
           children: [],
         },
       ],
@@ -246,7 +259,8 @@ export const AddUsersModel = (props: {
 
   const renderListItem: React.FC<{
     index: number;
-  }> = ({ index }) => {
+    style: React.CSSProperties;
+  }> = ({ index, style }) => {
     const item = displayFlatUpdateTreeData[index];
 
     const isSelected = selectedNodes.has(item.id);
@@ -258,7 +272,7 @@ export const AddUsersModel = (props: {
     const paddingLeft = padding * (item.idRoute.length - 1);
 
     return (
-      <div>
+      <div style={style}>
         <ListItem
           key={item.idRoute.toString()}
           style={{ paddingLeft: `${paddingLeft}rem` }}
