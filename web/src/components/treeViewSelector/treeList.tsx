@@ -19,7 +19,7 @@ const { Expandable } = Renderers;
 const expandData = new Map();
 
 const FootballPlayerRenderer = (props: any) => {
-  const { node, children, handleDeptOrUserClick } = props;
+  const { node, children, handleDeptOrUserClick, onChange } = props;
   const { name, selected, indeterminate, idRoute, id } = node;
 
   const { isExpanded } = getNodeRenderOptions(node);
@@ -62,8 +62,19 @@ const FootballPlayerRenderer = (props: any) => {
           width: "100%",
         }}
         onClick={() => {
-          node.children.length &&
+          if (node.children.length) {
             expandData.set(node.name, !node.state.expanded);
+            onChange({
+              node: {
+                ...node,
+                state: {
+                  ...(node.state || {}),
+                  expanded: !node.state.expanded,
+                },
+              },
+              type: 2,
+            });
+          }
         }}
       >
         <span>{name}</span>

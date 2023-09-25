@@ -245,14 +245,15 @@ const useAction = ({
               const data = Array.from(cloneData.values()).find(
                 (cItem) => String(cItem.id) === String(id)
               );
-              let childrenList: IDepartmentAndUserListValue[] = [];
+              const childrenList: IDepartmentAndUserListValue[] = [];
+
               data &&
                 cloneData.forEach((i) => {
                   if (i.parentid === data.id && data?.name !== i.name) {
                     childrenList.push(i);
                   }
                 });
-              console.log(childrenList);
+
               data &&
                 cloneData.set(getUniqueId(data), {
                   ...data,
