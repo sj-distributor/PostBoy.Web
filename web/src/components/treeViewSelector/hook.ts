@@ -67,6 +67,10 @@ const useAction = ({
   >(map);
 
   const [userData, setUserData] = useState<IUserResponse>();
+  // 提示语
+  const [promptText, setPromptText] = useState<string>("");
+  // 提示显隐
+  const [openError, openErrorAction] = useBoolean(false);
 
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
@@ -408,6 +412,10 @@ const useAction = ({
     let teamMembers = getUserTeamMembers();
 
     if (!teamMembers.length) {
+      setPromptText(
+        "The current account name does not have a direct team member"
+      );
+      openErrorAction.setTrue();
       return;
     }
     console.log(teamMembers);
@@ -521,6 +529,8 @@ const useAction = ({
     throttledValue,
     isDirectTeamMembers,
     foldMap,
+    promptText,
+    openError,
     handleGetAllTeamMembers,
     setSearchValue,
     setLoading,

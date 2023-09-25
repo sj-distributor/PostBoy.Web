@@ -561,6 +561,7 @@ const useAction = (props: MeetingSettingsProps) => {
       let attendeesList: string[] = [];
 
       participantList &&
+        participantList.length &&
         (attendeesList = getUserChildrenList(
           departmentAndUserList[0].data,
           participantList,

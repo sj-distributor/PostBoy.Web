@@ -1,4 +1,11 @@
-import { Autocomplete, Radio, Tab, Tabs, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Radio,
+  Snackbar,
+  Tab,
+  Tabs,
+  TextField,
+} from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import { onFilterDeptAndUsers } from "./fitler";
 import useAction from "./hook";
@@ -49,6 +56,8 @@ const TreeViewSelector = ({
     handleTypeIsCanSelect,
     foldMap,
     isDirectTeamMembers,
+    promptText,
+    openError,
     handleGetAllTeamMembers,
   } = useAction({
     appId,
@@ -87,6 +96,15 @@ const TreeViewSelector = ({
 
   return (
     <>
+      <Snackbar
+        message={promptText}
+        open={openError}
+        resumeHideDuration={3000}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
       <Tabs
         value={schemaType}
         aria-label="basic tabs example"
