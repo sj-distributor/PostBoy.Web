@@ -1,13 +1,14 @@
 import { useBoolean, useMap, useThrottle } from "ahooks";
 import { clone } from "ramda";
 import { useEffect, useState } from "react";
-import { validate as uuidValidate } from "uuid";
+import { GetAuthUser } from "../../api/user-management";
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
+import { IUserResponse } from "../../dtos/user-management";
 import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps } from "./props";
 
@@ -64,6 +65,8 @@ const useAction = ({
     string | number,
     IDepartmentAndUserListValue
   >(map);
+
+  const [userData, setUserData] = useState<IUserResponse>();
 
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
@@ -404,6 +407,10 @@ const useAction = ({
 
     let teamMembers = getUserTeamMembers();
 
+    if (!teamMembers.length) {
+      return;
+    }
+    console.log(teamMembers);
     if (isDirectTeamMembers) {
       let newData: IDepartmentAndUserListValue[] = [];
       teamMembers.map((item) => {
@@ -437,12 +444,12 @@ const useAction = ({
   //获取组员
   const getUserTeamMembers = () => {
     const teamMembers = schemaType
-      ? flattenList.find((item) => item.name === "TED.F")?.children
+      ? flattenList.find((item) => item.name === userData?.userName)?.children
       : flattenList.filter(
           (item) =>
             item.department_leader &&
             item.department_leader.length &&
-            item.department_leader[0] === "TED.F"
+            item.department_leader[0] === userData?.userName
         );
 
     const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
@@ -498,6 +505,11 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
+    GetAuthUser().then((res) => {
+      if (!!res) {
+        setUserData(res);
+      }
+    });
   }, []);
 
   return {
