@@ -105,19 +105,19 @@ export const AddUsersModel = (props: {
         },
       ],
     },
-    // {
-    //   id: 15,
-    //   idRoute: [15],
-    //   title: "节点15",
-    //   children: [
-    //     {
-    //       id: 16,
-    //       idRoute: [15, 16],
-    //       title: "节点15-16",
-    //       children: [],
-    //     },
-    //   ],
-    // },
+    {
+      id: 15,
+      idRoute: [15],
+      title: "节点15",
+      children: [
+        {
+          id: 16,
+          idRoute: [15, 16],
+          title: "节点15-16",
+          children: [],
+        },
+      ],
+    },
   ];
 
   const padding = 2;
@@ -146,23 +146,26 @@ export const AddUsersModel = (props: {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
-  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState(
-    flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
-  );
+  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
+    TreeNode[]
+  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
 
-  const getChildrenNodeByParentId = (
+  const getChildrenNodeByParentIdRoute = (
     currentList: TreeNode[],
     parentIdRoute: number[]
   ) => {
     return {
       allChildrenIncludeParentList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
-          nodeRoute.toString().includes(parentIdRoute.toString())
+          parentIdRoute.every(
+            (parentIdRoute, index) => parentIdRoute === nodeRoute[index]
+          )
       ),
       nextLevelChildrenList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
-          nodeRoute.toString().includes(parentIdRoute.toString()) &&
-          nodeRoute.length === parentIdRoute.length + 1
+          parentIdRoute.every(
+            (parentIdRoute, index) => parentIdRoute === nodeRoute[index]
+          ) && nodeRoute.length === parentIdRoute.length + 1
       ),
     };
   };
@@ -176,17 +179,15 @@ export const AddUsersModel = (props: {
 
     const parentRoute = currentClickItem.idRoute;
 
-    const currentChildrenItem = getChildrenNodeByParentId(
+    const currentChildrenItem = getChildrenNodeByParentIdRoute(
       flatTreeData,
       parentRoute
     ).nextLevelChildrenList;
 
-    const currentTotalChildrenItem = getChildrenNodeByParentId(
+    const currentTotalChildrenItem = getChildrenNodeByParentIdRoute(
       displayFlatTreeData,
       parentRoute
     ).allChildrenIncludeParentList;
-
-    console.log(currentTotalChildrenItem, "currentTotalChildrenItem");
 
     const parentIndex = displayFlatTreeData.findIndex(
       (node) => currentClickItem.id === node.id
@@ -208,18 +209,19 @@ export const AddUsersModel = (props: {
 
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
+  const [indeterminateNodes, setIndeterminateNodes] = useState<Set<number>>(
+    new Set()
+  );
 
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
 
     const newExpandedNodes = new Set(expandedNodes);
 
-    const expendChildrenList = getChildrenNodeByParentId(
+    const expendChildrenList = getChildrenNodeByParentIdRoute(
       flatTreeTotalListData,
       currentClickItem.idRoute
     ).allChildrenIncludeParentList;
-
-    console.log(expendChildrenList, "expendChildrenList");
 
     if (newExpandedNodes.has(currentNodeId)) {
       expendChildrenList.forEach(({ id: nodeId }) => {
@@ -243,11 +245,25 @@ export const AddUsersModel = (props: {
   const selectNode = (currentClickItem: TreeNode) => {
     const newSelectedNodes = new Set(selectedNodes);
 
+    const newIndeterminateNode = new Set(indeterminateNodes);
+
     const conditioned = newSelectedNodes.has(currentClickItem.id);
 
     const parentRoute = currentClickItem.idRoute;
 
-    const selectTotalItemList = getChildrenNodeByParentId(
+    const parentItemList = flatTreeTotalListData.filter(
+      ({ idRoute: nodeRoute }) => {
+        return (
+          nodeRoute.length < currentClickItem.idRoute.length &&
+          nodeRoute.every(
+            (parentIdRoute, index) =>
+              parentIdRoute === currentClickItem.idRoute[index]
+          )
+        );
+      }
+    );
+
+    const selectTotalItemList = getChildrenNodeByParentIdRoute(
       flatTreeTotalListData,
       parentRoute
     ).allChildrenIncludeParentList;
@@ -258,7 +274,14 @@ export const AddUsersModel = (props: {
         : newSelectedNodes.add(nodeId);
     });
 
+    parentItemList.forEach(({ id: nodeId }) => {
+      conditioned
+        ? newIndeterminateNode.delete(nodeId)
+        : newIndeterminateNode.add(nodeId);
+    });
+
     setSelectedNodes(newSelectedNodes);
+    setIndeterminateNodes(newIndeterminateNode);
   };
 
   const renderListItem: React.FC<{
@@ -270,6 +293,8 @@ export const AddUsersModel = (props: {
     const isSelected = selectedNodes.has(item.id);
 
     const isExpanded = expandedNodes.has(item.id);
+
+    const isIndeterminate = indeterminateNodes.has(item.id);
 
     const hasChildren = item.children.length > 0;
 
@@ -284,7 +309,8 @@ export const AddUsersModel = (props: {
           <ListItemIcon>
             <Checkbox
               checked={isSelected}
-              onChange={(e) => {
+              indeterminate={isIndeterminate}
+              onChange={() => {
                 selectNode(item);
               }}
             />
