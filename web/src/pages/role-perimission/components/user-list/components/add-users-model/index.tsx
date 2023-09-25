@@ -152,20 +152,27 @@ export const AddUsersModel = (props: {
 
   const getChildrenNodeByParentIdRoute = (
     currentList: TreeNode[],
-    parentIdRoute: number[]
+    currentIdRoute: number[]
   ) => {
     return {
       allChildrenIncludeParentList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
-          parentIdRoute.every(
+          currentIdRoute.every(
             (parentIdRoute, index) => parentIdRoute === nodeRoute[index]
           )
       ),
       nextLevelChildrenList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
-          parentIdRoute.every(
+          currentIdRoute.every(
             (parentIdRoute, index) => parentIdRoute === nodeRoute[index]
-          ) && nodeRoute.length === parentIdRoute.length + 1
+          ) && nodeRoute.length === currentIdRoute.length + 1
+      ),
+      allParentList: currentList.filter(
+        ({ idRoute: nodeRoute }) =>
+          nodeRoute.length < currentIdRoute.length &&
+          nodeRoute.every(
+            (childIdRoute, index) => childIdRoute === currentIdRoute[index]
+          )
       ),
     };
   };
@@ -249,24 +256,14 @@ export const AddUsersModel = (props: {
 
     const conditioned = newSelectedNodes.has(currentClickItem.id);
 
-    const parentRoute = currentClickItem.idRoute;
+    const currentRoute = currentClickItem.idRoute;
 
-    const parentItemList = flatTreeTotalListData.filter(
-      ({ idRoute: nodeRoute }) => {
-        return (
-          nodeRoute.length < currentClickItem.idRoute.length &&
-          nodeRoute.every(
-            (parentIdRoute, index) =>
-              parentIdRoute === currentClickItem.idRoute[index]
-          )
-        );
-      }
-    );
-
-    const selectTotalItemList = getChildrenNodeByParentIdRoute(
-      flatTreeTotalListData,
-      parentRoute
-    ).allChildrenIncludeParentList;
+    const {
+      allChildrenIncludeParentList: selectTotalItemList,
+      allParentList: parentItemList,
+    } = getChildrenNodeByParentIdRoute(flatTreeTotalListData, currentRoute);
+    console.log(selectTotalItemList, "selectTotalItemList");
+    console.log(parentItemList, "parentItemList");
 
     selectTotalItemList.forEach(({ id: nodeId }) => {
       conditioned
