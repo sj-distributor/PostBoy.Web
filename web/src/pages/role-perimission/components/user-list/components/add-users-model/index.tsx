@@ -17,6 +17,7 @@ import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import React, { RefObject, useState } from "react";
 import { FixedSizeList } from "react-window";
+import { log } from "console";
 
 interface TreeNode {
   id: number;
@@ -131,7 +132,12 @@ export const AddUsersModel = (props: {
     for (const node of tree) {
       const idRoute = [...parentIdRoute, node.id];
 
-      flattenedList.push(node);
+      flattenedList.push({
+        id: node.id,
+        idRoute: node.idRoute,
+        title: node.title,
+        children: node.children,
+      });
 
       if (node.children && node.children.length > 0) {
         flattenedList = [
@@ -146,83 +152,69 @@ export const AddUsersModel = (props: {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
-  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState(
+  const [displayflatUpdateTreeData, setDisplayflatUpdateTreeData] = useState(
     flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
   );
-
-  const getChildrenNodeByParentId = (
-    currentList: TreeNode[],
-    parentIdRoute: number[]
-  ) => {
-    return {
-      allChildrenIncludeParentList: currentList.filter(
-        ({ idRoute: nodeRoute }) =>
-          nodeRoute.toString().includes(parentIdRoute.toString())
-      ),
-      nextLevelChildrenList: currentList.filter(
-        ({ idRoute: nodeRoute }) =>
-          nodeRoute.toString().includes(parentIdRoute.toString()) &&
-          nodeRoute.length === parentIdRoute.length + 1
-      ),
-    };
-  };
 
   const displayTreeList = (
     flatTreeData: TreeNode[],
     currentClickItem: TreeNode,
     isExistCurrentItem: boolean
   ): TreeNode[] => {
-    const displayFlatTreeData = displayFlatUpdateTreeData;
+    const displayflatTreeData = displayflatUpdateTreeData;
 
     const parentRoute = currentClickItem.idRoute;
 
-    const currentChildrenItem = getChildrenNodeByParentId(
-      flatTreeData,
-      parentRoute
-    ).nextLevelChildrenList;
+    const currentChildrenItem = flatTreeData.filter((node) => {
+      const nodeRoute = node.idRoute;
+      return (
+        nodeRoute.length === parentRoute.length + 1 &&
+        nodeRoute
+          .slice(0, parentRoute.length)
+          .every((value, index) => value === parentRoute[index])
+      );
+    });
 
-    const currentTotalChildrenItem = getChildrenNodeByParentId(
-      displayFlatTreeData,
-      parentRoute
-    ).allChildrenIncludeParentList;
+    const currentTotalChildrenItem = displayflatTreeData.filter((node) => {
+      const nodeRoute = node.idRoute;
+      return (
+        nodeRoute.length > parentRoute.length &&
+        nodeRoute
+          .slice(0, parentRoute.length)
+          .every((value, index) => value === parentRoute[index])
+      );
+    });
 
-    const parentIndex = displayFlatTreeData.findIndex(
+    const parentIndex = displayflatTreeData.findIndex(
       (node) => currentClickItem.id === node.id
     );
 
     if (parentIndex !== -1) {
       if (isExistCurrentItem) {
-        displayFlatTreeData.splice(parentIndex + 1, 0, ...currentChildrenItem);
+        displayflatTreeData.splice(parentIndex + 1, 0, ...currentChildrenItem);
       } else {
-        displayFlatTreeData.splice(
+        displayflatTreeData.splice(
           parentIndex + 1,
-          currentTotalChildrenItem.length - 1
+          currentTotalChildrenItem.length
         );
       }
     }
 
-    return displayFlatTreeData;
+    return displayflatTreeData;
   };
 
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
 
   const toggleNode = (currentClickItem: TreeNode) => {
-    const currentNodeId = currentClickItem.id;
+    const nodeId = currentClickItem.id;
 
     const newExpandedNodes = new Set(expandedNodes);
 
-    const expendChildrenList = getChildrenNodeByParentId(
-      flatTreeTotalListData,
-      currentClickItem.idRoute
-    ).allChildrenIncludeParentList;
-
-    if (newExpandedNodes.has(currentNodeId)) {
-      expendChildrenList.forEach(({ id: nodeId }) => {
-        newExpandedNodes.delete(nodeId);
-      });
+    if (newExpandedNodes.has(nodeId)) {
+      newExpandedNodes.delete(nodeId);
     } else {
-      newExpandedNodes.add(currentNodeId);
+      newExpandedNodes.add(nodeId);
     }
 
     const currentListData = displayTreeList(
@@ -233,25 +225,32 @@ export const AddUsersModel = (props: {
 
     setExpandedNodes(newExpandedNodes);
 
-    setDisplayFlatUpdateTreeData(currentListData);
+    setDisplayflatUpdateTreeData(currentListData);
   };
 
   const selectNode = (currentClickItem: TreeNode) => {
     const newSelectedNodes = new Set(selectedNodes);
 
-    const conditioned = newSelectedNodes.has(currentClickItem.id);
-
     const parentRoute = currentClickItem.idRoute;
 
-    const selectTotalItemList = getChildrenNodeByParentId(
-      flatTreeTotalListData,
-      parentRoute
-    ).allChildrenIncludeParentList;
+    const selectTotalItemList = flatTreeTotalListData.filter((node) => {
+      const nodeRoute = node.idRoute;
+      return (
+        nodeRoute.length >= parentRoute.length &&
+        nodeRoute
+          .slice(0, parentRoute.length)
+          .every((value, index) => value === parentRoute[index])
+      );
+    });
 
-    selectTotalItemList.forEach(({ id: nodeId }) => {
-      conditioned
-        ? newSelectedNodes.delete(nodeId)
-        : newSelectedNodes.add(nodeId);
+    selectTotalItemList.forEach((node) => {
+      const nodeId = node.id;
+
+      if (newSelectedNodes.has(nodeId)) {
+        newSelectedNodes.delete(nodeId);
+      } else {
+        newSelectedNodes.add(nodeId);
+      }
     });
 
     setSelectedNodes(newSelectedNodes);
@@ -261,7 +260,7 @@ export const AddUsersModel = (props: {
     index: number;
     style: React.CSSProperties;
   }> = ({ index, style }) => {
-    const item = displayFlatUpdateTreeData[index];
+    const item = displayflatUpdateTreeData[index];
 
     const isSelected = selectedNodes.has(item.id);
 
@@ -342,7 +341,7 @@ export const AddUsersModel = (props: {
           <Box sx={{ width: "100%", height: 500 }}>
             <FixedSizeList
               height={500}
-              itemCount={displayFlatUpdateTreeData.length}
+              itemCount={displayflatUpdateTreeData.length}
               itemSize={46}
               width={360}
             >
