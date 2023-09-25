@@ -97,12 +97,12 @@ const NodeMeasure = (props: {
     const expandArr = Array.from(expandData);
 
     const arrayToTree = (
-      arr: IDepartmentAndUserListValue[]
+      oneDimensionArray: IDepartmentAndUserListValue[]
     ): IDepartmentAndUserListValue | null => {
       const treeNode: Map<string, IDepartmentAndUserListValue> = new Map();
 
       let root: any = []; // 树根节点
-      arr.forEach((item) => {
+      oneDimensionArray.forEach((item) => {
         const {
           id,
           name,
@@ -111,7 +111,7 @@ const NodeMeasure = (props: {
           isCollapsed,
           indeterminate,
           idRoute,
-        } = item; // 解构赋值
+        } = item;
 
         const isExpanded = expandArr.find((item) => item[0] === name);
         // 定义树节点tree node，并使用Map维持id与节点之间的关系

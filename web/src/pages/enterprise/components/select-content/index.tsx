@@ -690,10 +690,12 @@ const SelectContent = memo(
           )}
           {sendTypeValue === MessageJobSendType.Recurring && (
             <TimeSelector
+              setDateValue={setDateValue}
               cronExp={cronExp}
               setCronExp={setCronExp}
               setCronError={setCronError}
               endDateValue={endDateValue}
+              startDateValue={dateValue}
               setEndDateValue={setEndDateValue}
               showErrorPrompt={showErrorPrompt}
             />

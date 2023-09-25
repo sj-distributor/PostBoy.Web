@@ -7,14 +7,18 @@ const TimeSelector = (props: {
   setCronExp: React.Dispatch<React.SetStateAction<string>>;
   setCronError: React.Dispatch<React.SetStateAction<string>>;
   endDateValue: string;
+  startDateValue: string;
   setEndDateValue: React.Dispatch<React.SetStateAction<string>>;
   showErrorPrompt: (text: string) => void;
+  setDateValue: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const {
     cronExp,
     setCronExp,
     setCronError,
     endDateValue,
+    startDateValue,
+    setDateValue,
     setEndDateValue,
     showErrorPrompt,
   } = props;
@@ -42,6 +46,30 @@ const TimeSelector = (props: {
             locale={"zh_CN"}
           />
         </div>
+        <TextField
+          label="开始时间"
+          type="datetime-local"
+          sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
+          value={startDateValue}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={(e) => {
+            if (
+              moment((e.target as HTMLInputElement).value).isSameOrAfter(
+                new Date(),
+                "minute"
+              )
+            ) {
+              setDateValue(
+                (e.target as HTMLInputElement).value.replace("T", " ")
+              );
+            } else {
+              e.preventDefault();
+              showErrorPrompt("The start time cannot exceed the current time!");
+            }
+          }}
+        />
         <TextField
           label="终止时间"
           type="datetime-local"
