@@ -105,19 +105,19 @@ export const AddUsersModel = (props: {
         },
       ],
     },
-    // {
-    //   id: 15,
-    //   idRoute: [15],
-    //   title: "节点15",
-    //   children: [
-    //     {
-    //       id: 16,
-    //       idRoute: [15, 16],
-    //       title: "节点15-16",
-    //       children: [],
-    //     },
-    //   ],
-    // },
+    {
+      id: 15,
+      idRoute: [15],
+      title: "节点15",
+      children: [
+        {
+          id: 16,
+          idRoute: [15, 16],
+          title: "节点15-16",
+          children: [],
+        },
+      ],
+    },
   ];
 
   const padding = 2;
@@ -157,12 +157,15 @@ export const AddUsersModel = (props: {
     return {
       allChildrenIncludeParentList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
-          nodeRoute.toString().includes(parentIdRoute.toString())
+          parentIdRoute.every(
+            (parentId, index) => parentId === nodeRoute[index]
+          )
       ),
       nextLevelChildrenList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
-          nodeRoute.toString().includes(parentIdRoute.toString()) &&
-          nodeRoute.length === parentIdRoute.length + 1
+          parentIdRoute.every(
+            (parentId, index) => parentId === nodeRoute[index]
+          ) && nodeRoute.length === parentIdRoute.length + 1
       ),
     };
   };
@@ -185,8 +188,6 @@ export const AddUsersModel = (props: {
       displayFlatTreeData,
       parentRoute
     ).allChildrenIncludeParentList;
-
-    console.log(currentTotalChildrenItem, "currentTotalChildrenItem");
 
     const parentIndex = displayFlatTreeData.findIndex(
       (node) => currentClickItem.id === node.id
@@ -218,8 +219,6 @@ export const AddUsersModel = (props: {
       flatTreeTotalListData,
       currentClickItem.idRoute
     ).allChildrenIncludeParentList;
-
-    console.log(expendChildrenList, "expendChildrenList");
 
     if (newExpandedNodes.has(currentNodeId)) {
       expendChildrenList.forEach(({ id: nodeId }) => {
