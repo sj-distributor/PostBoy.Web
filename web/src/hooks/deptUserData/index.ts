@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
-import { v4 as parse } from "uuid";
+import { useMemo, useState } from "react";
 import {
   DepartmentAndUserType,
   IDepartmentAndUserListValue,
   IDepartmentKeyControl,
-  IDepartmentUsersData,
   IDeptAndUserList,
   IDeptUserDataHookProp,
 } from "../../dtos/enterprise";
@@ -97,6 +95,7 @@ const useDeptUserData = ({ appId, schemaType }: IDeptUserDataHookProp) => {
         const uniqueIds = new Set(
           source.childrens.map((obj) => obj.department.id)
         );
+
         users = users.filter((obj) => !uniqueIds.has(obj.id));
       } else {
         users = source.users.map((user) => ({

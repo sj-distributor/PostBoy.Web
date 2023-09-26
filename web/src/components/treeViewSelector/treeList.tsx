@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./index.module.scss";
 import { v4 as uuidv4 } from "uuid";
-import Tree, {
-  renderers as Renderers,
-  selectors,
-} from "react-virtualized-tree";
+import Tree, { renderers as Renderers } from "react-virtualized-tree";
 import {
   ClickType,
   IDepartmentAndUserListValue,
@@ -13,7 +10,6 @@ import {
 import { Checkbox, ListItemButton } from "@mui/material";
 import "material-icons/css/material-icons.css";
 
-const { getNodeRenderOptions } = selectors;
 const { Expandable } = Renderers;
 
 const expandData = new Map();
@@ -21,8 +17,6 @@ const expandData = new Map();
 const FootballPlayerRenderer = (props: any) => {
   const { node, children, handleDeptOrUserClick, onChange } = props;
   const { name, selected, indeterminate, idRoute, id } = node;
-
-  const { isExpanded } = getNodeRenderOptions(node);
 
   useEffect(() => {
     props.measure();

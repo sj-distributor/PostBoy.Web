@@ -69,6 +69,11 @@ const useAction = (props: MeetingSettingsProps) => {
     agentId: 0,
   });
 
+  //层级结构类型
+  const [schemaType, setSchemaType] = useState<WorkWeChatTreeStructureType>(
+    WorkWeChatTreeStructureType.WeChatStructure
+  );
+
   const {
     departmentAndUserList,
     flattenDepartmentList,
@@ -78,6 +83,7 @@ const useAction = (props: MeetingSettingsProps) => {
     loadDeptUsersFromWebWorker,
   } = useDeptUserData({
     appId: corpAppValue?.appId,
+    schemaType: schemaType,
   });
 
   // 获取的企业数组
@@ -337,11 +343,6 @@ const useAction = (props: MeetingSettingsProps) => {
   });
 
   const [participantPage, setParticipantPage] = useState<number>(1);
-
-  //层级结构类型
-  const [schemaType, setSchemaType] = useState<WorkWeChatTreeStructureType>(
-    WorkWeChatTreeStructureType.WeChatStructure
-  );
 
   const departmentKeyValue = useMemo(() => {
     const result = departmentAndUserList.find(
@@ -990,6 +991,22 @@ const useAction = (props: MeetingSettingsProps) => {
     setSettings(data);
   };
 
+  const loadDepartment = async (AppId: string) => {
+    setIsTreeViewLoading(true);
+    const deptListResponse = await GetDeptTreeList(AppId, schemaType);
+    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+      setIsTreeViewLoading(false);
+
+    !!deptListResponse &&
+      loadDeptUsersFromWebWorker({
+        AppId,
+        workWeChatUnits: deptListResponse.workWeChatUnits,
+      }).then(() => {
+        setIsTreeViewLoading(false);
+        setIsLoadStop(true);
+      });
+  };
+
   // 初始化企业数组
   useEffect(() => {
     GetCorpsList().then((data) => {
@@ -1058,21 +1075,6 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [participantList]);
 
   useEffect(() => {
-    const loadDepartment = async (AppId: string) => {
-      setIsTreeViewLoading(true);
-      const deptListResponse = await GetDeptTreeList(AppId, schemaType);
-      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
-        setIsTreeViewLoading(false);
-
-      !!deptListResponse &&
-        loadDeptUsersFromWebWorker({
-          AppId,
-          workWeChatUnits: deptListResponse.workWeChatUnits,
-        }).then(() => {
-          setIsTreeViewLoading(false);
-          setIsLoadStop(true);
-        });
-    };
     if (
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
@@ -1094,6 +1096,10 @@ const useAction = (props: MeetingSettingsProps) => {
         loadDepartment(corpAppValue.appId);
     }
   }, [isShowDialog]);
+
+  useEffect(() => {
+    corpAppValue.appId && loadDepartment(corpAppValue.appId);
+  }, [schemaType]);
 
   useEffect(() => {
     if (isLoadStop) {

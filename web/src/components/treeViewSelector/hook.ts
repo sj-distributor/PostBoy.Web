@@ -418,7 +418,7 @@ const useAction = ({
       openErrorAction.setTrue();
       return;
     }
-    console.log(teamMembers);
+
     if (isDirectTeamMembers) {
       let newData: IDepartmentAndUserListValue[] = [];
       teamMembers.map((item) => {
@@ -519,6 +519,15 @@ const useAction = ({
       }
     });
   }, []);
+
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse();
+      }, 3000);
+    }
+  }, [openError]);
 
   return {
     foldList,

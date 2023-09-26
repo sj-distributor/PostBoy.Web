@@ -214,7 +214,8 @@ const SelectTargetDialog = memo(
       prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
       prevProps.AppId === nextProps.AppId &&
       prevProps.chatId === nextProps.chatId &&
-      prevProps.isLoading === nextProps.isLoading
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.schemaType === nextProps.schemaType
     );
   }
 );
