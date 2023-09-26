@@ -128,6 +128,8 @@ export const useAction = () => {
 
   const padding = 2;
 
+  const [totalTreeData, setTotalTreeData] = useState<TreeNode[]>(treeData);
+
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
@@ -142,7 +144,7 @@ export const useAction = () => {
     TreeNode[]
   >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
 
-  const getChildrenNodeByParentIdRoute = (
+  const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
     currentIdRoute: number[]
   ) => {
@@ -178,12 +180,12 @@ export const useAction = () => {
 
     const parentRoute = currentClickItem.idRoute;
 
-    const currentChildrenItem = getChildrenNodeByParentIdRoute(
+    const currentChildrenItem = getCurrentNodeListByCurrentIdRoute(
       flatTreeData,
       parentRoute
     ).nextLevelChildrenList;
 
-    const currentTotalChildrenItem = getChildrenNodeByParentIdRoute(
+    const currentTotalChildrenItem = getCurrentNodeListByCurrentIdRoute(
       displayFlatTreeData,
       parentRoute
     ).allChildrenIncludeParentList;
@@ -211,13 +213,20 @@ export const useAction = () => {
 
     const newExpandedNodes = new Set(expandedNodes);
 
-    const expendChildrenList = getChildrenNodeByParentIdRoute(
+    const {
+      allChildrenIncludeParentList: expendChildrenNodeList,
+      nextLevelChildrenList: expendNextLevelChildrenList,
+    } = getCurrentNodeListByCurrentIdRoute(
       flatTreeTotalListData,
       currentClickItem.idRoute
-    ).allChildrenIncludeParentList;
+    );
+
+    currentClickItem.childrenIdList = expendNextLevelChildrenList.map(
+      ({ id }) => id
+    );
 
     if (newExpandedNodes.has(currentNodeId)) {
-      expendChildrenList.forEach(({ id: nodeId }) => {
+      expendChildrenNodeList.forEach(({ id: nodeId }) => {
         newExpandedNodes.delete(nodeId);
       });
     } else {
@@ -235,6 +244,8 @@ export const useAction = () => {
     setDisplayFlatUpdateTreeData(currentListData);
   };
 
+  console.log(totalTreeData);
+
   const selectNode = (currentClickItem: TreeNode) => {
     const newSelectedNodes = new Set(selectedNodes);
 
@@ -247,11 +258,13 @@ export const useAction = () => {
     const {
       allChildrenIncludeParentList: selectTotalItemList,
       allParentList: parentItemList,
-    } = getChildrenNodeByParentIdRoute(flatTreeTotalListData, currentRoute);
+    } = getCurrentNodeListByCurrentIdRoute(flatTreeTotalListData, currentRoute);
 
     const parentNextLevelChildrenList = parentItemList.map((node) => {
-      return getChildrenNodeByParentIdRoute(flatTreeTotalListData, node.idRoute)
-        .nextLevelChildrenList;
+      return getCurrentNodeListByCurrentIdRoute(
+        flatTreeTotalListData,
+        node.idRoute
+      ).nextLevelChildrenList;
     });
 
     const nextLevelChildrenlist = parentNextLevelChildrenList.map(
@@ -259,7 +272,6 @@ export const useAction = () => {
         return nextLevelChildren;
       }
     );
-    console.log(nextLevelChildrenlist, "nextLevelChildrenlist");
 
     selectTotalItemList.forEach(({ id: nodeId }) => {
       conditioned
