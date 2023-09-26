@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
@@ -128,8 +128,6 @@ export const useAction = () => {
 
   const padding = 2;
 
-  const [totalTreeData, setTotalTreeData] = useState<TreeNode[]>(treeData);
-
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
@@ -244,8 +242,6 @@ export const useAction = () => {
     setDisplayFlatUpdateTreeData(currentListData);
   };
 
-  console.log(totalTreeData);
-
   const selectNode = (currentClickItem: TreeNode) => {
     const newSelectedNodes = new Set(selectedNodes);
 
@@ -260,19 +256,6 @@ export const useAction = () => {
       allParentList: parentItemList,
     } = getCurrentNodeListByCurrentIdRoute(flatTreeTotalListData, currentRoute);
 
-    const parentNextLevelChildrenList = parentItemList.map((node) => {
-      return getCurrentNodeListByCurrentIdRoute(
-        flatTreeTotalListData,
-        node.idRoute
-      ).nextLevelChildrenList;
-    });
-
-    const nextLevelChildrenlist = parentNextLevelChildrenList.map(
-      (nextLevelChildren) => {
-        return nextLevelChildren;
-      }
-    );
-
     selectTotalItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newSelectedNodes.delete(nodeId)
@@ -285,15 +268,28 @@ export const useAction = () => {
         : newIndeterminateNode.add(nodeId);
     });
 
-    const resultList = nextLevelChildrenlist.map((subList) => {
-      return subList.every((item) => newSelectedNodes.has(item.id));
+    const parentIdRoute = currentRoute
+      .filter((currenyId) => currenyId !== currentClickItem.id)
+      .reverse();
+
+    parentIdRoute.forEach((parentId) => {
+      const matchParentIdItem = displayFlatUpdateTreeData.find(
+        (item) => item.id === parentId
+      );
+
+      if (matchParentIdItem?.childrenIdList) {
+        const allChildrenSelected = matchParentIdItem?.childrenIdList.every(
+          (childId) => newSelectedNodes.has(childId)
+        );
+
+        if (allChildrenSelected) {
+          newIndeterminateNode.delete(matchParentIdItem.id);
+          newSelectedNodes.add(matchParentIdItem.id);
+        } else {
+          newSelectedNodes.delete(matchParentIdItem.id);
+        }
+      }
     });
-
-    // const optionList = resultList.map((subList) => {
-    //   if(subList){
-
-    //   }
-    // });
 
     setSelectedNodes(newSelectedNodes);
     setIndeterminateNodes(newIndeterminateNode);
