@@ -17,6 +17,7 @@ import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject, useState } from "react";
 import { FixedSizeList } from "react-window";
+import { forEach } from "ramda";
 
 interface TreeNode {
   id: number;
@@ -55,6 +56,12 @@ export const AddUsersModel = (props: {
                   children: [],
                 },
                 {
+                  id: 12,
+                  idRoute: [1, 4, 5, 12],
+                  title: "节点1-4-5-12",
+                  children: [],
+                },
+                {
                   id: 9,
                   idRoute: [1, 4, 5, 9],
                   title: "节点1-4-5-9",
@@ -62,13 +69,13 @@ export const AddUsersModel = (props: {
                     {
                       id: 10,
                       idRoute: [1, 4, 5, 9, 10],
-                      title: "节点1-4-5-10",
+                      title: "节点1-4-5-9-10",
                       children: [],
                     },
                     {
                       id: 11,
                       idRoute: [1, 4, 5, 9, 11],
-                      title: "节点1-4-5-11",
+                      title: "节点1-4-5--9-11",
                       children: [],
                     },
                   ],
@@ -262,8 +269,18 @@ export const AddUsersModel = (props: {
       allChildrenIncludeParentList: selectTotalItemList,
       allParentList: parentItemList,
     } = getChildrenNodeByParentIdRoute(flatTreeTotalListData, currentRoute);
-    console.log(selectTotalItemList, "selectTotalItemList");
-    console.log(parentItemList, "parentItemList");
+
+    const parentNextLevelChildrenList = parentItemList.map((node) => {
+      return getChildrenNodeByParentIdRoute(flatTreeTotalListData, node.idRoute)
+        .nextLevelChildrenList;
+    });
+
+    const nextLevelChildrenlist = parentNextLevelChildrenList.map(
+      (nextLevelChildren) => {
+        return nextLevelChildren;
+      }
+    );
+    console.log(nextLevelChildrenlist, "nextLevelChildrenlist");
 
     selectTotalItemList.forEach(({ id: nodeId }) => {
       conditioned
@@ -276,6 +293,16 @@ export const AddUsersModel = (props: {
         ? newIndeterminateNode.delete(nodeId)
         : newIndeterminateNode.add(nodeId);
     });
+
+    const resultList = nextLevelChildrenlist.map((subList) => {
+      return subList.every((item) => newSelectedNodes.has(item.id));
+    });
+
+    // const optionList = resultList.map((subList) => {
+    //   if(subList){
+
+    //   }
+    // });
 
     setSelectedNodes(newSelectedNodes);
     setIndeterminateNodes(newIndeterminateNode);
