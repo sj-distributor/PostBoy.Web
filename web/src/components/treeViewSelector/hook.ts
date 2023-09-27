@@ -320,7 +320,6 @@ const useAction = ({
     });
 
     setAll(cloneData);
-    setSelectedList([]);
   };
 
   useEffect(() => {
