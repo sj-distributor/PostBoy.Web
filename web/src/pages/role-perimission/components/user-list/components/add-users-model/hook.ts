@@ -261,16 +261,14 @@ export const useAction = () => {
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
     });
-
+    !conditioned && newIndeterminateNode.clear();
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newIndeterminateNode.delete(nodeId)
         : newIndeterminateNode.add(nodeId);
     });
 
-    const parentIdRoute = currentRoute
-      .filter((currenyId) => currenyId !== currentClickItem.id)
-      .reverse();
+    const parentIdRoute = currentRoute.slice(0, -1).reverse();
 
     parentIdRoute.forEach((parentId) => {
       const matchParentIdItem = displayFlatUpdateTreeData.find(
@@ -283,22 +281,17 @@ export const useAction = () => {
         );
 
         const allChildrenNotSelected = matchParentIdItem?.childrenIdList.every(
-          (childId) => !newSelectedNodes.has(childId)
+          (childId) =>
+            !newSelectedNodes.has(childId) && !newIndeterminateNode.has(childId)
         );
 
         if (allChildrenSelected) {
           newIndeterminateNode.delete(matchParentIdItem.id);
           newSelectedNodes.add(matchParentIdItem.id);
         } else {
-          if (allChildrenNotSelected) {
-            newSelectedNodes.delete(matchParentIdItem.id);
-          } else {
-            // parentItemList
-            //   .filter((currenyId) => currenyId.id !== currentClickItem.id)
-            //   .forEach(({ id: nodeId }) => {
-            //     newIndeterminateNode.delete(nodeId);
-            //   });
-          }
+          newSelectedNodes.delete(matchParentIdItem.id);
+          !allChildrenNotSelected &&
+            newIndeterminateNode.add(matchParentIdItem.id);
         }
       }
     });
