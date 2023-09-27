@@ -7,15 +7,28 @@ import {
   IDepartmentAndUserListValue,
   WorkWeChatTreeStructureType,
 } from "../../dtos/enterprise";
-import { Checkbox, ListItemButton } from "@mui/material";
+import {
+  Checkbox,
+  createTheme,
+  ListItemButton,
+  ThemeProvider,
+} from "@mui/material";
 import "material-icons/css/material-icons.css";
 
 const { Expandable } = Renderers;
 
 const expandData = new Map();
 
+const theme = createTheme({
+  palette: {
+    info: {
+      main: "#29a8e0",
+    },
+  },
+});
+
 const FootballPlayerRenderer = (props: any) => {
-  const { node, children, handleDeptOrUserClick, onChange } = props;
+  const { node, children, handleDeptOrUserClick, onChange, schemaType } = props;
   const { name, selected, indeterminate, idRoute, id } = node;
 
   useEffect(() => {
@@ -32,22 +45,25 @@ const FootballPlayerRenderer = (props: any) => {
         marginLeft: 2 * (name !== id ? idRoute.length - 1 : idRoute.length),
       }}
     >
-      <Checkbox
-        edge="start"
-        checked={selected}
-        tabIndex={-1}
-        disableRipple
-        indeterminate={indeterminate}
-        onClick={(e) => {
-          e.stopPropagation();
+      <ThemeProvider theme={theme}>
+        <Checkbox
+          edge="start"
+          checked={selected}
+          tabIndex={-1}
+          disableRipple
+          indeterminate={!schemaType ? indeterminate : undefined}
+          color={indeterminate ? "info" : undefined}
+          className="abccc"
+          onClick={(e) => {
+            e.stopPropagation();
 
-          node &&
-            handleDeptOrUserClick(ClickType.Select, {
-              ...node,
-            });
-        }}
-      />
-
+            node &&
+              handleDeptOrUserClick(ClickType.Select, {
+                ...node,
+              });
+          }}
+        />
+      </ThemeProvider>
       <div
         style={{
           display: "flex",
@@ -167,6 +183,7 @@ const NodeMeasure = (props: {
             {...p}
             handleDeptOrUserClick={handleDeptOrUserClick}
             setNodes={setNodes}
+            schemaType={schemaType}
           >
             <Expandable node={node} {...p} />
           </FootballPlayerRenderer>

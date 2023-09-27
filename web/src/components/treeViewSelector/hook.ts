@@ -182,33 +182,58 @@ const useAction = ({
         ? clickItem.indeterminate
         : false;
 
-      let updateSelectedList = [
-        ...setAllChildrenById(getUniqueId(selectItem), [], true),
-        selectItem,
-      ];
+      let updateSelectedList: IDepartmentAndUserListValue[] = [];
+
+      if (schemaType) {
+        updateSelectedList = selectItem.selected
+          ? selectItem.indeterminate
+            ? [selectItem]
+            : [
+                ...setAllChildrenById(getUniqueId(selectItem), [], true),
+                selectItem,
+              ]
+          : [
+              ...setAllChildrenById(getUniqueId(selectItem), [], true),
+              selectItem,
+            ];
+      } else {
+        updateSelectedList = [
+          ...setAllChildrenById(getUniqueId(selectItem), [], true),
+          selectItem,
+        ];
+      }
 
       for (const [key, value] of cloneData.entries()) {
         const selectedListItem = updateSelectedList.find(
           (item) => item.name === value.name
         );
 
-        selectedListItem &&
-          cloneData.set(key, {
-            ...value,
-            selected: isIndeterminate ? true : !value.selected,
+        if (selectedListItem) {
+          schemaType
+            ? cloneData.set(key, {
+                ...value,
+                selected: selectItem.selected ? !value.selected : true,
+                indeterminate: false,
+              })
+            : cloneData.set(key, {
+                ...value,
+                selected: isIndeterminate ? true : !value.selected,
+                indeterminate: false,
+              });
+        }
+      }
+
+      if (!schemaType) {
+        isIndeterminate &&
+          clickItem &&
+          cloneData.set(getUniqueId(clickItem), {
+            ...(cloneData.get(
+              getUniqueId(clickItem)
+            ) as IDepartmentAndUserListValue),
+            selected: true,
             indeterminate: false,
           });
       }
-
-      isIndeterminate &&
-        clickItem &&
-        cloneData.set(getUniqueId(clickItem), {
-          ...(cloneData.get(
-            getUniqueId(clickItem)
-          ) as IDepartmentAndUserListValue),
-          selected: true,
-          indeterminate: false,
-        });
 
       if (fatherItem) {
         let fatherMapData: IDepartmentAndUserListValue = cloneData.get(
@@ -229,55 +254,67 @@ const useAction = ({
           fatherMapData &&
           fatherMapData.children.find((item) => item.name === selectItem.name)
         ) {
-          cloneData.set(getUniqueId(fatherItem), {
-            ...fatherMapData,
-            selected: childrenList.every((item) => item?.selected === true),
-            indeterminate: !childrenList.every((item) => item?.selected)
-              ? childrenList.some((item) => item.indeterminate) ||
-                childrenList.some((item) => item.selected)
-              : false,
-          });
+          if (schemaType) {
+            cloneData.set(getUniqueId(fatherItem), {
+              ...fatherMapData,
+              indeterminate: !childrenList.every((item) => item?.selected)
+                ? childrenList.some((item) => item.indeterminate) ||
+                  childrenList.some((item) => item.selected)
+                : false,
+            });
+          } else {
+            cloneData.set(getUniqueId(fatherItem), {
+              ...fatherMapData,
+              selected: childrenList.every((item) => item?.selected === true),
+              indeterminate: !childrenList.every((item) => item?.selected)
+                ? childrenList.some((item) => item.indeterminate) ||
+                  childrenList.some((item) => item.selected)
+                : false,
+            });
+          }
         }
 
-        let superiors = (
-          fatherItem.children.length > 0
-            ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
-            : fatherItem.idRoute
-        )?.reverse();
+        if (!schemaType) {
+          let superiors = (
+            fatherItem.children.length > 0
+              ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
+              : fatherItem.idRoute
+          )?.reverse();
 
-        if (superiors && superiors.length) {
-          const setFatherItemStatus = (idRoutes: (string | number)[]) => {
-            if (idRoutes.length) {
-              const id = idRoutes.splice(0, 1);
-              const data = Array.from(cloneData.values()).find(
-                (cItem) => String(cItem.id) === String(id)
-              );
-              const childrenList: IDepartmentAndUserListValue[] = [];
+          if (superiors && superiors.length) {
+            const setFatherItemStatus = (idRoutes: (string | number)[]) => {
+              if (idRoutes.length) {
+                const id = idRoutes.splice(0, 1);
+                const data = Array.from(cloneData.values()).find(
+                  (cItem) => String(cItem.id) === String(id)
+                );
+                const childrenList: IDepartmentAndUserListValue[] = [];
 
-              data &&
-                cloneData.forEach((i) => {
-                  if (i.parentid === data.id && data?.name !== i.name) {
-                    childrenList.push(i);
-                  }
-                });
+                data &&
+                  cloneData.forEach((i) => {
+                    if (i.parentid === data.id && data?.name !== i.name) {
+                      childrenList.push(i);
+                    }
+                  });
 
-              data &&
-                cloneData.set(getUniqueId(data), {
-                  ...data,
-                  selected: childrenList.every(
-                    (item) => item?.selected === true
-                  ),
-                  indeterminate: !childrenList.every((item) => item?.selected)
-                    ? childrenList.some((item) => item.indeterminate) ||
-                      childrenList.some((item) => item.selected)
-                    : false,
-                });
+                data &&
+                  cloneData.set(getUniqueId(data), {
+                    ...data,
+                    selected: childrenList.every(
+                      (item) => item?.selected === true
+                    ),
+                    indeterminate: !childrenList.every((item) => item?.selected)
+                      ? childrenList.some((item) => item.indeterminate) ||
+                        childrenList.some((item) => item.selected)
+                      : false,
+                  });
 
-              setFatherItemStatus(idRoutes);
-            }
-          };
+                setFatherItemStatus(idRoutes);
+              }
+            };
 
-          setFatherItemStatus(superiors);
+            setFatherItemStatus(superiors);
+          }
         }
       }
     });
