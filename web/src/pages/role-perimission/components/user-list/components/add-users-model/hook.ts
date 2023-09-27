@@ -282,11 +282,23 @@ export const useAction = () => {
           (childId) => newSelectedNodes.has(childId)
         );
 
+        const allChildrenNotSelected = matchParentIdItem?.childrenIdList.every(
+          (childId) => !newSelectedNodes.has(childId)
+        );
+
         if (allChildrenSelected) {
           newIndeterminateNode.delete(matchParentIdItem.id);
           newSelectedNodes.add(matchParentIdItem.id);
         } else {
-          newSelectedNodes.delete(matchParentIdItem.id);
+          if (allChildrenNotSelected) {
+            newSelectedNodes.delete(matchParentIdItem.id);
+          } else {
+            // parentItemList
+            //   .filter((currenyId) => currenyId.id !== currentClickItem.id)
+            //   .forEach(({ id: nodeId }) => {
+            //     newIndeterminateNode.delete(nodeId);
+            //   });
+          }
         }
       }
     });
