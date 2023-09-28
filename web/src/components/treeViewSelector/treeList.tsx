@@ -108,7 +108,7 @@ const NodeMeasure = (props: {
 }) => {
   const { data, handleDeptOrUserClick, foldMap, schemaType } = props;
 
-  const [nodes, setNodes] = useState<any>(data);
+  const [nodes, setNodes] = useState(data);
 
   const handleChange = (nodes: any) => {
     setNodes(nodes);

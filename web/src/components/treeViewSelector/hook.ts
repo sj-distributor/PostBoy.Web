@@ -169,6 +169,50 @@ const useAction = ({
   ) => {
     const cloneData = clone(foldMap);
 
+    //处理横杆状态逻辑
+    const setIndeterminateAllStatus = (
+      fatherItem: IDepartmentAndUserListValue
+    ) => {
+      const setFatherItemStatus = (idRoutes: (string | number)[]) => {
+        if (idRoutes.length) {
+          const id = idRoutes.splice(0, 1);
+          const data = Array.from(cloneData.values()).find(
+            (cItem) => String(cItem.id) === String(id)
+          );
+          const childrenList: IDepartmentAndUserListValue[] = [];
+
+          data &&
+            cloneData.forEach((i) => {
+              if (i.parentid === data.id && data?.name !== i.name) {
+                childrenList.push(i);
+              }
+            });
+
+          data &&
+            cloneData.set(getUniqueId(data), {
+              ...data,
+              selected: childrenList.every((item) => item?.selected === true),
+              indeterminate: !childrenList.every((item) => item?.selected)
+                ? childrenList.some((item) => item.indeterminate) ||
+                  childrenList.some((item) => item.selected)
+                : false,
+            });
+
+          setFatherItemStatus(idRoutes);
+        }
+      };
+
+      const superiors = (
+        fatherItem.children.length > 0
+          ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
+          : fatherItem.idRoute
+      )?.reverse();
+
+      if (superiors && superiors.length) {
+        setFatherItemStatus(superiors);
+      }
+    };
+
     selectedList.map((selectItem) => {
       let fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
         cloneData.values()
@@ -274,51 +318,30 @@ const useAction = ({
           }
         }
 
-        if (!schemaType) {
-          let superiors = (
-            fatherItem.children.length > 0
-              ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
-              : fatherItem.idRoute
-          )?.reverse();
-
-          if (superiors && superiors.length) {
-            const setFatherItemStatus = (idRoutes: (string | number)[]) => {
-              if (idRoutes.length) {
-                const id = idRoutes.splice(0, 1);
-                const data = Array.from(cloneData.values()).find(
-                  (cItem) => String(cItem.id) === String(id)
-                );
-                const childrenList: IDepartmentAndUserListValue[] = [];
-
-                data &&
-                  cloneData.forEach((i) => {
-                    if (i.parentid === data.id && data?.name !== i.name) {
-                      childrenList.push(i);
-                    }
-                  });
-
-                data &&
-                  cloneData.set(getUniqueId(data), {
-                    ...data,
-                    selected: childrenList.every(
-                      (item) => item?.selected === true
-                    ),
-                    indeterminate: !childrenList.every((item) => item?.selected)
-                      ? childrenList.some((item) => item.indeterminate) ||
-                        childrenList.some((item) => item.selected)
-                      : false,
-                  });
-
-                setFatherItemStatus(idRoutes);
-              }
-            };
-
-            setFatherItemStatus(superiors);
-          }
-        }
+        !schemaType && setIndeterminateAllStatus(fatherItem);
       }
     });
 
+    //处理有存在多个部门的横杆逻辑
+    const filteredItems = Array.from(cloneData.values()).filter(
+      (item, index, self) => {
+        return (
+          item.selected &&
+          self.findIndex(function (i) {
+            return i.name === item.name;
+          }) !== index
+        );
+      }
+    );
+    if (filteredItems.length) {
+      filteredItems.map((fItems) => {
+        const fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
+          cloneData.values()
+        ).find((item) => item.id === fItems.parentid);
+
+        fatherItem && setIndeterminateAllStatus(fatherItem);
+      });
+    }
     setAll(cloneData);
   };
 
@@ -333,9 +356,8 @@ const useAction = ({
         departmentItem.push(item);
       }
     });
-    setTimeout(() => {
-      setSelectedList(departmentItem);
-    }, 100);
+
+    setSelectedList(departmentItem);
   }, [foldMap]);
 
   // 处理部门列表点击选择或者展开
@@ -549,6 +571,7 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
+
     GetAuthUser().then((res) => {
       if (!!res) {
         setUserData(res);

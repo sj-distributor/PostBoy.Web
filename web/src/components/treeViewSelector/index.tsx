@@ -189,7 +189,7 @@ const TreeViewSelector = ({
               },
             }}
             renderGroup={(params) => (
-              <div key={params.key}>{params.children}</div>
+              <div key={String(uuidv4())}>{params.children}</div>
             )}
             renderOption={(props, option) => {
               let style = Object.assign(

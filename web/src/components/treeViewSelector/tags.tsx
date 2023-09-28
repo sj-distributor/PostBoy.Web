@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { IDepartmentAndUserListValue } from "../../dtos/enterprise";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
-import { difference } from "ramda";
+import { v4 as uuidv4 } from "uuid";
 import styles from "./index.module.scss";
 
 interface ITagsProps {
@@ -48,10 +48,7 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
     <>
       {reselectList.map((item) => {
         return (
-          <span
-            className={styles.selectedTags}
-            key={`${item.id}${item.idRoute?.join("")}`}
-          >
+          <span className={styles.selectedTags} key={String(uuidv4())}>
             <div
               style={{
                 display: "flex",

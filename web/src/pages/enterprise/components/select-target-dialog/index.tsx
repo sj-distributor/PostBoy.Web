@@ -151,9 +151,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                         setDepartmentSelectedList(value)
                       }
                       inputLabel={
-                        sendType === SendObjOrGroup.Object
-                          ? "部门与用户搜索"
-                          : "用户搜索"
+                        sendType === SendObjOrGroup.Object ? "结果" : "用户搜索"
                       }
                       displayMode={
                         clickName === "选择发送目标" &&
