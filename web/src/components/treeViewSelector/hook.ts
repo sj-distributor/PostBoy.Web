@@ -163,6 +163,13 @@ const useAction = ({
     return resultList;
   };
 
+  const getIndeterminateStatus = (childrenList:IDepartmentAndUserListValue[]) => {
+    return  !childrenList.every((item) => item?.selected)
+    ? childrenList.some((item) => item.indeterminate) ||
+      childrenList.some((item) => item.selected)
+    : false
+  }
+
   const handleMapUpdate = (
     selectedList: IDepartmentAndUserListValue[],
     indeterminateList?: IDepartmentAndUserListValue[]
@@ -171,8 +178,14 @@ const useAction = ({
 
     //处理横杆状态逻辑
     const setIndeterminateAllStatus = (
-      fatherItem: IDepartmentAndUserListValue
+      fatherItem: IDepartmentAndUserListValue,
     ) => {
+      const superiors = (
+        fatherItem.children.length > 0
+          ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
+          : fatherItem.idRoute
+      )?.reverse();
+
       const setFatherItemStatus = (idRoutes: (string | number)[]) => {
         if (idRoutes.length) {
           const id = idRoutes.splice(0, 1);
@@ -183,7 +196,7 @@ const useAction = ({
 
           data &&
             cloneData.forEach((i) => {
-              if (i.parentid === data.id && data?.name !== i.name) {
+              if (i.parentid === data.id && data?.id !== i.id) {
                 childrenList.push(i);
               }
             });
@@ -191,22 +204,13 @@ const useAction = ({
           data &&
             cloneData.set(getUniqueId(data), {
               ...data,
-              selected: childrenList.every((item) => item?.selected === true),
-              indeterminate: !childrenList.every((item) => item?.selected)
-                ? childrenList.some((item) => item.indeterminate) ||
-                  childrenList.some((item) => item.selected)
-                : false,
+              selected: childrenList.every((item) => item?.selected),
+              indeterminate: getIndeterminateStatus(childrenList),
             });
 
           setFatherItemStatus(idRoutes);
         }
       };
-
-      const superiors = (
-        fatherItem.children.length > 0
-          ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
-          : fatherItem.idRoute
-      )?.reverse();
 
       if (superiors && superiors.length) {
         setFatherItemStatus(superiors);
@@ -280,10 +284,6 @@ const useAction = ({
       }
 
       if (fatherItem) {
-        let fatherMapData: IDepartmentAndUserListValue = cloneData.get(
-          getUniqueId(fatherItem)
-        ) as IDepartmentAndUserListValue;
-
         let childrenList: IDepartmentAndUserListValue[] = [];
         cloneData.forEach((item) => {
           if (
@@ -294,26 +294,17 @@ const useAction = ({
           }
         });
 
-        if (
-          fatherMapData &&
-          fatherMapData.children.find((item) => item.name === selectItem.name)
-        ) {
+        if (fatherItem.children.find((item) => item.name === selectItem.name)) {
           if (schemaType) {
             cloneData.set(getUniqueId(fatherItem), {
-              ...fatherMapData,
-              indeterminate: !childrenList.every((item) => item?.selected)
-                ? childrenList.some((item) => item.indeterminate) ||
-                  childrenList.some((item) => item.selected)
-                : false,
+              ...fatherItem,
+              indeterminate: getIndeterminateStatus(childrenList),
             });
           } else {
             cloneData.set(getUniqueId(fatherItem), {
-              ...fatherMapData,
+              ...fatherItem,
               selected: childrenList.every((item) => item?.selected === true),
-              indeterminate: !childrenList.every((item) => item?.selected)
-                ? childrenList.some((item) => item.indeterminate) ||
-                  childrenList.some((item) => item.selected)
-                : false,
+              indeterminate: getIndeterminateStatus(childrenList),
             });
           }
         }
@@ -323,22 +314,40 @@ const useAction = ({
     });
 
     //处理有存在多个部门的横杆逻辑
+
+
     const filteredItems = Array.from(cloneData.values()).filter(
-      (item, index, self) => {
-        return (
-          item.selected &&
-          self.findIndex(function (i) {
-            return i.name === item.name;
-          }) !== index
-        );
-      }
+      (item, index, self) =>  item.selected && item.name === item.id && self.findIndex(i => {
+        return i.name === item.name;
+      }) !== index
     );
+    
     if (filteredItems.length) {
       filteredItems.map((fItems) => {
         const fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
           cloneData.values()
         ).find((item) => item.id === fItems.parentid);
 
+        let childrenList: IDepartmentAndUserListValue[] = [];
+        cloneData.forEach((item) => {
+          if (
+            fatherItem &&
+            item.parentid === fatherItem.id &&
+            fatherItem?.name !== item.name
+          ) {
+            childrenList.push(item);
+          }
+        });
+
+        fatherItem && cloneData.set(getUniqueId(fatherItem), {
+          ...fatherItem,
+          selected: childrenList.every((item) => item?.selected === true),
+          indeterminate: !childrenList.every((item) => item?.selected)
+            ? childrenList.some((item) => item.indeterminate) ||
+              childrenList.some((item) => item.selected)
+            : false,
+        });
+        
         fatherItem && setIndeterminateAllStatus(fatherItem);
       });
     }
@@ -351,7 +360,7 @@ const useAction = ({
     foldMap.forEach((item) => {
       if (
         item.selected &&
-        !departmentItem.find((dItem) => item.name === dItem.name)
+        !departmentItem.find((dItem) => item.id === dItem.id)
       ) {
         departmentItem.push(item);
       }
