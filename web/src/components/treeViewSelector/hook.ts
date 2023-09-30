@@ -314,8 +314,6 @@ const useAction = ({
     });
 
     //处理有存在多个部门的横杆逻辑
-
-
     const filteredItems = Array.from(cloneData.values()).filter(
       (item, index, self) =>  item.selected && item.name === item.id && self.findIndex(i => {
         return i.name === item.name;
