@@ -131,13 +131,16 @@ export const useAction = () => {
     new Set()
   );
 
-  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
-    TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+  const initialListData = flatTreeTotalListData.filter(
+    (node) => node.idRoute.length === 1
+  );
+
+  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] =
+    useState<TreeNode[]>(initialListData);
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+  >([]);
 
   const isSearch = useMemo(() => {
     return searchDisplayTreeData.length > 0;
@@ -221,15 +224,12 @@ export const useAction = () => {
       .map((id) => flatTreeTotalListData.find((item) => item.id === id))
       .filter((item): item is TreeNode => item !== undefined);
 
-    if (value !== "") {
+    if (!isSearch) {
       setSearchDisplayTreeData(displaydata);
     } else {
       setSearchDisplayTreeData([]);
-      setDisplayFlatUpdateTreeData(
-        flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
-      );
+      setDisplayFlatUpdateTreeData(initialListData);
     }
-    console.log(isSearch);
   };
 
   const toggleNode = (currentClickItem: TreeNode) => {
@@ -298,8 +298,8 @@ export const useAction = () => {
 
     parentIdRoute.forEach((parentId) => {
       const matchParentIdItem = isSearch
-        ? searchDisplayTreeData.find((item) => item.id === parentId)
-        : displayFlatUpdateTreeData.find((item) => item.id === parentId);
+        ? displayFlatUpdateTreeData.find((item) => item.id === parentId)
+        : searchDisplayTreeData.find((item) => item.id === parentId);
 
       if (matchParentIdItem?.childrenIdList) {
         const allChildrenSelected = matchParentIdItem?.childrenIdList.every(
