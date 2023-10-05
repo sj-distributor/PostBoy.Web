@@ -163,12 +163,14 @@ const useAction = ({
     return resultList;
   };
 
-  const getIndeterminateStatus = (childrenList:IDepartmentAndUserListValue[]) => {
-    return  !childrenList.every((item) => item?.selected)
-    ? childrenList.some((item) => item.indeterminate) ||
-      childrenList.some((item) => item.selected)
-    : false
-  }
+  const getIndeterminateStatus = (
+    childrenList: IDepartmentAndUserListValue[]
+  ) => {
+    return !childrenList.every((item) => item?.selected)
+      ? childrenList.some((item) => item.indeterminate) ||
+          childrenList.some((item) => item.selected)
+      : false;
+  };
 
   const handleMapUpdate = (
     selectedList: IDepartmentAndUserListValue[],
@@ -178,7 +180,7 @@ const useAction = ({
 
     //处理横杆状态逻辑
     const setIndeterminateAllStatus = (
-      fatherItem: IDepartmentAndUserListValue,
+      fatherItem: IDepartmentAndUserListValue
     ) => {
       const superiors = (
         fatherItem.children.length > 0
@@ -315,11 +317,14 @@ const useAction = ({
 
     //处理有存在多个部门的横杆逻辑
     const filteredItems = Array.from(cloneData.values()).filter(
-      (item, index, self) =>  item.selected && item.name === item.id && self.findIndex(i => {
-        return i.name === item.name;
-      }) !== index
+      (item, index, self) =>
+        item.selected &&
+        item.name === item.id &&
+        self.findIndex((i) => {
+          return i.name === item.name;
+        }) !== index
     );
-    
+
     if (filteredItems.length) {
       filteredItems.map((fItems) => {
         const fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
@@ -337,15 +342,16 @@ const useAction = ({
           }
         });
 
-        fatherItem && cloneData.set(getUniqueId(fatherItem), {
-          ...fatherItem,
-          selected: childrenList.every((item) => item?.selected === true),
-          indeterminate: !childrenList.every((item) => item?.selected)
-            ? childrenList.some((item) => item.indeterminate) ||
-              childrenList.some((item) => item.selected)
-            : false,
-        });
-        
+        fatherItem &&
+          cloneData.set(getUniqueId(fatherItem), {
+            ...fatherItem,
+            selected: childrenList.every((item) => item?.selected === true),
+            indeterminate: !childrenList.every((item) => item?.selected)
+              ? childrenList.some((item) => item.indeterminate) ||
+                childrenList.some((item) => item.selected)
+              : false,
+          });
+
         fatherItem && setIndeterminateAllStatus(fatherItem);
       });
     }
@@ -469,12 +475,12 @@ const useAction = ({
   };
 
   //指数组员按钮逻辑
-  const handleGetAllTeamMembers = () => {
+  const handleGetAllTeamMembers = async () => {
     isDirectTeamMembers
       ? setIsDirectTeamMembers.setFalse()
       : setIsDirectTeamMembers.setTrue();
 
-    let teamMembers = getUserTeamMembers();
+    let teamMembers = await getUserTeamMembers();
 
     if (!teamMembers.length) {
       setPromptText(
@@ -515,9 +521,18 @@ const useAction = ({
   };
 
   //获取组员
-  const getUserTeamMembers = () => {
+  const getUserTeamMembers = async () => {
+    const userData = await GetAuthUser();
+
+    const childrenData =
+      flattenList.find((item) => item.name === userData?.userName)?.children ??
+      [];
+    const user = flattenList.find((item) => item.name === userData?.userName);
+
     const teamMembers = schemaType
-      ? flattenList.find((item) => item.name === userData?.userName)?.children
+      ? user
+        ? [...childrenData, user]
+        : []
       : flattenList.filter(
           (item) =>
             item.department_leader &&
@@ -539,23 +554,28 @@ const useAction = ({
 
       return teamMembers;
     };
-    let data = removeDuplicate(teamMembers ?? []);
-    data = data.filter((item) => !data.some((i) => i.id === item.parentid));
 
-    return data;
+    const data = removeDuplicate(teamMembers ?? []);
+
+    return schemaType
+      ? data
+      : data.filter((item) => !data.some((i) => i.id === item.parentid));
   };
 
   useEffect(() => {
     // 同步外部selectedList
     settingSelectedList(selectedList);
+    (async function () {
+      const teamMembers = await getUserTeamMembers();
 
-    const teamMembers = getUserTeamMembers();
-
-    teamMembers.every((tItem) =>
-      selectedList.map((item) => item.name).includes(tItem.name)
-    ) && teamMembers.length <= selectedList.length
-      ? setIsDirectTeamMembers.setFalse()
-      : setIsDirectTeamMembers.setTrue();
+      teamMembers.length &&
+      teamMembers.every((tItem) =>
+        selectedList.map((item) => item.name).includes(tItem.name)
+      ) &&
+      teamMembers.length <= selectedList.length
+        ? setIsDirectTeamMembers.setFalse()
+        : setIsDirectTeamMembers.setTrue();
+    })();
   }, [selectedList]);
 
   useEffect(() => {
@@ -578,12 +598,6 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
-
-    GetAuthUser().then((res) => {
-      if (!!res) {
-        setUserData(res);
-      }
-    });
   }, []);
 
   // 延迟关闭警告提示
