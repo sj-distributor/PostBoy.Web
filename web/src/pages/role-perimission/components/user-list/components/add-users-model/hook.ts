@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
@@ -209,7 +209,7 @@ export const useAction = () => {
   };
 
   //搜索
-  const handleSearchChange = (event: any) => {
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
       return item.title.toLowerCase().includes(value.toLowerCase());
@@ -229,6 +229,7 @@ export const useAction = () => {
       setSearchDisplayTreeData(displaydata);
     } else {
       setIsSearch(false);
+      setExpandedNodes(new Set());
       setDisplayFlatUpdateTreeData(
         flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
       );
