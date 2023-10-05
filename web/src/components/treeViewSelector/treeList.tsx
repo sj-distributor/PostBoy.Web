@@ -15,6 +15,20 @@ import {
 } from "@mui/material";
 import "material-icons/css/material-icons.css";
 
+interface NodeType {
+  id: string | number;
+  name: string;
+  type: number;
+  state: { expanded: boolean };
+  parentid: string | number;
+  idRoute?: number[];
+  selected: boolean;
+  isCollapsed: boolean;
+  indeterminate?: boolean;
+  children: NodeType[];
+  department_leader: string[];
+}
+
 const { Expandable } = Renderers;
 
 const expandData = new Map();
@@ -108,7 +122,7 @@ const NodeMeasure = (props: {
 }) => {
   const { data, handleDeptOrUserClick, foldMap, schemaType } = props;
 
-  const [nodes, setNodes] = useState(data);
+  const [nodes, setNodes] = useState<IDepartmentAndUserListValue[]>(data);
 
   const handleChange = (nodes: any) => {
     setNodes(nodes);
@@ -120,7 +134,7 @@ const NodeMeasure = (props: {
     const arrayToTree = (
       oneDimensionArray: IDepartmentAndUserListValue[]
     ): IDepartmentAndUserListValue | null => {
-      const treeNode: Map<string, IDepartmentAndUserListValue> = new Map();
+      const treeNode: Map<string, NodeType> = new Map();
 
       let root: any = []; // 树根节点
       oneDimensionArray.forEach((item) => {
@@ -136,7 +150,7 @@ const NodeMeasure = (props: {
 
         const isExpanded = expandArr.find((item) => item[0] === name);
         // 定义树节点tree node，并使用Map维持id与节点之间的关系
-        const node: any = {
+        const node: NodeType = {
           id,
           name,
           type: 1,

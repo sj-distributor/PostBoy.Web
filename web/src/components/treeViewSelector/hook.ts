@@ -89,7 +89,7 @@ const useAction = ({
     isSelected: boolean
   ) => {
     const mapItem = foldMapGetter(id);
-    //向下
+
     mapItem &&
       mapItem.children.forEach((item) => {
         const innerItem = foldMapGetter(getUniqueId(item));
@@ -107,60 +107,6 @@ const useAction = ({
         }
       });
     return childrenList;
-  };
-
-  const handleIndeterminateList = (
-    clickedItem: IDepartmentAndUserListValue,
-    selectedList: IDepartmentAndUserListValue[],
-    indeterminateList: IDepartmentAndUserListValue[]
-  ) => {
-    /*
-      处理indeterminateList横杠列表的方法
-      找出所有父数据的children是否全选中/全不选中(直接对比selectedList即可) 或 有杠 (此处处理顺序必须从点击项开始往上)
-      只要数据符合条件便set入resultList
-      return一个resultList
-    */
-
-    const resultList: IDepartmentAndUserListValue[] = [...indeterminateList];
-    const idRouteList = clickedItem.idRoute?.slice().reverse();
-
-    idRouteList?.forEach((item) => {
-      const idIndex = (item: number) =>
-        clickedItem.idRoute?.findIndex((x) => x === item) ?? 0;
-
-      const mapItem = foldMapGetter(
-        `${clickedItem.id}${clickedItem.idRoute?.join("")}`
-      );
-
-      if (mapItem) {
-        const idSelectedList = selectedList.map((x) => x.id);
-        const idIndeterminateList = resultList.map((x) => x.id);
-
-        const determine = {
-          allSelected: mapItem?.children.every((child) =>
-            idSelectedList.includes(child.id)
-          ),
-          allNotSelected: mapItem?.children.every(
-            (child) => !idSelectedList.includes(child.id)
-          ),
-          someIndeterminate: mapItem?.children.some((child) =>
-            idIndeterminateList.includes(child.id)
-          ),
-        };
-
-        const activeIndex = resultList.findIndex((x) => x.id === mapItem.id);
-        determine.allSelected &&
-          !determine.allNotSelected &&
-          !selectedList.some((item) => item.id === mapItem.id) &&
-          selectedList.push(mapItem);
-        determine.someIndeterminate ||
-        (!determine.allSelected && !determine.allNotSelected)
-          ? activeIndex === -1 && resultList.push(mapItem)
-          : activeIndex > -1 && resultList.splice(activeIndex, 1);
-      }
-    });
-
-    return resultList;
   };
 
   const getIndeterminateStatus = (
@@ -384,59 +330,23 @@ const useAction = ({
     clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
     toSelect?: boolean
   ) => {
-    /*
-      一、先统一当前项和当前项的所有子数据在同一个列表
-      二、当前项还要丢给处理indeterminateList横杠列表的方法:handleIndeterminateList,会返回一个横杠列表
-      三、最后在调用遍历map的方法:handleMapUpdate,并传入上述list,但不使用state, 使用普通变量
-    */
     const clickedItem = Array.isArray(clickedList)
       ? clickedList
       : [clickedList];
 
     for (const value of clickedItem) {
       if (type === ClickType.Collapse) {
-        // 折叠
-
         foldMapSetter(schemaType ? value.name : getUniqueId(value), {
           ...value,
           isCollapsed: !value.isCollapsed,
         });
       } else {
-        let newSelectedList = [...selectedList, value];
-
-        const uniqueArray = (arr: IDepartmentAndUserListValue[]) => {
-          const set: IDepartmentAndUserListValue[] = [];
-          arr.map((item) => {
-            !set.find((cItem) => item.id === cItem.id) && set.push(item);
-          });
-
-          return schemaType
-            ? set.filter((item) => isNaN(Number(item.id)))
-            : set;
-        };
-
-        let newIndeterminateList = handleIndeterminateList(
-          value,
-          newSelectedList,
-          indeterminateList
-        );
-        newSelectedList.length &&
-          (newSelectedList = uniqueArray(
-            newSelectedList.filter(
-              (value) =>
-                !newIndeterminateList.some((item) => item.id === value.id)
-            )
-          ));
-
         if (!schemaType) {
           handleMapUpdate([value]);
+        } else {
+          handleMapUpdate([value], toSelect);
         }
-        setIndeterminateList(newIndeterminateList);
       }
-    }
-
-    if (schemaType && type !== ClickType.Collapse) {
-      handleMapUpdate(clickedItem, toSelect);
     }
   };
 
@@ -602,6 +512,29 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
+
+    function getDates(startDate: Date, numDays: number): string[] {
+      const dates: string[] = [];
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+
+      for (let i = 0; i < numDays; i++) {
+        const currentDate = new Date(
+          startDate.getTime() + i * millisecondsPerDay
+        );
+        dates.push(
+          currentDate.getMonth() + 1 + "月" + currentDate.getDay() + "日"
+        );
+      }
+
+      return dates;
+    }
+
+    // 示例用法
+    const startDate = new Date();
+    const numDays = 14;
+    const result = getDates(startDate, numDays);
+
+    console.log(result);
   }, []);
 
   // 延迟关闭警告提示
