@@ -2,14 +2,6 @@ import { useEffect, useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
-  const alreadySelectData: string[] = [
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-  ];
-
   const treeData: TreeNode[] = [
     {
       id: 1,
@@ -182,7 +174,9 @@ export const useAction = () => {
     currentClickItem: TreeNode,
     isExistCurrentItem: boolean
   ): TreeNode[] => {
-    const displayFlatTreeData = displayFlatUpdateTreeData;
+    const displayFlatTreeData = isSearch
+      ? searchDisplayTreeData
+      : displayFlatUpdateTreeData;
 
     const parentRoute = currentClickItem.idRoute;
 
@@ -214,6 +208,7 @@ export const useAction = () => {
     return displayFlatTreeData;
   };
 
+  //搜索
   const handleSearchChange = (event: any) => {
     const { value } = event.target;
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
@@ -240,6 +235,7 @@ export const useAction = () => {
     }
   };
 
+  //展开
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
 
@@ -271,11 +267,19 @@ export const useAction = () => {
       newExpandedNodes.has(currentClickItem.id)
     );
 
+    const filteredSearchDisplayTreeData = currentListData.filter(
+      (item, index, self) =>
+        self.findIndex((searchItem) => searchItem.id === item.id) === index
+    );
+
     setExpandedNodes(newExpandedNodes);
 
-    setDisplayFlatUpdateTreeData(currentListData);
+    isSearch
+      ? setSearchDisplayTreeData(filteredSearchDisplayTreeData)
+      : setDisplayFlatUpdateTreeData(currentListData);
   };
 
+  //选中
   const selectNode = (currentClickItem: TreeNode) => {
     const newSelectedNodes = new Set(selectedNodes);
 
@@ -295,7 +299,9 @@ export const useAction = () => {
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
     });
+
     !conditioned && newIndeterminateNode.clear();
+
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newIndeterminateNode.delete(nodeId)
@@ -334,6 +340,16 @@ export const useAction = () => {
     setIndeterminateNodes(newIndeterminateNode);
   };
 
+  const alreadySelectData = flatTreeTotalListData.filter((item) =>
+    selectedNodes.has(item.id)
+  );
+
+  const handleSelectItemDelete = (itemId: number) => {
+    const newSelectedNodes = new Set(selectedNodes);
+    newSelectedNodes.delete(itemId);
+    setSelectedNodes(newSelectedNodes);
+  };
+
   return {
     alreadySelectData,
     isSearch,
@@ -346,5 +362,6 @@ export const useAction = () => {
     selectNode,
     toggleNode,
     handleSearchChange,
+    handleSelectItemDelete,
   };
 };

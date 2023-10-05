@@ -16,6 +16,7 @@ import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject } from "react";
 import { FixedSizeList } from "react-window";
+import { TreeNode } from "./props";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -34,6 +35,7 @@ export const AddUsersModel = (props: {
     selectNode,
     toggleNode,
     handleSearchChange,
+    handleSelectItemDelete,
   } = useAction();
 
   const renderListItem: React.FC<{
@@ -63,12 +65,13 @@ export const AddUsersModel = (props: {
           <ListItemIcon>
             <Checkbox
               checked={isSelected}
+              disabled={isSelected ? true : false}
               indeterminate={isIndeterminate}
               onChange={() => {
                 selectNode(item);
               }}
             />
-            {hasChildren ? (
+            {hasChildren && (
               <div onClick={() => toggleNode(item)}>
                 {isExpanded ? (
                   <>
@@ -82,8 +85,6 @@ export const AddUsersModel = (props: {
                   </>
                 )}
               </div>
-            ) : (
-              <></>
             )}
           </ListItemIcon>
           <ListItemText primary={item.title} />
@@ -140,11 +141,14 @@ export const AddUsersModel = (props: {
             />
           </div>
           <div>
-            {alreadySelectData.map((selectItems: string, index: number) => {
+            {alreadySelectData.map((selectItem: TreeNode, index: number) => {
               return (
                 <div className={styles.selectListWrap} key={index}>
-                  <div>{selectItems}</div>
-                  <CloseIcon className={styles.delete} />
+                  <div>{selectItem.title}</div>
+                  <CloseIcon
+                    className={styles.delete}
+                    onClick={() => handleSelectItemDelete(selectItem.id)}
+                  />
                 </div>
               );
             })}
