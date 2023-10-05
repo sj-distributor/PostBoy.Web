@@ -270,7 +270,9 @@ const useAction = ({
                 selected: selectItem.selected
                   ? !value.selected
                   : isClickFilter
-                  ? !value.selected
+                  ? clickItem?.children.length && !clickItem.selected
+                    ? true
+                    : !value.selected
                   : true,
               })
             : cloneData.set(key, {
@@ -280,17 +282,13 @@ const useAction = ({
         }
       }
 
-      if (!schemaType) {
-        isIndeterminate &&
-          clickItem &&
-          cloneData.set(getUniqueId(clickItem), {
-            ...(cloneData.get(
-              getUniqueId(clickItem)
-            ) as IDepartmentAndUserListValue),
-            selected: true,
-            indeterminate: false,
-          });
-      }
+      isIndeterminate &&
+        clickItem &&
+        cloneData.set(getUniqueId(clickItem), {
+          ...clickItem,
+          selected: !schemaType ? true : !clickItem.selected,
+          indeterminate: false,
+        });
 
       if (fatherItem) {
         let childrenList: IDepartmentAndUserListValue[] = [];

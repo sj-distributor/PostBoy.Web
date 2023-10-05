@@ -199,8 +199,11 @@ const TreeViewSelector = ({
                 { fontSize: "0.9rem" }
               );
               props.onClick = () => {
+                const data = Array.from(foldMap.values()).find(
+                  (item) => item.id === option.id
+                );
                 handleTypeIsCanSelect(canSelect, option.type) &&
-                  handleDeptOrUserClick(ClickType.Select, option, true);
+                  handleDeptOrUserClick(ClickType.Select, data ?? option, true);
               };
               return (
                 <li {...props} style={style}>
