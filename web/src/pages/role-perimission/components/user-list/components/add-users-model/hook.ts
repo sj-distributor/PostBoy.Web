@@ -104,6 +104,7 @@ export const useAction = () => {
     },
   ];
 
+  //平铺树结构
   const flattenTreeTotalList = (
     tree: TreeNode[],
     parentIdRoute: number[] = []
@@ -128,6 +129,8 @@ export const useAction = () => {
 
   const padding = 2;
 
+  const flatTreeTotalListData = flattenTreeTotalList(treeData);
+
   const [isSearch, setIsSearch] = useState<boolean>(false);
 
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
@@ -137,8 +140,6 @@ export const useAction = () => {
   const [indeterminateNodes, setIndeterminateNodes] = useState<Set<number>>(
     new Set()
   );
-
-  const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
   const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
     TreeNode[]
@@ -175,6 +176,7 @@ export const useAction = () => {
     };
   };
 
+  //根据展开插入或删除节点
   const displayTreeList = (
     flatTreeData: TreeNode[],
     currentClickItem: TreeNode,
@@ -220,9 +222,9 @@ export const useAction = () => {
     const idRouteList = [
       ...new Set(targetSearchFilterList.map((item) => item.idRoute)),
     ];
-    const uniqueNumbers = [...new Set(idRouteList.flat())];
+    const uniqueTreeNumbersList = [...new Set(idRouteList.flat())];
 
-    const displaydata: TreeNode[] = uniqueNumbers
+    const displaydata: TreeNode[] = uniqueTreeNumbersList
       .map((id) => flatTreeTotalListData.find((item) => item.id === id))
       .filter((item): item is TreeNode => item !== undefined);
 
@@ -271,9 +273,7 @@ export const useAction = () => {
 
     setExpandedNodes(newExpandedNodes);
 
-    isSearch
-      ? setSearchDisplayTreeData(currentListData)
-      : setDisplayFlatUpdateTreeData(currentListData);
+    setDisplayFlatUpdateTreeData(currentListData);
   };
 
   const selectNode = (currentClickItem: TreeNode) => {

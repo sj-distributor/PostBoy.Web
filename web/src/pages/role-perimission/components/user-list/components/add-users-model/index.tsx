@@ -40,8 +40,9 @@ export const AddUsersModel = (props: {
     index: number;
     style: React.CSSProperties;
   }> = ({ index, style }) => {
-    const item =
-      displayFlatUpdateTreeData[index] || searchDisplayTreeData[index];
+    const item = isSearch
+      ? searchDisplayTreeData[index]
+      : displayFlatUpdateTreeData[index];
 
     const isSelected = selectedNodes.has(item.id);
 
