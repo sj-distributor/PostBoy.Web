@@ -258,6 +258,11 @@ const useAction = ({
           (item) => item.name === value.name
         );
 
+        cloneData.set(key, {
+          ...value,
+          indeterminate: false,
+        });
+
         if (selectedListItem) {
           schemaType
             ? cloneData.set(key, {
@@ -267,12 +272,10 @@ const useAction = ({
                   : isClickFilter
                   ? !value.selected
                   : true,
-                indeterminate: false,
               })
             : cloneData.set(key, {
                 ...value,
                 selected: isIndeterminate ? true : !value.selected,
-                indeterminate: false,
               });
         }
       }
