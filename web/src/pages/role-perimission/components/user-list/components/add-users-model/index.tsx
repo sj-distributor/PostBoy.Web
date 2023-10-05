@@ -70,20 +70,16 @@ export const AddUsersModel = (props: {
               onChange={() => {
                 selectNode(item);
               }}
+              sx={{ padding: 0 }}
             />
             {hasChildren && (
               <div onClick={() => toggleNode(item)}>
                 {isExpanded ? (
-                  <>
-                    <ArrowDropDownIcon className={styles.arrowRight} />
-                    <FolderIcon className={styles.folder} />
-                  </>
+                  <ArrowDropDownIcon className={styles.arrowIcon} />
                 ) : (
-                  <>
-                    <ArrowRightIcon className={styles.arrowRight} />
-                    <FolderIcon className={styles.folder} />
-                  </>
+                  <ArrowRightIcon className={styles.arrowIcon} />
                 )}
+                <FolderIcon className={styles.folder} />
               </div>
             )}
           </ListItemIcon>
