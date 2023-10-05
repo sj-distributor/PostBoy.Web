@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import styles from "./index.module.scss";
+import styles from "../index.module.scss";
 import { v4 as uuidv4 } from "uuid";
 import Tree, { renderers as Renderers } from "react-virtualized-tree";
 import {
   ClickType,
   IDepartmentAndUserListValue,
   WorkWeChatTreeStructureType,
-} from "../../dtos/enterprise";
+} from "../../../dtos/enterprise";
 import {
   Checkbox,
   createTheme,

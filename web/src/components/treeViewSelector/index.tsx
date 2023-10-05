@@ -17,9 +17,9 @@ import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
-import TagsComponent from "./tags";
+import TagsComponent from "./components/tags";
 
-import TreeList from "./treeList";
+import TreeList from "./components/treeList";
 
 const TreeViewSelector = ({
   appId,
@@ -54,6 +54,7 @@ const TreeViewSelector = ({
     handleClear,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
+    foldMapGetter,
     foldMap,
     isDirectTeamMembers,
     promptText,
@@ -199,9 +200,7 @@ const TreeViewSelector = ({
                 { fontSize: "0.9rem" }
               );
               props.onClick = () => {
-                const data = Array.from(foldMap.values()).find(
-                  (item) => item.id === option.id
-                );
+                const data = foldMapGetter(option.id);
                 handleTypeIsCanSelect(canSelect, option.type) &&
                   handleDeptOrUserClick(ClickType.Select, data ?? option, true);
               };

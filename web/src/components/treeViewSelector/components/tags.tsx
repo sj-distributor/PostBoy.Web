@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { IDepartmentAndUserListValue } from "../../dtos/enterprise";
+import { IDepartmentAndUserListValue } from "../../../dtos/enterprise";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { v4 as uuidv4 } from "uuid";
-import styles from "./index.module.scss";
+import styles from "../index.module.scss";
 
 interface ITagsProps {
   selectedList: IDepartmentAndUserListValue[];

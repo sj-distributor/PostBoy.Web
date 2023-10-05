@@ -130,7 +130,7 @@ const useAction = ({
     ) => {
       const superiors = (
         fatherItem.children.length > 0
-          ? fatherItem.idRoute?.slice(0, fatherItem.idRoute.length - 1)
+          ? fatherItem.idRoute?.slice(0, -1)
           : fatherItem.idRoute
       )?.reverse();
 
@@ -144,7 +144,7 @@ const useAction = ({
 
           data &&
             cloneData.forEach((i) => {
-              if (i.parentid === data.id && data?.id !== i.id) {
+              if (i.parentid === data.id && data.id !== i.id) {
                 childrenList.push(i);
               }
             });
@@ -160,9 +160,7 @@ const useAction = ({
         }
       };
 
-      if (superiors && superiors.length) {
-        setFatherItemStatus(superiors);
-      }
+      superiors?.length && setFatherItemStatus(superiors);
     };
 
     selectedList.map((selectItem) => {
@@ -180,23 +178,20 @@ const useAction = ({
 
       let updateSelectedList: IDepartmentAndUserListValue[] = [];
 
+      const allChildrenData = setAllChildrenById(
+        getUniqueId(selectItem),
+        [],
+        true
+      );
+
       if (schemaType) {
         updateSelectedList = selectItem.selected
           ? selectItem.indeterminate
             ? [selectItem]
-            : [
-                ...setAllChildrenById(getUniqueId(selectItem), [], true),
-                selectItem,
-              ]
-          : [
-              ...setAllChildrenById(getUniqueId(selectItem), [], true),
-              selectItem,
-            ];
+            : [...allChildrenData, selectItem]
+          : [...allChildrenData, selectItem];
       } else {
-        updateSelectedList = [
-          ...setAllChildrenById(getUniqueId(selectItem), [], true),
-          selectItem,
-        ];
+        updateSelectedList = [...allChildrenData, selectItem];
       }
 
       for (const [key, value] of cloneData.entries()) {
@@ -512,29 +507,6 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
-
-    function getDates(startDate: Date, numDays: number): string[] {
-      const dates: string[] = [];
-      const millisecondsPerDay = 24 * 60 * 60 * 1000;
-
-      for (let i = 0; i < numDays; i++) {
-        const currentDate = new Date(
-          startDate.getTime() + i * millisecondsPerDay
-        );
-        dates.push(
-          currentDate.getMonth() + 1 + "月" + currentDate.getDay() + "日"
-        );
-      }
-
-      return dates;
-    }
-
-    // 示例用法
-    const startDate = new Date();
-    const numDays = 14;
-    const result = getDates(startDate, numDays);
-
-    console.log(result);
   }, []);
 
   // 延迟关闭警告提示
