@@ -174,7 +174,7 @@ const useAction = ({
 
   const handleMapUpdate = (
     selectedList: IDepartmentAndUserListValue[],
-    indeterminateList?: IDepartmentAndUserListValue[]
+    isClickFilter?: boolean
   ) => {
     const cloneData = clone(foldMap);
 
@@ -262,7 +262,11 @@ const useAction = ({
           schemaType
             ? cloneData.set(key, {
                 ...value,
-                selected: selectItem.selected ? !value.selected : true,
+                selected: selectItem.selected
+                  ? !value.selected
+                  : isClickFilter
+                  ? !value.selected
+                  : true,
                 indeterminate: false,
               })
             : cloneData.set(key, {
@@ -424,14 +428,14 @@ const useAction = ({
           ));
 
         if (!schemaType) {
-          handleMapUpdate([value], newIndeterminateList);
+          handleMapUpdate([value]);
         }
         setIndeterminateList(newIndeterminateList);
       }
     }
 
     if (schemaType && type !== ClickType.Collapse) {
-      handleMapUpdate(clickedItem, []);
+      handleMapUpdate(clickedItem, toSelect);
     }
   };
 
@@ -497,7 +501,7 @@ const useAction = ({
           newData.push(item);
       });
 
-      handleMapUpdate(newData, indeterminateList);
+      handleMapUpdate(newData);
     } else {
       let newData: IDepartmentAndUserListValue[] = [];
       teamMembers.map((item, index) => {
@@ -508,8 +512,7 @@ const useAction = ({
       handleMapUpdate(
         selectedList.filter((item) =>
           teamMembers.find((tItem) => item.name === tItem.name)
-        ),
-        indeterminateList
+        )
       );
 
       flattenList.forEach(

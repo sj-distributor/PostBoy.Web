@@ -200,7 +200,7 @@ const TreeViewSelector = ({
               );
               props.onClick = () => {
                 handleTypeIsCanSelect(canSelect, option.type) &&
-                  handleDeptOrUserClick(ClickType.Select, option);
+                  handleDeptOrUserClick(ClickType.Select, option, true);
               };
               return (
                 <li {...props} style={style}>
