@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
@@ -123,8 +123,6 @@ export const useAction = () => {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
-  const [isSearch, setIsSearch] = useState<boolean>(false);
-
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
@@ -140,6 +138,10 @@ export const useAction = () => {
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+
+  const isSearch = useMemo(() => {
+    return searchDisplayTreeData.length > 0;
+  }, [searchDisplayTreeData]);
 
   const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
@@ -167,16 +169,13 @@ export const useAction = () => {
       ),
     };
   };
-
   //根据展开插入或删除节点
   const displayTreeList = (
     flatTreeData: TreeNode[],
     currentClickItem: TreeNode,
     isExistCurrentItem: boolean
   ): TreeNode[] => {
-    const displayFlatTreeData = isSearch
-      ? searchDisplayTreeData
-      : displayFlatUpdateTreeData;
+    const displayFlatTreeData = displayFlatUpdateTreeData;
 
     const parentRoute = currentClickItem.idRoute;
 
@@ -208,8 +207,7 @@ export const useAction = () => {
     return displayFlatTreeData;
   };
 
-  //搜索
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: any) => {
     const { value } = event.target;
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
       return item.title.toLowerCase().includes(value.toLowerCase());
@@ -224,19 +222,16 @@ export const useAction = () => {
       .filter((item): item is TreeNode => item !== undefined);
 
     if (value !== "") {
-      setIsSearch(true);
-      setDisplayFlatUpdateTreeData([]);
       setSearchDisplayTreeData(displaydata);
     } else {
-      setIsSearch(false);
-      setExpandedNodes(new Set());
+      setSearchDisplayTreeData([]);
       setDisplayFlatUpdateTreeData(
         flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
       );
     }
+    console.log(isSearch);
   };
 
-  //展开
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
 
@@ -268,19 +263,11 @@ export const useAction = () => {
       newExpandedNodes.has(currentClickItem.id)
     );
 
-    const filteredSearchDisplayTreeData = currentListData.filter(
-      (item, index, self) =>
-        self.findIndex((searchItem) => searchItem.id === item.id) === index
-    );
-
     setExpandedNodes(newExpandedNodes);
 
-    isSearch
-      ? setSearchDisplayTreeData(filteredSearchDisplayTreeData)
-      : setDisplayFlatUpdateTreeData(currentListData);
+    setDisplayFlatUpdateTreeData(currentListData);
   };
 
-  //选中
   const selectNode = (currentClickItem: TreeNode) => {
     const newSelectedNodes = new Set(selectedNodes);
 
@@ -300,9 +287,7 @@ export const useAction = () => {
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
     });
-
     !conditioned && newIndeterminateNode.clear();
-
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newIndeterminateNode.delete(nodeId)
