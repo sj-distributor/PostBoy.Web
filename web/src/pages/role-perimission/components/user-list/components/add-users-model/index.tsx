@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Checkbox,
-  List,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -15,9 +14,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
-import { RefObject, useState } from "react";
+import { RefObject } from "react";
 import { FixedSizeList } from "react-window";
-import { forEach } from "ramda";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -26,20 +24,24 @@ export const AddUsersModel = (props: {
 
   const {
     alreadySelectData,
+    isSearch,
     displayFlatUpdateTreeData,
+    searchDisplayTreeData,
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
     padding,
     selectNode,
     toggleNode,
+    handleSearchChange,
   } = useAction();
 
   const renderListItem: React.FC<{
     index: number;
     style: React.CSSProperties;
   }> = ({ index, style }) => {
-    const item = displayFlatUpdateTreeData[index];
+    const item =
+      displayFlatUpdateTreeData[index] || searchDisplayTreeData[index];
 
     const isSelected = selectedNodes.has(item.id);
 
@@ -107,23 +109,18 @@ export const AddUsersModel = (props: {
           className={styles.search}
           placeholder="搜索"
           size="small"
+          onChange={handleSearchChange}
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          {/* <List>
-            <ListItem>
-              <Checkbox defaultChecked />
-              <ListItemIcon>
-                <ArrowRightIcon className={styles.arrowRight} />
-                <FolderIcon className={styles.folder} />
-              </ListItemIcon>
-              <ListItemText primary="Single-line item" />
-            </ListItem>
-          </List> */}
           <Box sx={{ width: "100%", height: 500 }}>
             <FixedSizeList
               height={500}
-              itemCount={displayFlatUpdateTreeData.length}
+              itemCount={
+                isSearch
+                  ? searchDisplayTreeData.length
+                  : displayFlatUpdateTreeData.length
+              }
               itemSize={46}
               width={360}
             >

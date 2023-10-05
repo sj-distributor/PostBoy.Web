@@ -128,6 +128,8 @@ export const useAction = () => {
 
   const padding = 2;
 
+  const [isSearch, setIsSearch] = useState<boolean>(false);
+
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
@@ -139,6 +141,10 @@ export const useAction = () => {
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
   const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
+    TreeNode[]
+  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+
+  const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
 
@@ -206,6 +212,32 @@ export const useAction = () => {
     return displayFlatTreeData;
   };
 
+  const handleSearchChange = (event: any) => {
+    const { value } = event.target;
+    const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
+      return item.title.toLowerCase().includes(value.toLowerCase());
+    });
+    const idRouteList = [
+      ...new Set(targetSearchFilterList.map((item) => item.idRoute)),
+    ];
+    const uniqueNumbers = [...new Set(idRouteList.flat())];
+
+    const displaydata: TreeNode[] = uniqueNumbers
+      .map((id) => flatTreeTotalListData.find((item) => item.id === id))
+      .filter((item): item is TreeNode => item !== undefined);
+
+    if (value !== "") {
+      setIsSearch(true);
+      setDisplayFlatUpdateTreeData([]);
+      setSearchDisplayTreeData(displaydata);
+    } else {
+      setIsSearch(false);
+      setDisplayFlatUpdateTreeData(
+        flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
+      );
+    }
+  };
+
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
 
@@ -239,7 +271,9 @@ export const useAction = () => {
 
     setExpandedNodes(newExpandedNodes);
 
-    setDisplayFlatUpdateTreeData(currentListData);
+    isSearch
+      ? setSearchDisplayTreeData(currentListData)
+      : setDisplayFlatUpdateTreeData(currentListData);
   };
 
   const selectNode = (currentClickItem: TreeNode) => {
@@ -271,9 +305,9 @@ export const useAction = () => {
     const parentIdRoute = currentRoute.slice(0, -1).reverse();
 
     parentIdRoute.forEach((parentId) => {
-      const matchParentIdItem = displayFlatUpdateTreeData.find(
-        (item) => item.id === parentId
-      );
+      const matchParentIdItem = isSearch
+        ? searchDisplayTreeData.find((item) => item.id === parentId)
+        : displayFlatUpdateTreeData.find((item) => item.id === parentId);
 
       if (matchParentIdItem?.childrenIdList) {
         const allChildrenSelected = matchParentIdItem?.childrenIdList.every(
@@ -302,12 +336,15 @@ export const useAction = () => {
 
   return {
     alreadySelectData,
+    isSearch,
     displayFlatUpdateTreeData,
+    searchDisplayTreeData,
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
     padding,
     selectNode,
     toggleNode,
+    handleSearchChange,
   };
 };
