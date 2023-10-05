@@ -62,10 +62,9 @@ export const AddUsersModel = (props: {
           key={item.idRoute.toString()}
           style={{ paddingLeft: `${paddingLeft}rem` }}
         >
-          <ListItemIcon>
+          <ListItemIcon sx={{ minWidth: "2rem" }}>
             <Checkbox
               checked={isSelected}
-              disabled={isSelected ? true : false}
               indeterminate={isIndeterminate}
               onChange={() => {
                 selectNode(item);
