@@ -268,7 +268,7 @@ const useAction = ({
         item.selected &&
         self.findIndex((i) => {
           return i.name === item.name;
-        }) !== 0
+        }) !== (schemaType ? index : 0)
     );
 
     if (filteredItems.length) {
