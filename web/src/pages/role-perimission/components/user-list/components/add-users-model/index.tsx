@@ -60,7 +60,7 @@ export const AddUsersModel = (props: {
           key={item.idRoute.toString()}
           style={{ paddingLeft: `${paddingLeft}rem` }}
         >
-          <ListItemIcon>
+          <ListItemIcon sx={{ minWidth: "2rem" }}>
             <Checkbox
               checked={isSelected}
               indeterminate={isIndeterminate}
@@ -72,12 +72,12 @@ export const AddUsersModel = (props: {
               <div onClick={() => toggleNode(item)}>
                 {isExpanded ? (
                   <>
-                    <ArrowDropDownIcon className={styles.arrowRight} />
+                    <ArrowDropDownIcon className={styles.arrowIcon} />
                     <FolderIcon className={styles.folder} />
                   </>
                 ) : (
                   <>
-                    <ArrowRightIcon className={styles.arrowRight} />
+                    <ArrowRightIcon className={styles.arrowIcon} />
                     <FolderIcon className={styles.folder} />
                   </>
                 )}

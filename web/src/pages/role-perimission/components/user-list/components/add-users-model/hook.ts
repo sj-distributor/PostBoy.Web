@@ -1,15 +1,8 @@
-import { useState } from "react";
+import { clone } from "ramda";
+import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
-  const alreadySelectData: string[] = [
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-    "AAAAAAAAA.A",
-  ];
-
   const treeData: TreeNode[] = [
     {
       id: 1,
@@ -131,8 +124,6 @@ export const useAction = () => {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
-  const [isSearch, setIsSearch] = useState<boolean>(false);
-
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
@@ -147,7 +138,19 @@ export const useAction = () => {
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+  >([]);
+
+  const alreadySelectData: string[] = useMemo(() => {
+    return Array.from(selectedNodes).map(
+      (node) =>
+        displayFlatUpdateTreeData.find((item) => item.id === node)?.title || ""
+    );
+  }, [selectedNodes]);
+
+  const isSearch = useMemo(
+    () => searchDisplayTreeData.length > 0,
+    [searchDisplayTreeData]
+  );
 
   const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
@@ -178,40 +181,39 @@ export const useAction = () => {
 
   //根据展开插入或删除节点
   const displayTreeList = (
-    flatTreeData: TreeNode[],
     currentClickItem: TreeNode,
-    isExistCurrentItem: boolean
+    nextLevelChildrenList: TreeNode[],
+    isExpandingCurrentItem: boolean
   ): TreeNode[] => {
-    const displayFlatTreeData = displayFlatUpdateTreeData;
+    if (isSearch) return searchDisplayTreeData;
+
+    const displayList = clone(displayFlatUpdateTreeData);
 
     const parentRoute = currentClickItem.idRoute;
 
-    const currentChildrenItem = getCurrentNodeListByCurrentIdRoute(
-      flatTreeData,
-      parentRoute
-    ).nextLevelChildrenList;
+    const currentChildrenItem = nextLevelChildrenList;
 
     const currentTotalChildrenItem = getCurrentNodeListByCurrentIdRoute(
-      displayFlatTreeData,
+      displayList,
       parentRoute
     ).allChildrenIncludeParentList;
 
-    const parentIndex = displayFlatTreeData.findIndex(
-      (node: TreeNode) => currentClickItem.id === node.id
+    const parentIndex = displayList.findIndex(
+      (node) => currentClickItem.id === node.id
     );
 
     if (parentIndex !== -1) {
-      if (isExistCurrentItem) {
-        displayFlatTreeData.splice(parentIndex + 1, 0, ...currentChildrenItem);
+      if (isExpandingCurrentItem) {
+        displayList.splice(parentIndex + 1, 0, ...currentChildrenItem);
       } else {
-        displayFlatTreeData.splice(
+        displayList.splice(
           parentIndex + 1,
           currentTotalChildrenItem.length - 1
         );
       }
     }
 
-    return displayFlatTreeData;
+    return displayList;
   };
 
   const handleSearchChange = (event: any) => {
@@ -220,23 +222,18 @@ export const useAction = () => {
       return item.title.toLowerCase().includes(value.toLowerCase());
     });
     const idRouteList = [
-      ...new Set(targetSearchFilterList.map((item) => item.idRoute)),
+      ...new Set(...targetSearchFilterList.map(({ idRoute }) => idRoute)),
     ];
-    const uniqueTreeNumbersList = [...new Set(idRouteList.flat())];
 
-    const displayData: TreeNode[] = uniqueTreeNumbersList
-      .map((id) => flatTreeTotalListData.find((item) => item.id === id))
+    const displayData: TreeNode[] = idRouteList
+      .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
       .filter((item): item is TreeNode => item !== undefined);
 
     if (value !== "") {
-      setIsSearch(true);
-      setDisplayFlatUpdateTreeData([]);
+      setExpandedNodes(new Set([...expandedNodes, ...idRouteList]));
       setSearchDisplayTreeData(displayData);
     } else {
-      setIsSearch(false);
-      setDisplayFlatUpdateTreeData(
-        flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
-      );
+      setSearchDisplayTreeData([]);
     }
   };
 
@@ -249,31 +246,31 @@ export const useAction = () => {
       allChildrenIncludeParentList: expendChildrenNodeList,
       nextLevelChildrenList: expendNextLevelChildrenList,
     } = getCurrentNodeListByCurrentIdRoute(
-      flatTreeTotalListData,
+      isSearch ? searchDisplayTreeData : flatTreeTotalListData,
       currentClickItem.idRoute
     );
 
     currentClickItem.childrenIdList = expendNextLevelChildrenList.map(
       ({ id }) => id
     );
-
-    if (newExpandedNodes.has(currentNodeId)) {
-      expendChildrenNodeList.forEach(({ id: nodeId }) => {
-        newExpandedNodes.delete(nodeId);
-      });
-    } else {
-      newExpandedNodes.add(currentNodeId);
-    }
+    if (!isSearch)
+      newExpandedNodes.has(currentNodeId)
+        ? expendChildrenNodeList.forEach(({ id: nodeId }) => {
+            newExpandedNodes.delete(nodeId);
+          })
+        : newExpandedNodes.add(currentNodeId);
 
     const currentListData = displayTreeList(
-      flatTreeTotalListData,
       currentClickItem,
+      expendNextLevelChildrenList,
       newExpandedNodes.has(currentClickItem.id)
     );
 
     setExpandedNodes(newExpandedNodes);
 
-    setDisplayFlatUpdateTreeData(currentListData);
+    isSearch
+      ? setSearchDisplayTreeData(currentListData)
+      : setDisplayFlatUpdateTreeData(currentListData);
   };
 
   const selectNode = (currentClickItem: TreeNode) => {
@@ -282,6 +279,8 @@ export const useAction = () => {
     const newIndeterminateNode = new Set(indeterminateNodes);
 
     const conditioned = newSelectedNodes.has(currentClickItem.id);
+
+    !conditioned && newIndeterminateNode.delete(currentClickItem.id);
 
     const currentRoute = currentClickItem.idRoute;
 
@@ -295,6 +294,7 @@ export const useAction = () => {
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
     });
+
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newIndeterminateNode.delete(nodeId)
