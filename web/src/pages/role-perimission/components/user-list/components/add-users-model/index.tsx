@@ -16,7 +16,6 @@ import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject } from "react";
 import { FixedSizeList } from "react-window";
-import { TreeNode } from "./props";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -35,7 +34,6 @@ export const AddUsersModel = (props: {
     selectNode,
     toggleNode,
     handleSearchChange,
-    handleSelectItemDelete,
   } = useAction();
 
   const renderListItem: React.FC<{
@@ -62,24 +60,30 @@ export const AddUsersModel = (props: {
           key={item.idRoute.toString()}
           style={{ paddingLeft: `${paddingLeft}rem` }}
         >
-          <ListItemIcon sx={{ minWidth: "2rem" }}>
+          <ListItemIcon>
             <Checkbox
               checked={isSelected}
               indeterminate={isIndeterminate}
               onChange={() => {
                 selectNode(item);
               }}
-              sx={{ padding: 0 }}
             />
-            {hasChildren && (
+            {hasChildren ? (
               <div onClick={() => toggleNode(item)}>
                 {isExpanded ? (
-                  <ArrowDropDownIcon className={styles.arrowIcon} />
+                  <>
+                    <ArrowDropDownIcon className={styles.arrowRight} />
+                    <FolderIcon className={styles.folder} />
+                  </>
                 ) : (
-                  <ArrowRightIcon className={styles.arrowIcon} />
+                  <>
+                    <ArrowRightIcon className={styles.arrowRight} />
+                    <FolderIcon className={styles.folder} />
+                  </>
                 )}
-                <FolderIcon className={styles.folder} />
               </div>
+            ) : (
+              <></>
             )}
           </ListItemIcon>
           <ListItemText primary={item.title} />
@@ -136,14 +140,11 @@ export const AddUsersModel = (props: {
             />
           </div>
           <div>
-            {alreadySelectData.map((selectItem: TreeNode, index: number) => {
+            {alreadySelectData.map((selectItems: string, index: number) => {
               return (
                 <div className={styles.selectListWrap} key={index}>
-                  <div>{selectItem.title}</div>
-                  <CloseIcon
-                    className={styles.delete}
-                    onClick={() => handleSelectItemDelete(selectItem.id)}
-                  />
+                  <div>{selectItems}</div>
+                  <CloseIcon className={styles.delete} />
                 </div>
               );
             })}

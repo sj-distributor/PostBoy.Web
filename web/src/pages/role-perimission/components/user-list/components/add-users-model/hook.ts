@@ -1,7 +1,15 @@
-import { ChangeEvent, useMemo, useState } from "react";
+import { useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
+  const alreadySelectData: string[] = [
+    "AAAAAAAAA.A",
+    "AAAAAAAAA.A",
+    "AAAAAAAAA.A",
+    "AAAAAAAAA.A",
+    "AAAAAAAAA.A",
+  ];
+
   const treeData: TreeNode[] = [
     {
       id: 1,
@@ -123,6 +131,8 @@ export const useAction = () => {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
+  const [isSearch, setIsSearch] = useState<boolean>(false);
+
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
@@ -131,20 +141,13 @@ export const useAction = () => {
     new Set()
   );
 
-  const initialListData = flatTreeTotalListData.filter(
-    (node) => node.idRoute.length === 1
-  );
-
-  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] =
-    useState<TreeNode[]>(initialListData);
+  const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
+    TreeNode[]
+  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
-  >([]);
-
-  const isSearch = useMemo(() => {
-    return searchDisplayTreeData.length > 0;
-  }, [searchDisplayTreeData]);
+  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
 
   const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
@@ -172,6 +175,7 @@ export const useAction = () => {
       ),
     };
   };
+
   //根据展开插入或删除节点
   const displayTreeList = (
     flatTreeData: TreeNode[],
@@ -220,15 +224,19 @@ export const useAction = () => {
     ];
     const uniqueTreeNumbersList = [...new Set(idRouteList.flat())];
 
-    const displaydata: TreeNode[] = uniqueTreeNumbersList
+    const displayData: TreeNode[] = uniqueTreeNumbersList
       .map((id) => flatTreeTotalListData.find((item) => item.id === id))
       .filter((item): item is TreeNode => item !== undefined);
 
-    if (!isSearch) {
-      setSearchDisplayTreeData(displaydata);
+    if (value !== "") {
+      setIsSearch(true);
+      setDisplayFlatUpdateTreeData([]);
+      setSearchDisplayTreeData(displayData);
     } else {
-      setSearchDisplayTreeData([]);
-      setDisplayFlatUpdateTreeData(initialListData);
+      setIsSearch(false);
+      setDisplayFlatUpdateTreeData(
+        flatTreeTotalListData.filter((node) => node.idRoute.length === 1)
+      );
     }
   };
 
@@ -287,19 +295,21 @@ export const useAction = () => {
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
     });
-    !conditioned && newIndeterminateNode.clear();
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newIndeterminateNode.delete(nodeId)
-        : newIndeterminateNode.add(nodeId);
+        : (() => {
+            newIndeterminateNode.add(nodeId);
+            !conditioned && newIndeterminateNode.delete(nodeId);
+          })();
     });
 
     const parentIdRoute = currentRoute.slice(0, -1).reverse();
 
     parentIdRoute.forEach((parentId) => {
       const matchParentIdItem = isSearch
-        ? displayFlatUpdateTreeData.find((item) => item.id === parentId)
-        : searchDisplayTreeData.find((item) => item.id === parentId);
+        ? searchDisplayTreeData.find((item) => item.id === parentId)
+        : displayFlatUpdateTreeData.find((item) => item.id === parentId);
 
       if (matchParentIdItem?.childrenIdList) {
         const allChildrenSelected = matchParentIdItem?.childrenIdList.every(
@@ -326,16 +336,6 @@ export const useAction = () => {
     setIndeterminateNodes(newIndeterminateNode);
   };
 
-  const alreadySelectData = flatTreeTotalListData.filter((item) =>
-    selectedNodes.has(item.id)
-  );
-
-  const handleSelectItemDelete = (itemId: number) => {
-    const newSelectedNodes = new Set(selectedNodes);
-    newSelectedNodes.delete(itemId);
-    setSelectedNodes(newSelectedNodes);
-  };
-
   return {
     alreadySelectData,
     isSearch,
@@ -348,6 +348,5 @@ export const useAction = () => {
     selectNode,
     toggleNode,
     handleSearchChange,
-    handleSelectItemDelete,
   };
 };
