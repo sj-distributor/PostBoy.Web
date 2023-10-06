@@ -57,6 +57,7 @@ const FootballPlayerRenderer = (props: any) => {
       sx={{
         height: "2.2rem",
         marginLeft: 2 * (name !== id ? idRoute.length - 1 : idRoute.length),
+        paddingRight: 0,
       }}
     >
       <ThemeProvider theme={theme}>
@@ -69,7 +70,6 @@ const FootballPlayerRenderer = (props: any) => {
           color={indeterminate ? "info" : undefined}
           onClick={(e) => {
             e.stopPropagation();
-
             node &&
               handleDeptOrUserClick(ClickType.Select, {
                 ...node,
@@ -83,6 +83,8 @@ const FootballPlayerRenderer = (props: any) => {
           justifyContent: "space-between",
           alignItems: "center",
           width: "100%",
+          paddingTop: 8,
+          paddingBottom: 8,
         }}
         onClick={() => {
           if (node.children.length) {

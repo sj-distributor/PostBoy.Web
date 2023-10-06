@@ -8,6 +8,7 @@ import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
+import { IUserResponse } from "../../dtos/user-management";
 import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps } from "./props";
 
@@ -66,6 +67,8 @@ const useAction = ({
   const [promptText, setPromptText] = useState<string>("");
   // 提示显隐
   const [openError, openErrorAction] = useBoolean(false);
+
+  const [userData, setUserData] = useState<IUserResponse>();
 
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
@@ -165,7 +168,7 @@ const useAction = ({
 
       let clickItem: IDepartmentAndUserListValue | undefined = Array.from(
         cloneData.values()
-      ).find((item) => item.name === selectItem.name);
+      ).find((item) => item.id === selectItem.id);
 
       let isIndeterminate = clickItem?.indeterminate
         ? clickItem.indeterminate
@@ -231,13 +234,13 @@ const useAction = ({
         cloneData.forEach((item) => {
           if (
             item.parentid === selectItem.parentid &&
-            fatherItem?.name !== item.name
+            fatherItem?.id !== item.id
           ) {
             childrenList.push(item);
           }
         });
 
-        if (fatherItem.children.find((item) => item.name === selectItem.name)) {
+        if (fatherItem.children.find((item) => item.id === selectItem.id)) {
           if (schemaType) {
             cloneData.set(getUniqueId(fatherItem), {
               ...fatherItem,
@@ -274,7 +277,7 @@ const useAction = ({
         let childrenList: IDepartmentAndUserListValue[] = [];
 
         cloneData.forEach((item) => {
-          if (data && item.parentid === data.id && data?.name !== item.name) {
+          if (data && item.parentid === data.id && data?.id !== item.id) {
             childrenList.push(item);
           }
         });
@@ -393,7 +396,7 @@ const useAction = ({
 
     let teamMembers = await getUserTeamMembers();
 
-    if (!teamMembers.length) {
+    if (!teamMembers?.length) {
       setPromptText(
         "The current account name does not have a direct team member"
       );
@@ -418,13 +421,13 @@ const useAction = ({
 
       handleMapUpdate(
         selectedList.filter((item) =>
-          teamMembers.find((tItem) => item.name === tItem.name)
+          teamMembers?.find((tItem) => item.name === tItem.name)
         )
       );
 
       flattenList.forEach(
         (item) =>
-          teamMembers.some((tItem) => tItem.name === item.name) &&
+          teamMembers?.some((tItem) => tItem.name === item.name) &&
           foldMapSetter(getUniqueId(item), { ...item, selected: false })
       );
     }
@@ -432,12 +435,14 @@ const useAction = ({
 
   //获取组员
   const getUserTeamMembers = async () => {
-    const userData = await GetAuthUser();
+    let userName = userData?.userName;
+    if (!userName) {
+      return;
+    }
 
     const childrenData =
-      flattenList.find((item) => item.name === userData?.userName)?.children ??
-      [];
-    const user = flattenList.find((item) => item.name === userData?.userName);
+      flattenList.find((item) => item.name === userName)?.children ?? [];
+    const user = flattenList.find((item) => item.name === userName);
 
     const teamMembers = schemaType
       ? user
@@ -447,7 +452,7 @@ const useAction = ({
           (item) =>
             item.department_leader &&
             item.department_leader.length &&
-            item.department_leader[0] === userData?.userName
+            item.department_leader[0] === userName
         );
 
     const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
@@ -478,7 +483,7 @@ const useAction = ({
     (async function () {
       const teamMembers = await getUserTeamMembers();
 
-      teamMembers.length &&
+      teamMembers?.length &&
       teamMembers.every((tItem) =>
         selectedList.map((item) => item.name).includes(tItem.name)
       ) &&
@@ -508,6 +513,12 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
+
+    GetAuthUser().then((res) => {
+      if (!!res) {
+        setUserData(res);
+      }
+    });
   }, []);
 
   // 延迟关闭警告提示

@@ -40,3 +40,7 @@
   user-select: none;
   cursor: pointer;
 }
+
+.MuiThemeProvider-root {
+  padding-right: 0 !important;
+}
