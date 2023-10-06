@@ -67,7 +67,6 @@ const FootballPlayerRenderer = (props: any) => {
           disableRipple
           indeterminate={!schemaType ? indeterminate : undefined}
           color={indeterminate ? "info" : undefined}
-          className="abccc"
           onClick={(e) => {
             e.stopPropagation();
 
