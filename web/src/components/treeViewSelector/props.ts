@@ -2,6 +2,7 @@ import React from "react";
 import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
+  WorkWeChatTreeStructureType,
 } from "../../dtos/enterprise";
 
 export interface IFoldSelectorProps
@@ -27,6 +28,10 @@ export interface ITreeViewProps {
   flattenSelectorProps?: IFlattenSelectorProps;
   sourceType?: SourceType;
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
+  schemaType: WorkWeChatTreeStructureType;
+  setSchemaType: React.Dispatch<
+    React.SetStateAction<WorkWeChatTreeStructureType>
+  >;
 }
 
 export interface ITreeViewHookProps {
@@ -35,6 +40,7 @@ export interface ITreeViewHookProps {
   foldData: IDepartmentAndUserListValue[];
   flattenData: IDepartmentAndUserListValue[];
   sourceType?: SourceType;
+  schemaType: WorkWeChatTreeStructureType;
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
 }
 

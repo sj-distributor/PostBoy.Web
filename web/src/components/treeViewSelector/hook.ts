@@ -1,13 +1,16 @@
-import { clone, difference, remove } from "ramda";
+import { useBoolean, useMap, useThrottle } from "ahooks";
+import { clone } from "ramda";
 import { useEffect, useState } from "react";
+import { GetAuthUser } from "../../api/user-management";
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
+import { IUserResponse } from "../../dtos/user-management";
 import useDeptUserData from "../../hooks/deptUserData";
-import { ITreeViewHookProps, SourceType } from "./props";
+import { ITreeViewHookProps } from "./props";
 
 const useAction = ({
   appId,
@@ -15,6 +18,7 @@ const useAction = ({
   flattenData,
   foldData,
   sourceType,
+  schemaType,
   settingSelectedList,
 }: ITreeViewHookProps) => {
   const { deduplicationArray } = useDeptUserData({ appId });
@@ -36,6 +40,36 @@ const useAction = ({
     clone(flattenData)
   );
 
+  const [limitTags, setLimitTags] = useState<number>(0);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  const throttledValue = useThrottle(searchValue, { wait: 500 });
+
+  const getUniqueId = (value: IDepartmentAndUserListValue): string => {
+    return schemaType ? value.name : `${value.id}${value.idRoute?.join("")}`;
+  };
+
+  const [isDirectTeamMembers, setIsDirectTeamMembers] = useBoolean(true);
+
+  const map = new Map();
+
+  flattenList.forEach((value) => map.set(getUniqueId(value), value));
+
+  const [foldMap, { set: foldMapSetter, get: foldMapGetter, setAll }] = useMap<
+    string | number,
+    IDepartmentAndUserListValue
+  >(map);
+
+  // 提示语
+  const [promptText, setPromptText] = useState<string>("");
+  // 提示显隐
+  const [openError, openErrorAction] = useBoolean(false);
+
+  const [userData, setUserData] = useState<IUserResponse>();
+
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
     canSelect: DeptUserCanSelectStatus,
@@ -47,148 +81,400 @@ const useAction = ({
       : canSelect === DeptUserCanSelectStatus.User;
   };
 
-  function findNodeByIdRoute(
-    node: IDepartmentAndUserListValue,
-    idRoute: number[]
-  ): IDepartmentAndUserListValue | undefined {
-    if (idRoute.length === 0 || node.id !== idRoute[0]) {
-      return undefined;
-    }
+  const setAllChildrenById = (
+    id: string | number,
+    childrenList: IDepartmentAndUserListValue[],
+    isSelected: boolean
+  ) => {
+    const mapItem = foldMapGetter(id);
 
-    if (idRoute.length === 1 && idRoute[0] === node.id) {
-      return node;
-    }
+    mapItem &&
+      mapItem.children.forEach((item) => {
+        const innerItem = foldMapGetter(getUniqueId(item));
+        if (innerItem) {
+          const flattenItem = flattenList.find(
+            (x) => getUniqueId(x) === getUniqueId(innerItem)
+          );
+          flattenItem && childrenList.push(flattenItem);
+          innerItem.children.length > 0 &&
+            setAllChildrenById(
+              getUniqueId(innerItem),
+              childrenList,
+              isSelected
+            );
+        }
+      });
+    return childrenList;
+  };
 
-    for (const child of node.children) {
-      const foundNode = findNodeByIdRoute(child, idRoute.slice(1));
-      if (foundNode) {
-        return foundNode;
+  const getIndeterminateStatus = (
+    childrenList: IDepartmentAndUserListValue[]
+  ) => {
+    return !childrenList.every((item) => item?.selected)
+      ? childrenList.some((item) => item.indeterminate) ||
+          childrenList.some((item) => item.selected)
+      : false;
+  };
+
+  const handleMapUpdate = (
+    selectedList: IDepartmentAndUserListValue[],
+    isClickFilter?: boolean
+  ) => {
+    const cloneData = clone(foldMap);
+
+    //处理横杆状态逻辑
+    const setIndeterminateAllStatus = (
+      fatherItem: IDepartmentAndUserListValue
+    ) => {
+      const superiors = (
+        fatherItem.children.length > 0
+          ? fatherItem.idRoute?.slice(0, -1)
+          : fatherItem.idRoute
+      )?.reverse();
+
+      const setFatherItemStatus = (idRoutes: (string | number)[]) => {
+        if (idRoutes.length) {
+          const id = idRoutes.splice(0, 1);
+          const data = Array.from(cloneData.values()).find(
+            (cItem) => String(cItem.id) === String(id)
+          );
+          const childrenList: IDepartmentAndUserListValue[] = [];
+
+          data &&
+            cloneData.forEach((i) => {
+              if (i.parentid === data.id && data.id !== i.id) {
+                childrenList.push(i);
+              }
+            });
+
+          data &&
+            cloneData.set(getUniqueId(data), {
+              ...data,
+              selected: childrenList.every((item) => item?.selected),
+              indeterminate: getIndeterminateStatus(childrenList),
+            });
+
+          setFatherItemStatus(idRoutes);
+        }
+      };
+
+      superiors?.length && setFatherItemStatus(superiors);
+    };
+
+    selectedList.map((selectItem) => {
+      let fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
+        cloneData.values()
+      ).find((item) => item.id === selectItem.parentid);
+
+      let clickItem: IDepartmentAndUserListValue | undefined = Array.from(
+        cloneData.values()
+      ).find((item) => item.id === selectItem.id);
+
+      let isIndeterminate = clickItem?.indeterminate
+        ? clickItem.indeterminate
+        : false;
+
+      let updateSelectedList: IDepartmentAndUserListValue[] = [];
+
+      const allChildrenData = setAllChildrenById(
+        getUniqueId(selectItem),
+        [],
+        true
+      );
+
+      if (schemaType) {
+        updateSelectedList = selectItem.selected
+          ? selectItem.indeterminate
+            ? [selectItem]
+            : [...allChildrenData, selectItem]
+          : [...allChildrenData, selectItem];
+      } else {
+        updateSelectedList = [...allChildrenData, selectItem];
       }
+
+      for (const [key, value] of cloneData.entries()) {
+        const selectedListItem = updateSelectedList.find(
+          (item) => item.name === value.name
+        );
+
+        cloneData.set(key, {
+          ...value,
+          indeterminate: false,
+        });
+
+        if (selectedListItem) {
+          schemaType
+            ? cloneData.set(key, {
+                ...value,
+                selected: selectItem.selected
+                  ? !value.selected
+                  : isClickFilter
+                  ? clickItem?.children.length && !clickItem.selected
+                    ? true
+                    : !value.selected
+                  : true,
+              })
+            : cloneData.set(key, {
+                ...value,
+                selected: isIndeterminate ? true : !value.selected,
+              });
+        }
+      }
+
+      isIndeterminate &&
+        clickItem &&
+        cloneData.set(getUniqueId(clickItem), {
+          ...clickItem,
+          selected: !schemaType ? true : !clickItem.selected,
+          indeterminate: false,
+        });
+
+      if (fatherItem) {
+        let childrenList: IDepartmentAndUserListValue[] = [];
+        cloneData.forEach((item) => {
+          if (
+            item.parentid === selectItem.parentid &&
+            fatherItem?.id !== item.id
+          ) {
+            childrenList.push(item);
+          }
+        });
+
+        if (fatherItem.children.find((item) => item.id === selectItem.id)) {
+          if (schemaType) {
+            cloneData.set(getUniqueId(fatherItem), {
+              ...fatherItem,
+              indeterminate: getIndeterminateStatus(childrenList),
+            });
+          } else {
+            cloneData.set(getUniqueId(fatherItem), {
+              ...fatherItem,
+              selected: childrenList.every((item) => item?.selected === true),
+              indeterminate: getIndeterminateStatus(childrenList),
+            });
+          }
+        }
+
+        !schemaType && setIndeterminateAllStatus(fatherItem);
+      }
+    });
+
+    //处理有存在多个部门的横杆逻辑
+    const filteredItems = Array.from(cloneData.values()).filter(
+      (item, index, self) =>
+        item.selected &&
+        self.findIndex((i) => {
+          return i.name === item.name;
+        }) !== (schemaType ? index : 0)
+    );
+
+    if (filteredItems.length) {
+      const setCloneItemData = (id: string | number) => {
+        const data: IDepartmentAndUserListValue | undefined = Array.from(
+          cloneData.values()
+        ).find((item) => item.id === id);
+
+        let childrenList: IDepartmentAndUserListValue[] = [];
+
+        cloneData.forEach((item) => {
+          if (data && item.parentid === data.id && data?.id !== item.id) {
+            childrenList.push(item);
+          }
+        });
+
+        data &&
+          cloneData.set(getUniqueId(data), {
+            ...data,
+            selected: childrenList.every((item) => item?.selected === true),
+            indeterminate: !childrenList.every((item) => item?.selected)
+              ? childrenList.some((item) => item.indeterminate) ||
+                childrenList.some((item) => item.selected)
+              : false,
+          });
+
+        return data;
+      };
+
+      filteredItems.map((fItems) => {
+        if (fItems.children.length) {
+          setCloneItemData(fItems.id);
+        }
+        const fatherItem = setCloneItemData(fItems.parentid);
+
+        fatherItem && setIndeterminateAllStatus(fatherItem);
+      });
     }
 
-    return undefined;
-  }
+    setAll(cloneData);
+  };
+
+  useEffect(() => {
+    let newSelectedList: IDepartmentAndUserListValue[] = [];
+
+    foldMap.forEach((item) => {
+      if (
+        item.selected &&
+        !newSelectedList.find((dItem) => item.id === dItem.id)
+      ) {
+        newSelectedList.push(item);
+      }
+    });
+
+    setSelectedList(newSelectedList);
+  }, [foldMap]);
 
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
     type: ClickType,
     clickedList: IDepartmentAndUserListValue | IDepartmentAndUserListValue[],
-    value?: boolean
+    toSelect?: boolean
   ) => {
-    const clickedItem = !Array.isArray(clickedList)
-      ? clickedList
-      : clickedList[0];
-
-    setSelectedList((prev) => {
-      if (
-        prev.some((item) => item.id === clickedItem.id) &&
-        !clickedItem.selected
-      )
-        return prev;
-      return type === ClickType.Select
-        ? clickedItem.selected
-          ? remove(
-              prev.findIndex((item) => item.id === clickedItem.id),
-              1,
-              prev
-            )
-          : [...prev, clickedItem]
-        : prev;
-    });
-
-    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
-      (item) => ({ ...item })
-    );
-
-    const copyClickedList = Array.isArray(clickedList)
+    const clickedItem = Array.isArray(clickedList)
       ? clickedList
       : [clickedList];
 
-    setFoldList(
-      handleSelectDataSync(copyFoldList, copyClickedList, value, type)
-    );
+    for (const value of clickedItem) {
+      if (type === ClickType.Collapse) {
+        foldMapSetter(schemaType ? value.name : getUniqueId(value), {
+          ...value,
+          isCollapsed: !value.isCollapsed,
+        });
+      } else {
+        if (!schemaType) {
+          handleMapUpdate([value]);
+        } else {
+          handleMapUpdate([value], toSelect);
+        }
+      }
+    }
   };
 
-  // 搜索框变化时同步到部门列表
-  const setSearchToDeptValue = (valueArr: IDepartmentAndUserListValue[]) => {
-    const diff = difference(valueArr, selectedList);
-    const diffReverse = difference(selectedList, valueArr);
-
-    diff.length > 0 && handleDeptOrUserClick(ClickType.Select, diff, true);
-    diffReverse.length > 0 &&
-      handleDeptOrUserClick(ClickType.Select, diffReverse, false);
-
-    setSelectedList(valueArr);
-  };
-
-  const handleSelectDataSync = (
-    sourceData: IDepartmentAndUserListValue[],
-    selectedList: IDepartmentAndUserListValue[],
-    value?: boolean,
-    type?: ClickType
+  const handleClear = (
+    valueArr: IDepartmentAndUserListValue[],
+    reason: string,
+    clickItem?: IDepartmentAndUserListValue
   ) => {
-    const copySourceData: IDepartmentAndUserListValue[] = sourceData.map(
-      (item) => ({
-        ...item,
-      })
-    );
+    if (reason === "clear") {
+      setSelectedList([]);
+      flattenList.forEach((item) =>
+        foldMapSetter(getUniqueId(item), { ...item, selected: false })
+      );
+    } else {
+      clickItem && handleDeptOrUserClick(ClickType.Select, clickItem);
+      setSelectedList((prev) =>
+        prev.filter((item) => item.name !== clickItem?.name)
+      );
+    }
+  };
 
-    selectedList.length > 0 &&
-      selectedList.forEach((selectedItem) => {
-        const topLevelIdList = copySourceData.map((item) => Number(item.id));
-        const repeatUserList = deduplicationArray(
-          flattenList.filter((x) => x.type === DepartmentAndUserType.Department)
-        )
-          .concat(
-            deduplicationArray(
-              flattenList.filter((x) => x.type === DepartmentAndUserType.User),
-              (x, y) => x.id === y.id && x.parentid === y.parentid
-            )
-          )
-          .filter((flattenItem) => selectedItem.id === flattenItem.id);
-
-        // 提前判断顶层user数据选中并返回
-        const userData = copySourceData.find(
-          (item) => item.id === selectedItem.id
+  const setFilterChildren = (arr: IDepartmentAndUserListValue[]) => {
+    // 遍歷數組中的每個對象
+    arr.forEach((item) => {
+      if (item.children.length) {
+        // 檢查item的children是否都存在於數組中
+        const allChildrenExist = item.children.every((child) =>
+          arr.some((obj) => obj.name === child.name)
         );
-        if (!Number(selectedItem.id) && userData) {
-          type !== ClickType.Collapse
-            ? (userData.selected = value ?? !userData.selected)
-            : (userData.isCollapsed = !userData?.isCollapsed);
-        }
-        for (const repeatItem of repeatUserList) {
-          // 提取顶层department数据并剪裁idRoute
-          const topIndex = repeatItem.idRoute?.findIndex((id) =>
-            topLevelIdList.some((topId) => topId === id)
+
+        // 如果所有children都存在，則刪除數組中所有爲item的children
+        if (allChildrenExist) {
+          arr = arr.filter(
+            (obj) => !item.children.find((item) => item.name === obj.name)
           );
-          // 通用-通过idRoute修改对应数据
-          const routeArr =
-            (sourceType === SourceType.Part
-              ? topIndex !== undefined &&
-                topIndex > -1 &&
-                repeatItem.idRoute?.slice(topIndex)
-              : repeatItem.idRoute) || [];
-
-          const innerItem: IDepartmentAndUserListValue | undefined =
-            copySourceData
-              .map((copySourceDataItem) => {
-                return findNodeByIdRoute(copySourceDataItem, routeArr);
-              })
-              .filter((x) => x)[0];
-
-          const finalInnerItem =
-            repeatItem.type === DepartmentAndUserType.Department
-              ? innerItem
-              : innerItem?.children.find((cell) => cell.id === repeatItem.id);
-
-          finalInnerItem &&
-            (type !== ClickType.Collapse
-              ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
-              : (finalInnerItem.isCollapsed = !finalInnerItem?.isCollapsed));
         }
+      }
+    });
+
+    return arr;
+  };
+
+  //指数组员按钮逻辑
+  const handleGetAllTeamMembers = async () => {
+    isDirectTeamMembers
+      ? setIsDirectTeamMembers.setFalse()
+      : setIsDirectTeamMembers.setTrue();
+
+    let teamMembers = await getUserTeamMembers();
+
+    if (!teamMembers?.length) {
+      setPromptText(
+        "The current account name does not have a direct team member"
+      );
+      openErrorAction.setTrue();
+      return;
+    }
+
+    if (isDirectTeamMembers) {
+      let newData: IDepartmentAndUserListValue[] = [];
+      teamMembers.map((item) => {
+        !selectedList.find((nItem) => nItem.name === item.name) &&
+          newData.push(item);
       });
 
-    return copySourceData;
+      handleMapUpdate(newData);
+    } else {
+      let newData: IDepartmentAndUserListValue[] = [];
+      teamMembers.map((item, index) => {
+        !selectedList.find((nItem) => nItem.name === item.name) &&
+          newData.splice(index, 1);
+      });
+
+      handleMapUpdate(
+        selectedList.filter((item) =>
+          teamMembers?.find((tItem) => item.name === tItem.name)
+        )
+      );
+
+      flattenList.forEach(
+        (item) =>
+          teamMembers?.some((tItem) => tItem.name === item.name) &&
+          foldMapSetter(getUniqueId(item), { ...item, selected: false })
+      );
+    }
+  };
+
+  //获取组员
+  const getUserTeamMembers = async () => {
+    let userName = userData?.userName;
+    if (!userName) {
+      return;
+    }
+
+    const childrenData =
+      flattenList.find((item) => item.name === userName)?.children ?? [];
+    const user = flattenList.find((item) => item.name === userName);
+
+    const teamMembers = schemaType
+      ? user
+        ? [...childrenData, user]
+        : []
+      : flattenList.filter(
+          (item) =>
+            item.department_leader &&
+            item.department_leader.length &&
+            item.department_leader[0] === userName
+        );
+
+    const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
+      let len = teamMembers.length;
+      for (let i = 0; i < len; i++) {
+        for (let j = i + 1; j < len; j++) {
+          if (teamMembers[i].name === teamMembers[j].name) {
+            teamMembers.splice(j, 1);
+            len--;
+            j--;
+          }
+        }
+      }
+
+      return teamMembers;
+    };
+
+    const data = removeDuplicate(teamMembers ?? []);
+
+    return schemaType
+      ? data
+      : data.filter((item) => !data.some((i) => i.id === item.parentid));
   };
 
   useEffect(() => {
@@ -197,21 +483,77 @@ const useAction = ({
   }, [selectedList]);
 
   useEffect(() => {
-    // 初始化已选择的item到foldList中
-    const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
-      (item) => ({ ...item })
-    );
+    (async function () {
+      const teamMembers = await getUserTeamMembers();
 
-    setFoldList(handleSelectDataSync(copyFoldList, selectedList));
+      teamMembers?.length &&
+      teamMembers.every((tItem) =>
+        selectedList.map((item) => item.name).includes(tItem.name)
+      ) &&
+      teamMembers.length <= selectedList.length
+        ? setIsDirectTeamMembers.setFalse()
+        : setIsDirectTeamMembers.setTrue();
+    })();
+  }, [userData, selectedList]);
+
+  useEffect(() => {
+    if (limitTags === selectedList.length) setLoading(false);
+  }, [limitTags]);
+
+  //初始化选中数据
+  useEffect(() => {
+    !loading &&
+      handleMapUpdate(
+        schemaType
+          ? setFilterChildren(
+              flattenList.filter((item) =>
+                selectedList
+                  .filter((item) => item.name === item.id)
+                  .some((clickItem) => clickItem.name === item.name)
+              )
+            )
+          : flattenList.filter((item) =>
+              selectedList.some((clickItem) => clickItem.name === item.name)
+            )
+      );
+
+    GetAuthUser().then((res) => {
+      if (!!res) {
+        setUserData(res);
+      }
+    });
   }, []);
+
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse();
+      }, 3000);
+    }
+  }, [openError]);
 
   return {
     foldList,
     flattenList,
     selectedList,
+    limitTags,
+    loading,
+    throttledValue,
+    isDirectTeamMembers,
+    foldMap,
+    promptText,
+    openError,
+    handleGetAllTeamMembers,
+    setSearchValue,
+    setLoading,
+    handleClear,
+    setLimitTags,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
-    setSearchToDeptValue,
+    foldMapGetter,
+    foldMapSetter,
+    getUniqueId,
   };
 };
 
