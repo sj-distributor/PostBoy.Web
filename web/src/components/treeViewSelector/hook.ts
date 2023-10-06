@@ -480,6 +480,9 @@ const useAction = ({
   useEffect(() => {
     // 同步外部selectedList
     settingSelectedList(selectedList);
+  }, [selectedList]);
+
+  useEffect(() => {
     (async function () {
       const teamMembers = await getUserTeamMembers();
 
@@ -491,7 +494,7 @@ const useAction = ({
         ? setIsDirectTeamMembers.setFalse()
         : setIsDirectTeamMembers.setTrue();
     })();
-  }, [selectedList]);
+  }, [userData, selectedList]);
 
   useEffect(() => {
     if (limitTags === selectedList.length) setLoading(false);
