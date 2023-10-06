@@ -123,6 +123,8 @@ const SelectContent = memo(
       recursiveSearchDeptOrUser,
       loadDeptUsersFromWebWorker,
       settingSelectedList,
+      schemaType,
+      setSchemaType,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -429,6 +431,8 @@ const SelectContent = memo(
             isUpdatedDeptUser={isUpdatedDeptUser}
             targetSelectedList={targetSelectedList}
             settingSelectedList={settingSelectedList}
+            schemaType={schemaType}
+            setSchemaType={setSchemaType}
           />
         </div>
 

@@ -5,6 +5,7 @@ export const onFilterDeptAndUsers = (
   options: IDepartmentAndUserListValue[],
   state: FilterOptionsState<IDepartmentAndUserListValue>
 ) => {
+
   if (state.inputValue !== "") {
     const array: IDepartmentAndUserListValue[] = []
     const findArray = options.filter((item) =>

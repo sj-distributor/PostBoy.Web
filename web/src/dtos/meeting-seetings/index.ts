@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { WorkWeChatTreeStructureType } from "../enterprise";
 
 export interface ICorpData {
   corpName: string;
@@ -49,10 +50,10 @@ export interface IDepartmentAndUserListValue {
   isCollapsed: boolean;
   idRoute?: number[];
   children: IDepartmentAndUserListValue[];
+  department_leader: [] | [string];
 }
 
 export interface IDepartmentData {
-  department_leader: [];
   id: number;
   name: string;
   name_en: null;
@@ -142,6 +143,10 @@ export interface ITargetDialogProps {
   >;
   loadSelectData?: IDepartmentAndUserListValue[];
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
+  schemaType: WorkWeChatTreeStructureType;
+  setSchemaType: React.Dispatch<
+    React.SetStateAction<WorkWeChatTreeStructureType>
+  >;
 }
 
 export interface DateTimeProps {
