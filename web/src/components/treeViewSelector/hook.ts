@@ -1,5 +1,6 @@
 import { useBoolean, useMap, useThrottle } from "ahooks";
 import { clone } from "ramda";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { GetAuthUser } from "../../api/user-management";
 import {
@@ -265,32 +266,28 @@ const useAction = ({
     const filteredItems = Array.from(cloneData.values()).filter(
       (item, index, self) =>
         item.selected &&
-        item.name === item.id &&
         self.findIndex((i) => {
           return i.name === item.name;
-        }) !== index
+        }) !== 0
     );
 
     if (filteredItems.length) {
-      filteredItems.map((fItems) => {
-        const fatherItem: IDepartmentAndUserListValue | undefined = Array.from(
+      const setCloneItemData = (id: string | number) => {
+        const data: IDepartmentAndUserListValue | undefined = Array.from(
           cloneData.values()
-        ).find((item) => item.id === fItems.parentid);
+        ).find((item) => item.id === id);
 
         let childrenList: IDepartmentAndUserListValue[] = [];
+
         cloneData.forEach((item) => {
-          if (
-            fatherItem &&
-            item.parentid === fatherItem.id &&
-            fatherItem?.name !== item.name
-          ) {
+          if (data && item.parentid === data.id && data?.name !== item.name) {
             childrenList.push(item);
           }
         });
 
-        fatherItem &&
-          cloneData.set(getUniqueId(fatherItem), {
-            ...fatherItem,
+        data &&
+          cloneData.set(getUniqueId(data), {
+            ...data,
             selected: childrenList.every((item) => item?.selected === true),
             indeterminate: !childrenList.every((item) => item?.selected)
               ? childrenList.some((item) => item.indeterminate) ||
@@ -298,9 +295,19 @@ const useAction = ({
               : false,
           });
 
+        return data;
+      };
+
+      filteredItems.map((fItems) => {
+        if (fItems.children.length) {
+          setCloneItemData(fItems.id);
+        }
+        const fatherItem = setCloneItemData(fItems.parentid);
+
         fatherItem && setIndeterminateAllStatus(fatherItem);
       });
     }
+
     setAll(cloneData);
   };
 
