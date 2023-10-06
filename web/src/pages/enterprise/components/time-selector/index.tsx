@@ -46,34 +46,7 @@ const TimeSelector = (props: {
             locale={"zh_CN"}
           />
         </div>
-        {(cronExp === "0 0 */14 * *" || cronExp === "0 0 */28 * *") && (
-          <TextField
-            label="开始时间"
-            type="datetime-local"
-            sx={{ width: 252, marginTop: 2, marginBottom: "0.7rem" }}
-            value={startDateValue}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            onChange={(e) => {
-              if (
-                moment((e.target as HTMLInputElement).value).isSameOrAfter(
-                  new Date(),
-                  "minute"
-                )
-              ) {
-                setDateValue(
-                  (e.target as HTMLInputElement).value.replace("T", " ")
-                );
-              } else {
-                e.preventDefault();
-                showErrorPrompt(
-                  "The start time cannot exceed the current time!"
-                );
-              }
-            }}
-          />
-        )}
+
         <TextField
           label="终止时间"
           type="datetime-local"
