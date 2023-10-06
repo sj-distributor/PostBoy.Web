@@ -1,6 +1,5 @@
 import { useBoolean, useMap, useThrottle } from "ahooks";
 import { clone } from "ramda";
-import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { GetAuthUser } from "../../api/user-management";
 import {
@@ -9,7 +8,6 @@ import {
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
 } from "../../dtos/enterprise";
-import { IUserResponse } from "../../dtos/user-management";
 import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps } from "./props";
 
@@ -32,9 +30,6 @@ const useAction = ({
       idRoute: flattenData.find((cell) => cell.id === item.id)?.idRoute,
     })) ?? []
   );
-  const [indeterminateList, setIndeterminateList] = useState<
-    IDepartmentAndUserListValue[]
-  >([]);
 
   const [foldList, setFoldList] = useState<IDepartmentAndUserListValue[]>(
     clone(foldData)
@@ -67,7 +62,6 @@ const useAction = ({
     IDepartmentAndUserListValue
   >(map);
 
-  const [userData, setUserData] = useState<IUserResponse>();
   // 提示语
   const [promptText, setPromptText] = useState<string>("");
   // 提示显隐
@@ -312,18 +306,18 @@ const useAction = ({
   };
 
   useEffect(() => {
-    let departmentItem: IDepartmentAndUserListValue[] = [];
+    let newSelectedList: IDepartmentAndUserListValue[] = [];
 
     foldMap.forEach((item) => {
       if (
         item.selected &&
-        !departmentItem.find((dItem) => item.id === dItem.id)
+        !newSelectedList.find((dItem) => item.id === dItem.id)
       ) {
-        departmentItem.push(item);
+        newSelectedList.push(item);
       }
     });
 
-    setSelectedList(departmentItem);
+    setSelectedList(newSelectedList);
   }, [foldMap]);
 
   // 处理部门列表点击选择或者展开
