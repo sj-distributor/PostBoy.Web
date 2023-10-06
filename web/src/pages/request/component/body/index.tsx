@@ -307,11 +307,9 @@ export const RequestBody = (props: RequestBodyProps) => {
         {sendTypeValue === MessageJobSendType.Recurring && (
           <TimeSelector
             cronExp={cronExp}
-            setDateValue={setDateValue}
             setCronExp={setCronExp}
             setCronError={setCronError}
             endDateValue={endDateValue}
-            startDateValue={dateValue}
             setEndDateValue={setEndDateValue}
             showErrorPrompt={showErrorPrompt}
           />

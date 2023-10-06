@@ -342,8 +342,6 @@ const SendEmail = (props: {
             setCronExp={setCronExp}
             setCronError={setCronError}
             endDateValue={endDateValue}
-            startDateValue={dateValue}
-            setDateValue={setDateValue}
             setEndDateValue={setEndDateValue}
             showErrorPrompt={showErrorPrompt}
           />

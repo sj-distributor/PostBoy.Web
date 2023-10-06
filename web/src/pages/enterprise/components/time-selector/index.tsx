@@ -7,18 +7,14 @@ const TimeSelector = (props: {
   setCronExp: React.Dispatch<React.SetStateAction<string>>;
   setCronError: React.Dispatch<React.SetStateAction<string>>;
   endDateValue: string;
-  startDateValue: string;
   setEndDateValue: React.Dispatch<React.SetStateAction<string>>;
   showErrorPrompt: (text: string) => void;
-  setDateValue: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const {
     cronExp,
     setCronExp,
     setCronError,
     endDateValue,
-    startDateValue,
-    setDateValue,
     setEndDateValue,
     showErrorPrompt,
   } = props;
