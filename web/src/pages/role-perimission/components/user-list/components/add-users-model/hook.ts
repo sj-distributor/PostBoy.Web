@@ -78,20 +78,27 @@ export const useAction = () => {
           id: 8,
           idRoute: [3, 8],
           title: "节点3-8",
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 15,
-      idRoute: [15],
-      title: "节点15",
-      children: [
-        {
-          id: 16,
-          idRoute: [15, 16],
-          title: "节点15-16",
-          children: [],
+          children: [
+            {
+              id: 15,
+              idRoute: [3, 8, 15],
+              title: "节点3-8-15",
+              children: [
+                {
+                  id: 16,
+                  idRoute: [3, 8, 15, 16],
+                  title: "节点3-8-15-16",
+                  children: [],
+                },
+                {
+                  id: 17,
+                  idRoute: [3, 8, 15, 17],
+                  title: "节点3-8-15-17",
+                  children: [],
+                },
+              ],
+            },
+          ],
         },
       ],
     },
@@ -143,7 +150,7 @@ export const useAction = () => {
   const alreadySelectData: string[] = useMemo(() => {
     return Array.from(selectedNodes).map(
       (node) =>
-        displayFlatUpdateTreeData.find((item) => item.id === node)?.title || ""
+        flatTreeTotalListData.find((item) => item.id === node)?.title || ""
     );
   }, [selectedNodes]);
 
@@ -253,6 +260,7 @@ export const useAction = () => {
     currentClickItem.childrenIdList = expendNextLevelChildrenList.map(
       ({ id }) => id
     );
+
     if (!isSearch)
       newExpandedNodes.has(currentNodeId)
         ? expendChildrenNodeList.forEach(({ id: nodeId }) => {
@@ -280,8 +288,6 @@ export const useAction = () => {
 
     const conditioned = newSelectedNodes.has(currentClickItem.id);
 
-    !conditioned && newIndeterminateNode.delete(currentClickItem.id);
-
     const currentRoute = currentClickItem.idRoute;
 
     const {
@@ -293,23 +299,34 @@ export const useAction = () => {
       conditioned
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
+      if (newIndeterminateNode.has(nodeId)) {
+        newIndeterminateNode.delete(nodeId);
+      }
     });
 
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
         ? newIndeterminateNode.delete(nodeId)
-        : (() => {
-            newIndeterminateNode.add(nodeId);
-            !conditioned && newIndeterminateNode.delete(nodeId);
-          })();
+        : newIndeterminateNode.add(nodeId);
     });
 
     const parentIdRoute = currentRoute.slice(0, -1).reverse();
 
     parentIdRoute.forEach((parentId) => {
-      const matchParentIdItem = isSearch
-        ? searchDisplayTreeData.find((item) => item.id === parentId)
-        : displayFlatUpdateTreeData.find((item) => item.id === parentId);
+      const matchParentIdItem = flatTreeTotalListData.find(
+        (item) => item.id === parentId
+      );
+
+      if (matchParentIdItem) {
+        const { nextLevelChildrenList: expendNextLevelChildrenList } =
+          getCurrentNodeListByCurrentIdRoute(
+            flatTreeTotalListData,
+            matchParentIdItem.idRoute
+          );
+        matchParentIdItem.childrenIdList = expendNextLevelChildrenList.map(
+          ({ id }) => id
+        );
+      }
 
       if (matchParentIdItem?.childrenIdList) {
         const allChildrenSelected = matchParentIdItem?.childrenIdList.every(
