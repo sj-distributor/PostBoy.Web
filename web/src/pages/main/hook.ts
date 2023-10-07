@@ -15,9 +15,15 @@ const useMainAction = () => {
   const [userData, setUserData] = useState<IUserResponse>();
 
   useEffect(() => {
-    const indexInRouterArray = routerArray.findIndex((item) =>
-      mainLocation.pathname.includes(item.path)
-    );
+    const currentPath = mainLocation.pathname;
+
+    const indexInRouterArray = routerArray.findIndex((routeItem) => {
+      const currentPathSplit = currentPath.split("/");
+
+      const currentPathFirstPart = currentPathSplit[1];
+
+      return routeItem.path.includes(currentPathFirstPart);
+    });
 
     setMainClickIndex(indexInRouterArray);
   }, [mainLocation.pathname]);
