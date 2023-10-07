@@ -1,5 +1,5 @@
 import { clone } from "ramda";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { TreeNode } from "./props";
 
 export const useAction = () => {
@@ -116,12 +116,9 @@ export const useAction = () => {
 
       flattenedList.push(node);
 
-      if (node.children && node.children.length > 0) {
-        flattenedList = [
-          ...flattenedList,
-          ...flattenTreeTotalList(node.children, idRoute),
-        ];
-      }
+      node.children &&
+        node.children.length > 0 &&
+        flattenedList.push(...flattenTreeTotalList(node.children, idRoute));
     }
 
     return flattenedList;
@@ -234,7 +231,7 @@ export const useAction = () => {
 
     const displayData: TreeNode[] = idRouteList
       .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
-      .filter((item): item is TreeNode => item !== undefined);
+      .filter((item): item is TreeNode => !!item);
 
     if (value !== "") {
       setExpandedNodes(new Set([...expandedNodes, ...idRouteList]));
@@ -242,9 +239,8 @@ export const useAction = () => {
     } else {
       const newExpandedNodes = new Set(expandedNodes);
       displayFlatUpdateTreeData.forEach((node) => {
-        if (!(node.childrenIdList && node.childrenIdList.length > 0)) {
+        !(node.childrenIdList && node.childrenIdList.length > 0) &&
           newExpandedNodes.delete(node.id);
-        }
       });
       setExpandedNodes(newExpandedNodes);
       setSearchDisplayTreeData([]);
