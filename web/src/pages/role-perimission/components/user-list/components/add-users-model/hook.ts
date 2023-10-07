@@ -240,6 +240,13 @@ export const useAction = () => {
       setExpandedNodes(new Set([...expandedNodes, ...idRouteList]));
       setSearchDisplayTreeData(displayData);
     } else {
+      const newExpandedNodes = new Set(expandedNodes);
+      displayFlatUpdateTreeData.forEach((node) => {
+        if (!(node.childrenIdList && node.childrenIdList.length > 0)) {
+          newExpandedNodes.delete(node.id);
+        }
+      });
+      setExpandedNodes(newExpandedNodes);
       setSearchDisplayTreeData([]);
     }
   };
@@ -253,7 +260,7 @@ export const useAction = () => {
       allChildrenIncludeParentList: expendChildrenNodeList,
       nextLevelChildrenList: expendNextLevelChildrenList,
     } = getCurrentNodeListByCurrentIdRoute(
-      isSearch ? searchDisplayTreeData : flatTreeTotalListData,
+      flatTreeTotalListData,
       currentClickItem.idRoute
     );
 
