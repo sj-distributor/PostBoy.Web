@@ -45,7 +45,7 @@ export const useAction = () => {
                     {
                       id: 11,
                       idRoute: [1, 4, 5, 9, 11],
-                      title: "节点1-4-5--9-11",
+                      title: "节点1-4-5-11",
                       children: [],
                     },
                   ],
