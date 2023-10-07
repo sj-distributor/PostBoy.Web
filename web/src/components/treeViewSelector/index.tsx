@@ -166,6 +166,9 @@ const TreeViewSelector = ({
                   marginTop: 0,
                   marginBottom: 0,
                 },
+                "& .MuiOutlinedInput-root .MuiAutocomplete-endAdornment": {
+                  right: 20,
+                },
               }}
               getOptionLabel={(option) => option.name}
               renderTags={(value) => {
