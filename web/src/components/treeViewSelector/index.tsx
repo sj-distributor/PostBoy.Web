@@ -226,7 +226,7 @@ const TreeViewSelector = ({
                   sx={{
                     "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
                       {
-                        border: "none", // 取消边框
+                        border: "none",
                       },
                   }}
                 />
