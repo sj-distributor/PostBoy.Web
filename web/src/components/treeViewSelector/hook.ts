@@ -244,7 +244,11 @@ const useAction = ({
           if (schemaType) {
             cloneData.set(getUniqueId(fatherItem), {
               ...fatherItem,
-              indeterminate: getIndeterminateStatus(childrenList),
+              indeterminate:
+                childrenList.every((item) => !item?.selected) &&
+                fatherItem.selected
+                  ? true
+                  : getIndeterminateStatus(childrenList),
             });
           } else {
             cloneData.set(getUniqueId(fatherItem), {
