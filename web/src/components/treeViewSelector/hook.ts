@@ -166,9 +166,9 @@ const useAction = ({
         cloneData.values()
       ).find((item) => item.id === selectItem.parentid);
 
-      let clickItem: IDepartmentAndUserListValue | undefined = Array.from(
-        cloneData.values()
-      ).find((item) => item.id === selectItem.id);
+      let clickItem: IDepartmentAndUserListValue | undefined = cloneData.get(
+        getUniqueId(selectItem)
+      );
 
       let isIndeterminate = clickItem?.indeterminate
         ? clickItem.indeterminate
@@ -244,7 +244,11 @@ const useAction = ({
           if (schemaType) {
             cloneData.set(getUniqueId(fatherItem), {
               ...fatherItem,
-              indeterminate: getIndeterminateStatus(childrenList),
+              indeterminate:
+                childrenList.every((item) => !item?.selected) &&
+                fatherItem.selected
+                  ? true
+                  : getIndeterminateStatus(childrenList),
             });
           } else {
             cloneData.set(getUniqueId(fatherItem), {
