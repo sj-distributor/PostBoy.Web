@@ -155,6 +155,7 @@ const TreeViewSelector = ({
                 "& .MuiInputBase-root.MuiOutlinedInput-root": {
                   maxHeight: "10rem",
                   overflowY: "auto",
+                  position: "unset",
                 },
                 "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
                   borderBottomColor: "transparent",
