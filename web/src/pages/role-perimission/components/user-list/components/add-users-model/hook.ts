@@ -128,7 +128,10 @@ export const useAction = () => {
 
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
-  const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
+  const [expandedNodes, setExpandedNodes] = useState<{
+    dispalayExpandedNodes: Set<number>;
+    searchExpandedNodes: Set<number>;
+  }>({ dispalayExpandedNodes: new Set(), searchExpandedNodes: new Set() });
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
 
@@ -234,15 +237,19 @@ export const useAction = () => {
       .filter((item): item is TreeNode => !!item);
 
     if (value !== "") {
-      setExpandedNodes(new Set([...expandedNodes, ...idRouteList]));
+      setExpandedNodes((prevExpandedNodes) => ({
+        ...prevExpandedNodes,
+        searchExpandedNodes: new Set([
+          ...prevExpandedNodes.searchExpandedNodes,
+          ...idRouteList,
+        ]),
+      }));
       setSearchDisplayTreeData(displayData);
     } else {
-      const newExpandedNodes = new Set(expandedNodes);
-      displayFlatUpdateTreeData.forEach((node) => {
-        !(node.childrenIdList && node.childrenIdList.length > 0) &&
-          newExpandedNodes.delete(node.id);
+      setExpandedNodes({
+        dispalayExpandedNodes: expandedNodes.dispalayExpandedNodes,
+        searchExpandedNodes: new Set(),
       });
-      setExpandedNodes(newExpandedNodes);
       setSearchDisplayTreeData([]);
     }
   };
@@ -250,7 +257,7 @@ export const useAction = () => {
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
 
-    const newExpandedNodes = new Set(expandedNodes);
+    const newExpandedNodes = new Set(expandedNodes.dispalayExpandedNodes);
 
     const {
       allChildrenIncludeParentList: expendChildrenNodeList,
@@ -277,7 +284,10 @@ export const useAction = () => {
       newExpandedNodes.has(currentClickItem.id)
     );
 
-    setExpandedNodes(newExpandedNodes);
+    setExpandedNodes({
+      dispalayExpandedNodes: newExpandedNodes,
+      searchExpandedNodes: new Set(),
+    });
 
     isSearch
       ? setSearchDisplayTreeData(currentListData)
