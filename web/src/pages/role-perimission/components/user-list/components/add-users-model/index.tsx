@@ -46,9 +46,7 @@ export const AddUsersModel = (props: {
 
     const isSelected = selectedNodes.has(item.id);
 
-    const isExpanded = isSearch
-      ? expandedNodes.searchExpandedNodes.has(item.id)
-      : expandedNodes.dispalayExpandedNodes.has(item.id);
+    const isExpanded = expandedNodes.dispalayExpandedNodes.has(item.id);
 
     const isIndeterminate = indeterminateNodes.has(item.id);
 
