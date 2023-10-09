@@ -30,7 +30,6 @@ export const AddUsersModel = (props: {
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
-    padding,
     selectNode,
     toggleNode,
     handleSearchChange,
@@ -52,7 +51,7 @@ export const AddUsersModel = (props: {
 
     const hasChildren = item.children.length > 0;
 
-    const paddingLeft = padding * (item.idRoute.length - 1);
+    const paddingLeft = 2 * (item.idRoute.length - 1);
 
     return (
       <div style={style}>

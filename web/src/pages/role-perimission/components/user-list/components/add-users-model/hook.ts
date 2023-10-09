@@ -124,8 +124,6 @@ export const useAction = () => {
     return flattenedList;
   };
 
-  const padding = 2;
-
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
   const [expandedNodes, setExpandedNodes] = useState<{
@@ -374,7 +372,6 @@ export const useAction = () => {
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
-    padding,
     selectNode,
     toggleNode,
     handleSearchChange,
