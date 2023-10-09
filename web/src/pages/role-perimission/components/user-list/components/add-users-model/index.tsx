@@ -51,13 +51,11 @@ export const AddUsersModel = (props: {
 
     const hasChildren = item.children.length > 0;
 
-    const paddingLeft = 2 * (item.idRoute.length - 1);
-
     return (
       <div style={style}>
         <ListItem
           key={item.idRoute.toString()}
-          style={{ paddingLeft: `${paddingLeft}rem` }}
+          style={{ paddingLeft: `${2 * (item.idRoute.length - 1)}rem` }}
         >
           <ListItemIcon>
             <Checkbox
