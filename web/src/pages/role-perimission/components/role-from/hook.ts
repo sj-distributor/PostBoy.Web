@@ -1,15 +1,33 @@
-import { SelectChangeEvent } from "@mui/material/Select";
-
-import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { IRoleOptions } from "../../../../dtos/role";
+import { IDepartmentDto } from "../../../../dtos/role";
 
 export const useAction = () => {
-  const options: IRoleOptions[] = [
-    { value: 10, label: "选项1" },
-    { value: 20, label: "选项2" },
-    { value: 30, label: "选项3" },
-  ];
+  const options: IDepartmentDto = {
+    allDepartment: [
+      {
+        higherDepartment: {
+          name: "WXF Office",
+          id: "0-0",
+          childrenDepartment: [
+            { name: "Operating Support Center", id: "0-0-1" },
+            { name: "Department A", id: "0-0-2" },
+            { name: "Department B", id: "0-0-3" },
+          ],
+        },
+      },
+      {
+        higherDepartment: {
+          name: "IS Office",
+          id: "0-1",
+          childrenDepartment: [
+            { name: "Department C", id: "0-1-1" },
+            { name: "Department D", id: "0-1-2" },
+          ],
+        },
+      },
+    ],
+  };
+
   const inputStyles = {
     border: 1,
     flex: 1,
@@ -34,7 +52,6 @@ export const useAction = () => {
     inputStyles,
     selectStyles,
     formStyles,
-
     location,
     navigate,
   };

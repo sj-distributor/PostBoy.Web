@@ -2,6 +2,7 @@ import { useAction } from "./hook";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 import {
   Autocomplete,
@@ -14,6 +15,16 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import { clone } from "ramda";
+
+type DepartmentDto = {
+  name: string;
+  id: string;
+  isSelected: boolean;
+  isExpand?: boolean;
+  indeterminate?: boolean;
+};
 
 export const RoleFrom = () => {
   const { options, inputStyles, selectStyles, formStyles, location, navigate } =
@@ -22,6 +33,41 @@ export const RoleFrom = () => {
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+  const newOptions = options.allDepartment.reduce((accumulator, item) => {
+    const higherDepartment: DepartmentDto = {
+      name: item.higherDepartment.name,
+      id: item.higherDepartment.id,
+      isSelected: false,
+    };
+
+    accumulator.push(higherDepartment);
+
+    if (
+      item.higherDepartment.childrenDepartment &&
+      item.higherDepartment.childrenDepartment.length > 0
+    ) {
+      higherDepartment.isExpand = false;
+      higherDepartment.indeterminate = false;
+
+      accumulator.push(
+        ...item.higherDepartment.childrenDepartment.map((child) => ({
+          name: child.name,
+          id: child.id,
+          isSelected: false,
+        }))
+      );
+    }
+
+    return accumulator;
+  }, [] as DepartmentDto[]);
+
+  const [checkboxState, setCheckboxState] =
+    useState<DepartmentDto[]>(newOptions);
+
+  // console.log(newOptions);
+
+  const newCheckboxState = clone(checkboxState);
 
   return (
     <div className={styles.container}>
@@ -136,21 +182,81 @@ export const RoleFrom = () => {
                   size="small"
                   sx={selectStyles}
                   multiple
-                  id="checkboxes-tags-demo"
-                  options={options}
+                  options={newOptions}
                   disableCloseOnSelect
-                  getOptionLabel={(option) => option.label}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option.label}
-                    </li>
-                  )}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  renderOption={(props, option, state) => {
+                    // const ind = () => {
+                    //   newCheckboxState.some((x) => {
+                    //     if (x.isSelected) {
+                    //       if (x.isExpand) {
+                    //         newCheckboxState.map((item, index) => {
+                    //           if (item.id.startsWith(option.id)) {
+                    //             newCheckboxState[index].isSelected =
+                    //               !newCheckboxState[index].isSelected;
+
+                    //             setCheckboxState(newCheckboxState);
+                    //           }
+                    //         });
+                    //         return undefined;
+                    //       }
+                    //     } else {
+                    //       return true;
+                    //     }
+                    //   });
+                    // };
+
+                    return (
+                      <li
+                        {...props}
+                        style={
+                          Object.hasOwn(option, "isExpand")
+                            ? {}
+                            : { paddingLeft: "4rem" }
+                        }
+                        onClickCapture={() => {
+                          if (Object.hasOwn(option, "isExpand")) {
+                            newCheckboxState.map((item, index) => {
+                              if (item.id.startsWith(option.id)) {
+                                newCheckboxState[index].isSelected =
+                                  !newCheckboxState[index].isSelected;
+
+                                setCheckboxState(newCheckboxState);
+                              }
+                            });
+                          } else {
+                            newCheckboxState[state.index].isSelected =
+                              !newCheckboxState[state.index].isSelected;
+
+                            if (option.indeterminate) {
+                              newCheckboxState[state.index].indeterminate =
+                                true;
+                            }
+
+                            setCheckboxState(newCheckboxState);
+                          }
+                        }}
+                      >
+                        {Object.hasOwn(option, "isExpand") && (
+                          <ArrowRightIcon
+                            fontSize="medium"
+                            sx={{ color: "#1876d3" }}
+                          />
+                        )}
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={checkboxState[state.index].isSelected}
+                          indeterminate={option.indeterminate}
+                        />
+                        {option.name}
+                      </li>
+                    );
+                  }}
                   style={{ width: 500 }}
                   renderInput={(params) => (
                     <TextField {...params} placeholder="請選擇" />
@@ -159,7 +265,7 @@ export const RoleFrom = () => {
               </div>
             </div>
 
-            <div className={`${styles.item} ${styles.lastItem}`}>
+            {/* <div className={`${styles.item} ${styles.lastItem}`}>
               <div className={styles.itemSubTitle}>通知功能：</div>
               <div className={styles.itemInput}>
                 <Autocomplete
@@ -167,9 +273,9 @@ export const RoleFrom = () => {
                   sx={selectStyles}
                   multiple
                   id="checkboxes-tags-demo"
-                  options={options}
+                  options={options.allDepartment}
                   disableCloseOnSelect
-                  getOptionLabel={(option) => option.label}
+                  getOptionLabel={(option) => option.higherDepartment.name}
                   renderOption={(props, option, { selected }) => (
                     <li {...props}>
                       <Checkbox
@@ -178,7 +284,7 @@ export const RoleFrom = () => {
                         style={{ marginRight: 8 }}
                         checked={selected}
                       />
-                      {option.label}
+                      {option.higherDepartment.name}
                     </li>
                   )}
                   style={{ width: 500 }}
@@ -187,7 +293,7 @@ export const RoleFrom = () => {
                   )}
                 />
               </div>
-            </div>
+            </div> */}
           </Stack>
         </Card>
       </Stack>
