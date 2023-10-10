@@ -146,7 +146,9 @@ export const useAction = () => {
   >([]);
 
   const alreadySelectData: TreeNode[] = useMemo(() => {
-    return flatTreeTotalListData.filter((item) => selectedNodes.has(item.id));
+    return flatTreeTotalListData.filter(
+      (item) => selectedNodes.has(item.id) && item.children.length === 0
+    );
   }, [selectedNodes]);
 
   const isSearch = useMemo(
