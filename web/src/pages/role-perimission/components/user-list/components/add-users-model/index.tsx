@@ -1,7 +1,7 @@
 import {
+  Box,
   Button,
   Checkbox,
-  List,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -11,16 +11,77 @@ import styles from "./index.module.scss";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FolderIcon from "@mui/icons-material/Folder";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject } from "react";
+import { FixedSizeList } from "react-window";
+import { TreeNode } from "./props";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
 }) => {
   const { addUsersRef } = props;
 
-  const { alreadySelectData } = useAction();
+  const {
+    alreadySelectData,
+    isSearch,
+    displayFlatUpdateTreeData,
+    searchDisplayTreeData,
+    selectedNodes,
+    expandedNodes,
+    indeterminateNodes,
+    selectNode,
+    toggleNode,
+    handleSearchChange,
+  } = useAction();
+
+  const renderListItem: React.FC<{
+    index: number;
+    style: React.CSSProperties;
+  }> = ({ index, style }) => {
+    const item = isSearch
+      ? searchDisplayTreeData[index]
+      : displayFlatUpdateTreeData[index];
+
+    const isSelected = selectedNodes.has(item.id);
+
+    const isExpanded = expandedNodes.displayExpandedNodes.has(item.id);
+
+    const isIndeterminate = indeterminateNodes.has(item.id);
+
+    const hasChildren = item.children.length > 0;
+
+    return (
+      <div style={style}>
+        <ListItem
+          key={item.idRoute.toString()}
+          style={{ paddingLeft: `${2 * (item.idRoute.length - 1)}rem` }}
+        >
+          <ListItemIcon>
+            <Checkbox
+              checked={isSelected}
+              indeterminate={isIndeterminate}
+              onChange={() => {
+                selectNode(item);
+              }}
+            />
+            {hasChildren && (
+              <div onClick={() => toggleNode(item)}>
+                {isExpanded ? (
+                  <ArrowDropDownIcon className={styles.arrowIcon} />
+                ) : (
+                  <ArrowRightIcon className={styles.arrowIcon} />
+                )}
+                <FolderIcon className={styles.folder} />
+              </div>
+            )}
+          </ListItemIcon>
+          <ListItemText primary={item.title} />
+        </ListItem>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.wrap}>
@@ -40,19 +101,24 @@ export const AddUsersModel = (props: {
           className={styles.search}
           placeholder="搜索"
           size="small"
+          onChange={handleSearchChange}
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <List>
-            <ListItem>
-              <Checkbox defaultChecked />
-              <ListItemIcon>
-                <ArrowRightIcon className={styles.arrowRight} />
-                <FolderIcon className={styles.folder} />
-              </ListItemIcon>
-              <ListItemText primary="Single-line item" />
-            </ListItem>
-          </List>
+          <Box sx={{ width: "100%", height: 500 }}>
+            <FixedSizeList
+              height={500}
+              itemCount={
+                isSearch
+                  ? searchDisplayTreeData.length
+                  : displayFlatUpdateTreeData.length
+              }
+              itemSize={46}
+              width={360}
+            >
+              {renderListItem}
+            </FixedSizeList>
+          </Box>
         </div>
       </div>
       <div className={styles.rightGroupBox}>
@@ -64,11 +130,11 @@ export const AddUsersModel = (props: {
               onClick={() => addUsersRef.current?.close()}
             />
           </div>
-          <div>
-            {alreadySelectData.map((selectItems: string, index: number) => {
+          <div className={styles.selectItemsBox}>
+            {alreadySelectData.map((selectItems: TreeNode, index: number) => {
               return (
                 <div className={styles.selectListWrap} key={index}>
-                  <div>{selectItems}</div>
+                  <div>{selectItems.title}</div>
                   <CloseIcon className={styles.delete} />
                 </div>
               );
