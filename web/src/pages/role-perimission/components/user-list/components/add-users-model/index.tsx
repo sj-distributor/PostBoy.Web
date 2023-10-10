@@ -135,7 +135,10 @@ export const AddUsersModel = (props: {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
-                  <CloseIcon className={styles.delete} />
+                  <CloseIcon
+                    className={styles.delete}
+                    onClick={() => selectNode(selectItems)}
+                  />
                 </div>
               );
             })}
