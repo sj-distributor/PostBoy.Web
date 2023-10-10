@@ -51,15 +51,21 @@
         }
       }
 
-      .selectListWrap {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.9rem;
-        margin-top: 2rem;
+      .selectItemsBox {
+        height: 35rem;
+        overflow-y: scroll;
 
-        .delete {
-          font-size: 1rem;
-          color: #90908f;
+        .selectListWrap {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.9rem;
+          margin-top: 1.5rem;
+
+          .delete {
+            margin-right: 1rem;
+            font-size: 1rem;
+            color: #90908f;
+          }
         }
       }
     }

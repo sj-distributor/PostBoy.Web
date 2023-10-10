@@ -127,9 +127,9 @@ export const useAction = () => {
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
   const [expandedNodes, setExpandedNodes] = useState<{
-    dispalayExpandedNodes: Set<number>;
+    displayExpandedNodes: Set<number>;
     searchExpandedNodes: Set<number>;
-  }>({ dispalayExpandedNodes: new Set(), searchExpandedNodes: new Set() });
+  }>({ displayExpandedNodes: new Set(), searchExpandedNodes: new Set() });
 
   const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
 
@@ -145,11 +145,8 @@ export const useAction = () => {
     TreeNode[]
   >([]);
 
-  const alreadySelectData: string[] = useMemo(() => {
-    return Array.from(selectedNodes).map(
-      (node) =>
-        flatTreeTotalListData.find((item) => item.id === node)?.title || ""
-    );
+  const alreadySelectData: TreeNode[] = useMemo(() => {
+    return flatTreeTotalListData.filter((item) => selectedNodes.has(item.id));
   }, [selectedNodes]);
 
   const isSearch = useMemo(
@@ -226,8 +223,9 @@ export const useAction = () => {
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
       return item.title.toLowerCase().includes(value.toLowerCase());
     });
+
     const idRouteList = [
-      ...new Set(...targetSearchFilterList.map(({ idRoute }) => idRoute)),
+      ...new Set(targetSearchFilterList.map(({ idRoute }) => idRoute).flat()),
     ];
 
     const displayData: TreeNode[] = idRouteList
@@ -245,7 +243,7 @@ export const useAction = () => {
       setSearchDisplayTreeData(displayData);
     } else {
       setExpandedNodes({
-        dispalayExpandedNodes: expandedNodes.dispalayExpandedNodes,
+        displayExpandedNodes: expandedNodes.displayExpandedNodes,
         searchExpandedNodes: new Set(),
       });
       setSearchDisplayTreeData([]);
@@ -255,7 +253,7 @@ export const useAction = () => {
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
 
-    const newExpandedNodes = new Set(expandedNodes.dispalayExpandedNodes);
+    const newExpandedNodes = new Set(expandedNodes.displayExpandedNodes);
 
     const {
       allChildrenIncludeParentList: expendChildrenNodeList,
@@ -283,7 +281,7 @@ export const useAction = () => {
     );
 
     setExpandedNodes({
-      dispalayExpandedNodes: newExpandedNodes,
+      displayExpandedNodes: newExpandedNodes,
       searchExpandedNodes: new Set(),
     });
 
@@ -310,9 +308,7 @@ export const useAction = () => {
       conditioned
         ? newSelectedNodes.delete(nodeId)
         : newSelectedNodes.add(nodeId);
-      if (newIndeterminateNode.has(nodeId)) {
-        newIndeterminateNode.delete(nodeId);
-      }
+      newIndeterminateNode.has(nodeId) && newIndeterminateNode.delete(nodeId);
     });
 
     parentItemList.forEach(({ id: nodeId }) => {
@@ -334,17 +330,16 @@ export const useAction = () => {
             flatTreeTotalListData,
             matchParentIdItem.idRoute
           );
+
         matchParentIdItem.childrenIdList = expendNextLevelChildrenList.map(
           ({ id }) => id
         );
-      }
 
-      if (matchParentIdItem?.childrenIdList) {
-        const allChildrenSelected = matchParentIdItem?.childrenIdList.every(
+        const allChildrenSelected = matchParentIdItem.childrenIdList.every(
           (childId) => newSelectedNodes.has(childId)
         );
 
-        const allChildrenNotSelected = matchParentIdItem?.childrenIdList.every(
+        const allChildrenNotSelected = matchParentIdItem.childrenIdList.every(
           (childId) =>
             !newSelectedNodes.has(childId) && !newIndeterminateNode.has(childId)
         );

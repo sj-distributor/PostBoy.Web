@@ -16,6 +16,7 @@ import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject } from "react";
 import { FixedSizeList } from "react-window";
+import { TreeNode } from "./props";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -45,7 +46,7 @@ export const AddUsersModel = (props: {
 
     const isSelected = selectedNodes.has(item.id);
 
-    const isExpanded = expandedNodes.dispalayExpandedNodes.has(item.id);
+    const isExpanded = expandedNodes.displayExpandedNodes.has(item.id);
 
     const isIndeterminate = indeterminateNodes.has(item.id);
 
@@ -129,11 +130,11 @@ export const AddUsersModel = (props: {
               onClick={() => addUsersRef.current?.close()}
             />
           </div>
-          <div>
-            {alreadySelectData.map((selectItems: string, index: number) => {
+          <div className={styles.selectItemsBox}>
+            {alreadySelectData.map((selectItems: TreeNode, index: number) => {
               return (
                 <div className={styles.selectListWrap} key={index}>
-                  <div>{selectItems}</div>
+                  <div>{selectItems.title}</div>
                   <CloseIcon className={styles.delete} />
                 </div>
               );
