@@ -8,15 +8,12 @@ import {
   TextField,
 } from "@mui/material";
 import styles from "./index.module.scss";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import FolderIcon from "@mui/icons-material/Folder";
 import CloseIcon from "@mui/icons-material/Close";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../../../dtos/modal";
 import { RefObject } from "react";
-import { FixedSizeList } from "react-window";
 import { TreeNode } from "./props";
+import { TreeSelectList } from "../../../tree-select";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -24,64 +21,12 @@ export const AddUsersModel = (props: {
   const { addUsersRef } = props;
 
   const {
-    alreadySelectData,
-    isSearch,
-    displayFlatUpdateTreeData,
-    searchDisplayTreeData,
-    selectedNodes,
-    expandedNodes,
-    indeterminateNodes,
-    selectNode,
-    toggleNode,
-    handleSearchChange,
+    // alreadySelectData,
+    // isSearch,
+    // selectNode,
+    // handleSearchChange,
+    treeData,
   } = useAction();
-
-  const renderListItem: React.FC<{
-    index: number;
-    style: React.CSSProperties;
-  }> = ({ index, style }) => {
-    const item = isSearch
-      ? searchDisplayTreeData[index]
-      : displayFlatUpdateTreeData[index];
-
-    const isSelected = selectedNodes.has(item.id);
-
-    const isExpanded = expandedNodes.displayExpandedNodes.has(item.id);
-
-    const isIndeterminate = indeterminateNodes.has(item.id);
-
-    const hasChildren = item.children.length > 0;
-
-    return (
-      <div style={style}>
-        <ListItem
-          key={item.idRoute.toString()}
-          style={{ paddingLeft: `${2 * (item.idRoute.length - 1)}rem` }}
-        >
-          <ListItemIcon>
-            <Checkbox
-              checked={isSelected}
-              indeterminate={isIndeterminate}
-              onChange={() => {
-                selectNode(item);
-              }}
-            />
-            {hasChildren && (
-              <div onClick={() => toggleNode(item)}>
-                {isExpanded ? (
-                  <ArrowDropDownIcon className={styles.arrowIcon} />
-                ) : (
-                  <ArrowRightIcon className={styles.arrowIcon} />
-                )}
-                <FolderIcon className={styles.folder} />
-              </div>
-            )}
-          </ListItemIcon>
-          <ListItemText primary={item.title} />
-        </ListItem>
-      </div>
-    );
-  };
 
   return (
     <div className={styles.wrap}>
@@ -101,37 +46,24 @@ export const AddUsersModel = (props: {
           className={styles.search}
           placeholder="搜索"
           size="small"
-          onChange={handleSearchChange}
+          // onChange={handleSearchChange}
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <Box sx={{ width: "100%", height: 500 }}>
-            <FixedSizeList
-              height={500}
-              itemCount={
-                isSearch
-                  ? searchDisplayTreeData.length
-                  : displayFlatUpdateTreeData.length
-              }
-              itemSize={46}
-              width={360}
-            >
-              {renderListItem}
-            </FixedSizeList>
-          </Box>
+          <TreeSelectList isSearch={false} treeData={treeData} />
         </div>
       </div>
       <div className={styles.rightGroupBox}>
         <div className={styles.countBox}>
           <div className={styles.selectTitleWrap}>
-            <div>已選{alreadySelectData.length}個用戶</div>
+            <div>已選{treeData.length}個用戶</div>
             <CloseIcon
               className={styles.cancel}
               onClick={() => addUsersRef.current?.close()}
             />
           </div>
           <div className={styles.selectItemsBox}>
-            {alreadySelectData.map((selectItems: TreeNode, index: number) => {
+            {/* {alreadySelectData.map((selectItems: TreeNode, index: number) => {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
@@ -141,7 +73,7 @@ export const AddUsersModel = (props: {
                   />
                 </div>
               );
-            })}
+            })} */}
           </div>
         </div>
         <div className={styles.buttonBox}>
