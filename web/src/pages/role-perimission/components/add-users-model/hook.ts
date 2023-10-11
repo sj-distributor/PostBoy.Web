@@ -1,6 +1,7 @@
 import { clone } from "ramda";
 import { useMemo, useState } from "react";
 import { TreeNode } from "./props";
+import { useRenderListItemAction } from "../tree-select/hook";
 
 export const useAction = () => {
   const treeData: TreeNode[] = [
@@ -104,20 +105,7 @@ export const useAction = () => {
     },
   ];
 
-  // const alreadySelectData: TreeNode[] = useMemo(() => {
-  //   return flatTreeTotalListData.filter(
-  //     (item) => selectedNodes.has(item.id) && item.children.length === 0
-  //   );
-  // }, [selectedNodes]);
-
-  // const isSearch = useMemo(
-  //   () => searchDisplayTreeData.length > 0,
-  //   [searchDisplayTreeData]
-  // );
-
   return {
-    // alreadySelectData,
-    // isSearch,
     treeData,
   };
 };

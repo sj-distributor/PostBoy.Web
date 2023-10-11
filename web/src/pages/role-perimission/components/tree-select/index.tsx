@@ -7,17 +7,18 @@ import {
   ListItemText,
 } from "@mui/material";
 import { FixedSizeList } from "react-window";
-import { TreeNode } from "../user-list/components/add-users-model/props";
-import { useRenderListItemAction } from "./components/hook";
+
+import { useRenderListItemAction } from "./hook";
 import { ArrowDropDownIcon, ArrowRightIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
-import styles from "././components/index.module.scss";
+import styles from "./index.module.scss";
+import { TreeNode } from "../add-users-model/props";
 
 export const TreeSelectList: React.FC<{
-  isSearch: boolean;
   treeData: TreeNode[];
-}> = ({ isSearch, treeData }) => {
+}> = ({ treeData }) => {
   const {
+    isSearch,
     searchDisplayTreeData,
     displayFlatUpdateTreeData,
     selectedNodes,
@@ -25,7 +26,7 @@ export const TreeSelectList: React.FC<{
     indeterminateNodes,
     selectNode,
     toggleNode,
-  } = useRenderListItemAction(isSearch, treeData);
+  } = useRenderListItemAction(treeData);
 
   const renderListItem: React.FC<{
     index: number;

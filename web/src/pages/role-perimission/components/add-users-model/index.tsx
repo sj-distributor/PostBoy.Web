@@ -10,23 +10,21 @@ import {
 import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
-import { ModalBoxRef } from "../../../../../../dtos/modal";
+import { ModalBoxRef } from "../../../../dtos/modal";
 import { RefObject } from "react";
 import { TreeNode } from "./props";
-import { TreeSelectList } from "../../../tree-select";
+import { useRenderListItemAction } from "../tree-select/hook";
+import { TreeSelectList } from "../tree-select";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
 }) => {
   const { addUsersRef } = props;
 
-  const {
-    // alreadySelectData,
-    // isSearch,
-    // selectNode,
-    // handleSearchChange,
-    treeData,
-  } = useAction();
+  const { treeData } = useAction();
+
+  const { selectNode, handleSearchChange, alreadySelectData } =
+    useRenderListItemAction(treeData);
 
   return (
     <div className={styles.wrap}>
@@ -46,24 +44,24 @@ export const AddUsersModel = (props: {
           className={styles.search}
           placeholder="搜索"
           size="small"
-          // onChange={handleSearchChange}
+          onChange={handleSearchChange}
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <TreeSelectList isSearch={false} treeData={treeData} />
+          <TreeSelectList treeData={treeData} />
         </div>
       </div>
       <div className={styles.rightGroupBox}>
         <div className={styles.countBox}>
           <div className={styles.selectTitleWrap}>
-            <div>已選{treeData.length}個用戶</div>
+            <div>已選{alreadySelectData.length}個用戶</div>
             <CloseIcon
               className={styles.cancel}
               onClick={() => addUsersRef.current?.close()}
             />
           </div>
           <div className={styles.selectItemsBox}>
-            {/* {alreadySelectData.map((selectItems: TreeNode, index: number) => {
+            {alreadySelectData.map((selectItems: TreeNode, index: number) => {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
@@ -73,7 +71,7 @@ export const AddUsersModel = (props: {
                   />
                 </div>
               );
-            })} */}
+            })}
           </div>
         </div>
         <div className={styles.buttonBox}>

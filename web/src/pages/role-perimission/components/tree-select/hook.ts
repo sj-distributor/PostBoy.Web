@@ -1,11 +1,8 @@
 import { clone } from "ramda";
-import { useState } from "react";
-import { TreeNode } from "../../user-list/components/add-users-model/props";
+import { useMemo, useState } from "react";
+import { TreeNode } from "../add-users-model/props";
 
-export const useRenderListItemAction = (
-  isSearch: boolean,
-  treeData: TreeNode[]
-) => {
+export const useRenderListItemAction = (treeData: TreeNode[]) => {
   //平铺树结构
   const flattenTreeTotalList = (
     tree: TreeNode[],
@@ -46,6 +43,17 @@ export const useRenderListItemAction = (
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >([]);
+
+  const alreadySelectData: TreeNode[] = useMemo(() => {
+    return flatTreeTotalListData.filter(
+      (item) => selectedNodes.has(item.id) && item.children.length === 0
+    );
+  }, [selectedNodes]);
+
+  const isSearch = useMemo(
+    () => searchDisplayTreeData.length > 0,
+    [searchDisplayTreeData]
+  );
 
   const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
@@ -110,6 +118,39 @@ export const useRenderListItemAction = (
 
     return displayList;
   };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+
+    const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
+      return item.title.toLowerCase().includes(value.toLowerCase());
+    });
+    const idRouteList = [
+      ...new Set(targetSearchFilterList.map(({ idRoute }) => idRoute).flat()),
+    ];
+    const displayData: TreeNode[] = idRouteList
+      .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
+      .filter((item): item is TreeNode => !!item);
+
+    if (value !== "") {
+      setExpandedNodes((prevExpandedNodes) => ({
+        ...prevExpandedNodes,
+        searchExpandedNodes: new Set([
+          ...prevExpandedNodes.searchExpandedNodes,
+          ...idRouteList,
+        ]),
+      }));
+      setSearchDisplayTreeData(displayData);
+    } else {
+      setExpandedNodes({
+        displayExpandedNodes: expandedNodes.displayExpandedNodes,
+        searchExpandedNodes: new Set(),
+      });
+      setSearchDisplayTreeData([]);
+    }
+  };
+
+  console.log(searchDisplayTreeData);
 
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
@@ -220,11 +261,8 @@ export const useRenderListItemAction = (
     setIndeterminateNodes(newIndeterminateNode);
   };
 
-  const itemCount = isSearch
-    ? searchDisplayTreeData.length
-    : displayFlatUpdateTreeData.length;
-
   return {
+    isSearch,
     searchDisplayTreeData,
     displayFlatUpdateTreeData,
     selectedNodes,
@@ -232,6 +270,8 @@ export const useRenderListItemAction = (
     indeterminateNodes,
     selectNode,
     toggleNode,
-    itemCount,
+    handleSearchChange,
+    flatTreeTotalListData,
+    alreadySelectData,
   };
 };
