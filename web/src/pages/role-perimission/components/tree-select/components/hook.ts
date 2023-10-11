@@ -43,8 +43,6 @@ export const useRenderListItemAction = (
     TreeNode[]
   >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
 
-  console.log(displayFlatUpdateTreeData);
-
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >([]);
@@ -141,14 +139,6 @@ export const useRenderListItemAction = (
       currentClickItem,
       expendNextLevelChildrenList,
       newExpandedNodes.has(currentClickItem.id)
-    );
-
-    console.log(
-      displayTreeList(
-        currentClickItem,
-        expendNextLevelChildrenList,
-        newExpandedNodes.has(currentClickItem.id)
-      )
     );
 
     setExpandedNodes({
