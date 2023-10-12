@@ -22,7 +22,7 @@ export const AddUsersModel = (props: {
   } = useAction();
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.modelWrap}>
       <div className={styles.leftGroupBox}>
         <TextField
           sx={{
