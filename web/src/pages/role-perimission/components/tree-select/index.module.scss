@@ -1,11 +1,14 @@
-.folder {
-  color: #1990ff;
-  padding-right: 0.5rem;
-  padding-bottom: 0.25rem;
-}
+.iconWrap {
+  display: flex;
 
-.arrowIcon {
-  font-size: 2rem;
-  padding-top: 0.22rem;
-  color: #888888;
+  .folder {
+    color: #1990ff;
+    padding: 0.5rem 0.5rem 0 0;
+  }
+
+  .arrowIcon {
+    font-size: 2rem !important;
+    color: #888888;
+    padding-top: 0.2rem;
+  }
 }

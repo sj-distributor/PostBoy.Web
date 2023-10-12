@@ -1,25 +1,24 @@
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useImperativeHandle } from "react";
 import {
   Box,
   Checkbox,
   ListItem,
   ListItemIcon,
   ListItemText,
-  TextField,
 } from "@mui/material";
 import { FixedSizeList } from "react-window";
-
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useRenderListItemAction } from "./hook";
-import { ArrowDropDownIcon, ArrowRightIcon } from "@mui/x-date-pickers";
+import { ArrowDropDownIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./index.module.scss";
-import { TreeNode } from "../add-users-model/props";
+import { TreeNode, TreeSelectRef } from "../add-users-model/props";
 
 export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
-  setSelectedData: (data: TreeNode[]) => void;
   searchValue: string;
-  ref: React.Ref<any>;
+  ref: React.Ref<TreeSelectRef>;
+  setSelectedData: (data: TreeNode[]) => void;
 }> = React.forwardRef(({ treeData, searchValue, setSelectedData }, ref) => {
   const {
     isSearch,
@@ -28,26 +27,11 @@ export const TreeSelectList: React.FC<{
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
-    flatTreeTotalListData,
     selectNode,
     toggleNode,
-  } = useRenderListItemAction(treeData, searchValue);
+  } = useRenderListItemAction(treeData, searchValue, setSelectedData);
 
-  useEffect(() => {
-    setSelectedData(
-      flatTreeTotalListData.filter(({ id }) =>
-        [...selectedNodes].find((item) => item === id)
-      )
-    );
-  }, [selectedNodes]);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      selectNode,
-    }),
-    []
-  );
+  useImperativeHandle(ref, () => ({ selectNode }), [selectedNodes]);
 
   const renderListItem: React.FC<{
     index: number;
@@ -80,13 +64,17 @@ export const TreeSelectList: React.FC<{
               }}
             />
             {hasChildren && (
-              <div onClick={() => toggleNode(item)}>
-                {isExpanded ? (
-                  <ArrowDropDownIcon className={styles.arrowIcon} />
-                ) : (
-                  <ArrowRightIcon className={styles.arrowIcon} />
-                )}
-                <FolderIcon className={styles.folder} />
+              <div onClick={() => toggleNode(item)} className={styles.iconWrap}>
+                <div>
+                  {isExpanded ? (
+                    <ArrowDropDownIcon className={styles.arrowIcon} />
+                  ) : (
+                    <ArrowRightIcon className={styles.arrowIcon} />
+                  )}
+                </div>
+                <div>
+                  <FolderIcon className={styles.folder} />
+                </div>
               </div>
             )}
           </ListItemIcon>

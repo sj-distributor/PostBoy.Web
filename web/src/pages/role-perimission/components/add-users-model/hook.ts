@@ -1,4 +1,5 @@
-import { TreeNode } from "./props";
+import { useRef, useState } from "react";
+import { TreeNode, TreeSelectRef } from "./props";
 
 export const useAction = () => {
   const treeData: TreeNode[] = [
@@ -102,7 +103,22 @@ export const useAction = () => {
     },
   ];
 
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  const treeSelectRef = useRef<TreeSelectRef>(null);
+
+  const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
+
   return {
     treeData,
+    searchValue,
+    handleSearchChange,
+    treeSelectRef,
+    alreadySelectData,
+    setAlreadySelectData,
   };
 };

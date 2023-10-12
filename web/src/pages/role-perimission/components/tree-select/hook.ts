@@ -4,7 +4,8 @@ import { TreeNode } from "../add-users-model/props";
 
 export const useRenderListItemAction = (
   treeData: TreeNode[],
-  searchValue: string
+  searchValue: string,
+  setSelectedData: (data: TreeNode[]) => void
 ) => {
   //平铺树结构
   const flattenTreeTotalList = (
@@ -46,12 +47,6 @@ export const useRenderListItemAction = (
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >([]);
-
-  const alreadySelectData: TreeNode[] = useMemo(() => {
-    return flatTreeTotalListData.filter(
-      (item) => selectedNodes.has(item.id) && item.children.length === 0
-    );
-  }, [selectedNodes]);
 
   const isSearch = useMemo(
     () => searchDisplayTreeData.length > 0,
@@ -266,7 +261,13 @@ export const useRenderListItemAction = (
 
   useEffect(() => {
     handleSearchChange(searchValue);
-  }, [searchValue]);
+
+    setSelectedData(
+      flatTreeTotalListData.filter(
+        (item) => selectedNodes.has(item.id) && item.children.length === 0
+      )
+    );
+  }, [searchValue, selectedNodes]);
 
   return {
     isSearch,
@@ -279,6 +280,5 @@ export const useRenderListItemAction = (
     toggleNode,
     handleSearchChange,
     flatTreeTotalListData,
-    alreadySelectData,
   };
 };

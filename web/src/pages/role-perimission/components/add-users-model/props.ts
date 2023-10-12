@@ -5,3 +5,7 @@ export interface TreeNode {
   childrenIdList?: number[];
   children: TreeNode[];
 }
+
+export interface TreeSelectRef {
+  selectNode: (item: TreeNode) => void;
+}

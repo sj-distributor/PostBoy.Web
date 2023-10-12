@@ -1,4 +1,4 @@
-.wrap {
+.modelWrap {
   width: 50rem;
   height: 40rem;
   display: flex;
@@ -17,18 +17,6 @@
       width: 80%;
       height: 0.5rem;
       border-color: #d0d0d0;
-    }
-
-    .folder {
-      color: #1990ff;
-      padding-right: 0.5rem;
-      padding-bottom: 0.25rem;
-    }
-
-    .arrowIcon {
-      font-size: 2rem;
-      padding-top: 0.22rem;
-      color: #888888;
     }
   }
 

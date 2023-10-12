@@ -3,10 +3,8 @@ import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { LegacyRef, RefObject, useRef, useState } from "react";
+import { RefObject } from "react";
 import { TreeNode } from "./props";
-
-import { useRenderListItemAction } from "../tree-select/hook";
 import { TreeSelectList } from "../tree-select";
 
 export const AddUsersModel = (props: {
@@ -14,23 +12,14 @@ export const AddUsersModel = (props: {
 }) => {
   const { addUsersRef } = props;
 
-  const { treeData } = useAction();
-
-  const [searchValue, setSearchValue] = useState("");
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchValue(value);
-  };
-
-  const treeRef = useRef<any>(null);
-
-  // const { selectNode, alreadySelectData } = useRenderListItemAction(
-  //   treeData,
-  //   searchValue
-  // );
-
-  const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
+  const {
+    treeData,
+    searchValue,
+    handleSearchChange,
+    treeSelectRef,
+    alreadySelectData,
+    setAlreadySelectData,
+  } = useAction();
 
   return (
     <div className={styles.wrap}>
@@ -56,7 +45,7 @@ export const AddUsersModel = (props: {
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
           <TreeSelectList
-            ref={treeRef}
+            ref={treeSelectRef}
             setSelectedData={(data) => setAlreadySelectData(data)}
             treeData={treeData}
             searchValue={searchValue}
@@ -77,12 +66,12 @@ export const AddUsersModel = (props: {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
-                  {treeRef && treeRef.current && (
-                    <CloseIcon
-                      className={styles.delete}
-                      onClick={() => treeRef.current.selectNode(selectItems)}
-                    />
-                  )}
+                  <CloseIcon
+                    className={styles.delete}
+                    onClick={() =>
+                      treeSelectRef.current?.selectNode(selectItems)
+                    }
+                  />
                 </div>
               );
             })}
