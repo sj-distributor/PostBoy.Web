@@ -26,7 +26,7 @@ export const RoleFrom = () => {
     formStyles,
     location,
     checkboxData,
-    autocompleteShowLabel,
+    showLabel,
     navigate,
     setCheckboxData,
     isHaveExpand,
@@ -251,13 +251,13 @@ export const RoleFrom = () => {
               "拉群功能：",
               "pullCrowdData",
               checkboxData.pullCrowdData,
-              autocompleteShowLabel.pullCrowdData
+              showLabel.pullCrowdData
             )}
             {renderInputBox(
               "通知功能：",
               "notificationData",
               checkboxData.notificationData,
-              autocompleteShowLabel.notificationData,
+              showLabel.notificationData,
               true
             )}
           </Stack>

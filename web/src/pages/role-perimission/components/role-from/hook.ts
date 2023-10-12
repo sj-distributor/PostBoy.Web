@@ -102,8 +102,10 @@ export const useAction = () => {
     notificationData: flatOptions,
   });
 
-  const [autocompleteShowLabel, setAutocompleteShowLabel] =
-    useState<AllDepartmentData>({ pullCrowdData: [], notificationData: [] });
+  const [showLabel, setShowLabel] = useState<AllDepartmentData>({
+    pullCrowdData: [],
+    notificationData: [],
+  });
 
   const cloneCheckboxData = clone(checkboxData);
 
@@ -137,7 +139,7 @@ export const useAction = () => {
       item.isSelected && renderShowLabel.push(item);
     });
 
-    setAutocompleteShowLabel((preValue) => {
+    setShowLabel((preValue) => {
       return { ...preValue, [dataSource]: renderShowLabel };
     });
   };
@@ -311,7 +313,7 @@ export const useAction = () => {
     formStyles,
     location,
     checkboxData,
-    autocompleteShowLabel,
+    showLabel,
     navigate,
     setCheckboxData,
     isHaveExpand,
