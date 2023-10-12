@@ -26,12 +26,9 @@ export const RoleFrom = () => {
     formStyles,
     location,
     checkboxData,
-    cloneCheckboxData,
     autocompleteShowLabel,
     navigate,
-    getChildrenUnifiedState,
     setCheckboxData,
-    updateData,
     expandTreeCheckbox,
     updateParentCheckbox,
     updateChildrenCheckbox,
@@ -155,8 +152,8 @@ export const RoleFrom = () => {
                   size="small"
                   sx={selectStyles}
                   multiple
-                  options={checkboxData}
-                  value={autocompleteShowLabel}
+                  options={checkboxData.pullCrowdData}
+                  value={autocompleteShowLabel.pullCrowdData}
                   disableCloseOnSelect
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(option, value) =>
@@ -164,11 +161,19 @@ export const RoleFrom = () => {
                   }
                   renderOption={(props, option, state) => {
                     return (
-                      <div style={{ display: "flex", alignItems: "center" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <div
-                          style={{ paddingTop: "0.5rem" }}
                           onClick={() =>
-                            expandTreeCheckbox(state.index, option)
+                            expandTreeCheckbox(
+                              "pullCrowdData",
+                              state.index,
+                              option
+                            )
                           }
                         >
                           {Object.hasOwn(option, "isExpand") &&
@@ -194,17 +199,28 @@ export const RoleFrom = () => {
                             }
                             onClickCapture={() => {
                               Object.hasOwn(option, "isExpand")
-                                ? updateParentCheckbox(state.index, option)
-                                : updateChildrenCheckbox(state.index);
+                                ? updateParentCheckbox(
+                                    "pullCrowdData",
+                                    state.index,
+                                    option
+                                  )
+                                : updateChildrenCheckbox(
+                                    "pullCrowdData",
+                                    state.index
+                                  );
                             }}
                           >
                             <Checkbox
                               icon={icon}
                               checkedIcon={checkedIcon}
                               style={{ marginRight: 8 }}
-                              checked={checkboxData[state.index].isSelected}
+                              checked={
+                                checkboxData.pullCrowdData[state.index]
+                                  .isSelected
+                              }
                               indeterminate={
-                                checkboxData[state.index].indeterminate
+                                checkboxData.pullCrowdData[state.index]
+                                  .indeterminate
                               }
                               indeterminateIcon={
                                 <IndeterminateCheckBoxIcon fontSize="small" />
@@ -222,9 +238,15 @@ export const RoleFrom = () => {
                   )}
                   onChange={(_, value, reason, details) => {
                     if (reason === "removeOption" && details?.option)
-                      removeOption(details.option);
+                      removeOption("pullCrowdData", details.option);
 
-                    reason === "clear" && setCheckboxData(flatOptions);
+                    reason === "clear" &&
+                      setCheckboxData((preValue) => {
+                        return {
+                          ...preValue,
+                          pullCrowdData: flatOptions,
+                        };
+                      });
                   }}
                 />
               </div>
@@ -237,24 +259,102 @@ export const RoleFrom = () => {
                   size="small"
                   sx={selectStyles}
                   multiple
-                  id="checkboxes-tags-demo"
-                  options={checkboxData}
+                  options={checkboxData.notificationData}
+                  value={autocompleteShowLabel.notificationData}
                   disableCloseOnSelect
                   getOptionLabel={(option) => option.name}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                      />
-                      {option.name}
-                    </li>
-                  )}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  renderOption={(props, option, state) => {
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div
+                          onClick={() =>
+                            expandTreeCheckbox(
+                              "notificationData",
+                              state.index,
+                              option
+                            )
+                          }
+                        >
+                          {Object.hasOwn(option, "isExpand") &&
+                            (option.isExpand ? (
+                              <ArrowDropDownIcon
+                                fontSize="large"
+                                sx={{ color: "#1876d3", cursor: "pointer" }}
+                              />
+                            ) : (
+                              <ArrowRightIcon
+                                fontSize="large"
+                                sx={{ color: "#1876d3", cursor: "pointer" }}
+                              />
+                            ))}
+                        </div>
+                        {!option.isHide && (
+                          <li
+                            {...props}
+                            style={
+                              Object.hasOwn(option, "isExpand")
+                                ? { paddingLeft: 0, flex: 1 }
+                                : { marginLeft: "2.2rem", flex: 1 }
+                            }
+                            onClickCapture={() => {
+                              Object.hasOwn(option, "isExpand")
+                                ? updateParentCheckbox(
+                                    "notificationData",
+                                    state.index,
+                                    option
+                                  )
+                                : updateChildrenCheckbox(
+                                    "notificationData",
+                                    state.index
+                                  );
+                            }}
+                          >
+                            <Checkbox
+                              icon={icon}
+                              checkedIcon={checkedIcon}
+                              style={{ marginRight: 8 }}
+                              checked={
+                                checkboxData.notificationData[state.index]
+                                  .isSelected
+                              }
+                              indeterminate={
+                                checkboxData.notificationData[state.index]
+                                  .indeterminate
+                              }
+                              indeterminateIcon={
+                                <IndeterminateCheckBoxIcon fontSize="small" />
+                              }
+                            />
+                            {option.name}
+                          </li>
+                        )}
+                      </div>
+                    );
+                  }}
                   style={{ width: 500 }}
                   renderInput={(params) => (
                     <TextField {...params} placeholder="請選擇" />
                   )}
+                  onChange={(_, value, reason, details) => {
+                    if (reason === "removeOption" && details?.option)
+                      removeOption("notificationData", details.option);
+
+                    reason === "clear" &&
+                      setCheckboxData((preValue) => {
+                        return {
+                          ...preValue,
+                          notificationData: flatOptions,
+                        };
+                      });
+                  }}
                 />
               </div>
             </div>

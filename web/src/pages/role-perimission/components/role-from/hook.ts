@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { IDepartmentDto } from "../../../../dtos/role";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { clone } from "ramda";
+import { useUpdateEffect } from "ahooks";
 
 export type DepartmentDto = {
   [key: string]: any;
@@ -12,6 +13,11 @@ export type DepartmentDto = {
   indeterminate?: boolean;
   parentId?: string;
   isHide?: boolean;
+};
+
+export type AllDepartmentDtoData = {
+  pullCrowdData: DepartmentDto[];
+  notificationData: DepartmentDto[];
 };
 
 export const useAction = () => {
@@ -91,18 +97,22 @@ export const useAction = () => {
     return accumulator;
   }, [] as DepartmentDto[]);
 
-  const [checkboxData, setCheckboxData] =
-    useState<DepartmentDto[]>(flatOptions);
+  const [checkboxData, setCheckboxData] = useState<AllDepartmentDtoData>({
+    pullCrowdData: flatOptions,
+    notificationData: flatOptions,
+  });
 
-  const [autocompleteShowLabel, setAutocompleteShowLabel] = useState<
-    DepartmentDto[]
-  >([]);
+  const [autocompleteShowLabel, setAutocompleteShowLabel] =
+    useState<AllDepartmentDtoData>({ pullCrowdData: [], notificationData: [] });
 
   const cloneCheckboxData = clone(checkboxData);
 
-  const getChildrenUnifiedState = (parentIndex: number) => {
-    const childrenDepartment = cloneCheckboxData.filter(
-      (item) => item.parentId === cloneCheckboxData[parentIndex].id
+  const getChildrenUnifiedState = (
+    dataSource: keyof AllDepartmentDtoData,
+    parentIndex: number
+  ) => {
+    const childrenDepartment = cloneCheckboxData[dataSource].filter(
+      (item) => item.parentId === cloneCheckboxData[dataSource][parentIndex].id
     );
 
     const isAllTrue = childrenDepartment?.every((x) => x?.isSelected === true);
@@ -112,118 +122,179 @@ export const useAction = () => {
     return { isAllTrue, isAllFalse };
   };
 
-  const renderShowLabel = () => {
+  const renderShowLabel = (dataSource: keyof AllDepartmentDtoData) => {
     const renderShowLabel: DepartmentDto[] = [];
 
-    cloneCheckboxData.forEach((item) => {
+    cloneCheckboxData[dataSource].forEach((item) => {
       item.isSelected && renderShowLabel.push(item);
     });
 
-    setAutocompleteShowLabel(renderShowLabel);
+    setAutocompleteShowLabel((preValue) => {
+      return { ...preValue, [dataSource]: renderShowLabel };
+    });
   };
 
-  const updateData = (
+  const updateCloneCheckboxData = (
+    dataSource: keyof AllDepartmentDtoData,
     index: number,
     key: keyof DepartmentDto,
     value?: boolean,
     isRebellion?: boolean,
     parentIndex?: number
   ) => {
-    if (value !== undefined) cloneCheckboxData[index][key] = value;
+    if (value !== undefined) cloneCheckboxData[dataSource][index][key] = value;
 
     if (isRebellion !== undefined && isRebellion)
-      cloneCheckboxData[index][key] = !cloneCheckboxData[index][key];
+      cloneCheckboxData[dataSource][index][key] =
+        !cloneCheckboxData[dataSource][index][key];
 
     if (parentIndex !== undefined)
-      cloneCheckboxData[index][key] = cloneCheckboxData[parentIndex][key];
+      cloneCheckboxData[dataSource][index][key] =
+        cloneCheckboxData[dataSource][parentIndex][key];
   };
 
-  const expandTreeCheckbox = (index: number, option: DepartmentDto) => {
-    updateData(index, "isExpand", undefined, true);
+  const expandTreeCheckbox = (
+    dataSource: keyof AllDepartmentDtoData,
+    index: number,
+    option: DepartmentDto
+  ) => {
+    updateCloneCheckboxData(dataSource, index, "isExpand", undefined, true);
 
-    cloneCheckboxData.forEach(
+    cloneCheckboxData[dataSource].forEach(
       (item, index) =>
         item.parentId === option.id &&
-        updateData(index, "isHide", undefined, true)
+        updateCloneCheckboxData(dataSource, index, "isHide", undefined, true)
     );
 
-    setCheckboxData(cloneCheckboxData);
+    setCheckboxData((preValue) => {
+      return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
+    });
   };
 
   const updateParentCheckbox = (
+    dataSource: keyof AllDepartmentDtoData,
     parameterIndex: number,
     option: DepartmentDto
   ) => {
-    updateData(parameterIndex, "indeterminate", false);
+    updateCloneCheckboxData(dataSource, parameterIndex, "indeterminate", false);
 
-    updateData(parameterIndex, "isSelected", undefined, true);
+    updateCloneCheckboxData(
+      dataSource,
+      parameterIndex,
+      "isSelected",
+      undefined,
+      true
+    );
 
-    cloneCheckboxData.forEach((item, index) => {
+    cloneCheckboxData[dataSource].forEach((item, index) => {
       if (item.parentId === option.id) {
-        updateData(index, "isSelected", undefined, undefined, parameterIndex);
+        updateCloneCheckboxData(
+          dataSource,
+          index,
+          "isSelected",
+          undefined,
+          undefined,
+          parameterIndex
+        );
       }
     });
 
-    setCheckboxData(cloneCheckboxData);
+    setCheckboxData((preValue) => {
+      return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
+    });
   };
 
-  const updateChildrenCheckbox = (index: number) => {
-    const parentIndex = cloneCheckboxData.findIndex(
-      (x) => cloneCheckboxData[index].parentId === x.id
+  const updateChildrenCheckbox = (
+    dataSource: keyof AllDepartmentDtoData,
+    index: number
+  ) => {
+    const parentIndex = cloneCheckboxData[dataSource].findIndex(
+      (x) => cloneCheckboxData[dataSource][index].parentId === x.id
     );
 
-    updateData(parentIndex, "indeterminate", true);
+    updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", true);
+    updateCloneCheckboxData(dataSource, index, "isSelected", undefined, true);
 
-    updateData(index, "isSelected", undefined, true);
-
-    if (getChildrenUnifiedState(parentIndex).isAllTrue) {
-      updateData(parentIndex, "indeterminate", false);
-
-      updateData(parentIndex, "isSelected", true);
-    } else if (getChildrenUnifiedState(parentIndex).isAllFalse) {
-      updateData(parentIndex, "indeterminate", false);
-
-      updateData(parentIndex, "isSelected", false);
+    if (getChildrenUnifiedState(dataSource, parentIndex).isAllTrue) {
+      updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", false);
+      updateCloneCheckboxData(dataSource, parentIndex, "isSelected", true);
     }
 
-    setCheckboxData(cloneCheckboxData);
+    if (getChildrenUnifiedState(dataSource, parentIndex).isAllFalse) {
+      updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", false);
+      updateCloneCheckboxData(dataSource, parentIndex, "isSelected", false);
+    }
+
+    setCheckboxData((preValue) => {
+      return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
+    });
   };
 
-  const removeOption = (option: DepartmentDto) => {
+  const removeOption = (
+    dataSource: keyof AllDepartmentDtoData,
+    option: DepartmentDto
+  ) => {
     let parentIndex: number | null = null;
     let removeOptionIndex: number | null = null;
 
-    removeOptionIndex = cloneCheckboxData.findIndex(
+    removeOptionIndex = cloneCheckboxData[dataSource].findIndex(
       (item) => item.id === option.id
     );
 
     if (Object.hasOwn(option, "isExpand")) {
-      cloneCheckboxData.forEach((item, index) => {
-        item.parentId === option.id && updateData(index, "isSelected", false);
+      cloneCheckboxData[dataSource].forEach((item, index) => {
+        item.parentId === option.id &&
+          updateCloneCheckboxData(dataSource, index, "isSelected", false);
       });
 
-      updateData(removeOptionIndex, "isSelected", false);
-      updateData(removeOptionIndex, "indeterminate", false);
+      updateCloneCheckboxData(
+        dataSource,
+        removeOptionIndex,
+        "isSelected",
+        false
+      );
+      updateCloneCheckboxData(
+        dataSource,
+        removeOptionIndex,
+        "indeterminate",
+        false
+      );
     } else {
-      parentIndex = cloneCheckboxData.findIndex(
+      parentIndex = cloneCheckboxData[dataSource].findIndex(
         (x) => x.id === option.parentId
       );
 
-      updateData(parentIndex, "indeterminate", true);
-      updateData(removeOptionIndex, "isSelected", false);
+      updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", true);
+      updateCloneCheckboxData(
+        dataSource,
+        removeOptionIndex,
+        "isSelected",
+        false
+      );
 
-      if (getChildrenUnifiedState(parentIndex).isAllFalse) {
-        updateData(parentIndex, "indeterminate", false);
-        updateData(parentIndex, "isSelected", false);
+      if (getChildrenUnifiedState(dataSource, parentIndex).isAllFalse) {
+        updateCloneCheckboxData(
+          dataSource,
+          parentIndex,
+          "indeterminate",
+          false
+        );
+        updateCloneCheckboxData(dataSource, parentIndex, "isSelected", false);
       }
     }
 
-    setCheckboxData(cloneCheckboxData);
+    setCheckboxData((preValue) => {
+      return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
+    });
   };
 
-  useEffect(() => {
-    renderShowLabel();
-  }, [checkboxData]);
+  useUpdateEffect(() => {
+    renderShowLabel("pullCrowdData");
+  }, [checkboxData.pullCrowdData]);
+
+  useUpdateEffect(() => {
+    renderShowLabel("notificationData");
+  }, [checkboxData.notificationData]);
 
   return {
     flatOptions,
@@ -232,12 +303,9 @@ export const useAction = () => {
     formStyles,
     location,
     checkboxData,
-    cloneCheckboxData,
     autocompleteShowLabel,
     navigate,
-    getChildrenUnifiedState,
     setCheckboxData,
-    updateData,
     expandTreeCheckbox,
     updateParentCheckbox,
     updateChildrenCheckbox,
