@@ -1,4 +1,4 @@
-import { DepartmentDto, useAction } from "./hook";
+import { AllDepartmentData, DepartmentDto, useAction } from "./hook";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
@@ -40,9 +40,103 @@ export const RoleFrom = () => {
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-  const pullCrowdData = "pullCrowdData";
+  const selectDataLabel = (
+    title: string,
+    dataName: keyof AllDepartmentData,
+    optionSource: DepartmentDto[],
+    valueSource: DepartmentDto[],
+    lastItem?: boolean
+  ) => {
+    return (
+      <div className={`${styles.item} ${lastItem && styles.lastItem}`}>
+        <div className={styles.itemSubTitle}>{title}</div>
+        <div className={styles.itemInput}>
+          <Autocomplete
+            size="small"
+            sx={selectStyles}
+            multiple
+            options={optionSource}
+            value={valueSource}
+            disableCloseOnSelect={true}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderOption={(props, option, state) => {
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    onClick={() =>
+                      expandTreeCheckbox(dataName, state.index, option)
+                    }
+                  >
+                    {haveIsExpand(option) &&
+                      (option.isExpand ? (
+                        <ArrowDropDownIcon
+                          fontSize="large"
+                          sx={{ color: "#1876d3", cursor: "pointer" }}
+                        />
+                      ) : (
+                        <ArrowRightIcon
+                          fontSize="large"
+                          sx={{ color: "#1876d3", cursor: "pointer" }}
+                        />
+                      ))}
+                  </div>
+                  {!option.isHide && (
+                    <li
+                      {...props}
+                      style={
+                        haveIsExpand(option)
+                          ? { paddingLeft: 0, flex: 1 }
+                          : { marginLeft: "2.2rem", flex: 1 }
+                      }
+                      onClickCapture={() => {
+                        haveIsExpand(option)
+                          ? updateParentCheckbox(dataName, state.index, option)
+                          : updateChildrenCheckbox(dataName, state.index);
+                      }}
+                    >
+                      <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={optionSource[state.index].isSelected}
+                        indeterminate={optionSource[state.index].indeterminate}
+                        indeterminateIcon={
+                          <IndeterminateCheckBoxIcon fontSize="small" />
+                        }
+                      />
+                      {option.name}
+                    </li>
+                  )}
+                </div>
+              );
+            }}
+            style={{ width: 500 }}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="請選擇" />
+            )}
+            onChange={(_, value, reason, details) => {
+              if (reason === "removeOption" && details?.option)
+                removeOption(dataName, details.option);
 
-  const notificationData = "notificationData";
+              reason === "clear" &&
+                setCheckboxData((preValue) => {
+                  return {
+                    ...preValue,
+                    [dataName]: flatOptions,
+                  };
+                });
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -150,219 +244,19 @@ export const RoleFrom = () => {
         <Card className={styles.card} variant="outlined">
           <Stack spacing={3}>
             <div className={styles.itemTitle}>數據權限</div>
-            <div className={styles.item}>
-              <div className={styles.itemSubTitle}>拉群功能：</div>
-              <div className={styles.itemInput}>
-                <Autocomplete
-                  size="small"
-                  sx={selectStyles}
-                  multiple
-                  options={checkboxData.pullCrowdData}
-                  value={autocompleteShowLabel.pullCrowdData}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  renderOption={(props, option, state) => {
-                    return (
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <div
-                          onClick={() =>
-                            expandTreeCheckbox(
-                              pullCrowdData,
-                              state.index,
-                              option
-                            )
-                          }
-                        >
-                          {haveIsExpand(option) &&
-                            (option.isExpand ? (
-                              <ArrowDropDownIcon
-                                fontSize="large"
-                                sx={{ color: "#1876d3", cursor: "pointer" }}
-                              />
-                            ) : (
-                              <ArrowRightIcon
-                                fontSize="large"
-                                sx={{ color: "#1876d3", cursor: "pointer" }}
-                              />
-                            ))}
-                        </div>
-                        {!option.isHide && (
-                          <li
-                            {...props}
-                            style={
-                              haveIsExpand(option)
-                                ? { paddingLeft: 0, flex: 1 }
-                                : { marginLeft: "2.2rem", flex: 1 }
-                            }
-                            onClickCapture={() => {
-                              haveIsExpand(option)
-                                ? updateParentCheckbox(
-                                    pullCrowdData,
-                                    state.index,
-                                    option
-                                  )
-                                : updateChildrenCheckbox(
-                                    pullCrowdData,
-                                    state.index
-                                  );
-                            }}
-                          >
-                            <Checkbox
-                              icon={icon}
-                              checkedIcon={checkedIcon}
-                              style={{ marginRight: 8 }}
-                              checked={
-                                checkboxData.pullCrowdData[state.index]
-                                  .isSelected
-                              }
-                              indeterminate={
-                                checkboxData.pullCrowdData[state.index]
-                                  .indeterminate
-                              }
-                              indeterminateIcon={
-                                <IndeterminateCheckBoxIcon fontSize="small" />
-                              }
-                            />
-                            {option.name}
-                          </li>
-                        )}
-                      </div>
-                    );
-                  }}
-                  style={{ width: 500 }}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="請選擇" />
-                  )}
-                  onChange={(_, value, reason, details) => {
-                    if (reason === "removeOption" && details?.option)
-                      removeOption(pullCrowdData, details.option);
-
-                    reason === "clear" &&
-                      setCheckboxData((preValue) => {
-                        return {
-                          ...preValue,
-                          pullCrowdData: flatOptions,
-                        };
-                      });
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className={`${styles.item} ${styles.lastItem}`}>
-              <div className={styles.itemSubTitle}>通知功能：</div>
-              <div className={styles.itemInput}>
-                <Autocomplete
-                  size="small"
-                  sx={selectStyles}
-                  multiple
-                  options={checkboxData.notificationData}
-                  value={autocompleteShowLabel.notificationData}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  renderOption={(props, option, state) => {
-                    return (
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <div
-                          onClick={() =>
-                            expandTreeCheckbox(
-                              notificationData,
-                              state.index,
-                              option
-                            )
-                          }
-                        >
-                          {haveIsExpand(option) &&
-                            (option.isExpand ? (
-                              <ArrowDropDownIcon
-                                fontSize="large"
-                                sx={{ color: "#1876d3", cursor: "pointer" }}
-                              />
-                            ) : (
-                              <ArrowRightIcon
-                                fontSize="large"
-                                sx={{ color: "#1876d3", cursor: "pointer" }}
-                              />
-                            ))}
-                        </div>
-                        {!option.isHide && (
-                          <li
-                            {...props}
-                            style={
-                              haveIsExpand(option)
-                                ? { paddingLeft: 0, flex: 1 }
-                                : { marginLeft: "2.2rem", flex: 1 }
-                            }
-                            onClickCapture={() => {
-                              haveIsExpand(option)
-                                ? updateParentCheckbox(
-                                    notificationData,
-                                    state.index,
-                                    option
-                                  )
-                                : updateChildrenCheckbox(
-                                    notificationData,
-                                    state.index
-                                  );
-                            }}
-                          >
-                            <Checkbox
-                              icon={icon}
-                              checkedIcon={checkedIcon}
-                              style={{ marginRight: 8 }}
-                              checked={
-                                checkboxData.notificationData[state.index]
-                                  .isSelected
-                              }
-                              indeterminate={
-                                checkboxData.notificationData[state.index]
-                                  .indeterminate
-                              }
-                              indeterminateIcon={
-                                <IndeterminateCheckBoxIcon fontSize="small" />
-                              }
-                            />
-                            {option.name}
-                          </li>
-                        )}
-                      </div>
-                    );
-                  }}
-                  style={{ width: 500 }}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="請選擇" />
-                  )}
-                  onChange={(_, value, reason, details) => {
-                    if (reason === "removeOption" && details?.option)
-                      removeOption(notificationData, details.option);
-
-                    reason === "clear" &&
-                      setCheckboxData((preValue) => {
-                        return {
-                          ...preValue,
-                          notificationData: flatOptions,
-                        };
-                      });
-                  }}
-                />
-              </div>
-            </div>
+            {selectDataLabel(
+              "拉群功能：",
+              "pullCrowdData",
+              checkboxData.pullCrowdData,
+              autocompleteShowLabel.pullCrowdData
+            )}
+            {selectDataLabel(
+              "通知功能：",
+              "notificationData",
+              checkboxData.notificationData,
+              autocompleteShowLabel.notificationData,
+              true
+            )}
           </Stack>
         </Card>
       </Stack>
