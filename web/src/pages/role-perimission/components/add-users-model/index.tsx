@@ -3,13 +3,11 @@ import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useState } from "react";
 import { TreeNode } from "./props";
-import { TreeSelectList } from "../tree-select";
 
-export interface TreeSelectRef {
-  selectNode: (item: TreeNode) => void;
-}
+import { useRenderListItemAction } from "../tree-select/hook";
+import { TreeSelectList } from "../tree-select";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -25,9 +23,10 @@ export const AddUsersModel = (props: {
     setSearchValue(value);
   };
 
-  const treeSelectRef = useRef<TreeSelectRef>(null);
-
-  const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
+  const { selectNode, alreadySelectData } = useRenderListItemAction(
+    treeData,
+    searchValue
+  );
 
   return (
     <div className={styles.wrap}>
@@ -52,12 +51,7 @@ export const AddUsersModel = (props: {
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <TreeSelectList
-            treeData={treeData}
-            searchValue={searchValue}
-            treeRef={treeSelectRef}
-            setSelectedData={(data) => setAlreadySelectData(data)}
-          />
+          <TreeSelectList treeData={treeData} searchValue={searchValue} />
         </div>
       </div>
       <div className={styles.rightGroupBox}>
@@ -74,12 +68,9 @@ export const AddUsersModel = (props: {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
-
                   <CloseIcon
                     className={styles.delete}
-                    onClick={() => {
-                      treeSelectRef.current?.selectNode(selectItems);
-                    }}
+                    onClick={() => selectNode(selectItems)}
                   />
                 </div>
               );
