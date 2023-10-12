@@ -3,7 +3,7 @@ import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { RefObject, useState } from "react";
+import { LegacyRef, RefObject, useRef, useState } from "react";
 import { TreeNode } from "./props";
 
 import { useRenderListItemAction } from "../tree-select/hook";
@@ -23,10 +23,14 @@ export const AddUsersModel = (props: {
     setSearchValue(value);
   };
 
-  const { selectNode, alreadySelectData } = useRenderListItemAction(
-    treeData,
-    searchValue
-  );
+  const treeRef = useRef<any>(null);
+
+  // const { selectNode, alreadySelectData } = useRenderListItemAction(
+  //   treeData,
+  //   searchValue
+  // );
+
+  const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
 
   return (
     <div className={styles.wrap}>
@@ -51,7 +55,12 @@ export const AddUsersModel = (props: {
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <TreeSelectList treeData={treeData} searchValue={searchValue} />
+          <TreeSelectList
+            ref={treeRef}
+            setSelectedData={(data) => setAlreadySelectData(data)}
+            treeData={treeData}
+            searchValue={searchValue}
+          />
         </div>
       </div>
       <div className={styles.rightGroupBox}>
@@ -68,10 +77,12 @@ export const AddUsersModel = (props: {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
-                  <CloseIcon
-                    className={styles.delete}
-                    onClick={() => selectNode(selectItems)}
-                  />
+                  {treeRef && treeRef.current && (
+                    <CloseIcon
+                      className={styles.delete}
+                      onClick={() => treeRef.current.selectNode(selectItems)}
+                    />
+                  )}
                 </div>
               );
             })}

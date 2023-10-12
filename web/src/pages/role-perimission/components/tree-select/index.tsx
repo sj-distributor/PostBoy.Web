@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
 import {
   Box,
   Checkbox,
@@ -17,8 +17,10 @@ import { TreeNode } from "../add-users-model/props";
 
 export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
+  setSelectedData: (data: TreeNode[]) => void;
   searchValue: string;
-}> = ({ treeData, searchValue }) => {
+  ref: React.Ref<any>;
+}> = React.forwardRef(({ treeData, searchValue, setSelectedData }, ref) => {
   const {
     isSearch,
     searchDisplayTreeData,
@@ -26,9 +28,26 @@ export const TreeSelectList: React.FC<{
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
+    flatTreeTotalListData,
     selectNode,
     toggleNode,
   } = useRenderListItemAction(treeData, searchValue);
+
+  useEffect(() => {
+    setSelectedData(
+      flatTreeTotalListData.filter(({ id }) =>
+        [...selectedNodes].find((item) => item === id)
+      )
+    );
+  }, [selectedNodes]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      selectNode,
+    }),
+    []
+  );
 
   const renderListItem: React.FC<{
     index: number;
@@ -95,4 +114,4 @@ export const TreeSelectList: React.FC<{
       </Box>
     </>
   );
-};
+});
