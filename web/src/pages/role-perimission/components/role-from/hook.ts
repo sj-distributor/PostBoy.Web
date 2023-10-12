@@ -26,11 +26,11 @@ export const useAction = () => {
       {
         higherDepartment: {
           name: "WXF Office",
-          id: "666",
+          id: "888",
           childrenDepartment: [
-            { name: "Operating Support Center", id: "11" },
-            { name: "Department A", id: "22" },
-            { name: "Department B", id: "33" },
+            { name: "Operating Support Center", id: "81" },
+            { name: "Department A", id: "82" },
+            { name: "Department B", id: "83" },
           ],
         },
       },
@@ -39,8 +39,8 @@ export const useAction = () => {
           name: "IS Office",
           id: "999",
           childrenDepartment: [
-            { name: "Department C", id: "11" },
-            { name: "Department D", id: "22" },
+            { name: "Department C", id: "91" },
+            { name: "Department D", id: "92" },
           ],
         },
       },
