@@ -107,7 +107,7 @@ export const useAction = () => {
 
   const cloneCheckboxData = clone(checkboxData);
 
-  const haveIsExpand = (option: DepartmentDto) => {
+  const isHaveExpand = (option: DepartmentDto) => {
     return Object.hasOwn(option, "isExpand");
   };
 
@@ -249,7 +249,7 @@ export const useAction = () => {
       (item) => item.id === option.id
     );
 
-    if (haveIsExpand(option)) {
+    if (isHaveExpand(option)) {
       cloneCheckboxData[dataSource].forEach((item, index) => {
         item.parentId === option.id &&
           updateCloneCheckboxData(dataSource, index, "isSelected", false);
@@ -314,7 +314,7 @@ export const useAction = () => {
     autocompleteShowLabel,
     navigate,
     setCheckboxData,
-    haveIsExpand,
+    isHaveExpand,
     expandTreeCheckbox,
     updateParentCheckbox,
     updateChildrenCheckbox,

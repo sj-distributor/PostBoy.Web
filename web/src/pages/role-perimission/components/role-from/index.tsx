@@ -29,7 +29,7 @@ export const RoleFrom = () => {
     autocompleteShowLabel,
     navigate,
     setCheckboxData,
-    haveIsExpand,
+    isHaveExpand,
     expandTreeCheckbox,
     updateParentCheckbox,
     updateChildrenCheckbox,
@@ -73,7 +73,7 @@ export const RoleFrom = () => {
                       expandTreeCheckbox(dataName, state.index, option)
                     }
                   >
-                    {haveIsExpand(option) &&
+                    {isHaveExpand(option) &&
                       (option.isExpand ? (
                         <ArrowDropDownIcon
                           fontSize="large"
@@ -90,12 +90,12 @@ export const RoleFrom = () => {
                     <li
                       {...props}
                       style={
-                        haveIsExpand(option)
+                        isHaveExpand(option)
                           ? { paddingLeft: 0, flex: 1 }
                           : { marginLeft: "2.2rem", flex: 1 }
                       }
                       onClickCapture={() => {
-                        haveIsExpand(option)
+                        isHaveExpand(option)
                           ? updateParentCheckbox(dataName, state.index, option)
                           : updateChildrenCheckbox(dataName, state.index);
                       }}
