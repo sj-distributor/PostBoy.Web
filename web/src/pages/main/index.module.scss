@@ -1,6 +1,6 @@
 $navBackgroundColor: #ffffff;
 $aColor: #000000;
-$aClickColor: #30cea3;
+$aClickColor: #1677ff;
 
 .main {
   display: flex;
@@ -32,6 +32,7 @@ $aClickColor: #30cea3;
         .itemClick {
           color: $aClickColor;
           text-decoration: none;
+          font-weight: bolder;
         }
 
         .iconTitleContainer {

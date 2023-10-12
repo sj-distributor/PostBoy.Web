@@ -51,14 +51,14 @@ const TreeViewSelector = ({
     flattenList,
     selectedList,
     loading,
-    handleClear,
-    handleDeptOrUserClick,
-    handleTypeIsCanSelect,
-    foldMapGetter,
     foldMap,
     isDirectTeamMembers,
     promptText,
     openError,
+    handleClear,
+    handleDeptOrUserClick,
+    handleTypeIsCanSelect,
+    getUniqueId,
     handleGetAllTeamMembers,
   } = useAction({
     appId,
@@ -78,22 +78,6 @@ const TreeViewSelector = ({
           justifyContent: "center",
         }
       : {};
-
-  const recursiveRenderDeptList = (
-    data: IDepartmentAndUserListValue[],
-    pl: number,
-    isDivider: boolean
-  ) => {
-    const result = (
-      <TreeList
-        data={data}
-        handleDeptOrUserClick={handleDeptOrUserClick}
-        foldMap={foldMap}
-        schemaType={schemaType}
-      />
-    );
-    return result;
-  };
 
   return (
     <>
@@ -136,95 +120,124 @@ const TreeViewSelector = ({
             ...center(),
           }}
         >
-          {foldList && recursiveRenderDeptList(foldList, 0, true)}
+          {foldList && (
+            <TreeList
+              data={foldList}
+              handleDeptOrUserClick={handleDeptOrUserClick}
+              foldMap={foldMap}
+              schemaType={schemaType}
+            />
+          )}
         </div>
       )}
 
       {children}
 
       {flattenList && displayMode !== TreeViewDisplayMode.Tree && (
-        <div {...flattenSelectorProps}>
-          <Autocomplete
-            disablePortal
-            openOnFocus
-            multiple
-            disableCloseOnSelect
-            size="small"
-            limitTags={20}
-            value={selectedList}
-            options={flattenList}
-            loading={loading}
-            filterOptions={(options, state) => {
-              return onFilterDeptAndUsers(options, state);
-            }}
-            className={selectedList.length > 20 ? "limiting" : ""}
-            sx={{
-              "& .MuiInputBase-root.MuiOutlinedInput-root": {
-                maxHeight: "20rem",
-                overflowY: "auto",
-              },
-              "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderBottomColor: "transparent",
-                borderLeftColor: "transparent",
-                borderRightColor: "transparent",
-              },
-            }}
-            getOptionLabel={(option) => option.name}
-            renderTags={(value) => {
-              return (
-                <TagsComponent
-                  selectedList={value}
-                  limit={selectedList.length}
-                  handleClear={handleClear}
+        <>
+          <div className={styles.selectInputTitle}>结果</div>
+          <div {...flattenSelectorProps} className={styles.selectAutocomplete}>
+            <Autocomplete
+              disablePortal
+              openOnFocus
+              multiple
+              disableCloseOnSelect
+              size="small"
+              limitTags={20}
+              value={selectedList}
+              options={flattenList}
+              loading={loading}
+              filterOptions={(options, state) => {
+                return onFilterDeptAndUsers(options, state);
+              }}
+              className={selectedList.length > 20 ? "limiting" : ""}
+              sx={{
+                "& .MuiInputBase-root.MuiOutlinedInput-root": {
+                  maxHeight: "10rem",
+                  overflowY: "auto",
+                  position: "unset",
+                },
+                "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderBottomColor: "transparent",
+                  borderLeftColor: "transparent",
+                  borderRightColor: "transparent",
+                },
+                "& .MuiTextField-root": {
+                  marginTop: 0,
+                  marginBottom: 0,
+                },
+                "& .MuiOutlinedInput-root .MuiAutocomplete-endAdornment": {
+                  right: 20,
+                },
+              }}
+              getOptionLabel={(option) => option.name}
+              renderTags={(value) => {
+                return (
+                  <TagsComponent
+                    selectedList={value}
+                    limit={selectedList.length}
+                    handleClear={handleClear}
+                  />
+                );
+              }}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              groupBy={(option) => {
+                return String(uuidv4());
+              }}
+              componentsProps={{
+                paper: { elevation: 3 },
+                popper: {
+                  placement: "top",
+                },
+              }}
+              renderGroup={(params) => (
+                <div key={String(uuidv4())}>{params.children}</div>
+              )}
+              renderOption={(props, option) => {
+                let style = Object.assign(
+                  option.type === DepartmentAndUserType.Department
+                    ? { color: "#666" }
+                    : { paddingLeft: "2rem" },
+                  { fontSize: "0.9rem" }
+                );
+                props.onClick = () => {
+                  const data = foldMap.get(getUniqueId(option));
+
+                  handleTypeIsCanSelect(canSelect, option.type) &&
+                    handleDeptOrUserClick(
+                      ClickType.Select,
+                      data ?? option,
+                      true
+                    );
+                };
+                return (
+                  <li {...props} style={style}>
+                    {option.name}
+                  </li>
+                );
+              }}
+              onChange={(e, value, reason) => {
+                handleClear(value as IDepartmentAndUserListValue[], reason);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  className={styles.InputButton}
+                  margin="dense"
+                  type="text"
+                  label={inputLabel ?? ""}
+                  sx={{
+                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                      {
+                        border: "none",
+                      },
+                  }}
                 />
-              );
-            }}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            groupBy={(option) => {
-              return String(uuidv4());
-            }}
-            componentsProps={{
-              paper: { elevation: 3 },
-              popper: {
-                placement: "top",
-              },
-            }}
-            renderGroup={(params) => (
-              <div key={String(uuidv4())}>{params.children}</div>
-            )}
-            renderOption={(props, option) => {
-              let style = Object.assign(
-                option.type === DepartmentAndUserType.Department
-                  ? { color: "#666" }
-                  : { paddingLeft: "2rem" },
-                { fontSize: "0.9rem" }
-              );
-              props.onClick = () => {
-                const data = foldMapGetter(option.id);
-                handleTypeIsCanSelect(canSelect, option.type) &&
-                  handleDeptOrUserClick(ClickType.Select, data ?? option, true);
-              };
-              return (
-                <li {...props} style={style}>
-                  {option.name}
-                </li>
-              );
-            }}
-            onChange={(e, value, reason) => {
-              handleClear(value as IDepartmentAndUserListValue[], reason);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                size="small"
-                className={styles.InputButton}
-                margin="dense"
-                type="text"
-                label={inputLabel ?? ""}
-              />
-            )}
-          />
-        </div>
+              )}
+            />
+          </div>
+        </>
       )}
     </>
   );

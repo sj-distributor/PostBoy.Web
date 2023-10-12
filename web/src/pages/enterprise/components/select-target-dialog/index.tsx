@@ -137,11 +137,6 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                     <TreeViewSelector
                       appId={AppId}
                       inputValue={""}
-                      flattenSelectorProps={{
-                        style: {
-                          marginTop: "1rem",
-                        },
-                      }}
                       sourceData={{
                         foldData: departmentKeyValue.data,
                         flattenData: flattenDepartmentList,
@@ -151,7 +146,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                         setDepartmentSelectedList(value)
                       }
                       inputLabel={
-                        sendType === SendObjOrGroup.Object ? "结果" : "用户搜索"
+                        sendType === SendObjOrGroup.Object ? "" : "用户搜索"
                       }
                       displayMode={
                         clickName === "选择发送目标" &&
