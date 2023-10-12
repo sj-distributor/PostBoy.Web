@@ -40,7 +40,7 @@ export const RoleFrom = () => {
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-  const selectDataLabel = (
+  const renderInputBox = (
     title: string,
     dataName: keyof AllDepartmentData,
     optionSource: DepartmentDto[],
@@ -244,13 +244,13 @@ export const RoleFrom = () => {
         <Card className={styles.card} variant="outlined">
           <Stack spacing={3}>
             <div className={styles.itemTitle}>數據權限</div>
-            {selectDataLabel(
+            {renderInputBox(
               "拉群功能：",
               "pullCrowdData",
               checkboxData.pullCrowdData,
               autocompleteShowLabel.pullCrowdData
             )}
-            {selectDataLabel(
+            {renderInputBox(
               "通知功能：",
               "notificationData",
               checkboxData.notificationData,
