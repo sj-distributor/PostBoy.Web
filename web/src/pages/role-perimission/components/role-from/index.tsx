@@ -69,6 +69,9 @@ export const RoleFrom = () => {
                   }}
                 >
                   <div
+                    style={{
+                      translate: "0 .3125rem",
+                    }}
                     onClick={() =>
                       expandTreeCheckbox(dataName, state.index, option)
                     }
