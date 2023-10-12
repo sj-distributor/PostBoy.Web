@@ -29,6 +29,7 @@ export const RoleFrom = () => {
     autocompleteShowLabel,
     navigate,
     setCheckboxData,
+    haveIsExpand,
     expandTreeCheckbox,
     updateParentCheckbox,
     updateChildrenCheckbox,
@@ -38,6 +39,10 @@ export const RoleFrom = () => {
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+  const pullCrowdData = "pullCrowdData";
+
+  const notificationData = "notificationData";
 
   return (
     <div className={styles.container}>
@@ -170,13 +175,13 @@ export const RoleFrom = () => {
                         <div
                           onClick={() =>
                             expandTreeCheckbox(
-                              "pullCrowdData",
+                              pullCrowdData,
                               state.index,
                               option
                             )
                           }
                         >
-                          {Object.hasOwn(option, "isExpand") &&
+                          {haveIsExpand(option) &&
                             (option.isExpand ? (
                               <ArrowDropDownIcon
                                 fontSize="large"
@@ -193,19 +198,19 @@ export const RoleFrom = () => {
                           <li
                             {...props}
                             style={
-                              Object.hasOwn(option, "isExpand")
+                              haveIsExpand(option)
                                 ? { paddingLeft: 0, flex: 1 }
                                 : { marginLeft: "2.2rem", flex: 1 }
                             }
                             onClickCapture={() => {
-                              Object.hasOwn(option, "isExpand")
+                              haveIsExpand(option)
                                 ? updateParentCheckbox(
-                                    "pullCrowdData",
+                                    pullCrowdData,
                                     state.index,
                                     option
                                   )
                                 : updateChildrenCheckbox(
-                                    "pullCrowdData",
+                                    pullCrowdData,
                                     state.index
                                   );
                             }}
@@ -238,7 +243,7 @@ export const RoleFrom = () => {
                   )}
                   onChange={(_, value, reason, details) => {
                     if (reason === "removeOption" && details?.option)
-                      removeOption("pullCrowdData", details.option);
+                      removeOption(pullCrowdData, details.option);
 
                     reason === "clear" &&
                       setCheckboxData((preValue) => {
@@ -277,13 +282,13 @@ export const RoleFrom = () => {
                         <div
                           onClick={() =>
                             expandTreeCheckbox(
-                              "notificationData",
+                              notificationData,
                               state.index,
                               option
                             )
                           }
                         >
-                          {Object.hasOwn(option, "isExpand") &&
+                          {haveIsExpand(option) &&
                             (option.isExpand ? (
                               <ArrowDropDownIcon
                                 fontSize="large"
@@ -300,19 +305,19 @@ export const RoleFrom = () => {
                           <li
                             {...props}
                             style={
-                              Object.hasOwn(option, "isExpand")
+                              haveIsExpand(option)
                                 ? { paddingLeft: 0, flex: 1 }
                                 : { marginLeft: "2.2rem", flex: 1 }
                             }
                             onClickCapture={() => {
-                              Object.hasOwn(option, "isExpand")
+                              haveIsExpand(option)
                                 ? updateParentCheckbox(
-                                    "notificationData",
+                                    notificationData,
                                     state.index,
                                     option
                                   )
                                 : updateChildrenCheckbox(
-                                    "notificationData",
+                                    notificationData,
                                     state.index
                                   );
                             }}
@@ -345,7 +350,7 @@ export const RoleFrom = () => {
                   )}
                   onChange={(_, value, reason, details) => {
                     if (reason === "removeOption" && details?.option)
-                      removeOption("notificationData", details.option);
+                      removeOption(notificationData, details.option);
 
                     reason === "clear" &&
                       setCheckboxData((preValue) => {

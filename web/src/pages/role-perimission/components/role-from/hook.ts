@@ -5,7 +5,7 @@ import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 
 export type DepartmentDto = {
-  [key: string]: any;
+  [key: string]: string | boolean | undefined;
   name: string;
   id: string;
   isSelected: boolean;
@@ -15,7 +15,7 @@ export type DepartmentDto = {
   isHide?: boolean;
 };
 
-export type AllDepartmentDtoData = {
+export type AllDepartmentData = {
   pullCrowdData: DepartmentDto[];
   notificationData: DepartmentDto[];
 };
@@ -97,32 +97,40 @@ export const useAction = () => {
     return accumulator;
   }, [] as DepartmentDto[]);
 
-  const [checkboxData, setCheckboxData] = useState<AllDepartmentDtoData>({
+  const [checkboxData, setCheckboxData] = useState<AllDepartmentData>({
     pullCrowdData: flatOptions,
     notificationData: flatOptions,
   });
 
   const [autocompleteShowLabel, setAutocompleteShowLabel] =
-    useState<AllDepartmentDtoData>({ pullCrowdData: [], notificationData: [] });
+    useState<AllDepartmentData>({ pullCrowdData: [], notificationData: [] });
 
   const cloneCheckboxData = clone(checkboxData);
 
+  const haveIsExpand = (option: DepartmentDto) => {
+    return Object.hasOwn(option, "isExpand");
+  };
+
   const getChildrenUnifiedState = (
-    dataSource: keyof AllDepartmentDtoData,
+    dataSource: keyof AllDepartmentData,
     parentIndex: number
   ) => {
     const childrenDepartment = cloneCheckboxData[dataSource].filter(
       (item) => item.parentId === cloneCheckboxData[dataSource][parentIndex].id
     );
 
-    const isAllTrue = childrenDepartment?.every((x) => x?.isSelected === true);
+    let isAllTrue = true;
+    let isAllFalse = true;
 
-    const isAllFalse = childrenDepartment?.every((x) => x.isSelected === false);
+    for (const child of childrenDepartment) {
+      if (child.isSelected) isAllFalse = false;
+      else isAllTrue = false;
+    }
 
     return { isAllTrue, isAllFalse };
   };
 
-  const renderShowLabel = (dataSource: keyof AllDepartmentDtoData) => {
+  const renderShowLabel = (dataSource: keyof AllDepartmentData) => {
     const renderShowLabel: DepartmentDto[] = [];
 
     cloneCheckboxData[dataSource].forEach((item) => {
@@ -135,7 +143,7 @@ export const useAction = () => {
   };
 
   const updateCloneCheckboxData = (
-    dataSource: keyof AllDepartmentDtoData,
+    dataSource: keyof AllDepartmentData,
     index: number,
     key: keyof DepartmentDto,
     value?: boolean,
@@ -154,7 +162,7 @@ export const useAction = () => {
   };
 
   const expandTreeCheckbox = (
-    dataSource: keyof AllDepartmentDtoData,
+    dataSource: keyof AllDepartmentData,
     index: number,
     option: DepartmentDto
   ) => {
@@ -172,7 +180,7 @@ export const useAction = () => {
   };
 
   const updateParentCheckbox = (
-    dataSource: keyof AllDepartmentDtoData,
+    dataSource: keyof AllDepartmentData,
     parameterIndex: number,
     option: DepartmentDto
   ) => {
@@ -205,7 +213,7 @@ export const useAction = () => {
   };
 
   const updateChildrenCheckbox = (
-    dataSource: keyof AllDepartmentDtoData,
+    dataSource: keyof AllDepartmentData,
     index: number
   ) => {
     const parentIndex = cloneCheckboxData[dataSource].findIndex(
@@ -231,7 +239,7 @@ export const useAction = () => {
   };
 
   const removeOption = (
-    dataSource: keyof AllDepartmentDtoData,
+    dataSource: keyof AllDepartmentData,
     option: DepartmentDto
   ) => {
     let parentIndex: number | null = null;
@@ -241,7 +249,7 @@ export const useAction = () => {
       (item) => item.id === option.id
     );
 
-    if (Object.hasOwn(option, "isExpand")) {
+    if (haveIsExpand(option)) {
       cloneCheckboxData[dataSource].forEach((item, index) => {
         item.parentId === option.id &&
           updateCloneCheckboxData(dataSource, index, "isSelected", false);
@@ -306,6 +314,7 @@ export const useAction = () => {
     autocompleteShowLabel,
     navigate,
     setCheckboxData,
+    haveIsExpand,
     expandTreeCheckbox,
     updateParentCheckbox,
     updateChildrenCheckbox,
