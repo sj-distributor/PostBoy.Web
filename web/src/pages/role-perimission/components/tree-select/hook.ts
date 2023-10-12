@@ -1,8 +1,11 @@
 import { clone } from "ramda";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
 
-export const useRenderListItemAction = (treeData: TreeNode[]) => {
+export const useRenderListItemAction = (
+  treeData: TreeNode[],
+  searchValue: string
+) => {
   //平铺树结构
   const flattenTreeTotalList = (
     tree: TreeNode[],
@@ -119,15 +122,15 @@ export const useRenderListItemAction = (treeData: TreeNode[]) => {
     return displayList;
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-
+  const handleSearchChange = (value: string) => {
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
       return item.title.toLowerCase().includes(value.toLowerCase());
     });
+
     const idRouteList = [
       ...new Set(targetSearchFilterList.map(({ idRoute }) => idRoute).flat()),
     ];
+
     const displayData: TreeNode[] = idRouteList
       .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
       .filter((item): item is TreeNode => !!item);
@@ -140,17 +143,17 @@ export const useRenderListItemAction = (treeData: TreeNode[]) => {
           ...idRouteList,
         ]),
       }));
+
       setSearchDisplayTreeData(displayData);
     } else {
       setExpandedNodes({
         displayExpandedNodes: expandedNodes.displayExpandedNodes,
         searchExpandedNodes: new Set(),
       });
+
       setSearchDisplayTreeData([]);
     }
   };
-
-  console.log(searchDisplayTreeData);
 
   const toggleNode = (currentClickItem: TreeNode) => {
     const currentNodeId = currentClickItem.id;
@@ -260,6 +263,10 @@ export const useRenderListItemAction = (treeData: TreeNode[]) => {
     setSelectedNodes(newSelectedNodes);
     setIndeterminateNodes(newIndeterminateNode);
   };
+
+  useEffect(() => {
+    handleSearchChange(searchValue);
+  }, [searchValue]);
 
   return {
     isSearch,

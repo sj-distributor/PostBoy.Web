@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  TextField,
-} from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { TreeNode } from "./props";
+
 import { useRenderListItemAction } from "../tree-select/hook";
 import { TreeSelectList } from "../tree-select";
 
@@ -23,8 +16,17 @@ export const AddUsersModel = (props: {
 
   const { treeData } = useAction();
 
-  const { selectNode, handleSearchChange, alreadySelectData } =
-    useRenderListItemAction(treeData);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchValue(value);
+  };
+
+  const { selectNode, alreadySelectData } = useRenderListItemAction(
+    treeData,
+    searchValue
+  );
 
   return (
     <div className={styles.wrap}>
@@ -45,10 +47,11 @@ export const AddUsersModel = (props: {
           placeholder="搜索"
           size="small"
           onChange={handleSearchChange}
+          value={searchValue}
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <TreeSelectList treeData={treeData} />
+          <TreeSelectList treeData={treeData} searchValue={searchValue} />
         </div>
       </div>
       <div className={styles.rightGroupBox}>

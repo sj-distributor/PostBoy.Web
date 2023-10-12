@@ -1,7 +1,4 @@
-import { clone } from "ramda";
-import { useMemo, useState } from "react";
 import { TreeNode } from "./props";
-import { useRenderListItemAction } from "../tree-select/hook";
 
 export const useAction = () => {
   const treeData: TreeNode[] = [

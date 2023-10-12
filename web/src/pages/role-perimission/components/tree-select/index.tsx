@@ -5,6 +5,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  TextField,
 } from "@mui/material";
 import { FixedSizeList } from "react-window";
 
@@ -16,7 +17,8 @@ import { TreeNode } from "../add-users-model/props";
 
 export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
-}> = ({ treeData }) => {
+  searchValue: string;
+}> = ({ treeData, searchValue }) => {
   const {
     isSearch,
     searchDisplayTreeData,
@@ -26,7 +28,7 @@ export const TreeSelectList: React.FC<{
     indeterminateNodes,
     selectNode,
     toggleNode,
-  } = useRenderListItemAction(treeData);
+  } = useRenderListItemAction(treeData, searchValue);
 
   const renderListItem: React.FC<{
     index: number;
@@ -76,19 +78,21 @@ export const TreeSelectList: React.FC<{
   };
 
   return (
-    <Box sx={{ width: "100%", height: 500 }}>
-      <FixedSizeList
-        height={500}
-        itemCount={
-          isSearch
-            ? searchDisplayTreeData.length
-            : displayFlatUpdateTreeData.length
-        }
-        itemSize={46}
-        width={360}
-      >
-        {renderListItem}
-      </FixedSizeList>
-    </Box>
+    <>
+      <Box sx={{ width: "100%", height: 500 }}>
+        <FixedSizeList
+          height={500}
+          itemCount={
+            isSearch
+              ? searchDisplayTreeData.length
+              : displayFlatUpdateTreeData.length
+          }
+          itemSize={46}
+          width={360}
+        >
+          {renderListItem}
+        </FixedSizeList>
+      </Box>
+    </>
   );
 };
