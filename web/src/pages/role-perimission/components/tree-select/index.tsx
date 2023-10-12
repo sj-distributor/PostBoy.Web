@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import {
   Box,
   Checkbox,
@@ -14,11 +14,14 @@ import { ArrowDropDownIcon, ArrowRightIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./index.module.scss";
 import { TreeNode } from "../add-users-model/props";
+import { TreeSelectRef } from "../add-users-model";
 
 export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
   searchValue: string;
-}> = ({ treeData, searchValue }) => {
+  treeRef: React.Ref<any>;
+  setSelectedData: (data: TreeNode[]) => void;
+}> = React.forwardRef(({ treeData, searchValue, setSelectedData }, ref) => {
   const {
     isSearch,
     searchDisplayTreeData,
@@ -28,7 +31,18 @@ export const TreeSelectList: React.FC<{
     indeterminateNodes,
     selectNode,
     toggleNode,
+    flatTreeTotalListData,
   } = useRenderListItemAction(treeData, searchValue);
+
+  useEffect(() => {
+    setSelectedData(
+      flatTreeTotalListData.filter(
+        (item) => selectedNodes.has(item.id) && item.children.length === 0
+      )
+    );
+  }, [selectedNodes]);
+
+  useImperativeHandle(ref, () => ({ selectNode }), []);
 
   const renderListItem: React.FC<{
     index: number;
@@ -95,4 +109,4 @@ export const TreeSelectList: React.FC<{
       </Box>
     </>
   );
-};
+});

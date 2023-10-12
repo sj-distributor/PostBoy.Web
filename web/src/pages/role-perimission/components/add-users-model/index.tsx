@@ -3,11 +3,13 @@ import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { RefObject, useState } from "react";
+import { RefObject, useRef, useState } from "react";
 import { TreeNode } from "./props";
-
-import { useRenderListItemAction } from "../tree-select/hook";
 import { TreeSelectList } from "../tree-select";
+
+export interface TreeSelectRef {
+  selectNode: (item: TreeNode) => void;
+}
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -23,10 +25,9 @@ export const AddUsersModel = (props: {
     setSearchValue(value);
   };
 
-  const { selectNode, alreadySelectData } = useRenderListItemAction(
-    treeData,
-    searchValue
-  );
+  const treeSelectRef = useRef<TreeSelectRef>(null);
+
+  const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
 
   return (
     <div className={styles.wrap}>
@@ -51,7 +52,12 @@ export const AddUsersModel = (props: {
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
-          <TreeSelectList treeData={treeData} searchValue={searchValue} />
+          <TreeSelectList
+            treeData={treeData}
+            searchValue={searchValue}
+            treeRef={treeSelectRef}
+            setSelectedData={(data) => setAlreadySelectData(data)}
+          />
         </div>
       </div>
       <div className={styles.rightGroupBox}>
@@ -68,9 +74,12 @@ export const AddUsersModel = (props: {
               return (
                 <div className={styles.selectListWrap} key={index}>
                   <div>{selectItems.title}</div>
+
                   <CloseIcon
                     className={styles.delete}
-                    onClick={() => selectNode(selectItems)}
+                    onClick={() => {
+                      treeSelectRef.current?.selectNode(selectItems);
+                    }}
                   />
                 </div>
               );
