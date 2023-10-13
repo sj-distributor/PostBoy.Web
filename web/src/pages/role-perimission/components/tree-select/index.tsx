@@ -88,21 +88,19 @@ export const TreeSelectList: React.FC<{
   };
 
   return (
-    <>
-      <Box sx={{ width: "100%", height: 500 }}>
-        <FixedSizeList
-          height={500}
-          itemCount={
-            isSearch
-              ? searchDisplayTreeData.length
-              : displayFlatUpdateTreeData.length
-          }
-          itemSize={46}
-          width={360}
-        >
-          {renderListItem}
-        </FixedSizeList>
-      </Box>
-    </>
+    <Box sx={{ width: "100%", height: 500 }}>
+      <FixedSizeList
+        height={500}
+        itemCount={
+          isSearch
+            ? searchDisplayTreeData.length
+            : displayFlatUpdateTreeData.length
+        }
+        itemSize={46}
+        width={360}
+      >
+        {renderListItem}
+      </FixedSizeList>
+    </Box>
   );
 });

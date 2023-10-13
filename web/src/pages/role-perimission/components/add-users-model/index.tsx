@@ -46,7 +46,7 @@ export const AddUsersModel = (props: {
           <div className={styles.listTitle}>OPERATION INC.</div>
           <TreeSelectList
             ref={treeSelectRef}
-            setSelectedData={(data) => setAlreadySelectData(data)}
+            setSelectedData={(selectItems) => setAlreadySelectData(selectItems)}
             treeData={treeData}
             searchValue={searchValue}
           />

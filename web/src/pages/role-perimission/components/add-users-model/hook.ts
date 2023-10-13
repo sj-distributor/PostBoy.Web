@@ -106,13 +106,13 @@ export const useAction = () => {
 
   const [searchValue, setSearchValue] = useState("");
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-  };
-
   const treeSelectRef = useRef<TreeSelectRef>(null);
 
   const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
 
   return {
     treeData,
