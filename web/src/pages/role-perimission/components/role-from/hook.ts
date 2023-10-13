@@ -148,13 +148,14 @@ export const useAction = () => {
     dataSource: keyof AllDepartmentData,
     index: number,
     key: keyof DepartmentDto,
-    value?: boolean,
-    isRebellion?: boolean,
+    fixedValue?: boolean,
+    isRebellionSelfValue?: boolean,
     parentIndex?: number
   ) => {
-    if (value !== undefined) cloneCheckboxData[dataSource][index][key] = value;
+    if (fixedValue !== undefined)
+      cloneCheckboxData[dataSource][index][key] = fixedValue;
 
-    if (isRebellion !== undefined && isRebellion)
+    if (isRebellionSelfValue !== undefined && isRebellionSelfValue)
       cloneCheckboxData[dataSource][index][key] =
         !cloneCheckboxData[dataSource][index][key];
 
