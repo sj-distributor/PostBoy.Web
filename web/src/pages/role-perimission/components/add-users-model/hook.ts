@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TreeNode, TreeSelectRef } from "./props";
+import { props } from "ramda";
 
 export const useAction = () => {
   const treeData: TreeNode[] = [
@@ -108,6 +109,12 @@ export const useAction = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
+
+  const searchValueRef = useRef(searchValue);
+
+  useEffect(() => {
+    searchValueRef.current = searchValue;
+  }, [searchValue]);
 
   const treeSelectRef = useRef<TreeSelectRef>(null);
 
