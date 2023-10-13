@@ -152,16 +152,15 @@ export const useAction = () => {
     isRebellionSelfValue?: boolean,
     parentIndex?: number
   ) => {
-    if (fixedValue !== undefined)
+    if (fixedValue !== undefined) {
       cloneCheckboxData[dataSource][index][key] = fixedValue;
-
-    if (isRebellionSelfValue !== undefined && isRebellionSelfValue)
+    } else if (isRebellionSelfValue !== undefined && isRebellionSelfValue) {
       cloneCheckboxData[dataSource][index][key] =
         !cloneCheckboxData[dataSource][index][key];
-
-    if (parentIndex !== undefined)
+    } else if (parentIndex !== undefined) {
       cloneCheckboxData[dataSource][index][key] =
         cloneCheckboxData[dataSource][parentIndex][key];
+    }
   };
 
   const expandTreeCheckbox = (
