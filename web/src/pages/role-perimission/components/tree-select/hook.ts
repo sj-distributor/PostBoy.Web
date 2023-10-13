@@ -131,8 +131,6 @@ export const useRenderListItemAction = (
       .filter((item): item is TreeNode => !!item);
 
     if (value !== "") {
-      console.log(expandedNodes);
-
       setExpandedNodes((prevExpandedNodes) => ({
         ...prevExpandedNodes,
         searchExpandedNodes: new Set([
@@ -140,8 +138,6 @@ export const useRenderListItemAction = (
           ...idRouteList,
         ]),
       }));
-
-      console.log(expandedNodes, "111");
 
       setSearchDisplayTreeData(displayData);
     } else {

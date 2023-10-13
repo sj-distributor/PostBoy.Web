@@ -12,7 +12,8 @@ import { useRenderListItemAction } from "./hook";
 import { ArrowDropDownIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./index.module.scss";
-import { TreeNode, TreeSelectRef } from "../add-users-model/props";
+import { TreeNode } from "../add-users-model/props";
+import { TreeSelectRef } from "./props";
 
 export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
