@@ -1,7 +1,11 @@
 import { useAction } from "./hook";
+import { AllDepartmentData, DepartmentDto } from "./props";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 
 import {
   Autocomplete,
@@ -16,12 +20,128 @@ import {
 } from "@mui/material";
 
 export const RoleFrom = () => {
-  const { options, inputStyles, selectStyles, formStyles, location, navigate } =
-    useAction();
+  const {
+    flatOptions,
+    inputStyles,
+    selectStyles,
+    formStyles,
+    location,
+    checkboxData,
+    showLabel,
+    navigate,
+    setCheckboxData,
+    isHaveExpand,
+    expandTreeCheckbox,
+    updateParentCheckbox,
+    updateChildrenCheckbox,
+    removeOption,
+  } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+  const renderInputBox = (
+    title: string,
+    dataName: keyof AllDepartmentData,
+    optionSource: DepartmentDto[],
+    valueSource: DepartmentDto[],
+    lastItem?: boolean
+  ) => {
+    return (
+      <div className={`${styles.item} ${lastItem && styles.lastItem}`}>
+        <div className={styles.itemSubTitle}>{title}</div>
+        <div className={styles.itemInput}>
+          <Autocomplete
+            size="small"
+            sx={selectStyles}
+            multiple
+            options={optionSource}
+            value={valueSource}
+            disableCloseOnSelect={true}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderOption={(props, option, state) => {
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      translate: "0 .3125rem",
+                    }}
+                    onClick={() =>
+                      expandTreeCheckbox(dataName, state.index, option)
+                    }
+                  >
+                    {isHaveExpand(option) &&
+                      (option.isExpand ? (
+                        <ArrowDropDownIcon
+                          fontSize="large"
+                          sx={{ color: "#1876d3", cursor: "pointer" }}
+                        />
+                      ) : (
+                        <ArrowRightIcon
+                          fontSize="large"
+                          sx={{ color: "#1876d3", cursor: "pointer" }}
+                        />
+                      ))}
+                  </div>
+                  {!option.isHide && (
+                    <li
+                      {...props}
+                      style={
+                        isHaveExpand(option)
+                          ? { paddingLeft: 0, flex: 1 }
+                          : { marginLeft: "2.2rem", flex: 1 }
+                      }
+                      onClickCapture={() => {
+                        isHaveExpand(option)
+                          ? updateParentCheckbox(dataName, state.index, option)
+                          : updateChildrenCheckbox(dataName, state.index);
+                      }}
+                    >
+                      <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={option.isSelected}
+                        indeterminate={option.indeterminate}
+                        indeterminateIcon={
+                          <IndeterminateCheckBoxIcon fontSize="small" />
+                        }
+                      />
+                      {option.name}
+                    </li>
+                  )}
+                </div>
+              );
+            }}
+            style={{ width: 500 }}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="請選擇" />
+            )}
+            onChange={(_, value, reason, details) => {
+              reason === "removeOption" &&
+                details?.option &&
+                removeOption(dataName, details.option);
+
+              reason === "clear" &&
+                setCheckboxData((preValue) => {
+                  return {
+                    ...preValue,
+                    [dataName]: flatOptions,
+                  };
+                });
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -129,65 +249,19 @@ export const RoleFrom = () => {
         <Card className={styles.card} variant="outlined">
           <Stack spacing={3}>
             <div className={styles.itemTitle}>數據權限</div>
-            <div className={styles.item}>
-              <div className={styles.itemSubTitle}>拉群功能：</div>
-              <div className={styles.itemInput}>
-                <Autocomplete
-                  size="small"
-                  sx={selectStyles}
-                  multiple
-                  id="checkboxes-tags-demo"
-                  options={options}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option.label}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option.label}
-                    </li>
-                  )}
-                  style={{ width: 500 }}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="請選擇" />
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className={`${styles.item} ${styles.lastItem}`}>
-              <div className={styles.itemSubTitle}>通知功能：</div>
-              <div className={styles.itemInput}>
-                <Autocomplete
-                  size="small"
-                  sx={selectStyles}
-                  multiple
-                  id="checkboxes-tags-demo"
-                  options={options}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option.label}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option.label}
-                    </li>
-                  )}
-                  style={{ width: 500 }}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="請選擇" />
-                  )}
-                />
-              </div>
-            </div>
+            {renderInputBox(
+              "拉群功能：",
+              "pullCrowdData",
+              checkboxData.pullCrowdData,
+              showLabel.pullCrowdData
+            )}
+            {renderInputBox(
+              "通知功能：",
+              "notificationData",
+              checkboxData.notificationData,
+              showLabel.notificationData,
+              true
+            )}
           </Stack>
         </Card>
       </Stack>

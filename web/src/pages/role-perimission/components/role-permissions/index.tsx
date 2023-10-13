@@ -89,9 +89,15 @@ export const RolePermissions = () => {
             autoComplete="off"
             value={inputVal}
             onChange={handleInputChange}
+            onKeyDown={(event) =>
+              event.key === "Enter" && inputVal && handleSearch()
+            }
           />
           <div className={styles.navIcon}>
-            <IconButton aria-label="Search" onClick={handleSearch}>
+            <IconButton
+              aria-label="Search"
+              onClick={() => inputVal && handleSearch()}
+            >
               <SearchIcon className={styles.navFont} />
             </IconButton>
           </div>
