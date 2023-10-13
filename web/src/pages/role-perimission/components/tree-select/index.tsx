@@ -43,7 +43,9 @@ export const TreeSelectList: React.FC<{
 
     const isSelected = selectedNodes.has(item.id);
 
-    const isExpanded = expandedNodes.displayExpandedNodes.has(item.id);
+    const isExpanded = isSearch
+      ? expandedNodes.searchExpandedNodes.has(item.id)
+      : expandedNodes.displayExpandedNodes.has(item.id);
 
     const isIndeterminate = indeterminateNodes.has(item.id);
 
