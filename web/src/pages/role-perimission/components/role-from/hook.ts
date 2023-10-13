@@ -3,22 +3,7 @@ import { IDepartmentDto } from "../../../../dtos/role";
 import { useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
-
-export type DepartmentDto = {
-  [key: string]: string | boolean | undefined;
-  name: string;
-  id: string;
-  isSelected: boolean;
-  isExpand?: boolean;
-  indeterminate?: boolean;
-  parentId?: string;
-  isHide?: boolean;
-};
-
-export type AllDepartmentData = {
-  pullCrowdData: DepartmentDto[];
-  notificationData: DepartmentDto[];
-};
+import { AllDepartmentData, DepartmentDto } from "./props";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
@@ -133,14 +118,14 @@ export const useAction = () => {
   };
 
   const renderShowLabel = (dataSource: keyof AllDepartmentData) => {
-    const renderShowLabel: DepartmentDto[] = [];
+    const result: DepartmentDto[] = [];
 
     cloneCheckboxData[dataSource].forEach((item) => {
-      item.isSelected && renderShowLabel.push(item);
+      item.isSelected && result.push(item);
     });
 
     setShowLabel((preValue) => {
-      return { ...preValue, [dataSource]: renderShowLabel };
+      return { ...preValue, [dataSource]: result };
     });
   };
 
@@ -223,15 +208,25 @@ export const useAction = () => {
     );
 
     updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", true);
+
     updateCloneCheckboxData(dataSource, index, "isSelected", undefined, true);
 
-    if (getChildrenUnifiedState(dataSource, parentIndex).isAllTrue) {
+    const { isAllTrue, isAllFalse } = getChildrenUnifiedState(
+      dataSource,
+      parentIndex
+    );
+
+    const changeIndeterminateToFalse = () => {
       updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", false);
+    };
+
+    if (isAllTrue) {
+      changeIndeterminateToFalse();
       updateCloneCheckboxData(dataSource, parentIndex, "isSelected", true);
     }
 
-    if (getChildrenUnifiedState(dataSource, parentIndex).isAllFalse) {
-      updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", false);
+    if (isAllFalse) {
+      changeIndeterminateToFalse();
       updateCloneCheckboxData(dataSource, parentIndex, "isSelected", false);
     }
 
@@ -244,10 +239,7 @@ export const useAction = () => {
     dataSource: keyof AllDepartmentData,
     option: DepartmentDto
   ) => {
-    let parentIndex: number | null = null;
-    let removeOptionIndex: number | null = null;
-
-    removeOptionIndex = cloneCheckboxData[dataSource].findIndex(
+    let removeOptionIndex = cloneCheckboxData[dataSource].findIndex(
       (item) => item.id === option.id
     );
 
@@ -263,6 +255,7 @@ export const useAction = () => {
         "isSelected",
         false
       );
+
       updateCloneCheckboxData(
         dataSource,
         removeOptionIndex,
@@ -270,11 +263,12 @@ export const useAction = () => {
         false
       );
     } else {
-      parentIndex = cloneCheckboxData[dataSource].findIndex(
+      let parentIndex = cloneCheckboxData[dataSource].findIndex(
         (x) => x.id === option.parentId
       );
 
       updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", true);
+
       updateCloneCheckboxData(
         dataSource,
         removeOptionIndex,
@@ -289,6 +283,7 @@ export const useAction = () => {
           "indeterminate",
           false
         );
+
         updateCloneCheckboxData(dataSource, parentIndex, "isSelected", false);
       }
     }

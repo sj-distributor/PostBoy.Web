@@ -1,4 +1,5 @@
-import { AllDepartmentData, DepartmentDto, useAction } from "./hook";
+import { useAction } from "./hook";
+import { AllDepartmentData, DepartmentDto } from "./props";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
@@ -107,8 +108,8 @@ export const RoleFrom = () => {
                         icon={icon}
                         checkedIcon={checkedIcon}
                         style={{ marginRight: 8 }}
-                        checked={optionSource[state.index].isSelected}
-                        indeterminate={optionSource[state.index].indeterminate}
+                        checked={option.isSelected}
+                        indeterminate={option.indeterminate}
                         indeterminateIcon={
                           <IndeterminateCheckBoxIcon fontSize="small" />
                         }
@@ -124,7 +125,8 @@ export const RoleFrom = () => {
               <TextField {...params} placeholder="請選擇" />
             )}
             onChange={(_, value, reason, details) => {
-              if (reason === "removeOption" && details?.option)
+              reason === "removeOption" &&
+                details?.option &&
                 removeOption(dataName, details.option);
 
               reason === "clear" &&
