@@ -239,7 +239,7 @@ export const useAction = () => {
     dataSource: keyof AllDepartmentData,
     option: DepartmentDto
   ) => {
-    let removeOptionIndex = cloneCheckboxData[dataSource].findIndex(
+    const removeOptionIndex = cloneCheckboxData[dataSource].findIndex(
       (item) => item.id === option.id
     );
 
@@ -263,7 +263,7 @@ export const useAction = () => {
         false
       );
     } else {
-      let parentIndex = cloneCheckboxData[dataSource].findIndex(
+      const parentIndex = cloneCheckboxData[dataSource].findIndex(
         (x) => x.id === option.parentId
       );
 
