@@ -62,9 +62,9 @@ export const AddUsersModel = (props: {
             />
           </div>
           <div className={styles.selectItemsBox}>
-            {alreadySelectData.map((selectItems: TreeNode, index: number) => {
+            {alreadySelectData.map((selectItems: TreeNode) => {
               return (
-                <div className={styles.selectListWrap} key={index}>
+                <div className={styles.selectListWrap} key={selectItems.id}>
                   <div>{selectItems.title}</div>
                   <CloseIcon
                     className={styles.delete}
