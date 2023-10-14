@@ -1,109 +1,12 @@
 import { clone } from "ramda";
-import { useMemo, useState } from "react";
-import { TreeNode } from "./props";
+import { useEffect, useMemo, useState } from "react";
+import { TreeNode } from "../add-users-model/props";
 
-export const useAction = () => {
-  const treeData: TreeNode[] = [
-    {
-      id: 1,
-      idRoute: [1],
-      title: "节点1",
-      children: [
-        {
-          id: 4,
-          idRoute: [1, 4],
-          title: "节点1-4",
-          children: [
-            {
-              id: 5,
-              idRoute: [1, 4, 5],
-              title: "节点1-4-5",
-              children: [
-                {
-                  id: 6,
-                  idRoute: [1, 4, 5, 6],
-                  title: "节点1-4-5-6",
-                  children: [],
-                },
-                {
-                  id: 12,
-                  idRoute: [1, 4, 5, 12],
-                  title: "节点1-4-5-12",
-                  children: [],
-                },
-                {
-                  id: 9,
-                  idRoute: [1, 4, 5, 9],
-                  title: "节点1-4-5-9",
-                  children: [
-                    {
-                      id: 10,
-                      idRoute: [1, 4, 5, 9, 10],
-                      title: "节点1-4-5-9-10",
-                      children: [],
-                    },
-                    {
-                      id: 11,
-                      idRoute: [1, 4, 5, 9, 11],
-                      title: "节点1-4-5--9-11",
-                      children: [],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 2,
-      idRoute: [2],
-      title: "节点2",
-      children: [
-        {
-          id: 7,
-          idRoute: [2, 7],
-          title: "节点2-7",
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 3,
-      idRoute: [3],
-      title: "节点3",
-      children: [
-        {
-          id: 8,
-          idRoute: [3, 8],
-          title: "节点3-8",
-          children: [
-            {
-              id: 15,
-              idRoute: [3, 8, 15],
-              title: "节点3-8-15",
-              children: [
-                {
-                  id: 16,
-                  idRoute: [3, 8, 15, 16],
-                  title: "节点3-8-15-16",
-                  children: [],
-                },
-                {
-                  id: 17,
-                  idRoute: [3, 8, 15, 17],
-                  title: "节点3-8-15-17",
-                  children: [],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ];
-
+export const useAction = (
+  treeData: TreeNode[],
+  searchValue: string,
+  setSelectedData: (data: TreeNode[]) => void
+) => {
   //平铺树结构
   const flattenTreeTotalList = (
     tree: TreeNode[],
@@ -144,12 +47,6 @@ export const useAction = () => {
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >([]);
-
-  const alreadySelectData: TreeNode[] = useMemo(() => {
-    return flatTreeTotalListData.filter(
-      (item) => selectedNodes.has(item.id) && item.children.length === 0
-    );
-  }, [selectedNodes]);
 
   const isSearch = useMemo(
     () => searchDisplayTreeData.length > 0,
@@ -220,8 +117,7 @@ export const useAction = () => {
     return displayList;
   };
 
-  const handleSearchChange = (event: any) => {
-    const { value } = event.target;
+  const handleSearchChange = (value: string) => {
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
       return item.title.toLowerCase().includes(value.toLowerCase());
     });
@@ -242,12 +138,14 @@ export const useAction = () => {
           ...idRouteList,
         ]),
       }));
+
       setSearchDisplayTreeData(displayData);
     } else {
       setExpandedNodes({
         displayExpandedNodes: expandedNodes.displayExpandedNodes,
         searchExpandedNodes: new Set(),
       });
+
       setSearchDisplayTreeData([]);
     }
   };
@@ -361,16 +259,26 @@ export const useAction = () => {
     setIndeterminateNodes(newIndeterminateNode);
   };
 
+  useEffect(() => {
+    handleSearchChange(searchValue);
+
+    setSelectedData(
+      flatTreeTotalListData.filter(
+        (item) => selectedNodes.has(item.id) && item.children.length === 0
+      )
+    );
+  }, [searchValue, selectedNodes]);
+
   return {
-    alreadySelectData,
     isSearch,
-    displayFlatUpdateTreeData,
     searchDisplayTreeData,
+    displayFlatUpdateTreeData,
     selectedNodes,
     expandedNodes,
     indeterminateNodes,
     selectNode,
     toggleNode,
     handleSearchChange,
+    flatTreeTotalListData,
   };
 };

@@ -5,7 +5,7 @@ import { DataGrid, GridColDef, GridSelectionModel } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import ModalBox from "../../../../components/modal/modal";
-import { AddUsersModel } from "./components/add-users-model";
+import { AddUsersModel } from "../add-users-model";
 
 export const UserList = () => {
   const {
