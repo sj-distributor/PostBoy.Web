@@ -104,7 +104,7 @@ export const useAction = () => {
     },
   ];
 
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const treeSelectRef = useRef<TreeSelectRef>(null);
 

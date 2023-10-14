@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { FixedSizeList } from "react-window";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { useRenderListItemAction } from "./hook";
+import { useAction } from "./hook";
 import { ArrowDropDownIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./index.module.scss";
@@ -30,7 +30,7 @@ export const TreeSelectList: React.FC<{
     indeterminateNodes,
     selectNode,
     toggleNode,
-  } = useRenderListItemAction(treeData, searchValue, setSelectedData);
+  } = useAction(treeData, searchValue, setSelectedData);
 
   useImperativeHandle(ref, () => ({ selectNode }), [selectedNodes]);
 

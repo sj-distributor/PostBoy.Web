@@ -2,7 +2,7 @@ import { clone } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
 
-export const useRenderListItemAction = (
+export const useAction = (
   treeData: TreeNode[],
   searchValue: string,
   setSelectedData: (data: TreeNode[]) => void
