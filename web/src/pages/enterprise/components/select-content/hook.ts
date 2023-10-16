@@ -277,6 +277,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
       workWeChatAppNotification?.toUsers &&
         result.push(...workWeChatAppNotification.toUsers);
+
       tagsValue && result.push(...tagsValue.map((x) => x.tagName));
     } else {
       !!chatId &&
@@ -388,14 +389,21 @@ export const useAction = (props: SelectContentHookProps) => {
           updateMessageJobInformation === undefined &&
           isNewOrUpdate === "new")
       )
-        setSendObject({
-          toUsers: targetSelectedList
-            .filter((e) => e.type === DepartmentAndUserType.User)
-            .map((e) => String(e.id)),
-          toParties: targetSelectedList
-            .filter((e) => e.type === DepartmentAndUserType.Department)
-            .map((e) => String(e.id)),
-        });
+        setSendObject(
+          schemaType
+            ? {
+                toUsers: targetSelectedList.map((e) => String(e.name)),
+                toParties: [],
+              }
+            : {
+                toUsers: targetSelectedList
+                  .filter((e) => e.type === DepartmentAndUserType.User)
+                  .map((e) => String(e.id)),
+                toParties: targetSelectedList
+                  .filter((e) => e.type === DepartmentAndUserType.Department)
+                  .map((e) => String(e.id)),
+              }
+        );
 
       chatId &&
         corpAppValue?.appId &&
