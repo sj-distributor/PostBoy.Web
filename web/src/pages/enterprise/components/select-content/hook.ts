@@ -1,4 +1,5 @@
 import { clone, isEmpty, uniqWith } from "ramda";
+import { validate } from "uuid";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GetCorpAppList,
@@ -389,22 +390,24 @@ export const useAction = (props: SelectContentHookProps) => {
           updateMessageJobInformation === undefined &&
           isNewOrUpdate === "new")
       )
-        setSendObject(
-          schemaType
-            ? {
-                toUsers: targetSelectedList.map((e) => String(e.name)),
-                toParties: [],
-              }
-            : {
-                toUsers: targetSelectedList
-                  .filter((e) => e.type === DepartmentAndUserType.User)
-                  .map((e) => String(e.id)),
-                toParties: targetSelectedList
-                  .filter((e) => e.type === DepartmentAndUserType.Department)
-                  .map((e) => String(e.id)),
-              }
-        );
+        console.log(validate("550e8400-e29b-41d4-a716-446655440000"));
 
+      setSendObject({
+        toUsers: targetSelectedList
+          .filter(
+            (e) =>
+              e.type === DepartmentAndUserType.User || validate(String(e.id))
+          )
+          .map((e) => (validate(String(e.id)) ? e.name : String(e.id))),
+        toParties: targetSelectedList
+          .filter(
+            (e) =>
+              e.type === DepartmentAndUserType.Department &&
+              !validate(String(e.id))
+          )
+          .map((e) => String(e.id)),
+      });
+      console.log(sendObject);
       chatId &&
         corpAppValue?.appId &&
         GetGroupDetail(corpAppValue.appId, chatId).then((data) => {

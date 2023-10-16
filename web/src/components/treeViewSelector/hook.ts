@@ -315,6 +315,12 @@ const useAction = ({
   useEffect(() => {
     let newSelectedList: IDepartmentAndUserListValue[] = [];
 
+    selectedList.map((item) => {
+      !flattenList.some((fList) => fList.name === item.name) &&
+        !newSelectedList.find((dItem) => item.id === dItem.id) &&
+        newSelectedList.push(item);
+    });
+
     foldMap.forEach((item) => {
       if (
         item.selected &&
@@ -506,6 +512,25 @@ const useAction = ({
 
   //初始化选中数据
   useEffect(() => {
+    function filterTopLevelData(data: IDepartmentAndUserListValue[]) {
+      const topLevelData: IDepartmentAndUserListValue[] = [];
+
+      // 创建一个 Map 来存储所有节点，以节点的 "id" 作为键
+      const nodeMap = new Map();
+      data.forEach((node) => {
+        nodeMap.set(node.id, node);
+      });
+
+      // 遍历每个节点，找到没有父节点的节点，将其添加到 topLevelData 数组中
+      data.forEach((node) => {
+        if (!node.parentid || !nodeMap.has(node.parentid)) {
+          topLevelData.push(node);
+        }
+      });
+
+      return topLevelData;
+    }
+
     !loading &&
       handleMapUpdate(
         schemaType
@@ -520,7 +545,11 @@ const useAction = ({
               selectedList.some((clickItem) => clickItem.name === item.name)
             )
       );
-
+    console.log(
+      flattenList.filter((item) =>
+        selectedList.some((clickItem) => clickItem.name === item.name)
+      )
+    );
     GetAuthUser().then((res) => {
       if (!!res) {
         setUserData(res);
