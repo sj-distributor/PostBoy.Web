@@ -11,6 +11,7 @@ import {
 import { IUserResponse } from "../../dtos/user-management";
 import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps } from "./props";
+import { validate } from "uuid";
 
 const useAction = ({
   appId,
@@ -492,8 +493,7 @@ const useAction = ({
       teamMembers?.length &&
       teamMembers.every((tItem) =>
         selectedList.map((item) => item.name).includes(tItem.name)
-      ) &&
-      teamMembers.length <= selectedList.length
+      )
         ? setIsDirectTeamMembers.setFalse()
         : setIsDirectTeamMembers.setTrue();
     })();
@@ -505,8 +505,13 @@ const useAction = ({
 
   //初始化选中数据
   useEffect(() => {
-    !loading &&
-      handleMapUpdate(setFilterChildren(removeDuplicate(selectedList)));
+    const newData = flattenList.filter((item) => {
+      return selectedList.some(
+        (selectedItem) => selectedItem.name === item.name
+      );
+    });
+
+    !loading && handleMapUpdate(setFilterChildren(removeDuplicate(newData)));
 
     GetAuthUser().then((res) => {
       if (!!res) {
