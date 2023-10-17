@@ -373,22 +373,17 @@ const useAction = ({
   };
 
   const setFilterChildren = (arr: IDepartmentAndUserListValue[]) => {
-    // 遍歷數組中的每個對象
+    const childNames = new Set<string>();
+
     arr.forEach((item) => {
       if (item.children.length) {
-        // 檢查item的children是否都存在於數組中
-        const allChildrenExist = item.children.every((child) =>
-          arr.some((obj) => obj.name === child.name)
-        );
-
-        // 如果所有children都存在，則刪除數組中所有爲item的children
-        if (allChildrenExist) {
-          arr = arr.filter(
-            (obj) => !item.children.find((item) => item.name === obj.name)
-          );
-        }
+        item.children.forEach((child) => {
+          childNames.add(child.name);
+        });
       }
     });
+
+    arr = arr.filter((item) => !childNames.has(item.name));
 
     return arr;
   };
