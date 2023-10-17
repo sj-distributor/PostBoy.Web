@@ -60,6 +60,7 @@ const TreeViewSelector = ({
     handleTypeIsCanSelect,
     getUniqueId,
     handleGetAllTeamMembers,
+    removeDuplicate,
   } = useAction({
     appId,
     defaultSelectedList,
@@ -148,7 +149,7 @@ const TreeViewSelector = ({
               options={flattenList}
               loading={loading}
               filterOptions={(options, state) => {
-                return onFilterDeptAndUsers(options, state);
+                return removeDuplicate(onFilterDeptAndUsers(options, state));
               }}
               className={selectedList.length > 20 ? "limiting" : ""}
               sx={{

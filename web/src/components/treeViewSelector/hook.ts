@@ -315,16 +315,10 @@ const useAction = ({
   useEffect(() => {
     let newSelectedList: IDepartmentAndUserListValue[] = [];
 
-    selectedList.map((item) => {
-      !flattenList.some((fList) => fList.name === item.name) &&
-        !newSelectedList.find((dItem) => item.id === dItem.id) &&
-        newSelectedList.push(item);
-    });
-
     foldMap.forEach((item) => {
       if (
         item.selected &&
-        !newSelectedList.find((dItem) => item.id === dItem.id)
+        !newSelectedList.find((dItem) => item.name === dItem.name)
       ) {
         newSelectedList.push(item);
       }
@@ -443,6 +437,20 @@ const useAction = ({
     }
   };
 
+  const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
+    const uniqueNames = new Set<string>();
+    const deduplicatedMembers: IDepartmentAndUserListValue[] = [];
+
+    for (const member of teamMembers) {
+      if (!uniqueNames.has(member.name)) {
+        uniqueNames.add(member.name);
+        deduplicatedMembers.push(member);
+      }
+    }
+
+    return deduplicatedMembers;
+  };
+
   //获取组员
   const getUserTeamMembers = async () => {
     let userName = userData?.userName;
@@ -464,21 +472,6 @@ const useAction = ({
             item.department_leader.length &&
             item.department_leader[0] === userName
         );
-
-    const removeDuplicate = (teamMembers: IDepartmentAndUserListValue[]) => {
-      let len = teamMembers.length;
-      for (let i = 0; i < len; i++) {
-        for (let j = i + 1; j < len; j++) {
-          if (teamMembers[i].name === teamMembers[j].name) {
-            teamMembers.splice(j, 1);
-            len--;
-            j--;
-          }
-        }
-      }
-
-      return teamMembers;
-    };
 
     const data = removeDuplicate(teamMembers ?? []);
 
@@ -512,44 +505,9 @@ const useAction = ({
 
   //初始化选中数据
   useEffect(() => {
-    function filterTopLevelData(data: IDepartmentAndUserListValue[]) {
-      const topLevelData: IDepartmentAndUserListValue[] = [];
-
-      // 创建一个 Map 来存储所有节点，以节点的 "id" 作为键
-      const nodeMap = new Map();
-      data.forEach((node) => {
-        nodeMap.set(node.id, node);
-      });
-
-      // 遍历每个节点，找到没有父节点的节点，将其添加到 topLevelData 数组中
-      data.forEach((node) => {
-        if (!node.parentid || !nodeMap.has(node.parentid)) {
-          topLevelData.push(node);
-        }
-      });
-
-      return topLevelData;
-    }
-
     !loading &&
-      handleMapUpdate(
-        schemaType
-          ? setFilterChildren(
-              flattenList.filter((item) =>
-                selectedList
-                  .filter((item) => item.name === item.id)
-                  .some((clickItem) => clickItem.name === item.name)
-              )
-            )
-          : flattenList.filter((item) =>
-              selectedList.some((clickItem) => clickItem.name === item.name)
-            )
-      );
-    console.log(
-      flattenList.filter((item) =>
-        selectedList.some((clickItem) => clickItem.name === item.name)
-      )
-    );
+      handleMapUpdate(setFilterChildren(removeDuplicate(selectedList)));
+
     GetAuthUser().then((res) => {
       if (!!res) {
         setUserData(res);
@@ -587,6 +545,7 @@ const useAction = ({
     foldMapGetter,
     foldMapSetter,
     getUniqueId,
+    removeDuplicate,
   };
 };
 

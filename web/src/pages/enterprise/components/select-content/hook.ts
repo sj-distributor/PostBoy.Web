@@ -390,24 +390,22 @@ export const useAction = (props: SelectContentHookProps) => {
           updateMessageJobInformation === undefined &&
           isNewOrUpdate === "new")
       )
-        console.log(validate("550e8400-e29b-41d4-a716-446655440000"));
+        setSendObject({
+          toUsers: targetSelectedList
+            .filter(
+              (e) =>
+                e.type === DepartmentAndUserType.User || validate(String(e.id))
+            )
+            .map((e) => (validate(String(e.id)) ? e.name : String(e.id))),
+          toParties: targetSelectedList
+            .filter(
+              (e) =>
+                e.type === DepartmentAndUserType.Department &&
+                !validate(String(e.id))
+            )
+            .map((e) => String(e.id)),
+        });
 
-      setSendObject({
-        toUsers: targetSelectedList
-          .filter(
-            (e) =>
-              e.type === DepartmentAndUserType.User || validate(String(e.id))
-          )
-          .map((e) => (validate(String(e.id)) ? e.name : String(e.id))),
-        toParties: targetSelectedList
-          .filter(
-            (e) =>
-              e.type === DepartmentAndUserType.Department &&
-              !validate(String(e.id))
-          )
-          .map((e) => String(e.id)),
-      });
-      console.log(sendObject);
       chatId &&
         corpAppValue?.appId &&
         GetGroupDetail(corpAppValue.appId, chatId).then((data) => {
