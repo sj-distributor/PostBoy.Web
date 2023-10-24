@@ -58,39 +58,39 @@ export const routerArray: RouteItem[] = [
     icons: <SettingsIcon />,
     element: <Manager />,
   },
-  {
-    path: "/roles",
-    head: "角色权限",
-    icons: <PersonOutlineIcon />,
-    element: <RolePermission />,
-    children: [
-      {
-        path: "",
-        title: "",
-        elementChild: <Navigate to={"/roles/roleList"} />,
-      },
-      {
-        path: "/roles/userList",
-        title: "",
-        elementChild: <UserList />,
-      },
-      {
-        path: "/roles/add",
-        title: "",
-        elementChild: <RoleFrom />,
-      },
-      {
-        path: "/roles/edit/:id",
-        title: "",
-        elementChild: <RoleFrom />,
-      },
-      {
-        path: "/roles/roleList",
-        title: "",
-        elementChild: <RolePermissions />,
-      },
-    ],
-  },
+  // {
+  //   path: "/roles",
+  //   head: "角色权限",
+  //   icons: <PersonOutlineIcon />,
+  //   element: <RolePermission />,
+  //   children: [
+  //     {
+  //       path: "",
+  //       title: "",
+  //       elementChild: <Navigate to={"/roles/roleList"} />,
+  //     },
+  //     {
+  //       path: "/roles/userList",
+  //       title: "",
+  //       elementChild: <UserList />,
+  //     },
+  //     {
+  //       path: "/roles/add",
+  //       title: "",
+  //       elementChild: <RoleFrom />,
+  //     },
+  //     {
+  //       path: "/roles/edit/:id",
+  //       title: "",
+  //       elementChild: <RoleFrom />,
+  //     },
+  //     {
+  //       path: "/roles/roleList",
+  //       title: "",
+  //       elementChild: <RolePermissions />,
+  //     },
+  //   ],
+  // },
   {
     path: "/meeting",
     head: "",
