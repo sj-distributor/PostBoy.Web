@@ -40,6 +40,7 @@ import { annexEditorConfig } from "../../../../uilts/wangEditor";
 import { useBoolean } from "ahooks";
 import useDeptUserData from "../../../../hooks/deptUserData";
 import { Preview } from "@mui/icons-material";
+import { setFilterChildren } from "../../../../uilts/convert-type";
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void;
 
@@ -383,21 +384,6 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isLoadStop]);
 
   useEffect(() => {
-    const setFilterChildren = (arr: IDepartmentAndUserListValue[]) => {
-      const childNames = new Set<string>();
-
-      arr.forEach((item) => {
-        if (item.children.length) {
-          item.children.forEach((child) => {
-            childNames.add(child.name);
-          });
-        }
-      });
-
-      arr = arr.filter((item) => !childNames.has(item.name));
-
-      return arr;
-    };
     const selectedData = schemaType
       ? targetSelectedList
       : setFilterChildren(targetSelectedList);

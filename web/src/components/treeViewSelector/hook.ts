@@ -12,6 +12,7 @@ import { IUserResponse } from "../../dtos/user-management";
 import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps } from "./props";
 import { validate } from "uuid";
+import { setFilterChildren } from "../../uilts/convert-type";
 
 const useAction = ({
   appId,
@@ -370,22 +371,6 @@ const useAction = ({
         prev.filter((item) => item.name !== clickItem?.name)
       );
     }
-  };
-
-  const setFilterChildren = (arr: IDepartmentAndUserListValue[]) => {
-    const childNames = new Set<string>();
-
-    arr.forEach((item) => {
-      if (item.children.length) {
-        item.children.forEach((child) => {
-          childNames.add(child.name);
-        });
-      }
-    });
-
-    arr = arr.filter((item) => !childNames.has(item.name));
-
-    return arr;
   };
 
   //指数组员按钮逻辑
