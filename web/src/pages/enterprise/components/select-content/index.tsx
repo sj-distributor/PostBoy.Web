@@ -9,6 +9,7 @@ import {
   Paper,
   Select,
   TextField,
+  makeStyles,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import styles from "./index.module.scss";
@@ -464,6 +465,23 @@ const SelectContent = memo(
                       ? option === value
                       : false
                   }
+                  sx={{
+                    "& .MuiInputBase-root.MuiOutlinedInput-root": {
+                      maxHeight: "15rem",
+                      overflowY: "auto",
+                      position: "unset",
+                    },
+                    "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderBottomColor: "transparent",
+                        borderLeftColor: "transparent",
+                        borderRightColor: "transparent",
+                      },
+                    "& .MuiTextField-root": {
+                      marginTop: 0,
+                      marginBottom: 0,
+                    },
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
