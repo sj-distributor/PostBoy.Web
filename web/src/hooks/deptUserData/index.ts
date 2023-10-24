@@ -66,7 +66,7 @@ const useDeptUserData = ({ appId, schemaType }: IDeptUserDataHookProp) => {
       const department: IDepartmentAndUserListValue = {
         id: source.department.id,
         name: source.department.name.toLocaleUpperCase(),
-        type: source.childrens.length
+        type: source.childrens?.length
           ? DepartmentAndUserType.Department
           : DepartmentAndUserType.User,
         parentid: source.department.parentid,
@@ -79,7 +79,7 @@ const useDeptUserData = ({ appId, schemaType }: IDeptUserDataHookProp) => {
 
       let users;
       if (schemaType) {
-        users = source.childrens.map((item) => ({
+        users = source.childrens?.map((item) => ({
           id: item.department.id,
           name: item.department.name.toLocaleUpperCase(),
           type: DepartmentAndUserType.User,
@@ -93,7 +93,7 @@ const useDeptUserData = ({ appId, schemaType }: IDeptUserDataHookProp) => {
             | [],
         }));
         const uniqueIds = new Set(
-          source.childrens.map((obj) => obj.department.id)
+          source.childrens?.map((obj) => obj.department.id)
         );
 
         users = users.filter((obj) => !uniqueIds.has(obj.id));
