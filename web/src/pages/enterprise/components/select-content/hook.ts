@@ -397,17 +397,10 @@ export const useAction = (props: SelectContentHookProps) => {
       )
         setSendObject({
           toUsers: selectedData
-            .filter(
-              (e) =>
-                e.type === DepartmentAndUserType.User || validate(String(e.id))
-            )
-            .map((e) => (validate(String(e.id)) ? e.name : String(e.id))),
+            .filter((e) => e.children.length <= 0 || validate(String(e.id)))
+            .map((e) => e.name),
           toParties: selectedData
-            .filter(
-              (e) =>
-                e.type === DepartmentAndUserType.Department &&
-                !validate(String(e.id))
-            )
+            .filter((e) => e.children.length > 0 && !validate(String(e.id)))
             .map((e) => String(e.id)),
         });
 

@@ -120,7 +120,8 @@ const useAction = ({
 
   const handleMapUpdate = (
     selectedList: IDepartmentAndUserListValue[],
-    isClickFilter?: boolean
+    isClickFilter?: boolean,
+    isStart?: boolean
   ) => {
     const cloneData = clone(foldMap);
 
@@ -218,7 +219,13 @@ const useAction = ({
               })
             : cloneData.set(key, {
                 ...value,
-                selected: isIndeterminate ? true : !value.selected,
+                selected: isIndeterminate
+                  ? true
+                  : isStart
+                  ? value.selected
+                    ? value.selected
+                    : !value.selected
+                  : !value.selected,
               });
         }
       }
@@ -491,7 +498,8 @@ const useAction = ({
       );
     });
 
-    !loading && handleMapUpdate(setFilterChildren(removeDuplicate(newData)));
+    !loading &&
+      handleMapUpdate(setFilterChildren(removeDuplicate(newData)), false, true);
 
     GetAuthUser().then((res) => {
       if (!!res) {
