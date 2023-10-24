@@ -383,6 +383,25 @@ export const useAction = (props: SelectContentHookProps) => {
   }, [isLoadStop]);
 
   useEffect(() => {
+    const setFilterChildren = (arr: IDepartmentAndUserListValue[]) => {
+      const childNames = new Set<string>();
+
+      arr.forEach((item) => {
+        if (item.children.length) {
+          item.children.forEach((child) => {
+            childNames.add(child.name);
+          });
+        }
+      });
+
+      arr = arr.filter((item) => !childNames.has(item.name));
+
+      return arr;
+    };
+    const selectedData = schemaType
+      ? targetSelectedList
+      : setFilterChildren(targetSelectedList);
+
     if (!isShowDialog) {
       if (
         (isGetLastTimeData && isNewOrUpdate === "update") ||
@@ -391,13 +410,13 @@ export const useAction = (props: SelectContentHookProps) => {
           isNewOrUpdate === "new")
       )
         setSendObject({
-          toUsers: targetSelectedList
+          toUsers: selectedData
             .filter(
               (e) =>
                 e.type === DepartmentAndUserType.User || validate(String(e.id))
             )
             .map((e) => (validate(String(e.id)) ? e.name : String(e.id))),
-          toParties: targetSelectedList
+          toParties: selectedData
             .filter(
               (e) =>
                 e.type === DepartmentAndUserType.Department &&
