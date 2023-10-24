@@ -13,6 +13,7 @@ import useDeptUserData from "../../hooks/deptUserData";
 import { ITreeViewHookProps } from "./props";
 import { validate } from "uuid";
 import { setFilterChildren } from "../../uilts/convert-type";
+import useAuth from "../../auth";
 
 const useAction = ({
   appId,
@@ -23,6 +24,8 @@ const useAction = ({
   schemaType,
   settingSelectedList,
 }: ITreeViewHookProps) => {
+  const { username } = useAuth();
+
   const { deduplicationArray } = useDeptUserData({ appId });
 
   const [selectedList, setSelectedList] = useState<
@@ -69,8 +72,6 @@ const useAction = ({
   const [promptText, setPromptText] = useState<string>("");
   // 提示显隐
   const [openError, openErrorAction] = useBoolean(false);
-
-  const [userData, setUserData] = useState<IUserResponse>();
 
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
@@ -441,14 +442,13 @@ const useAction = ({
 
   //获取组员
   const getUserTeamMembers = async () => {
-    let userName = userData?.userName;
-    if (!userName) {
+    if (!username) {
       return;
     }
 
     const childrenData =
-      flattenList.find((item) => item.name === userName)?.children ?? [];
-    const user = flattenList.find((item) => item.name === userName);
+      flattenList.find((item) => item.name === username)?.children ?? [];
+    const user = flattenList.find((item) => item.name === username);
 
     const teamMembers = schemaType
       ? user
@@ -458,7 +458,7 @@ const useAction = ({
           (item) =>
             item.department_leader &&
             item.department_leader.length &&
-            item.department_leader[0] === userName
+            item.department_leader[0] === username
         );
 
     const data = removeDuplicate(teamMembers ?? []);
@@ -484,7 +484,7 @@ const useAction = ({
         ? setIsDirectTeamMembers.setFalse()
         : setIsDirectTeamMembers.setTrue();
     })();
-  }, [userData, selectedList]);
+  }, [username, selectedList]);
 
   useEffect(() => {
     if (limitTags === selectedList.length) setLoading(false);
@@ -500,12 +500,6 @@ const useAction = ({
 
     !loading &&
       handleMapUpdate(setFilterChildren(removeDuplicate(newData)), false, true);
-
-    GetAuthUser().then((res) => {
-      if (!!res) {
-        setUserData(res);
-      }
-    });
   }, []);
 
   // 延迟关闭警告提示
