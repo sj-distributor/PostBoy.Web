@@ -507,7 +507,10 @@ const SelectContent = memo(
                   <div style={{ position: "relative" }}>
                     <div
                       className={styles.mentionsInputWrap}
-                      style={{ color: isFocusing ? "#1664b3" : "" }}
+                      style={{
+                        fontSize: 12,
+                        color: isFocusing ? "#1664b3" : "",
+                      }}
                     >
                       内容
                     </div>
