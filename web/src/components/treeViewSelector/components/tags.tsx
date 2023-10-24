@@ -56,7 +56,7 @@ const TagsComponent = ({ selectedList, limit, handleClear }: ITagsProps) => {
                 alignItems: "center",
               }}
             >
-              {item.name}
+              <span style={{ fontSize: 12 }}>{item.name}</span>
               <ClearOutlinedIcon
                 className={styles.clearIcon}
                 onClick={(e) => {

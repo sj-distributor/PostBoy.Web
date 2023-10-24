@@ -101,15 +101,17 @@ const TreeViewSelector = ({
         <Tab label="企业微信架构" />
         <Tab label="人员层级架构" />
       </Tabs>
-      <div className={styles.directTeamMembers}>
-        <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
-          <Radio
-            checked={!isDirectTeamMembers}
-            name="radio-direct-team-members"
-          />
-          直属组员
-        </span>
-      </div>
+      {!!schemaType && (
+        <div className={styles.directTeamMembers}>
+          <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
+            <Radio
+              checked={!isDirectTeamMembers}
+              name="radio-direct-team-members"
+            />
+            直属组员
+          </span>
+        </div>
+      )}
       {displayMode !== TreeViewDisplayMode.Dropdown && (
         <div
           {...foldSelectorProps}
@@ -118,6 +120,7 @@ const TreeViewSelector = ({
             overflowY: "auto",
             position: "relative",
             marginBottom: "1rem",
+            marginTop: "1rem",
             ...center(),
           }}
         >
