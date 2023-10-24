@@ -27,6 +27,7 @@ export interface ITreeViewProps {
   foldSelectorProps?: IFoldSelectorProps;
   flattenSelectorProps?: IFlattenSelectorProps;
   sourceType?: SourceType;
+  isShowLevel?: boolean;
   settingSelectedList: (selectedList: IDepartmentAndUserListValue[]) => void;
   schemaType: WorkWeChatTreeStructureType;
   setSchemaType: React.Dispatch<

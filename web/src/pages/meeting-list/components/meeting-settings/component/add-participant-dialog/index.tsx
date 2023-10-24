@@ -131,6 +131,7 @@ const SelectTargetDialog = memo(
                         }}
                         schemaType={schemaType}
                         setSchemaType={setSchemaType}
+                        isShowLevel={false}
                       />
                     )}
                   </div>

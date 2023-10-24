@@ -137,6 +137,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                     <TreeViewSelector
                       appId={AppId}
                       inputValue={""}
+                      isShowLevel={true}
                       sourceData={{
                         foldData: departmentKeyValue.data,
                         flattenData: flattenDepartmentList,
