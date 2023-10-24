@@ -98,9 +98,9 @@ const TreeViewSelector = ({
         }}
       >
         <Tab label="企业微信架构" />
-        <Tab label="人员层级架构" />
+        {/* <Tab label="人员层级架构" /> */}
       </Tabs>
-      <div className={styles.directTeamMembers}>
+      {/* <div className={styles.directTeamMembers}>
         <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
           <Radio
             checked={!isDirectTeamMembers}
@@ -108,7 +108,7 @@ const TreeViewSelector = ({
           />
           直属组员
         </span>
-      </div>
+      </div> */}
       {displayMode !== TreeViewDisplayMode.Dropdown && (
         <div
           {...foldSelectorProps}
