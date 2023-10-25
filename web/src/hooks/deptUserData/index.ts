@@ -85,7 +85,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
       department.children.push(...users);
       flattenList.push({ ...department }, ...users);
       resultList.unshift(department);
-      source.childrens.length > 0 &&
+      source.childrens?.length > 0 &&
         recursiveTransformList(
           source.childrens,
           department.children,
