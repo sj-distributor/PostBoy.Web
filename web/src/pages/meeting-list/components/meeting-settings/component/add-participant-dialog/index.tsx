@@ -8,6 +8,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import useAction from "./hook";
 import styles from "./index.module.scss";
 import {
+  IDepartmentAndUserListValue,
   ITagsList,
   ITargetDialogProps,
   SelectPersonnelTitle,
@@ -125,7 +126,9 @@ const SelectTargetDialog = memo(
                         }}
                         defaultSelectedList={loadSelectData}
                         settingSelectedList={(value) => {
-                          setDepartmentSelectedList(value);
+                          setDepartmentSelectedList(
+                            value as IDepartmentAndUserListValue[]
+                          );
                         }}
                       />
                     )}
