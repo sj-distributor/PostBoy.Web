@@ -92,37 +92,25 @@ const TreeViewSelector = ({
           horizontal: "center",
         }}
       />
-      {isShowLevel ? (
-        <>
-          <Tabs
-            value={schemaType}
-            aria-label="basic tabs example"
-            onChange={(e, value) => {
-              setSchemaType(value);
-            }}
-          >
-            <Tab label="企业微信架构" />
-            <Tab label="人员层级架构" />
-          </Tabs>
-
-          {!!schemaType && (
-            <div className={styles.directTeamMembers}>
-              <span
-                className={styles.radioLabel}
-                onClick={handleGetAllTeamMembers}
-              >
-                <Radio
-                  checked={!isDirectTeamMembers}
-                  name="radio-direct-team-members"
-                />
-                直属组员
-              </span>
-            </div>
-          )}
-        </>
-      ) : (
-        <></>
-      )}
+      <Tabs
+        value={schemaType}
+        aria-label="basic tabs example"
+        onChange={(e, value) => {
+          setSchemaType(value);
+        }}
+      >
+        <Tab label="企业微信架构" />
+        {/* <Tab label="人员层级架构" /> */}
+      </Tabs>
+      {/* <div className={styles.directTeamMembers}>
+        <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
+          <Radio
+            checked={!isDirectTeamMembers}
+            name="radio-direct-team-members"
+          />
+          直属组员
+        </span>
+      </div> */}
       {displayMode !== TreeViewDisplayMode.Dropdown && (
         <div
           {...foldSelectorProps}
