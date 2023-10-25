@@ -147,3 +147,9 @@
     }
   }
 }
+
+.contentTextarea {
+  textarea {
+    overflow-y: auto !important;
+  }
+}

@@ -510,7 +510,7 @@ const SelectContent = memo(
                     <MentionsInput
                       className={`${styles.MentionsInput} ${
                         !isFocusing || styles.borderColor
-                      }`}
+                      } ${styles.contentTextarea}`}
                       value={content}
                       allowSuggestionsAboveCursor
                       customSuggestionsContainer={(children) =>
