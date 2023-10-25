@@ -322,20 +322,24 @@ const useAction = ({
     setAll(cloneData);
   };
 
-  useEffect(() => {
-    let newSelectedList: IDepartmentAndUserListValue[] = [];
+  // useEffect(() => {
+  //   let newSelectedList: IDepartmentAndUserListValue[] = [];
 
-    foldMap.forEach((item) => {
-      if (
-        item.selected &&
-        !newSelectedList.find((dItem) => item.name === dItem.name)
-      ) {
-        newSelectedList.push(item);
-      }
-    });
+  //   foldMap.forEach((item) => {
+  //     if (
+  //       item.selected &&
+  //       !newSelectedList.find((dItem) => item.name === dItem.name)
+  //     ) {
+  //       newSelectedList.push(item);
+  //     }
+  //   });
 
-    setSelectedList(newSelectedList);
-  }, [foldMap]);
+  //   setSelectedList(setFilterChildren(newSelectedList));
+  //   console.log(selectedList);
+  //   setFilterChildren(newSelectedList).map((item) => {
+  //     console.log(item);
+  //   });
+  // }, [foldMap]);
 
   // 处理部门列表点击选择或者展开
   const handleDeptOrUserClick = (
@@ -354,6 +358,23 @@ const useAction = ({
           isCollapsed: !value.isCollapsed,
         });
       } else {
+        selectedList.map((selectItem) => {
+          if (selectedList.some((i) => i.id === value.id)) {
+            console.log("first");
+            setSelectedList((prev) =>
+              prev.filter((item) => item.id !== value.id)
+            );
+          } else {
+            const allChildrenData = setAllChildrenById(
+              getUniqueId(selectItem),
+              [],
+              true
+            );
+            allChildrenData.some((item) => item.id === value.id) &&
+              console.log(selectItem);
+          }
+        });
+
         if (!schemaType) {
           handleMapUpdate([value]);
         } else {
