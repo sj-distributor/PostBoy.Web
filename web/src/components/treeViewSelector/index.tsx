@@ -1,25 +1,24 @@
 import {
   Autocomplete,
-  Radio,
-  Snackbar,
-  Tab,
-  Tabs,
+  Checkbox,
+  Collapse,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemText,
   TextField,
-} from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-import { onFilterDeptAndUsers } from "./fitler";
-import useAction from "./hook";
-import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props";
-import styles from "./index.module.scss";
+} from "@mui/material"
+import { onFilterDeptAndUsers } from "./fitler"
+import useAction from "./hook"
+import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props"
+import styles from "./index.module.scss"
+import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
-} from "../../dtos/enterprise";
-import TagsComponent from "./components/tags";
-
-import TreeList from "./components/treeList";
+} from "../../dtos/enterprise"
 
 const TreeViewSelector = ({
   appId,
@@ -34,41 +33,31 @@ const TreeViewSelector = ({
   foldSelectorProps,
   flattenSelectorProps,
   settingSelectedList,
-  schemaType,
-  setSchemaType,
 }: ITreeViewProps) => {
   const { foldData, flattenData } = sourceData ?? {
     foldData: [],
     flattenData: [],
-  };
+  }
 
-  displayMode = displayMode ?? TreeViewDisplayMode.Both;
+  displayMode = displayMode ?? TreeViewDisplayMode.Both
 
-  const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both;
+  const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both
 
   const {
     foldList,
     flattenList,
     selectedList,
-    loading,
-    foldMap,
-    isDirectTeamMembers,
-    promptText,
-    openError,
-    handleClear,
     handleDeptOrUserClick,
     handleTypeIsCanSelect,
-    getUniqueId,
-    handleGetAllTeamMembers,
+    setSearchToDeptValue,
   } = useAction({
     appId,
     defaultSelectedList,
     foldData,
     flattenData,
     sourceType: sourceType ?? SourceType.Full,
-    schemaType,
     settingSelectedList,
-  });
+  })
 
   const center = () =>
     !foldData
@@ -77,38 +66,70 @@ const TreeViewSelector = ({
           alignItems: "center",
           justifyContent: "center",
         }
-      : {};
+      : {}
+
+  const recursiveRenderDeptList = (
+    data: IDepartmentAndUserListValue[],
+    pl: number,
+    isDivider: boolean
+  ) => {
+    const result = (
+      <List key={appId} dense>
+        {data.map((deptUserData, index) => {
+          return (
+            <div key={deptUserData.name}>
+              <ListItemButton
+                sx={{ pl, height: "2.2rem" }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  deptUserData.children.length > 0 &&
+                    handleDeptOrUserClick(ClickType.Collapse, deptUserData)
+                }}
+              >
+                {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
+                  <Checkbox
+                    edge="start"
+                    checked={deptUserData.selected}
+                    tabIndex={-1}
+                    disableRipple
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeptOrUserClick(ClickType.Select, deptUserData)
+                    }}
+                  />
+                )}
+                <ListItemText primary={deptUserData.name} />
+                {deptUserData.children.length > 0 &&
+                  (!!deptUserData.isCollapsed ? (
+                    <ExpandLess />
+                  ) : (
+                    <ExpandMore />
+                  ))}
+              </ListItemButton>
+              {deptUserData.children.length > 0 && (
+                <Collapse
+                  in={!!deptUserData.isCollapsed}
+                  timeout={0}
+                  unmountOnExit
+                >
+                  {recursiveRenderDeptList(
+                    deptUserData.children,
+                    pl + 2,
+                    index !== data.length - 1
+                  )}
+                </Collapse>
+              )}
+            </div>
+          )
+        })}
+        {isDivider && <Divider />}
+      </List>
+    )
+    return result
+  }
 
   return (
     <>
-      <Snackbar
-        message={promptText}
-        open={openError}
-        resumeHideDuration={3000}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      />
-      <Tabs
-        value={schemaType}
-        aria-label="basic tabs example"
-        onChange={(e, value) => {
-          setSchemaType(value);
-        }}
-      >
-        <Tab label="企业微信架构" />
-        {/* <Tab label="人员层级架构" /> */}
-      </Tabs>
-      {/* <div className={styles.directTeamMembers}>
-        <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
-          <Radio
-            checked={!isDirectTeamMembers}
-            name="radio-direct-team-members"
-          />
-          直属组员
-        </span>
-      </div> */}
       {displayMode !== TreeViewDisplayMode.Dropdown && (
         <div
           {...foldSelectorProps}
@@ -120,127 +141,71 @@ const TreeViewSelector = ({
             ...center(),
           }}
         >
-          {foldList && (
-            <TreeList
-              data={foldList}
-              handleDeptOrUserClick={handleDeptOrUserClick}
-              foldMap={foldMap}
-              schemaType={schemaType}
-            />
-          )}
+          {foldList && recursiveRenderDeptList(foldList, 0, true)}
         </div>
       )}
 
       {children}
 
       {flattenList && displayMode !== TreeViewDisplayMode.Tree && (
-        <>
-          <div className={styles.selectInputTitle}>结果</div>
-          <div {...flattenSelectorProps} className={styles.selectAutocomplete}>
-            <Autocomplete
-              disablePortal
-              openOnFocus
-              multiple
-              disableCloseOnSelect
-              size="small"
-              limitTags={20}
-              value={selectedList}
-              options={flattenList}
-              loading={loading}
-              filterOptions={(options, state) => {
-                return onFilterDeptAndUsers(options, state);
-              }}
-              className={selectedList.length > 20 ? "limiting" : ""}
-              sx={{
-                "& .MuiInputBase-root.MuiOutlinedInput-root": {
-                  maxHeight: "10rem",
-                  overflowY: "auto",
-                  position: "unset",
-                },
-                "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderBottomColor: "transparent",
-                  borderLeftColor: "transparent",
-                  borderRightColor: "transparent",
-                },
-                "& .MuiTextField-root": {
-                  marginTop: 0,
-                  marginBottom: 0,
-                },
-                "& .MuiOutlinedInput-root .MuiAutocomplete-endAdornment": {
-                  right: 20,
-                },
-              }}
-              getOptionLabel={(option) => option.name}
-              renderTags={(value) => {
-                return (
-                  <TagsComponent
-                    selectedList={value}
-                    limit={selectedList.length}
-                    handleClear={handleClear}
-                  />
-                );
-              }}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              groupBy={(option) => {
-                return String(uuidv4());
-              }}
-              componentsProps={{
-                paper: { elevation: 3 },
-                popper: {
-                  placement: "top",
-                },
-              }}
-              renderGroup={(params) => (
-                <div key={String(uuidv4())}>{params.children}</div>
-              )}
-              renderOption={(props, option) => {
-                let style = Object.assign(
-                  option.type === DepartmentAndUserType.Department
-                    ? { color: "#666" }
-                    : { paddingLeft: "2rem" },
-                  { fontSize: "0.9rem" }
-                );
-                props.onClick = () => {
-                  const data = foldMap.get(getUniqueId(option));
-
-                  handleTypeIsCanSelect(canSelect, option.type) &&
-                    handleDeptOrUserClick(
-                      ClickType.Select,
-                      data ?? option,
-                      true
-                    );
-                };
-                return (
-                  <li {...props} style={style}>
-                    {option.name}
-                  </li>
-                );
-              }}
-              onChange={(e, value, reason) => {
-                handleClear(value as IDepartmentAndUserListValue[], reason);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  className={styles.InputButton}
-                  margin="dense"
-                  type="text"
-                  label={inputLabel ?? ""}
-                  sx={{
-                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        border: "none",
-                      },
-                  }}
-                />
-              )}
-            />
-          </div>
-        </>
+        <div {...flattenSelectorProps}>
+          <Autocomplete
+            disablePortal
+            openOnFocus
+            multiple
+            disableCloseOnSelect
+            size="small"
+            value={selectedList}
+            options={flattenList}
+            filterOptions={(options, state) =>
+              onFilterDeptAndUsers(options, state)
+            }
+            getOptionLabel={(option: IDepartmentAndUserListValue) =>
+              option.name
+            }
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            groupBy={(option) => String(option.parentid)}
+            componentsProps={{
+              paper: { elevation: 3 },
+              popper: {
+                placement: "top",
+              },
+            }}
+            renderGroup={(params) => (
+              <div key={params.key}>{params.children}</div>
+            )}
+            renderOption={(props, option) => {
+              let style = Object.assign(
+                option.type === DepartmentAndUserType.Department
+                  ? { color: "#666" }
+                  : { paddingLeft: "2rem" },
+                { fontSize: "0.9rem" }
+              )
+              !handleTypeIsCanSelect(canSelect, option.type) &&
+                (props.onClick = () => {})
+              return (
+                <li {...props} style={style}>
+                  {option.name}
+                </li>
+              )
+            }}
+            onChange={(e, value) => value && setSearchToDeptValue(value as IDepartmentAndUserListValue[])}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                value={inputValue}
+                className={styles.InputButton}
+                margin="dense"
+                type="text"
+                label={inputLabel ?? ""}
+              />
+            )}
+          />
+        </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default TreeViewSelector;
+export default TreeViewSelector

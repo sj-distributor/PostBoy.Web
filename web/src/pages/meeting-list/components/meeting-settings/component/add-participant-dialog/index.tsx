@@ -35,8 +35,6 @@ const SelectTargetDialog = memo(
       chatId,
       outerTagsValue,
       loadSelectData,
-      schemaType,
-      setSchemaType,
       setChatId,
       setOpenFunction,
       setDeptUserList,
@@ -129,8 +127,6 @@ const SelectTargetDialog = memo(
                         settingSelectedList={(value) => {
                           setDepartmentSelectedList(value);
                         }}
-                        schemaType={schemaType}
-                        setSchemaType={setSchemaType}
                       />
                     )}
                   </div>
@@ -214,8 +210,7 @@ const SelectTargetDialog = memo(
       prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
       prevProps.AppId === nextProps.AppId &&
       prevProps.chatId === nextProps.chatId &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.schemaType === nextProps.schemaType
+      prevProps.isLoading === nextProps.isLoading
     );
   }
 );

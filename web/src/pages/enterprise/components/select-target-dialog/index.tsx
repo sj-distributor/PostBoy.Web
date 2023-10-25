@@ -1,31 +1,23 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import TextField from "@mui/material/TextField";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import Autocomplete from "@mui/material/Autocomplete";
-import useAction from "./hook";
-import styles from "./index.module.scss";
+import Button from "@mui/material/Button"
+import Dialog from "@mui/material/Dialog"
+import TextField from "@mui/material/TextField"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogActions from "@mui/material/DialogActions"
+import DialogContent from "@mui/material/DialogContent"
+import Autocomplete from "@mui/material/Autocomplete"
+import useAction from "./hook"
+import styles from "./index.module.scss"
 
 import {
   ITargetDialogProps,
   DeptUserCanSelectStatus,
   SendObjOrGroup,
   ITagsList,
-} from "../../../../dtos/enterprise";
-import {
-  CircularProgress,
-  FormControlLabel,
-  Radio,
-  Snackbar,
-  Tab,
-  Tabs,
-} from "@mui/material";
-import TreeViewSelector from "../../../../components/treeViewSelector";
-import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props";
-
-import { LoadingButton } from "@mui/lab";
+} from "../../../../dtos/enterprise"
+import { CircularProgress, Snackbar } from "@mui/material"
+import { LoadingButton } from "@mui/lab"
+import TreeViewSelector from "../../../../components/treeViewSelector"
+import { TreeViewDisplayMode } from "../../../../components/treeViewSelector/props"
 
 const SelectTargetDialog = (props: ITargetDialogProps) => {
   const {
@@ -47,8 +39,6 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     outerTagsValue,
     isUpdatedDeptUser,
     targetSelectedList,
-    schemaType,
-    setSchemaType,
     setSendType,
     setChatId,
     setChatName,
@@ -57,7 +47,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     setDeptUserList,
     setOuterTagsValue,
     settingSelectedList,
-  } = props;
+  } = props
 
   const {
     departmentSelectedList,
@@ -108,7 +98,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
     setOuterTagsValue,
     setGroupList,
     settingSelectedList,
-  });
+  })
 
   return (
     <div>
@@ -137,6 +127,11 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                     <TreeViewSelector
                       appId={AppId}
                       inputValue={""}
+                      flattenSelectorProps={{
+                        style: {
+                          marginTop: "1rem",
+                        },
+                      }}
                       sourceData={{
                         foldData: departmentKeyValue.data,
                         flattenData: flattenDepartmentList,
@@ -146,7 +141,9 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                         setDepartmentSelectedList(value)
                       }
                       inputLabel={
-                        sendType === SendObjOrGroup.Object ? "" : "用户搜索"
+                        sendType === SendObjOrGroup.Object
+                          ? "部门与用户搜索"
+                          : "用户搜索"
                       }
                       displayMode={
                         clickName === "选择发送目标" &&
@@ -154,8 +151,6 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                           ? TreeViewDisplayMode.Tree
                           : TreeViewDisplayMode.Both
                       }
-                      schemaType={schemaType}
-                      setSchemaType={setSchemaType}
                     >
                       {clickName === "选择发送目标" && (
                         <Autocomplete
@@ -217,13 +212,13 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                             (e.target as HTMLElement).scrollHeight,
                             (e.target as HTMLElement).scrollTop,
                             (e.target as HTMLElement).clientHeight
-                          );
+                          )
                         },
                       }}
                       clearOnBlur={false}
                       onInputChange={(_, value) => {
-                        setKeyword(value);
-                        setGroupPage(1);
+                        setKeyword(value)
+                        setGroupPage(1)
                       }}
                       renderInput={(params) => (
                         <TextField
@@ -236,9 +231,9 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                         />
                       )}
                       onChange={(e, value) => {
-                        setChatId && setChatId(value ? value.chatId : "");
-                        setChatName && setChatName(value ? value.chatName : "");
-                        setSearchValue(value);
+                        setChatId && setChatId(value ? value.chatId : "")
+                        setChatName && setChatName(value ? value.chatName : "")
+                        setSearchValue(value)
                       }}
                     />
                   )}
@@ -269,9 +264,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                           label="标签列表"
                         />
                       )}
-                      onChange={(e, value) =>
-                        setTagsValue(value as ITagsList[])
-                      }
+                      onChange={(e, value) => setTagsValue(value as ITagsList[])}
                     />
                   )}
                 </>
@@ -318,7 +311,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
                       />
                     )}
                     onChange={(e, value) => {
-                      setGroupOwner(value);
+                      setGroupOwner(value)
                     }}
                   />
                 </>
@@ -346,7 +339,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
             onClick={() => {
               clickName !== "选择发送目标"
                 ? handleCreateGroup()
-                : handleConfirm();
+                : handleConfirm()
             }}
           >
             {clickName === "选择发送目标" ? "确定" : "创建"}
@@ -378,8 +371,6 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
           isUpdatedDeptUser={isUpdatedDeptUser}
           targetSelectedList={targetSelectedList}
           settingSelectedList={settingSelectedList}
-          schemaType={schemaType}
-          setSchemaType={setSchemaType}
         />
       )}
 
@@ -393,7 +384,7 @@ const SelectTargetDialog = (props: ITargetDialogProps) => {
         }}
       />
     </div>
-  );
-};
+  )
+}
 
-export default SelectTargetDialog;
+export default SelectTargetDialog

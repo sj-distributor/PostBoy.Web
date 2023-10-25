@@ -1,25 +1,25 @@
-import styles from "./index.module.scss";
-import { Link, Outlet } from "react-router-dom";
-import { routerArray } from "../../router/elementRoute";
-import useMainAction from "./hook";
-import UserInformation from "./components/user-information";
-import { RouteItem } from "../../dtos/route";
-import { createContext } from "react";
+import styles from "./index.module.scss"
+import { Link, Outlet } from "react-router-dom"
+import { routerArray } from "../../router/elementRoute"
+import useMainAction from "./hook"
+import UserInformation from "./components/user-information"
+import { RouteItem } from "../../dtos/route-type"
+import { createContext } from "react"
 
 interface AdministratorContextType {
-  haveAdministrator: boolean;
+  haveAdministrator: boolean
 }
 
 export const AdministratorContext = createContext<AdministratorContextType>(
   null!
-);
+)
 
 const Main = () => {
   const { clickMainIndex, setMainClickIndex, haveAdministrator } =
-    useMainAction();
+    useMainAction()
 
   const verifyPermissions = (item: RouteItem) =>
-    !["/user", "/manager", "/roles"].includes(item.path) || !!haveAdministrator;
+    ["/user", "/manager"].includes(item.path) ? !!haveAdministrator : true
 
   const routerTabBar = () => {
     return routerArray.map((item, index) => {
@@ -29,22 +29,20 @@ const Main = () => {
             <Link
               to={item.path}
               onClick={() => {
-                setMainClickIndex(index);
+                setMainClickIndex(index)
               }}
               className={
                 clickMainIndex === index ? styles.itemClick : styles.itemNone
               }
             >
-              <div className={styles.iconTitleContainer}>
-                {item.icons}
-                <span className={styles.title}>{item.head}</span>
-              </div>
+              <span className={item.icons} />
+              {item.head}
             </Link>
           )}
         </div>
-      );
-    });
-  };
+      )
+    })
+  }
 
   return (
     <div className={styles.main}>
@@ -62,7 +60,7 @@ const Main = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Main;
+export default Main
