@@ -1,4 +1,5 @@
 import { clone, isEmpty, uniqWith } from "ramda";
+import { validate } from "uuid";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GetCorpAppList,
@@ -29,6 +30,7 @@ import {
   SendObject,
   SendObjOrGroup,
   SendParameter,
+  WorkWeChatTreeStructureType,
 } from "../../../../dtos/enterprise";
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job";
 import { convertBase64 } from "../../../../uilts/convert-base64";
@@ -38,6 +40,7 @@ import { annexEditorConfig } from "../../../../uilts/wangEditor";
 import { useBoolean } from "ahooks";
 import useDeptUserData from "../../../../hooks/deptUserData";
 import { Preview } from "@mui/icons-material";
+import auth from "../../../../auth";
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void;
 
@@ -61,6 +64,8 @@ export const useAction = (props: SelectContentHookProps) => {
     clearData,
     setIsShowPage,
   } = props;
+
+  const { schemaType } = auth();
 
   const defaultCorpValue = {
     corpName: "",
@@ -272,6 +277,7 @@ export const useAction = (props: SelectContentHookProps) => {
 
       workWeChatAppNotification?.toUsers &&
         result.push(...workWeChatAppNotification.toUsers);
+
       tagsValue && result.push(...tagsValue.map((x) => x.tagName));
     } else {
       !!chatId &&
@@ -415,22 +421,23 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [isShowDialog]);
 
-  useEffect(() => {
-    const loadDepartment = async (AppId: string) => {
-      setIsTreeViewLoading(true);
-      const deptListResponse = await GetDeptTreeList(AppId);
-      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
-        setIsTreeViewLoading(false);
+  const loadDepartment = async (AppId: string) => {
+    setIsTreeViewLoading(true);
+    const deptListResponse = await GetDeptTreeList(AppId, schemaType);
+    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+      setIsTreeViewLoading(false);
 
-      !!deptListResponse &&
-        loadDeptUsersFromWebWorker({
-          AppId,
-          workWeChatUnits: deptListResponse.workWeChatUnits,
-        }).then(() => {
-          setIsTreeViewLoading(false);
-          setIsLoadStop(true);
-        });
-    };
+    !!deptListResponse &&
+      loadDeptUsersFromWebWorker({
+        AppId,
+        workWeChatUnits: deptListResponse.workWeChatUnits,
+      }).then(() => {
+        setIsTreeViewLoading(false);
+        setIsLoadStop(true);
+      });
+  };
+
+  useEffect(() => {
     if (
       isShowDialog &&
       !!corpAppValue &&
@@ -460,6 +467,10 @@ export const useAction = (props: SelectContentHookProps) => {
       corpAppValue.appId && loadDepartment(corpAppValue.appId);
     }
   }, [corpAppValue?.appId, isShowDialog]);
+
+  useEffect(() => {
+    corpAppValue.appId && loadDepartment(corpAppValue.appId);
+  }, [schemaType]);
 
   // 判断文件大小
   const judgingFileSize = (

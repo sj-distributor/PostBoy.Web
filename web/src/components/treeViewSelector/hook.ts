@@ -99,11 +99,11 @@ const useAction = ({
     const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
       (item) => ({ ...item })
     );
-
+    console.log(clickedItem, copyFoldList);
     const copyClickedList = Array.isArray(clickedList)
       ? clickedList
       : [clickedList];
-
+    console.log(type);
     setFoldList(
       handleSelectDataSync(copyFoldList, copyClickedList, value, type)
     );
@@ -135,7 +135,7 @@ const useAction = ({
 
     selectedList.length > 0 &&
       selectedList.forEach((selectedItem) => {
-        const topLevelIdList = copySourceData.map((item) => Number(item.id));
+        const topLevelIdList = copySourceData.map((item) => item.id);
         const repeatUserList = deduplicationArray(
           flattenList.filter((x) => x.type === DepartmentAndUserType.Department)
         )
@@ -151,7 +151,9 @@ const useAction = ({
         const userData = copySourceData.find(
           (item) => item.id === selectedItem.id
         );
-        if (!Number(selectedItem.id) && userData) {
+
+        if (!selectedItem.id && userData) {
+          console.log("first");
           type !== ClickType.Collapse
             ? (userData.selected = value ?? !userData.selected)
             : (userData.isCollapsed = !userData?.isCollapsed);
@@ -161,6 +163,7 @@ const useAction = ({
           const topIndex = repeatItem.idRoute?.findIndex((id) =>
             topLevelIdList.some((topId) => topId === id)
           );
+
           // 通用-通过idRoute修改对应数据
           const routeArr =
             (sourceType === SourceType.Part
@@ -180,7 +183,7 @@ const useAction = ({
             repeatItem.type === DepartmentAndUserType.Department
               ? innerItem
               : innerItem?.children.find((cell) => cell.id === repeatItem.id);
-
+          console.log(repeatItem);
           finalInnerItem &&
             (type !== ClickType.Collapse
               ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)

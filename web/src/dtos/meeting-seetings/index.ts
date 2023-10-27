@@ -49,6 +49,7 @@ export interface IDepartmentAndUserListValue {
   isCollapsed: boolean;
   idRoute?: number[];
   children: IDepartmentAndUserListValue[];
+  department_leader?: [] | [string];
 }
 
 export interface IDepartmentData {

@@ -6,19 +6,22 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Tab,
+  Tabs,
   TextField,
-} from "@mui/material"
-import { onFilterDeptAndUsers } from "./fitler"
-import useAction from "./hook"
-import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props"
-import styles from "./index.module.scss"
-import { ExpandLess, ExpandMore } from "@mui/icons-material"
+} from "@mui/material";
+import { onFilterDeptAndUsers } from "./fitler";
+import useAction from "./hook";
+import { ITreeViewProps, SourceType, TreeViewDisplayMode } from "./props";
+import styles from "./index.module.scss";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   ClickType,
   DepartmentAndUserType,
   DeptUserCanSelectStatus,
   IDepartmentAndUserListValue,
-} from "../../dtos/enterprise"
+} from "../../dtos/enterprise";
+import auth from "../../auth";
 
 const TreeViewSelector = ({
   appId,
@@ -37,11 +40,11 @@ const TreeViewSelector = ({
   const { foldData, flattenData } = sourceData ?? {
     foldData: [],
     flattenData: [],
-  }
+  };
 
-  displayMode = displayMode ?? TreeViewDisplayMode.Both
+  displayMode = displayMode ?? TreeViewDisplayMode.Both;
 
-  const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both
+  const canSelect = isCanSelect ?? DeptUserCanSelectStatus.Both;
 
   const {
     foldList,
@@ -57,7 +60,9 @@ const TreeViewSelector = ({
     flattenData,
     sourceType: sourceType ?? SourceType.Full,
     settingSelectedList,
-  })
+  });
+
+  const { schemaType, setSchemaType } = auth();
 
   const center = () =>
     !foldData
@@ -66,7 +71,7 @@ const TreeViewSelector = ({
           alignItems: "center",
           justifyContent: "center",
         }
-      : {}
+      : {};
 
   const recursiveRenderDeptList = (
     data: IDepartmentAndUserListValue[],
@@ -81,9 +86,9 @@ const TreeViewSelector = ({
               <ListItemButton
                 sx={{ pl, height: "2.2rem" }}
                 onClick={(e) => {
-                  e.stopPropagation()
+                  e.stopPropagation();
                   deptUserData.children.length > 0 &&
-                    handleDeptOrUserClick(ClickType.Collapse, deptUserData)
+                    handleDeptOrUserClick(ClickType.Collapse, deptUserData);
                 }}
               >
                 {handleTypeIsCanSelect(canSelect, deptUserData.type) && (
@@ -93,8 +98,8 @@ const TreeViewSelector = ({
                     tabIndex={-1}
                     disableRipple
                     onClick={(e) => {
-                      e.stopPropagation()
-                      handleDeptOrUserClick(ClickType.Select, deptUserData)
+                      e.stopPropagation();
+                      handleDeptOrUserClick(ClickType.Select, deptUserData);
                     }}
                   />
                 )}
@@ -120,16 +125,35 @@ const TreeViewSelector = ({
                 </Collapse>
               )}
             </div>
-          )
+          );
         })}
         {isDivider && <Divider />}
       </List>
-    )
-    return result
-  }
+    );
+    return result;
+  };
 
   return (
     <>
+      <Tabs
+        value={schemaType}
+        aria-label="basic tabs example"
+        onChange={(e, value) => {
+          setSchemaType(value);
+        }}
+      >
+        <Tab label="企业微信架构" value={0} />
+        <Tab label="人员层级架构" value={1} />
+      </Tabs>
+      {/* <div className={styles.directTeamMembers}>
+        <span className={styles.radioLabel} onClick={handleGetAllTeamMembers}>
+          <Radio
+            checked={!isDirectTeamMembers}
+            name="radio-direct-team-members"
+          />
+          直属组员
+        </span>
+      </div> */}
       {displayMode !== TreeViewDisplayMode.Dropdown && (
         <div
           {...foldSelectorProps}
@@ -180,16 +204,19 @@ const TreeViewSelector = ({
                   ? { color: "#666" }
                   : { paddingLeft: "2rem" },
                 { fontSize: "0.9rem" }
-              )
+              );
               !handleTypeIsCanSelect(canSelect, option.type) &&
-                (props.onClick = () => {})
+                (props.onClick = () => {});
               return (
                 <li {...props} style={style}>
                   {option.name}
                 </li>
-              )
+              );
             }}
-            onChange={(e, value) => value && setSearchToDeptValue(value as IDepartmentAndUserListValue[])}
+            onChange={(e, value) =>
+              value &&
+              setSearchToDeptValue(value as IDepartmentAndUserListValue[])
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -205,7 +232,7 @@ const TreeViewSelector = ({
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default TreeViewSelector
+export default TreeViewSelector;
