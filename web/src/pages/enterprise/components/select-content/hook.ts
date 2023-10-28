@@ -346,12 +346,13 @@ export const useAction = (props: SelectContentHookProps) => {
 
   // 默认选择第一个App对象
   useEffect(() => {
-    corpAppList.length > 0
-      ? setCorpAppValue(corpAppList[0])
-      : (() => {
-          setCorpAppValue(defaultAppValue);
-          setGroupList([]);
-        })();
+    if (isNewOrUpdate === "new")
+      corpAppList.length > 0
+        ? setCorpAppValue(corpAppList[0])
+        : (() => {
+            setCorpAppValue(defaultAppValue);
+            setGroupList([]);
+          })();
   }, [corpAppList]);
 
   useEffect(() => {
