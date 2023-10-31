@@ -183,7 +183,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
           ? newData
           : [...newData, { key: data.AppId, data: dataList }];
       });
-      console.log(oaFData);
+
       setFlattenDepartmentList((prev) => {
         const newData = prev.slice();
         const flattenData = findActiveData(data.AppId, newData);
@@ -209,7 +209,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
               { key: data.AppId, data: oaFData.length ? oaFData : flattenList },
             ];
       });
-      console.log(flattenDepartmentList);
+
       resolve(true);
     });
   };

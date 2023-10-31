@@ -99,11 +99,11 @@ const useAction = ({
     const copyFoldList: IDepartmentAndUserListValue[] = foldList.map(
       (item) => ({ ...item })
     );
-    console.log(clickedItem, copyFoldList);
+
     const copyClickedList = Array.isArray(clickedList)
       ? clickedList
       : [clickedList];
-    console.log(type);
+
     setFoldList(
       handleSelectDataSync(copyFoldList, copyClickedList, value, type)
     );
@@ -153,7 +153,6 @@ const useAction = ({
         );
 
         if (!selectedItem.id && userData) {
-          console.log("first");
           type !== ClickType.Collapse
             ? (userData.selected = value ?? !userData.selected)
             : (userData.isCollapsed = !userData?.isCollapsed);
@@ -182,8 +181,10 @@ const useAction = ({
           const finalInnerItem =
             repeatItem.type === DepartmentAndUserType.Department
               ? innerItem
+              : innerItem?.id === repeatItem.id
+              ? innerItem
               : innerItem?.children.find((cell) => cell.id === repeatItem.id);
-          console.log(repeatItem);
+
           finalInnerItem &&
             (type !== ClickType.Collapse
               ? (finalInnerItem.selected = value ?? !finalInnerItem.selected)
