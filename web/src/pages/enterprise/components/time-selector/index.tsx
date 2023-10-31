@@ -1,14 +1,14 @@
-import { TextField } from "@mui/material";
-import Scheduler from "smart-cron";
-import moment from "moment";
+import { TextField } from "@mui/material"
+import Scheduler from "smart-cron"
+import moment from "moment"
 
 const TimeSelector = (props: {
-  cronExp: string;
-  setCronExp: React.Dispatch<React.SetStateAction<string>>;
-  setCronError: React.Dispatch<React.SetStateAction<string>>;
-  endDateValue: string;
-  setEndDateValue: React.Dispatch<React.SetStateAction<string>>;
-  showErrorPrompt: (text: string) => void;
+  cronExp: string
+  setCronExp: React.Dispatch<React.SetStateAction<string>>
+  setCronError: React.Dispatch<React.SetStateAction<string>>
+  endDateValue: string
+  setEndDateValue: React.Dispatch<React.SetStateAction<string>>
+  showErrorPrompt: (text: string) => void
 }) => {
   const {
     cronExp,
@@ -17,7 +17,7 @@ const TimeSelector = (props: {
     endDateValue,
     setEndDateValue,
     showErrorPrompt,
-  } = props;
+  } = props
 
   return (
     <div style={{ marginBottom: "1rem" }}>
@@ -42,7 +42,6 @@ const TimeSelector = (props: {
             locale={"zh_CN"}
           />
         </div>
-
         <TextField
           label="终止时间"
           type="datetime-local"
@@ -60,16 +59,16 @@ const TimeSelector = (props: {
             ) {
               setEndDateValue(
                 (e.target as HTMLInputElement).value.replace("T", " ")
-              );
+              )
             } else {
-              e.preventDefault();
-              showErrorPrompt("The end time cannot exceed the current time!");
+              e.preventDefault()
+              showErrorPrompt("The end time cannot exceed the current time!")
             }
           }}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TimeSelector;
+export default TimeSelector

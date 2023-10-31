@@ -18,11 +18,7 @@ const UserInformation = () => {
       >
         <PersonIcon sx={{ color: "#000" }} />
       </Button>
-      <Menu
-        open={menuElement !== null}
-        onClose={() => setMenuElement(null)}
-        anchorEl={menuElement}
-      >
+      <Menu open={menuElement !== null} onClose={() => setMenuElement(null)} anchorEl={menuElement}>
         <MenuItem className={styles.username}>{username}</MenuItem>
         <MenuItem onClick={() => signOut()}>Logout</MenuItem>
       </Menu>

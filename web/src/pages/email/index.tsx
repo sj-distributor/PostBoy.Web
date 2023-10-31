@@ -1,40 +1,40 @@
-import useAction from "./hook";
-import styles from "./index.module.scss";
-import { Editor, Toolbar } from "@wangeditor/editor-for-react";
-import "@wangeditor/editor/dist/css/style.css";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import Button from "@mui/material/Button";
-import InputAdornment from "@mui/material/InputAdornment";
-import Chip from "@mui/material/Chip";
-import SendIcon from "@mui/icons-material/Send";
-import ModalBox from "../../components/modal/modal";
-import SendNotice from "../notification";
-import ClearIcon from "@mui/icons-material/Clear";
+import useAction from "./hook"
+import styles from "./index.module.scss"
+import { Editor, Toolbar } from "@wangeditor/editor-for-react"
+import "@wangeditor/editor/dist/css/style.css"
+import TextField from "@mui/material/TextField"
+import MenuItem from "@mui/material/MenuItem"
+import Select from "@mui/material/Select"
+import Button from "@mui/material/Button"
+import InputAdornment from "@mui/material/InputAdornment"
+import Chip from "@mui/material/Chip"
+import SendIcon from "@mui/icons-material/Send"
+import ModalBox from "../../components/modal/modal"
+import SendNotice from "../notification"
+import ClearIcon from "@mui/icons-material/Clear"
 import {
   ILastShowTableData,
   IUpdateMessageCommand,
   MessageJobDestination,
   MessageJobSendType,
-} from "../../dtos/enterprise";
-import DateSelector from "../enterprise/components/date-selector";
-import TimeSelector from "../enterprise/components/time-selector";
-import { sendTypeList, timeZone } from "../../dtos/send-message-job";
+} from "../../dtos/enterprise"
+import DateSelector from "../enterprise/components/date-selector"
+import TimeSelector from "../enterprise/components/time-selector"
+import { sendTypeList, timeZone } from "../../dtos/send-message-job"
 import {
   Box,
   CircularProgress,
   FormControl,
   InputLabel,
   Snackbar,
-} from "@mui/material";
-import { green } from "@mui/material/colors";
+} from "@mui/material"
+import { green } from "@mui/material/colors"
 
 const SendEmail = (props: {
-  emailUpdateData?: ILastShowTableData;
-  outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void;
+  emailUpdateData?: ILastShowTableData
+  outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void
 }) => {
-  const { emailUpdateData, outterGetUpdateData } = props;
+  const { emailUpdateData, outterGetUpdateData } = props
   const {
     toolbarConfig,
     editorConfig,
@@ -83,7 +83,7 @@ const SendEmail = (props: {
     handleChange,
     handleBlur,
     handleAnnexDelete,
-  } = useAction(outterGetUpdateData, emailUpdateData);
+  } = useAction(outterGetUpdateData, emailUpdateData)
 
   return (
     <div className={styles.wrap}>
@@ -108,8 +108,8 @@ const SendEmail = (props: {
           onChange={(event, child) => {
             const selected = emailList.find(
               (e) => e.displayName === event.target.value
-            );
-            selected && setEmailFrom(selected);
+            )
+            selected && setEmailFrom(selected)
           }}
         >
           {emailList.map((item, index) => (
@@ -144,7 +144,7 @@ const SendEmail = (props: {
             value={sendTypeValue}
             label="发送类型"
             onChange={(e) => {
-              setSendTypeValue(Number(e.target.value));
+              setSendTypeValue(Number(e.target.value))
             }}
           >
             {sendTypeList.map((item, key) => (
@@ -183,10 +183,10 @@ const SendEmail = (props: {
                     key={index}
                     onDelete={() => {
                       setEmailToArr((prev) => {
-                        const newValue = prev.filter((x) => x);
-                        newValue.splice(index, 1);
-                        return newValue;
-                      });
+                        const newValue = prev.filter((x) => x)
+                        newValue.splice(index, 1)
+                        return newValue
+                      })
                     }}
                     deleteIcon={<ClearIcon />}
                   />
@@ -238,10 +238,10 @@ const SendEmail = (props: {
                       key={index}
                       onDelete={() => {
                         setEmailCopyToArr((prev) => {
-                          const newValue = prev.filter((x) => x);
-                          newValue.splice(index, 1);
-                          return newValue;
-                        });
+                          const newValue = prev.filter((x) => x)
+                          newValue.splice(index, 1)
+                          return newValue
+                        })
                       }}
                       deleteIcon={<ClearIcon />}
                     />
@@ -261,7 +261,7 @@ const SendEmail = (props: {
           className={styles.corpInput}
           sx={inputSx}
           onChange={(e) => {
-            setEmailSubject(e.target.value);
+            setEmailSubject(e.target.value)
           }}
         />
       </div>
@@ -279,7 +279,7 @@ const SendEmail = (props: {
                 key={index}
                 onDelete={() => handleAnnexDelete(item)}
               />
-            );
+            )
           })}
         </div>
       )}
@@ -316,7 +316,7 @@ const SendEmail = (props: {
               value={timeZoneValue}
               label="时区"
               onChange={(e) => {
-                setTimeZoneValue(Number(e.target.value));
+                setTimeZoneValue(Number(e.target.value))
               }}
             >
               {timeZone
@@ -382,6 +382,6 @@ const SendEmail = (props: {
         <SendNotice recordType={MessageJobDestination.Email} />
       </ModalBox>
     </div>
-  );
-};
-export default SendEmail;
+  )
+}
+export default SendEmail

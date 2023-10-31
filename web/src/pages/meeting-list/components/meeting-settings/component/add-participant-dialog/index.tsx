@@ -8,6 +8,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import useAction from "./hook";
 import styles from "./index.module.scss";
 import {
+  IDepartmentAndUserListValue,
   ITagsList,
   ITargetDialogProps,
   SelectPersonnelTitle,
@@ -35,8 +36,6 @@ const SelectTargetDialog = memo(
       chatId,
       outerTagsValue,
       loadSelectData,
-      schemaType,
-      setSchemaType,
       setChatId,
       setOpenFunction,
       setDeptUserList,
@@ -127,10 +126,10 @@ const SelectTargetDialog = memo(
                         }}
                         defaultSelectedList={loadSelectData}
                         settingSelectedList={(value) => {
-                          setDepartmentSelectedList(value);
+                          setDepartmentSelectedList(
+                            value as IDepartmentAndUserListValue[]
+                          );
                         }}
-                        schemaType={schemaType}
-                        setSchemaType={setSchemaType}
                       />
                     )}
                   </div>
@@ -214,8 +213,7 @@ const SelectTargetDialog = memo(
       prevProps.departmentKeyValue === nextProps.departmentKeyValue &&
       prevProps.AppId === nextProps.AppId &&
       prevProps.chatId === nextProps.chatId &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.schemaType === nextProps.schemaType
+      prevProps.isLoading === nextProps.isLoading
     );
   }
 );

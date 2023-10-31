@@ -29,7 +29,6 @@ import {
   SendObject,
   SendObjOrGroup,
   SendParameter,
-  WorkWeChatTreeStructureType,
 } from "../../../../dtos/enterprise";
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job";
 import { convertBase64 } from "../../../../uilts/convert-base64";
@@ -176,10 +175,6 @@ export const useAction = (props: SelectContentHookProps) => {
     IDepartmentAndUserListValue[]
   >([]);
 
-  const [schemaType, setSchemaType] = useState<WorkWeChatTreeStructureType>(
-    WorkWeChatTreeStructureType.WeChatStructure
-  );
-
   const {
     departmentAndUserList,
     flattenDepartmentList,
@@ -190,7 +185,7 @@ export const useAction = (props: SelectContentHookProps) => {
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
     deduplicationArray,
-  } = useDeptUserData({ appId: corpAppValue?.appId, schemaType });
+  } = useDeptUserData({ appId: corpAppValue?.appId });
 
   const settingSelectedList = (valueList: IDepartmentAndUserListValue[]) => {
     setTargetSelectedList(deduplicationArray(valueList));
@@ -421,23 +416,22 @@ export const useAction = (props: SelectContentHookProps) => {
     }
   }, [isShowDialog]);
 
-  const loadDepartment = async (AppId: string) => {
-    setIsTreeViewLoading(true);
-    const deptListResponse = await GetDeptTreeList(AppId, schemaType);
-    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
-      setIsTreeViewLoading(false);
-
-    !!deptListResponse &&
-      loadDeptUsersFromWebWorker({
-        AppId,
-        workWeChatUnits: deptListResponse.workWeChatUnits,
-      }).then(() => {
-        setIsTreeViewLoading(false);
-        setIsLoadStop(true);
-      });
-  };
-
   useEffect(() => {
+    const loadDepartment = async (AppId: string) => {
+      setIsTreeViewLoading(true);
+      const deptListResponse = await GetDeptTreeList(AppId);
+      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+        setIsTreeViewLoading(false);
+
+      !!deptListResponse &&
+        loadDeptUsersFromWebWorker({
+          AppId,
+          workWeChatUnits: deptListResponse.workWeChatUnits,
+        }).then(() => {
+          setIsTreeViewLoading(false);
+          setIsLoadStop(true);
+        });
+    };
     if (
       isShowDialog &&
       !!corpAppValue &&
@@ -467,10 +461,6 @@ export const useAction = (props: SelectContentHookProps) => {
       corpAppValue.appId && loadDepartment(corpAppValue.appId);
     }
   }, [corpAppValue?.appId, isShowDialog]);
-
-  useEffect(() => {
-    corpAppValue.appId && loadDepartment(corpAppValue.appId);
-  }, [schemaType]);
 
   // 判断文件大小
   const judgingFileSize = (
@@ -1136,7 +1126,5 @@ export const useAction = (props: SelectContentHookProps) => {
     recursiveSearchDeptOrUser,
     loadDeptUsersFromWebWorker,
     settingSelectedList,
-    schemaType,
-    setSchemaType,
   };
 };

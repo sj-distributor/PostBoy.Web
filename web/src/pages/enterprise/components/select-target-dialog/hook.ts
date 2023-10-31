@@ -1,4 +1,4 @@
-import { useBoolean, useDebounceEffect } from "ahooks";
+import { useDebounceEffect } from "ahooks";
 import { clone, uniq } from "ramda";
 import { useEffect, useState } from "react";
 import {
@@ -70,7 +70,7 @@ const useAction = (props: {
     settingSelectedList,
   } = props;
 
-  const defaultGroupOwner: IDepartmentAndUserListValue = {
+  const defaultGroupOwner = {
     id: "-1",
     name: "随机群主",
     type: DepartmentAndUserType.User,
@@ -78,7 +78,6 @@ const useAction = (props: {
     selected: false,
     isCollapsed: false,
     children: [],
-    department_leader: [],
   };
   const [departmentSelectedList, setDepartmentSelectedList] = useState<
     IDepartmentAndUserListValue[] | undefined
