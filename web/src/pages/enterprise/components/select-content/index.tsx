@@ -123,6 +123,8 @@ const SelectContent = memo(
       recursiveSearchDeptOrUser,
       loadDeptUsersFromWebWorker,
       settingSelectedList,
+      schemaType,
+      setSchemaType,
     } = useAction({
       outerSendData: sendData,
       getSendData,
@@ -429,6 +431,8 @@ const SelectContent = memo(
             isUpdatedDeptUser={isUpdatedDeptUser}
             targetSelectedList={targetSelectedList}
             settingSelectedList={settingSelectedList}
+            schemaType={schemaType}
+            setSchemaType={setSchemaType}
           />
         </div>
 
@@ -510,7 +514,7 @@ const SelectContent = memo(
                     <MentionsInput
                       className={`${styles.MentionsInput} ${
                         !isFocusing || styles.borderColor
-                      } ${styles.contentTextarea}`}
+                      }`}
                       value={content}
                       allowSuggestionsAboveCursor
                       customSuggestionsContainer={(children) =>

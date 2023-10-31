@@ -90,6 +90,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
     participantList,
     tipsObject,
     appLoading,
+    schemaType,
+    setSchemaType,
     setCorpsValue,
     setIsShowDialog,
     setDepartmentAndUserList,
@@ -209,6 +211,8 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
         setChatId={setChatId}
         loadSelectData={loadSelectData}
         settingSelectedList={settingSelectedList}
+        schemaType={schemaType}
+        setSchemaType={setSchemaType}
       />
       <SeetingsDialog
         open={openSettingsDialog}

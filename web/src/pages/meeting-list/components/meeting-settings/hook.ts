@@ -39,6 +39,7 @@ import { clone } from "ramda";
 import { createMeeting, updateMeeting } from "../../../../api/meeting-seetings";
 import { useBoolean } from "ahooks";
 import useDeptUserData from "../../../../hooks/deptUserData";
+import { WorkWeChatTreeStructureType } from "../../../../dtos/enterprise";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -68,6 +69,11 @@ const useAction = (props: MeetingSettingsProps) => {
     agentId: 0,
   });
 
+  //层级结构类型
+  const [schemaType, setSchemaType] = useState<WorkWeChatTreeStructureType>(
+    WorkWeChatTreeStructureType.WeChatStructure
+  );
+
   const {
     departmentAndUserList,
     flattenDepartmentList,
@@ -77,6 +83,7 @@ const useAction = (props: MeetingSettingsProps) => {
     loadDeptUsersFromWebWorker,
   } = useDeptUserData({
     appId: corpAppValue?.appId,
+    schemaType: schemaType,
   });
 
   // 获取的企业数组
@@ -555,6 +562,7 @@ const useAction = (props: MeetingSettingsProps) => {
       let attendeesList: string[] = [];
 
       participantList &&
+        participantList.length &&
         (attendeesList = getUserChildrenList(
           departmentAndUserList[0].data,
           participantList,
@@ -903,6 +911,7 @@ const useAction = (props: MeetingSettingsProps) => {
             selected: false,
             isCollapsed: false,
             children: [],
+            department_leader: [],
           })
         );
         return hostData;
@@ -919,6 +928,7 @@ const useAction = (props: MeetingSettingsProps) => {
             selected: false,
             isCollapsed: false,
             children: [],
+            department_leader: [],
           })
         );
         return apponintData;
@@ -953,6 +963,7 @@ const useAction = (props: MeetingSettingsProps) => {
               selected: false,
               isCollapsed: false,
               children: [],
+              department_leader: [],
             })
           );
 
@@ -968,6 +979,7 @@ const useAction = (props: MeetingSettingsProps) => {
           selected: true,
           isCollapsed: false,
           children: [],
+          department_leader: [],
         },
       ]);
       setAppLoading(false);
@@ -977,6 +989,22 @@ const useAction = (props: MeetingSettingsProps) => {
   //获取会议设置数据
   const handleGetSettingData = (data: WorkWeChatMeetingSettingDto) => {
     setSettings(data);
+  };
+
+  const loadDepartment = async (AppId: string) => {
+    setIsTreeViewLoading(true);
+    const deptListResponse = await GetDeptTreeList(AppId, schemaType);
+    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+      setIsTreeViewLoading(false);
+
+    !!deptListResponse &&
+      loadDeptUsersFromWebWorker({
+        AppId,
+        workWeChatUnits: deptListResponse.workWeChatUnits,
+      }).then(() => {
+        setIsTreeViewLoading(false);
+        setIsLoadStop(true);
+      });
   };
 
   // 初始化企业数组
@@ -1047,21 +1075,6 @@ const useAction = (props: MeetingSettingsProps) => {
   }, [participantList]);
 
   useEffect(() => {
-    const loadDepartment = async (AppId: string) => {
-      setIsTreeViewLoading(true);
-      const deptListResponse = await GetDeptTreeList(AppId);
-      if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
-        setIsTreeViewLoading(false);
-
-      !!deptListResponse &&
-        loadDeptUsersFromWebWorker({
-          AppId,
-          workWeChatUnits: deptListResponse.workWeChatUnits,
-        }).then(() => {
-          setIsTreeViewLoading(false);
-          setIsLoadStop(true);
-        });
-    };
     if (
       !!corpAppValue &&
       !departmentAndUserList.find((e) => e.key === corpAppValue.appId)
@@ -1083,6 +1096,10 @@ const useAction = (props: MeetingSettingsProps) => {
         loadDepartment(corpAppValue.appId);
     }
   }, [isShowDialog]);
+
+  useEffect(() => {
+    corpAppValue.appId && loadDepartment(corpAppValue.appId);
+  }, [schemaType]);
 
   useEffect(() => {
     if (isLoadStop) {
@@ -1196,6 +1213,8 @@ const useAction = (props: MeetingSettingsProps) => {
     participantList,
     tipsObject,
     appLoading,
+    schemaType,
+    setSchemaType,
     setCorpsValue,
     setIsShowDialog,
     setDepartmentAndUserList,
