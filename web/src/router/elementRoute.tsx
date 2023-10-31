@@ -11,11 +11,12 @@ import EmailIcon from "@mui/icons-material/Email";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { RolePermission } from "../pages/role-perimission";
-import { RoleFrom } from "../pages/role-perimission/components/role-from";
-import { UserList } from "../pages/role-perimission/components/user-list";
-import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
+
 import { Navigate } from "react-router-dom";
+import { RolePermission } from "../pages/role-perimission";
+import { UserList } from "../pages/role-perimission/components/user-list";
+import { RoleFrom } from "../pages/role-perimission/components/role-from";
+import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
 
 export const routerArray: RouteItem[] = [
   {
