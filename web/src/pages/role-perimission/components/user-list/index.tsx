@@ -1,6 +1,12 @@
 import styles from "./index.module.scss";
 
-import { Button, IconButton, Pagination, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  IconButton,
+  Pagination,
+  TextField,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
@@ -15,6 +21,7 @@ export const UserList = () => {
     pageDto,
     userData,
     selectId,
+    loading,
     navigate,
     setSelectId,
     handleInputChange,
@@ -107,16 +114,29 @@ export const UserList = () => {
         </div>
       </div>
       <div className={styles.content}>
-        <DataGrid
-          columns={columns}
-          rows={userData.roleUsers}
-          hideFooter
-          checkboxSelection
-          disableColumnMenu
-          onSelectionModelChange={(selectionModel) => {
-            setSelectId(selectionModel as string[]);
-          }}
-        />
+        {!loading ? (
+          <DataGrid
+            columns={columns}
+            rows={userData.roleUsers}
+            hideFooter
+            checkboxSelection
+            disableColumnMenu
+            onSelectionModelChange={(selectionModel) => {
+              setSelectId(selectionModel as string[]);
+            }}
+          />
+        ) : (
+          <CircularProgress
+            style={{
+              position: "absolute",
+              width: "2rem",
+              height: "2rem",
+              left: "50%",
+              top: "50%",
+              margin: "-1rem 0 0 -1rem",
+            }}
+          />
+        )}
       </div>
       <div className={styles.footer}>
         <Pagination

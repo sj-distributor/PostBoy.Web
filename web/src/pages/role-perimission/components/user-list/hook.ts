@@ -21,6 +21,8 @@ export const useAction = () => {
     roleUsers: [],
   });
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -36,12 +38,18 @@ export const useAction = () => {
   };
 
   const initUserList = (search: string = "") => {
+    setLoading(true);
     // 少了传userId，搜索的参数，以及返回少了用户名
     GetRoleUser({ PageIndex: pageDto.PageIndex, PageSize: pageDto.PageSize })
       .then((res) => {
         setUserData(res);
       })
-      .catch(() => setUserData({ count: 0, roleUsers: [] }));
+      .catch(() => setUserData({ count: 0, roleUsers: [] }))
+      .finally(() => {
+        setTimeout(() => {
+          setLoading(false);
+        }, 300);
+      });
   };
 
   useEffect(() => {
@@ -54,6 +62,7 @@ export const useAction = () => {
     pageDto,
     userData,
     selectId,
+    loading,
     navigate,
     setSelectId,
     handleInputChange,
