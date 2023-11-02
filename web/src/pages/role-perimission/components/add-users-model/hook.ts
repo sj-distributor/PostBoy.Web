@@ -1,8 +1,42 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TreeNode } from "./props";
 import { TreeSelectRef } from "../tree-select/props";
+import { GetDeptTreeList } from "../../../../api/enterprise";
+import { WorkWeChatTreeStructureType } from "../../../../dtos/enterprise";
+import useDeptUserData from "../../../../hooks/deptUserData";
 
 export const useAction = () => {
+  const {
+    departmentAndUserList,
+    flattenDepartmentList,
+    departmentKeyValue,
+    searchKeyValue,
+    setDepartmentAndUserList,
+    setFlattenDepartmentList,
+    recursiveSearchDeptOrUser,
+    loadDeptUsersFromWebWorker,
+    deduplicationArray,
+  } = useDeptUserData({ appId: "b2X28ClKuu" });
+
+  const getTreeListData = async () => {
+    const deptListResponse = await GetDeptTreeList(
+      "b2X28ClKuu",
+      WorkWeChatTreeStructureType.PersonnelLevelStructure
+    );
+    console.log(deptListResponse);
+    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+      !!deptListResponse &&
+        loadDeptUsersFromWebWorker({
+          AppId: "b2X28ClKuu",
+          workWeChatUnits: deptListResponse.workWeChatUnits,
+        }).then(() => {});
+
+    console.log(departmentAndUserList);
+  };
+
+  useEffect(() => {
+    getTreeListData();
+  }, []);
   const treeData: TreeNode[] = [
     {
       id: 1,
