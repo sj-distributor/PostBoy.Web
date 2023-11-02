@@ -28,14 +28,14 @@ export const useAction = () => {
   };
 
   const handleSearch = () => {
-    console.log("Search content:", inputVal);
+    initUserList(inputVal);
   };
 
   const handleDelete = (id: string[]) => {
     DeleteRoleUser({ roleUserIds: id });
   };
 
-  const initUserList = () => {
+  const initUserList = (search: string = "") => {
     // 少了传userId，搜索的参数，以及返回少了用户名
     GetRoleUser({ PageIndex: pageDto.PageIndex, PageSize: pageDto.PageSize })
       .then((res) => {
