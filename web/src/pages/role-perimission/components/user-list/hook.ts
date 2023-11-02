@@ -1,45 +1,25 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { IUserTableDto } from "../../../../dtos/role";
+import { PageDto, RoleUserResponse } from "../../../../dtos/role";
 import { useNavigate } from "react-router-dom";
-import { GridSelectionModel } from "@mui/x-data-grid";
+import { DeleteRoleUser, GetRoleUser } from "../../../../api/role-user";
 
 export const useAction = () => {
-  const initData: IUserTableDto[] = [
-    {
-      id: 1,
-      name: "xxx",
-      date: "2014-12-24 23:12:00",
-    },
-    {
-      id: 2,
-      name: "xxx",
-      date: "2015-12-24 23:12:00",
-    },
-    {
-      id: 3,
-      name: "xxx",
-      date: "2016-12-24 23:12:00",
-    },
-    {
-      id: 4,
-      name: "xxx",
-      date: "2017-12-24 23:12:00",
-    },
-    {
-      id: 5,
-      name: "xxx",
-      date: "2018-12-24 23:12:00",
-    },
-  ];
-
   const [inputVal, setInputVal] = useState<string>("");
 
-  const [rows, setRows] = useState<IUserTableDto[]>(initData);
-
-  const [selectId, setSelectId] = useState<GridSelectionModel>([]);
+  const [selectId, setSelectId] = useState<string[]>([]);
 
   const addUsersRef = useRef<ModalBoxRef>(null);
+
+  const [pageDto, setPageDto] = useState<PageDto>({
+    PageIndex: 1,
+    PageSize: 20,
+  });
+
+  const [userData, setUserData] = useState<RoleUserResponse>({
+    count: 0,
+    roleUsers: [],
+  });
 
   const navigate = useNavigate();
 
@@ -51,29 +31,34 @@ export const useAction = () => {
     console.log("Search content:", inputVal);
   };
 
-  const handleDelete = (id: number) => {
-    const updatedRows = rows.filter((row: IUserTableDto) => row.id !== id);
-
-    setRows(updatedRows);
+  const handleDelete = (id: string[]) => {
+    DeleteRoleUser({ roleUserIds: id });
   };
 
-  const batchDelete = () => {
-    const updatedRows = rows.filter(
-      (row: IUserTableDto) => !selectId.includes(row.id)
-    );
-
-    setRows(updatedRows);
+  const initUserList = () => {
+    // 少了传userId，搜索的参数，以及返回少了用户名
+    GetRoleUser({ PageIndex: pageDto.PageIndex, PageSize: pageDto.PageSize })
+      .then((res) => {
+        setUserData(res);
+      })
+      .catch(() => setUserData({ count: 0, roleUsers: [] }));
   };
+
+  useEffect(() => {
+    initUserList();
+  }, [pageDto.PageIndex]);
 
   return {
-    rows,
     inputVal,
     addUsersRef,
+    pageDto,
+    userData,
+    selectId,
     navigate,
     setSelectId,
     handleInputChange,
     handleSearch,
     handleDelete,
-    batchDelete,
+    setPageDto,
   };
 };

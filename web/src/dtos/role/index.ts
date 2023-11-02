@@ -1,9 +1,3 @@
-export interface IUserTableDto {
-  id: number;
-  name: string;
-  date: string;
-}
-
 export interface IRoleTabltDto {
   id: number;
   name: string;
@@ -40,3 +34,28 @@ export const UserRoleType = {
   [UserRoleEnum.Admin]: "管理員",
   [UserRoleEnum.User]: "用戶",
 };
+
+export interface PageDto {
+  PageIndex: number;
+  PageSize: number;
+}
+
+export interface RoleUserResponse {
+  count: 0;
+  roleUsers: RoleUserItemDto[];
+}
+
+export interface RoleUserItemDto extends RoleUsersDto {
+  createdDate: string;
+  modifiedDate: string;
+}
+
+export interface RoleUsersDto {
+  id: string;
+  roleId: string;
+  userId: string;
+}
+
+export interface DeleteRoleUserRequest {
+  roleUserIds: string[];
+}

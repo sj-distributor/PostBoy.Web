@@ -1,23 +1,26 @@
 import styles from "./index.module.scss";
 
 import { Button, IconButton, Pagination, TextField } from "@mui/material";
-import { DataGrid, GridColDef, GridSelectionModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import ModalBox from "../../../../components/modal/modal";
 import { AddUsersModel } from "../add-users-model";
+import moment from "moment";
 
 export const UserList = () => {
   const {
-    rows,
     inputVal,
     addUsersRef,
+    pageDto,
+    userData,
+    selectId,
     navigate,
     setSelectId,
     handleInputChange,
     handleSearch,
     handleDelete,
-    batchDelete,
+    setPageDto,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -27,16 +30,19 @@ export const UserList = () => {
       width: 300,
     },
     {
-      field: "date",
+      field: "modifiedDate",
       headerName: "更新時間",
       width: 600,
+      renderCell: (params) =>
+        moment(params.row.modifiedDate).format("YYYY-MM-DD HH:mm:ss") ??
+        moment(params.row.createdDate).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
       field: "actions",
       headerName: "操作",
       width: 150,
       renderCell: (params) => (
-        <Button variant="text" onClick={() => handleDelete(params.row.id)}>
+        <Button variant="text" onClick={() => handleDelete([params.row.id])}>
           移除
         </Button>
       ),
@@ -84,7 +90,7 @@ export const UserList = () => {
           <Button
             className={styles.btnDel}
             variant="contained"
-            onClick={batchDelete}
+            onClick={() => handleDelete(selectId)}
           >
             批量移除
           </Button>
@@ -100,17 +106,25 @@ export const UserList = () => {
       <div className={styles.content}>
         <DataGrid
           columns={columns}
-          rows={rows}
+          rows={userData.roleUsers}
           hideFooter
           checkboxSelection
           disableColumnMenu
-          onSelectionModelChange={(selectionModel: GridSelectionModel) =>
-            setSelectId(selectionModel)
-          }
+          onSelectionModelChange={(selectionModel) => {
+            console.log(selectionModel);
+
+            setSelectId(selectionModel as string[]);
+          }}
         />
       </div>
       <div className={styles.footer}>
-        <Pagination count={10} shape="rounded" color="primary" />
+        <Pagination
+          page={pageDto.PageIndex}
+          count={userData.count}
+          onChange={(event, page) => {
+            setPageDto((prev) => ({ ...prev, PageIndex: page }));
+          }}
+        />
       </div>
     </div>
   );
