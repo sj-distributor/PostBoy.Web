@@ -1,4 +1,3 @@
-import { IEmailResonponse } from "../../dtos/email";
 import {
   DeleteRoleUserRequest,
   PageDto,
@@ -12,14 +11,15 @@ export const GetRoleUser = async (data: PageDto) => {
   return await Get<RoleUserResponse>("/api/Security/role/users");
 };
 
-export const UpdateRoleUser = async (data: RoleUsersDto) => {
-  return await Post<RoleUserItemDto>("/api/Security/role/users/update");
-};
-
 export const DeleteRoleUser = async (data: DeleteRoleUserRequest) => {
   return await Post("/api/Security/role/users/delete");
 };
 
-export const AddRoleUser = async (data: RoleUsersDto) => {
-  return await Post<RoleUserItemDto>("/api/Security/role/users/create");
-};
+// add update做二合一
+// export const AddRoleUser = async (data: RoleUsersDto) => {
+//   return await Post<RoleUserItemDto>("/api/Security/role/users/create");
+// };
+
+// export const UpdateRoleUser = async (data: RoleUsersDto) => {
+//   return await Post<RoleUserItemDto>("/api/Security/role/users/update");
+// };
