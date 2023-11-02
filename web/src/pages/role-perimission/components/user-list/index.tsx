@@ -28,11 +28,13 @@ export const UserList = () => {
       field: "name",
       headerName: "用戶名",
       width: 300,
+      sortable: false,
     },
     {
       field: "modifiedDate",
       headerName: "更新時間",
       width: 600,
+      sortable: false,
       renderCell: (params) =>
         moment(params.row.modifiedDate).format("YYYY-MM-DD HH:mm:ss") ??
         moment(params.row.createdDate).format("YYYY-MM-DD HH:mm:ss"),
@@ -41,6 +43,7 @@ export const UserList = () => {
       field: "actions",
       headerName: "操作",
       width: 150,
+      sortable: false,
       renderCell: (params) => (
         <Button variant="text" onClick={() => handleDelete([params.row.id])}>
           移除
@@ -111,8 +114,6 @@ export const UserList = () => {
           checkboxSelection
           disableColumnMenu
           onSelectionModelChange={(selectionModel) => {
-            console.log(selectionModel);
-
             setSelectId(selectionModel as string[]);
           }}
         />
