@@ -1,10 +1,12 @@
 import styles from "./index.module.scss";
 
 import {
+  Alert,
   Button,
   CircularProgress,
   IconButton,
   Pagination,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -22,6 +24,9 @@ export const UserList = () => {
     userData,
     selectId,
     loading,
+    openError,
+    alertType,
+    promptText,
     navigate,
     setSelectId,
     handleInputChange,
@@ -61,6 +66,15 @@ export const UserList = () => {
 
   return (
     <div className={styles.container}>
+      <Snackbar
+        open={openError}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert severity={alertType}>{promptText}</Alert>
+      </Snackbar>
       <div className={styles.nav}>
         <div className={styles.navTitle}>用戶列表</div>
         <div className={styles.navSearch}>

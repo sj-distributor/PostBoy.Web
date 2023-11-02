@@ -3,6 +3,7 @@ import { ModalBoxRef } from "../../../../dtos/modal";
 import { PageDto, RoleUserResponse } from "../../../../dtos/role";
 import { useNavigate } from "react-router-dom";
 import { DeleteRoleUser, GetRoleUser } from "../../../../api/role-user";
+import { useBoolean } from "ahooks";
 
 export const useAction = () => {
   const [inputVal, setInputVal] = useState<string>("");
@@ -23,6 +24,12 @@ export const useAction = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [openError, openErrorAction] = useBoolean(false);
+
+  const [alertType, setAlertType] = useState<"error" | "success">("error");
+
+  const [promptText, setPromptText] = useState("");
+
   const navigate = useNavigate();
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +41,18 @@ export const useAction = () => {
   };
 
   const handleDelete = (id: string[]) => {
-    DeleteRoleUser({ roleUserIds: id });
+    DeleteRoleUser({ roleUserIds: id })
+      .then(() => {
+        setAlertType("success");
+        setPromptText("移除成功");
+        openErrorAction.setTrue();
+        initUserList();
+      })
+      .catch(() => {
+        setAlertType("error");
+        setPromptText("移除失败");
+        openErrorAction.setTrue();
+      });
   };
 
   const initUserList = (search: string = "") => {
@@ -56,6 +74,15 @@ export const useAction = () => {
     initUserList();
   }, [pageDto.PageIndex]);
 
+  // 延迟关闭警告提示
+  useEffect(() => {
+    if (openError) {
+      setTimeout(() => {
+        openErrorAction.setFalse();
+      }, 3000);
+    }
+  }, [openError]);
+
   return {
     inputVal,
     addUsersRef,
@@ -63,6 +90,9 @@ export const useAction = () => {
     userData,
     selectId,
     loading,
+    openError,
+    alertType,
+    promptText,
     navigate,
     setSelectId,
     handleInputChange,
