@@ -35,6 +35,11 @@ export const RoleFrom = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
+    //new
+    permissions,
+    role,
+    updateRole,
+    addOrModifyRolePermission,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -154,7 +159,10 @@ export const RoleFrom = () => {
             <Button
               className={styles.navButton}
               variant="contained"
-              onClick={() => navigate("/roles/roleList")}
+              onClick={() => {
+                addOrModifyRolePermission();
+                // navigate("/roles/roleList")
+              }}
             >
               確認
             </Button>
@@ -178,6 +186,8 @@ export const RoleFrom = () => {
                   disableUnderline={true}
                   sx={inputStyles}
                   placeholder="請輸入角色名稱"
+                  value={role?.name ?? ""}
+                  onChange={(e) => updateRole("name", e.target.value)}
                 />
               </div>
             </div>
@@ -188,6 +198,8 @@ export const RoleFrom = () => {
                   disableUnderline={true}
                   sx={inputStyles}
                   placeholder="請輸入角色描述"
+                  value={role?.description ?? ""}
+                  onChange={(e) => updateRole("description", e.target.value)}
                 />
               </div>
             </div>

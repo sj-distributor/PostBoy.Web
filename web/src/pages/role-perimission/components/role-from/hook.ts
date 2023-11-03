@@ -5,8 +5,10 @@ import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
 import {
+  AddRolePermission,
   GetPermissions,
   GetRolePermission,
+  UpdateRolePermission,
 } from "../../../../api/role-user-permissions";
 import {
   IPermissionsDto,
@@ -14,6 +16,7 @@ import {
   IRolePermission,
   IRolePermissionItem,
 } from "../../../../dtos/role-user-permissions";
+import { error } from "console";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
@@ -315,15 +318,6 @@ export const useAction = () => {
 
   const { id } = useParams();
 
-  const [permissions, setPermissions] = useState<IPermissionsDto>({
-    count: 0,
-    permissions: [],
-  });
-
-  const [role, setRole] = useState<IRole | null>(null);
-
-  const [rolePermission, setRolePermission] = useState<IRolePermissionItem[]>();
-
   const defaultRole: IRole = {
     id: "",
     name: "",
@@ -332,22 +326,44 @@ export const useAction = () => {
     modifiedDate: "",
   };
 
-  const updateRole = (k: keyof IRole, v: string) => {
-    let data = clone(role);
-    if (data) data[k] = v;
-    else {
-      data = {
-        ...defaultRole,
-        [k]: v,
-      };
-    }
+  const [permissions, setPermissions] = useState<IPermissionsDto>({
+    count: 0,
+    permissions: [],
+  });
 
-    setRole(data);
+  const [role, setRole] = useState<IRole>(defaultRole);
+
+  const [rolePermission, setRolePermission] = useState<IRolePermissionItem[]>(
+    []
+  );
+
+  const updateRole = (k: keyof IRole, v: string) => {
+    setRole((prev) => ({ ...prev, [k]: v }));
   };
 
-  useEffect(() => {
-    console.log("role", role);
-  }, [role]);
+  const addOrModifyRolePermission = () => {
+    id ? updateRolePermission() : addRolePermission();
+  };
+
+  const addRolePermission = () => {
+    if (role.name && role.description)
+      AddRolePermission({ role, rolePermissions: rolePermission })
+        .then((res) => console.log(res))
+        .catch((error) => console.log((error as Error).message));
+    else {
+      console.log("添加未填完");
+    }
+  };
+
+  const updateRolePermission = () => {
+    if (role.name && role.description)
+      UpdateRolePermission({ role, rolePermissions: rolePermission })
+        .then((res) => console.log(res))
+        .catch((error) => console.log((error as Error).message));
+    else {
+      console.log("修改未填完");
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -355,16 +371,12 @@ export const useAction = () => {
       GetRolePermission(id)
         .then((res) => {
           const { role, rolePermissions } = res;
-
-          setRole(role ?? null);
-
+          setRole(role ?? defaultRole);
           setRolePermission(rolePermissions ?? []);
         })
         .catch((err) => {
-          console.log((err as Error).message);
-
-          setRole(null);
-
+          // console.log((err as Error).message);
+          setRole(defaultRole);
           setRolePermission([]);
         });
     }
@@ -404,5 +416,8 @@ export const useAction = () => {
     // new
     permissions,
     updateRole,
+    role,
+    rolePermission,
+    addOrModifyRolePermission,
   };
 };
