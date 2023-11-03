@@ -6,6 +6,7 @@ import { ModalBoxRef } from "../../../../dtos/modal";
 import { RefObject } from "react";
 import { TreeNode } from "./props";
 import { TreeSelectList } from "../tree-select";
+import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -18,6 +19,7 @@ export const AddUsersModel = (props: {
     handleSearchChange,
     treeSelectRef,
     alreadySelectData,
+    departmentAndUserList,
     setAlreadySelectData,
   } = useAction();
 
@@ -47,7 +49,9 @@ export const AddUsersModel = (props: {
           <TreeSelectList
             ref={treeSelectRef}
             setSelectedData={(selectItems) => setAlreadySelectData(selectItems)}
-            treeData={treeData}
+            treeData={
+              departmentAndUserList?.length ? departmentAndUserList[0].data : []
+            }
             searchValue={searchValue}
           />
         </div>
@@ -62,19 +66,21 @@ export const AddUsersModel = (props: {
             />
           </div>
           <div className={styles.selectItemsBox}>
-            {alreadySelectData.map((selectItems: TreeNode) => {
-              return (
-                <div className={styles.selectListWrap} key={selectItems.id}>
-                  <div>{selectItems.title}</div>
-                  <CloseIcon
-                    className={styles.delete}
-                    onClick={() =>
-                      treeSelectRef.current?.selectNode(selectItems)
-                    }
-                  />
-                </div>
-              );
-            })}
+            {alreadySelectData.map(
+              (selectItems: IDepartmentAndUserListValue) => {
+                return (
+                  <div className={styles.selectListWrap} key={selectItems.id}>
+                    <div>{selectItems.name}</div>
+                    <CloseIcon
+                      className={styles.delete}
+                      onClick={() =>
+                        treeSelectRef.current?.selectNode(selectItems)
+                      }
+                    />
+                  </div>
+                );
+              }
+            )}
           </div>
         </div>
         <div className={styles.buttonBox}>

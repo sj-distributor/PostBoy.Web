@@ -2,8 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { TreeNode } from "./props";
 import { TreeSelectRef } from "../tree-select/props";
 import { GetDeptTreeList } from "../../../../api/enterprise";
-import { WorkWeChatTreeStructureType } from "../../../../dtos/enterprise";
+import {
+  IDepartmentAndUserListValue,
+  WorkWeChatTreeStructureType,
+} from "../../../../dtos/enterprise";
 import useDeptUserData from "../../../../hooks/deptUserData";
+import auth from "../../../../auth";
 
 export const useAction = () => {
   const {
@@ -18,25 +22,32 @@ export const useAction = () => {
     deduplicationArray,
   } = useDeptUserData({ appId: "b2X28ClKuu" });
 
+  const { setSchemaType, schemaType } = auth();
+
+  const [personnelLevelUserList, setPersonnelLevelUserList] = useState<
+    IDepartmentAndUserListValue[]
+  >([]);
+
   const getTreeListData = async () => {
+    setSchemaType(WorkWeChatTreeStructureType.PersonnelLevelStructure);
+
     const deptListResponse = await GetDeptTreeList(
       "b2X28ClKuu",
-      WorkWeChatTreeStructureType.PersonnelLevelStructure
+      WorkWeChatTreeStructureType.WeChatStructure
     );
-    console.log(deptListResponse);
-    if (deptListResponse && deptListResponse.workWeChatUnits.length === 0)
+
+    if (deptListResponse && deptListResponse.workWeChatUnits.length)
       !!deptListResponse &&
         loadDeptUsersFromWebWorker({
           AppId: "b2X28ClKuu",
           workWeChatUnits: deptListResponse.workWeChatUnits,
         }).then(() => {});
-
-    console.log(departmentAndUserList);
   };
 
   useEffect(() => {
     getTreeListData();
   }, []);
+
   const treeData: TreeNode[] = [
     {
       id: 1,
@@ -142,7 +153,9 @@ export const useAction = () => {
 
   const treeSelectRef = useRef<TreeSelectRef>(null);
 
-  const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
+  const [alreadySelectData, setAlreadySelectData] = useState<
+    IDepartmentAndUserListValue[]
+  >([]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -154,6 +167,7 @@ export const useAction = () => {
     handleSearchChange,
     treeSelectRef,
     alreadySelectData,
+    departmentAndUserList,
     setAlreadySelectData,
   };
 };

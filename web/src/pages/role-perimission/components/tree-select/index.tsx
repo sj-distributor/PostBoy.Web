@@ -12,14 +12,15 @@ import { useAction } from "./hook";
 import { ArrowDropDownIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./index.module.scss";
-import { TreeNode } from "../add-users-model/props";
+
 import { TreeSelectRef } from "./props";
+import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
 
 export const TreeSelectList: React.FC<{
-  treeData: TreeNode[];
+  treeData: IDepartmentAndUserListValue[];
   searchValue: string;
   ref: React.Ref<TreeSelectRef>;
-  setSelectedData: (data: TreeNode[]) => void;
+  setSelectedData: (data: IDepartmentAndUserListValue[]) => void;
 }> = React.forwardRef(({ treeData, searchValue, setSelectedData }, ref) => {
   const {
     isSearch,
@@ -42,21 +43,25 @@ export const TreeSelectList: React.FC<{
       ? searchDisplayTreeData[index]
       : displayFlatUpdateTreeData[index];
 
-    const isSelected = selectedNodes.has(item.id);
+    const isSelected = selectedNodes.has(Number(item.id));
 
     const isExpanded = isSearch
-      ? expandedNodes.searchExpandedNodes.has(item.id)
-      : expandedNodes.displayExpandedNodes.has(item.id);
+      ? expandedNodes.searchExpandedNodes.has(Number(item.id))
+      : expandedNodes.displayExpandedNodes.has(Number(item.id));
 
-    const isIndeterminate = indeterminateNodes.has(item.id);
+    const isIndeterminate = indeterminateNodes.has(Number(item.id));
 
     const hasChildren = item.children.length > 0;
 
     return (
       <div style={style}>
         <ListItem
-          key={item.idRoute.toString()}
-          style={{ paddingLeft: `${2 * (item.idRoute.length - 1)}rem` }}
+          key={index}
+          style={{
+            paddingLeft: `${
+              2 * (item.idRoute ? item.idRoute.length - 1 : 0)
+            }rem`,
+          }}
         >
           <ListItemIcon>
             <Checkbox
@@ -81,7 +86,7 @@ export const TreeSelectList: React.FC<{
               </div>
             )}
           </ListItemIcon>
-          <ListItemText primary={item.title} />
+          <ListItemText primary={item.name} />
         </ListItem>
       </div>
     );

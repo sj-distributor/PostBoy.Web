@@ -1,18 +1,18 @@
 import { clone } from "ramda";
 import { useEffect, useMemo, useState } from "react";
-import { TreeNode } from "../add-users-model/props";
+import { IDepartmentAndUserListValue } from "../../../../dtos/enterprise";
 
 export const useAction = (
-  treeData: TreeNode[],
+  treeData: IDepartmentAndUserListValue[],
   searchValue: string,
-  setSelectedData: (data: TreeNode[]) => void
+  setSelectedData: (data: IDepartmentAndUserListValue[]) => void
 ) => {
   //平铺树结构
   const flattenTreeTotalList = (
-    tree: TreeNode[],
+    tree: IDepartmentAndUserListValue[],
     parentIdRoute: number[] = []
-  ): TreeNode[] => {
-    let flattenedList: TreeNode[] = [];
+  ): IDepartmentAndUserListValue[] => {
+    let flattenedList: IDepartmentAndUserListValue[] = [];
 
     for (const node of tree) {
       const idRoute = [...parentIdRoute, node.id];
@@ -21,7 +21,9 @@ export const useAction = (
 
       node.children &&
         node.children.length > 0 &&
-        flattenedList.push(...flattenTreeTotalList(node.children, idRoute));
+        flattenedList.push(
+          ...flattenTreeTotalList(node.children, [Number(idRoute)])
+        );
     }
 
     return flattenedList;
@@ -30,22 +32,24 @@ export const useAction = (
   const flatTreeTotalListData = flattenTreeTotalList(treeData);
 
   const [expandedNodes, setExpandedNodes] = useState<{
-    displayExpandedNodes: Set<number>;
-    searchExpandedNodes: Set<number>;
+    displayExpandedNodes: Set<number | undefined>;
+    searchExpandedNodes: Set<number | undefined>;
   }>({ displayExpandedNodes: new Set(), searchExpandedNodes: new Set() });
 
-  const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
-
-  const [indeterminateNodes, setIndeterminateNodes] = useState<Set<number>>(
+  const [selectedNodes, setSelectedNodes] = useState<Set<number | undefined>>(
     new Set()
   );
 
+  const [indeterminateNodes, setIndeterminateNodes] = useState<
+    Set<number | undefined>
+  >(new Set());
+
   const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
-    TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+    IDepartmentAndUserListValue[]
+  >(flatTreeTotalListData.filter((node) => node.idRoute?.length === 1));
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
-    TreeNode[]
+    IDepartmentAndUserListValue[]
   >([]);
 
   const isSearch = useMemo(
@@ -54,24 +58,27 @@ export const useAction = (
   );
 
   const getCurrentNodeListByCurrentIdRoute = (
-    currentList: TreeNode[],
+    currentList: IDepartmentAndUserListValue[],
     currentIdRoute: number[]
   ) => {
     return {
       allChildrenIncludeParentList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
           currentIdRoute.every(
-            (parentIdRoute, index) => parentIdRoute === nodeRoute[index]
+            (parentIdRoute, index) =>
+              nodeRoute && parentIdRoute === nodeRoute[index]
           )
       ),
       nextLevelChildrenList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
           currentIdRoute.every(
-            (parentIdRoute, index) => parentIdRoute === nodeRoute[index]
-          ) && nodeRoute.length === currentIdRoute.length + 1
+            (parentIdRoute, index) =>
+              nodeRoute && parentIdRoute === nodeRoute[index]
+          ) && nodeRoute?.length === currentIdRoute.length + 1
       ),
       allParentList: currentList.filter(
         ({ idRoute: nodeRoute }) =>
+          nodeRoute &&
           nodeRoute.length < currentIdRoute.length &&
           nodeRoute.every(
             (childIdRoute, index) => childIdRoute === currentIdRoute[index]
@@ -82,10 +89,10 @@ export const useAction = (
 
   //根据展开插入或删除节点
   const displayTreeList = (
-    currentClickItem: TreeNode,
-    nextLevelChildrenList: TreeNode[],
+    currentClickItem: IDepartmentAndUserListValue,
+    nextLevelChildrenList: IDepartmentAndUserListValue[],
     isExpandingCurrentItem: boolean
-  ): TreeNode[] => {
+  ): IDepartmentAndUserListValue[] => {
     if (isSearch) return searchDisplayTreeData;
 
     const displayList = clone(displayFlatUpdateTreeData);
@@ -96,7 +103,7 @@ export const useAction = (
 
     const currentTotalChildrenItem = getCurrentNodeListByCurrentIdRoute(
       displayList,
-      parentRoute
+      parentRoute ?? []
     ).allChildrenIncludeParentList;
 
     const parentIndex = displayList.findIndex(
@@ -119,16 +126,16 @@ export const useAction = (
 
   const handleSearchChange = (value: string) => {
     const targetSearchFilterList = flatTreeTotalListData.filter((item) => {
-      return item.title.toLowerCase().includes(value.toLowerCase());
+      return item.name.toLowerCase().includes(value.toLowerCase());
     });
 
     const idRouteList = [
       ...new Set(targetSearchFilterList.map(({ idRoute }) => idRoute).flat()),
     ];
 
-    const displayData: TreeNode[] = idRouteList
+    const displayData: IDepartmentAndUserListValue[] = idRouteList
       .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
-      .filter((item): item is TreeNode => !!item);
+      .filter((item): item is IDepartmentAndUserListValue => !!item);
 
     if (value !== "") {
       setExpandedNodes((prevExpandedNodes) => ({
@@ -150,7 +157,7 @@ export const useAction = (
     }
   };
 
-  const toggleNode = (currentClickItem: TreeNode) => {
+  const toggleNode = (currentClickItem: any) => {
     const currentNodeId = currentClickItem.id;
 
     const newExpandedNodes = new Set(expandedNodes.displayExpandedNodes);
@@ -160,7 +167,7 @@ export const useAction = (
       nextLevelChildrenList: expendNextLevelChildrenList,
     } = getCurrentNodeListByCurrentIdRoute(
       flatTreeTotalListData,
-      currentClickItem.idRoute
+      currentClickItem.idRoute ?? []
     );
 
     currentClickItem.childrenIdList = expendNextLevelChildrenList.map(
@@ -170,7 +177,7 @@ export const useAction = (
     if (!isSearch)
       newExpandedNodes.has(currentNodeId)
         ? expendChildrenNodeList.forEach(({ id: nodeId }) => {
-            newExpandedNodes.delete(nodeId);
+            newExpandedNodes.delete(Number(nodeId));
           })
         : newExpandedNodes.add(currentNodeId);
 
@@ -190,37 +197,41 @@ export const useAction = (
       : setDisplayFlatUpdateTreeData(currentListData);
   };
 
-  const selectNode = (currentClickItem: TreeNode) => {
+  const selectNode = (currentClickItem: IDepartmentAndUserListValue) => {
     const newSelectedNodes = new Set(selectedNodes);
 
     const newIndeterminateNode = new Set(indeterminateNodes);
 
-    const conditioned = newSelectedNodes.has(currentClickItem.id);
+    const conditioned = newSelectedNodes.has(Number(currentClickItem.id));
 
     const currentRoute = currentClickItem.idRoute;
 
     const {
       allChildrenIncludeParentList: selectTotalItemList,
       allParentList: parentItemList,
-    } = getCurrentNodeListByCurrentIdRoute(flatTreeTotalListData, currentRoute);
+    } = getCurrentNodeListByCurrentIdRoute(
+      flatTreeTotalListData,
+      currentRoute ?? []
+    );
 
     selectTotalItemList.forEach(({ id: nodeId }) => {
       conditioned
-        ? newSelectedNodes.delete(nodeId)
-        : newSelectedNodes.add(nodeId);
-      newIndeterminateNode.has(nodeId) && newIndeterminateNode.delete(nodeId);
+        ? newSelectedNodes.delete(Number(nodeId))
+        : newSelectedNodes.add(Number(nodeId));
+      newIndeterminateNode.has(Number(nodeId)) &&
+        newIndeterminateNode.delete(Number(nodeId));
     });
 
     parentItemList.forEach(({ id: nodeId }) => {
       conditioned
-        ? newIndeterminateNode.delete(nodeId)
-        : newIndeterminateNode.add(nodeId);
+        ? newIndeterminateNode.delete(Number(nodeId))
+        : newIndeterminateNode.add(Number(nodeId));
     });
 
-    const parentIdRoute = currentRoute.slice(0, -1).reverse();
+    const parentIdRoute = currentRoute?.slice(0, -1).reverse();
 
-    parentIdRoute.forEach((parentId) => {
-      const matchParentIdItem = flatTreeTotalListData.find(
+    parentIdRoute?.forEach((parentId) => {
+      const matchParentIdItem: any = flatTreeTotalListData.find(
         (item) => item.id === parentId
       );
 
@@ -228,7 +239,7 @@ export const useAction = (
         const { nextLevelChildrenList: expendNextLevelChildrenList } =
           getCurrentNodeListByCurrentIdRoute(
             flatTreeTotalListData,
-            matchParentIdItem.idRoute
+            matchParentIdItem.idRoute ?? []
           );
 
         matchParentIdItem.childrenIdList = expendNextLevelChildrenList.map(
@@ -236,11 +247,11 @@ export const useAction = (
         );
 
         const allChildrenSelected = matchParentIdItem.childrenIdList.every(
-          (childId) => newSelectedNodes.has(childId)
+          (childId: number) => newSelectedNodes.has(childId)
         );
 
         const allChildrenNotSelected = matchParentIdItem.childrenIdList.every(
-          (childId) =>
+          (childId: number) =>
             !newSelectedNodes.has(childId) && !newIndeterminateNode.has(childId)
         );
 
@@ -264,10 +275,16 @@ export const useAction = (
 
     setSelectedData(
       flatTreeTotalListData.filter(
-        (item) => selectedNodes.has(item.id) && item.children.length === 0
+        (item) =>
+          selectedNodes.has(Number(item.id)) && item.children.length === 0
       )
     );
   }, [searchValue, selectedNodes]);
+
+  useEffect(() => {
+    treeData.length && setDisplayFlatUpdateTreeData(treeData);
+    console.log(treeData);
+  }, [treeData]);
 
   return {
     isSearch,
