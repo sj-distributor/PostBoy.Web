@@ -54,3 +54,12 @@ export interface IRolesListResponse {
 }
 
 export interface IDeleteRoleResponse {}
+
+export interface IRoleAddData {
+  id: string;
+  name: string;
+}
+
+export interface IAddRoleData {
+  roles: IRoleAddData[];
+}

@@ -1,4 +1,9 @@
-import { IDeleteRoleResponse, IRolesListResponse } from "../../dtos/role";
+import {
+  IAddRoleData,
+  IDeleteRoleResponse,
+  IRoleData,
+  IRolesListResponse,
+} from "../../dtos/role";
 import { Get, Post } from "../http-client";
 
 export const GetRolesList = async (data: {
@@ -12,4 +17,12 @@ export const GetRolesList = async (data: {
 
 export const PostDeleteRole = async (data: { roleIds: string[] }) => {
   return await Post<IDeleteRoleResponse>(`/api/Security/roles/delete`, data);
+};
+
+export const PostCreateRole = async (data: IAddRoleData) => {
+  return await Post<IRoleData>(`/api/Security/roles/create`, data);
+};
+
+export const PostUpdateRole = async (data: IAddRoleData) => {
+  return await Post<IRoleData>(`/api/Security/roles/update`, data);
 };
