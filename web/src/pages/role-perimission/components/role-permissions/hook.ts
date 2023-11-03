@@ -43,6 +43,8 @@ export const useAction = () => {
 
   const [tipsText, setTipsText] = useState<string>("");
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [dto, setDto] = useState<{
     pageIndex: number;
     pageSize: number;
@@ -75,6 +77,7 @@ export const useAction = () => {
   };
 
   const getRolesList = () => {
+    setIsLoading(true);
     GetRolesList({ PageIndex: dto.pageIndex, PageSize: dto.pageSize })
       .then((res) => {
         if (res) {
@@ -86,6 +89,9 @@ export const useAction = () => {
       })
       .catch((err) => {
         setTipsText((err as Error).message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -111,6 +117,7 @@ export const useAction = () => {
     rowId,
     confirmTipsRef,
     tipsText,
+    isLoading,
     navigate,
     setRowId,
     handleInputChange,

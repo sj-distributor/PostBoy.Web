@@ -1,10 +1,10 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IDepartmentDto, IRoleAddData } from "../../../../dtos/role";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
-import { PostCreateRole, PostUpdateRole } from "../../../../api/roles";
+import { GetRole, PostCreateRole, PostUpdateRole } from "../../../../api/roles";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
@@ -51,6 +51,8 @@ export const useAction = () => {
   const location = useLocation();
 
   const navigate = useNavigate();
+
+  const { id } = useParams();
 
   const flatOptions = options.allDepartment.reduce((accumulator, item) => {
     const higherDepartment: DepartmentDto = {
@@ -302,7 +304,6 @@ export const useAction = () => {
   const handleAddRole = () => {
     PostCreateRole({ roles: [roleDto] })
       .then((res) => {
-        console.log(res);
         navigate("/roles/roleList");
       })
       .catch((err) => {
@@ -321,6 +322,24 @@ export const useAction = () => {
         console.log(err);
       });
   };
+
+  const handleGetRoleData = () => {
+    id &&
+      GetRole(id)
+        .then((res) => {
+          if (res) {
+            const { id, name } = res;
+            setRoleDto((prev) => ({ ...prev, id, name }));
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+  };
+
+  useEffect(() => {
+    id && handleGetRoleData();
+  }, [id]);
 
   useUpdateEffect(() => {
     renderShowLabel("pullCrowdData");

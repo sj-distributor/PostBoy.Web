@@ -22,6 +22,7 @@ export const RolePermissions = () => {
     rowId,
     confirmTipsRef,
     tipsText,
+    isLoading,
     navigate,
     setRowId,
     handleInputChange,
@@ -52,7 +53,7 @@ export const RolePermissions = () => {
         ) : params.row.role === UserRoleEnum.User ? (
           <Button
             variant="text"
-            onClick={() => navigate(`/roles/edit/${userId}`)}
+            onClick={() => navigate(`/roles/edit/${params.id}`)}
           >
             編輯
           </Button>
@@ -63,7 +64,7 @@ export const RolePermissions = () => {
             </Button>
             <Button
               variant="text"
-              onClick={() => navigate(`/roles/edit/${userId}`)}
+              onClick={() => navigate(`/roles/edit/${params.id}`)}
             >
               編輯
             </Button>
@@ -120,6 +121,7 @@ export const RolePermissions = () => {
         <DataGrid
           columns={columns}
           rows={rows}
+          loading={isLoading}
           hideFooter
           checkboxSelection
           disableColumnMenu

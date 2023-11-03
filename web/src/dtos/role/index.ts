@@ -63,3 +63,9 @@ export interface IRoleAddData {
 export interface IAddRoleData {
   roles: IRoleAddData[];
 }
+
+export interface IGetRolesDto {
+  PageIndex: number;
+  PageSize: number;
+  RoleId?: string;
+}
