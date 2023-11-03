@@ -1,9 +1,19 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IDepartmentDto } from "../../../../dtos/role";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
+import {
+  GetPermissions,
+  GetRolePermission,
+} from "../../../../api/role-user-permissions";
+import {
+  IPermissionsDto,
+  IRole,
+  IRolePermission,
+  IRolePermissionItem,
+} from "../../../../dtos/role-user-permissions";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
@@ -301,6 +311,81 @@ export const useAction = () => {
     renderShowLabel("notificationData");
   }, [checkboxData.notificationData]);
 
+  // new
+
+  const { id } = useParams();
+
+  const [permissions, setPermissions] = useState<IPermissionsDto>({
+    count: 0,
+    permissions: [],
+  });
+
+  const [role, setRole] = useState<IRole | null>(null);
+
+  const [rolePermission, setRolePermission] = useState<IRolePermissionItem[]>();
+
+  const defaultRole: IRole = {
+    id: "",
+    name: "",
+    description: "",
+    createdDate: "",
+    modifiedDate: "",
+  };
+
+  const updateRole = (k: keyof IRole, v: string) => {
+    let data = clone(role);
+    if (data) data[k] = v;
+    else {
+      data = {
+        ...defaultRole,
+        [k]: v,
+      };
+    }
+
+    setRole(data);
+  };
+
+  useEffect(() => {
+    console.log("role", role);
+  }, [role]);
+
+  useEffect(() => {
+    if (id) {
+      // 获取角色信息
+      GetRolePermission(id)
+        .then((res) => {
+          const { role, rolePermissions } = res;
+
+          setRole(role ?? null);
+
+          setRolePermission(rolePermissions ?? []);
+        })
+        .catch((err) => {
+          console.log((err as Error).message);
+
+          setRole(null);
+
+          setRolePermission([]);
+        });
+    }
+  }, [id]);
+
+  useEffect(() => {
+    GetPermissions()
+      .then((res) => {
+        setPermissions({
+          count: res.count ?? 0,
+          permissions: res.permissions ?? [],
+        });
+      })
+      .catch((err) => {
+        setPermissions({
+          count: 0,
+          permissions: [],
+        });
+      });
+  }, []);
+
   return {
     flatOptions,
     inputStyles,
@@ -316,5 +401,8 @@ export const useAction = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
+    // new
+    permissions,
+    updateRole,
   };
 };
