@@ -1,10 +1,9 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IDepartmentDto, IRoleAddData } from "../../../../dtos/role";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
-import { GetRole, PostCreateRole, PostUpdateRole } from "../../../../api/roles";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
@@ -301,46 +300,6 @@ export const useAction = () => {
     });
   };
 
-  const handleAddRole = () => {
-    PostCreateRole({ roles: [roleDto] })
-      .then((res) => {
-        navigate("/roles/roleList");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const handleEditRole = () => {
-    // location.pathname === "/roles/add"
-    PostUpdateRole({ roles: [roleDto] })
-      .then((res) => {
-        console.log(res);
-        navigate("/roles/roleList");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const handleGetRoleData = () => {
-    id &&
-      GetRole(id)
-        .then((res) => {
-          if (res) {
-            const { id, name } = res;
-            setRoleDto((prev) => ({ ...prev, id, name }));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-  };
-
-  useEffect(() => {
-    id && handleGetRoleData();
-  }, [id]);
-
   useUpdateEffect(() => {
     renderShowLabel("pullCrowdData");
   }, [checkboxData.pullCrowdData]);
@@ -366,7 +325,5 @@ export const useAction = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
-    handleAddRole,
-    handleEditRole,
   };
 };

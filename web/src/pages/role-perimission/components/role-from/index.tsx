@@ -38,8 +38,6 @@ export const RoleFrom = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
-    handleAddRole,
-    handleEditRole,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -159,11 +157,7 @@ export const RoleFrom = () => {
             <Button
               className={styles.navButton}
               variant="contained"
-              onClick={() =>
-                location.pathname === "/roles/add"
-                  ? handleAddRole()
-                  : handleEditRole()
-              }
+              onClick={() => navigate("/roles/roleList")}
             >
               確認
             </Button>
