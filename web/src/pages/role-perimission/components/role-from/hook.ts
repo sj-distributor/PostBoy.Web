@@ -19,6 +19,17 @@ import {
 import { error } from "console";
 
 export const useAction = () => {
+  const permissionOptions: string[] = [
+    "創建群組",
+    "添加群組成員",
+    "發送通知",
+    "發送紀錄",
+    "新增角色",
+    "分配",
+    "編輯",
+    "刪除",
+  ];
+
   const options: IDepartmentDto = {
     allDepartment: [
       {
@@ -57,8 +68,6 @@ export const useAction = () => {
   };
 
   const selectStyles = { marginLeft: "0.3rem", flex: 1 };
-
-  const formStyles = { flexBasis: "25%" };
 
   const location = useLocation();
 
@@ -402,7 +411,6 @@ export const useAction = () => {
     flatOptions,
     inputStyles,
     selectStyles,
-    formStyles,
     location,
     checkboxData,
     showLabel,
@@ -419,5 +427,6 @@ export const useAction = () => {
     role,
     rolePermission,
     addOrModifyRolePermission,
+    permissionOptions,
   };
 };

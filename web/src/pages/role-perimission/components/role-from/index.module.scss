@@ -63,6 +63,11 @@
 
         .itemPerssionsForm {
           display: flex;
+          flex-wrap: wrap;
+
+          .formLabel {
+            width: 10rem;
+          }
         }
       }
 

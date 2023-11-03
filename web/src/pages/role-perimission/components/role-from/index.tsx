@@ -24,7 +24,6 @@ export const RoleFrom = () => {
     flatOptions,
     inputStyles,
     selectStyles,
-    formStyles,
     location,
     checkboxData,
     showLabel,
@@ -40,6 +39,7 @@ export const RoleFrom = () => {
     role,
     updateRole,
     addOrModifyRolePermission,
+    permissionOptions,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -223,35 +223,18 @@ export const RoleFrom = () => {
               <div className={styles.itemPermission}>
                 <div className={styles.itemPermissionTitle}>功能權限</div>
                 <div className={styles.itemPerssionsForm}>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="創建群組"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="新增角色" />
-                  </FormGroup>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="添加群組成員"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="分配" />
-                  </FormGroup>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="發送通知"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="編輯" />
-                  </FormGroup>
-
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="發送紀錄"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="刪除" />
-                  </FormGroup>
+                  {permissionOptions.map(
+                    (optionItems: string, index: number) => {
+                      return (
+                        <FormControlLabel
+                          key={index}
+                          control={<Checkbox />}
+                          label={optionItems}
+                          className={styles.formLabel}
+                        />
+                      );
+                    }
+                  )}
                 </div>
               </div>
             </div>
