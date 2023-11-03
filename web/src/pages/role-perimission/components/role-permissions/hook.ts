@@ -1,11 +1,13 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
+  IRoleData,
   IRoleTabltDto,
   UserRoleEnum,
   UserRoleType,
 } from "../../../../dtos/role";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { useNavigate } from "react-router-dom";
+import { GetRolesList, PostDeleteRole } from "../../../../api/roles";
 
 export const useAction = () => {
   const initData: IRoleTabltDto[] = [
@@ -33,11 +35,23 @@ export const useAction = () => {
 
   const [inputVal, setInputVal] = useState<string>("");
 
-  const [rows, setRows] = useState<IRoleTabltDto[]>(initData);
+  const [rows, setRows] = useState<IRoleData[]>([]);
 
-  const [rowId, setRowId] = useState<number>();
+  const [rowId, setRowId] = useState<string>();
 
   const confirmTipsRef = useRef<ModalBoxRef>(null);
+
+  const [tipsText, setTipsText] = useState<string>("");
+
+  const [dto, setDto] = useState<{
+    pageIndex: number;
+    pageSize: number;
+    count: number;
+  }>({
+    pageIndex: 1,
+    pageSize: 20,
+    count: 0,
+  });
 
   const navigate = useNavigate();
 
@@ -49,11 +63,46 @@ export const useAction = () => {
     console.log("Search content:", inputVal);
   };
 
-  const handleDelete = (id: number) => {
-    const updatedRows = rows.filter((row: IRoleTabltDto) => row.id !== id);
-
-    setRows(updatedRows);
+  const handleDelete = (roles: string[]) => {
+    PostDeleteRole({ roleIds: roles })
+      .then((res) => {
+        setTipsText("删除成功");
+        getRolesList();
+      })
+      .catch((err) => {
+        setTipsText((err as Error).message);
+      });
   };
+
+  const getRolesList = () => {
+    GetRolesList({ PageIndex: dto.pageIndex, PageSize: dto.pageSize })
+      .then((res) => {
+        if (res) {
+          const { count, roles } = res;
+
+          setDto((prev) => ({ ...prev, count }));
+          setRows(roles);
+        }
+      })
+      .catch((err) => {
+        setTipsText((err as Error).message);
+      });
+  };
+
+  useEffect(() => {
+    if (tipsText) {
+      const timeout = setTimeout(() => {
+        setTipsText("");
+      }, 4000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [tipsText]);
+
+  useEffect(() => {
+    getRolesList();
+  }, []);
 
   return {
     userId,
@@ -61,6 +110,7 @@ export const useAction = () => {
     inputVal,
     rowId,
     confirmTipsRef,
+    tipsText,
     navigate,
     setRowId,
     handleInputChange,

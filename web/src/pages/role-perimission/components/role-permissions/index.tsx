@@ -1,6 +1,12 @@
 import styles from "./index.module.scss";
 
-import { Button, IconButton, Pagination, TextField } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  Pagination,
+  Snackbar,
+  TextField,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
@@ -15,6 +21,7 @@ export const RolePermissions = () => {
     inputVal,
     rowId,
     confirmTipsRef,
+    tipsText,
     navigate,
     setRowId,
     handleInputChange,
@@ -62,6 +69,7 @@ export const RolePermissions = () => {
             </Button>
             <Button
               variant="text"
+              disabled
               onClick={() => {
                 confirmTipsRef.current?.open();
                 setRowId(params.row.id);
@@ -141,7 +149,7 @@ export const RolePermissions = () => {
             <Button
               variant="contained"
               onClick={() => {
-                rowId && handleDelete(rowId);
+                rowId && handleDelete([rowId]);
                 confirmTipsRef.current?.close();
               }}
               className={styles.confirmButton}
@@ -151,6 +159,14 @@ export const RolePermissions = () => {
           </div>
         </div>
       </ModalBox>
+      <Snackbar
+        message={tipsText}
+        open={!!tipsText}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
     </div>
   );
 };

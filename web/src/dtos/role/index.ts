@@ -40,3 +40,17 @@ export const UserRoleType = {
   [UserRoleEnum.Admin]: "管理員",
   [UserRoleEnum.User]: "用戶",
 };
+
+export interface IRoleData {
+  createdDate: string;
+  id: string;
+  modifiedDate: string;
+  name: string;
+}
+
+export interface IRolesListResponse {
+  count: number;
+  roles: IRoleData[];
+}
+
+export interface IDeleteRoleResponse {}
