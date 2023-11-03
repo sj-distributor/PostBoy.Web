@@ -70,7 +70,7 @@ export const routerArray: RouteItem[] = [
         elementChild: <Navigate to={"/roles/roleList"} />,
       },
       {
-        path: "/roles/userList",
+        path: "/roles/userList/:roleId",
         title: "",
         elementChild: <UserList />,
       },
