@@ -9,7 +9,9 @@ import { Get, Post } from "../http-client";
 
 // 获取用户list
 export const GetRoleUser = async (data: PageDto) => {
-  return await Get<RoleUserResponse>("/api/Security/role/users");
+  return await Get<RoleUserResponse>(
+    `/api/Security/role/users?PageIndex=${data.PageIndex}&PageSize=${data.PageSize}&RoleId=${data.RoleId}&Keyword=${data.Keyword}`
+  );
 };
 
 // 移除用户

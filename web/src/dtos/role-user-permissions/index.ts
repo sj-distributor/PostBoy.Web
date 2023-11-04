@@ -2,7 +2,7 @@ export interface PageDto {
   PageIndex: number;
   PageSize: number;
   RoleId: string;
-  UserName?: string;
+  Keyword: string;
 }
 
 export interface RoleUserResponse {

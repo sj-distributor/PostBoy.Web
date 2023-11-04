@@ -31,6 +31,7 @@ export const useAction = () => {
     PageIndex: 1,
     PageSize: 20,
     RoleId: roleId,
+    Keyword: inputVal,
   });
 
   const [userData, setUserData] = useState<RoleUserResponse>({
@@ -70,12 +71,11 @@ export const useAction = () => {
   const initUserList = () => {
     setLoading(true);
 
-    // 接口差一个搜索的参数
     GetRoleUser({
       PageIndex: pageDto.PageIndex,
       PageSize: pageDto.PageSize,
       RoleId: pageDto.RoleId,
-      UserName: inputVal,
+      Keyword: inputVal,
     })
       .then((res) => {
         setUserData(res);
