@@ -54,7 +54,11 @@ export const useAction = () => {
   const handleDelete = () => {
     openConfirmAction.setTrue();
 
-    DeleteRoleUser({ roleUserIds: selectId })
+    const data = {
+      roleUserIds: selectId,
+    };
+
+    DeleteRoleUser(data)
       .then(() => {
         enqueueSnackbar("移除成功!", { variant: "success" });
         initUserList();
@@ -108,6 +112,7 @@ export const useAction = () => {
     openConfirm,
     openConfirmAction,
     batchBtnDisable,
+    roleId,
     navigate,
     setSelectId,
     handleSearch,

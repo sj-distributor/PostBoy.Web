@@ -9,9 +9,10 @@ import { TreeSelectList } from "../tree-select";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
+  roleId: string;
   initUserList: () => void;
 }) => {
-  const { addUsersRef, initUserList } = props;
+  const { addUsersRef, initUserList, roleId } = props;
 
   const {
     treeData,
@@ -22,7 +23,7 @@ export const AddUsersModel = (props: {
     isConfirmDisbale,
     setAlreadySelectData,
     handleAddRoleUsers,
-  } = useAction({ addUsersRef, initUserList });
+  } = useAction({ addUsersRef, roleId, initUserList });
 
   return (
     <div className={styles.modelWrap}>

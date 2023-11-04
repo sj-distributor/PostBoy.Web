@@ -28,6 +28,7 @@ export const UserList = () => {
     openConfirm,
     openConfirmAction,
     batchBtnDisable,
+    roleId,
     navigate,
     setSelectId,
     handleSearch,
@@ -122,6 +123,7 @@ export const UserList = () => {
             <AddUsersModel
               addUsersRef={addUsersRef}
               initUserList={initUserList}
+              roleId={roleId}
             />
           </ModalBox>
           <Button

@@ -18,7 +18,7 @@ export interface RoleUserItemDto extends RoleUsersDto {
 }
 
 export interface RoleUsersDto {
-  id: string;
+  id?: string;
   roleId: string;
   userId: string;
 }

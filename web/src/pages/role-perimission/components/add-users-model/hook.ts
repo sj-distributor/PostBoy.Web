@@ -14,11 +14,12 @@ import { clone } from "ramda";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
+  roleId: string;
   initUserList: () => void;
 }) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { addUsersRef, initUserList } = props;
+  const { addUsersRef, initUserList, roleId } = props;
 
   const [searchValue, setSearchValue] = useState<string>("");
 
@@ -28,23 +29,25 @@ export const useAction = (props: {
 
   const [isConfirmDisbale, setIsConfirmDisbale] = useState<boolean>(true);
 
-  const [foundationTreeListData, setFoundationTreeListData] =
-    useState<StaffFoundationHierarchyList[]>();
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
 
   const handleAddRoleUsers = () => {
-    // AddRoleUser({ roleUsers })
-    //   .then(() => {
-    //     enqueueSnackbar("添加用户成功!", { variant: "success" });
-    //     addUsersRef.current?.close();
-    //     initUserList();
-    //   })
-    //   .catch((error) => {
-    //     enqueueSnackbar((error as Error).message, { variant: "error" });
-    //   });
+    const roleUsers = alreadySelectData.map((item) => ({
+      userId: item.id,
+      roleId: roleId,
+    }));
+
+    AddRoleUser({ roleUsers })
+      .then(() => {
+        enqueueSnackbar("添加用户成功!", { variant: "success" });
+        addUsersRef.current?.close();
+        initUserList();
+      })
+      .catch((error) => {
+        enqueueSnackbar((error as Error).message, { variant: "error" });
+      });
   };
 
   const staffDepartmentHierarchyTestData =
