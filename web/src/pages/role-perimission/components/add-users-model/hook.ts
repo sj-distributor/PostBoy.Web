@@ -5,112 +5,17 @@ import { TreeSelectRef } from "../tree-select/props";
 import { useSnackbar } from "notistack";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { AddRoleUser } from "../../../../api/role-user-permissions";
+import {
+  StaffDepartmentHierarchyListProps,
+  StaffFoundationHierarchyList,
+} from "../../../../dtos/role-user-permissions";
+import jsonData from "./new tree structure.json";
+import { clone } from "ramda";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
   initUserList: () => void;
 }) => {
-  const treeData: TreeNode[] = [
-    {
-      id: 1,
-      idRoute: [1],
-      title: "节点1",
-      children: [
-        {
-          id: 4,
-          idRoute: [1, 4],
-          title: "节点1-4",
-          children: [
-            {
-              id: 5,
-              idRoute: [1, 4, 5],
-              title: "节点1-4-5",
-              children: [
-                {
-                  id: 6,
-                  idRoute: [1, 4, 5, 6],
-                  title: "节点1-4-5-6",
-                  children: [],
-                },
-                {
-                  id: 12,
-                  idRoute: [1, 4, 5, 12],
-                  title: "节点1-4-5-12",
-                  children: [],
-                },
-                {
-                  id: 9,
-                  idRoute: [1, 4, 5, 9],
-                  title: "节点1-4-5-9",
-                  children: [
-                    {
-                      id: 10,
-                      idRoute: [1, 4, 5, 9, 10],
-                      title: "节点1-4-5-9-10",
-                      children: [],
-                    },
-                    {
-                      id: 11,
-                      idRoute: [1, 4, 5, 9, 11],
-                      title: "节点1-4-5--9-11",
-                      children: [],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 2,
-      idRoute: [2],
-      title: "节点2",
-      children: [
-        {
-          id: 7,
-          idRoute: [2, 7],
-          title: "节点2-7",
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 3,
-      idRoute: [3],
-      title: "节点3",
-      children: [
-        {
-          id: 8,
-          idRoute: [3, 8],
-          title: "节点3-8",
-          children: [
-            {
-              id: 15,
-              idRoute: [3, 8, 15],
-              title: "节点3-8-15",
-              children: [
-                {
-                  id: 16,
-                  idRoute: [3, 8, 15, 16],
-                  title: "节点3-8-15-16",
-                  children: [],
-                },
-                {
-                  id: 17,
-                  idRoute: [3, 8, 15, 17],
-                  title: "节点3-8-15-17",
-                  children: [],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ];
-
   const { enqueueSnackbar } = useSnackbar();
 
   const { addUsersRef, initUserList } = props;
@@ -122,6 +27,9 @@ export const useAction = (props: {
   const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
 
   const [isConfirmDisbale, setIsConfirmDisbale] = useState<boolean>(true);
+
+  const [foundationTreeListData, setFoundationTreeListData] =
+    useState<StaffFoundationHierarchyList[]>();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -138,6 +46,62 @@ export const useAction = (props: {
     //     enqueueSnackbar((error as Error).message, { variant: "error" });
     //   });
   };
+
+  const staffDepartmentHierarchyTestData =
+    jsonData.data.staffDepartmentHierarchy;
+  const staffDepartmentHierarchyTreeData = clone(
+    staffDepartmentHierarchyTestData
+  );
+  const treeData: TreeNode[] = [];
+
+  const flattenTreeDepartmentList = (
+    source: StaffDepartmentHierarchyListProps[],
+    idRoute: string[]
+  ) => {
+    for (const sourceItem of source) {
+      treeData.push({
+        id: sourceItem.department.id,
+        title: sourceItem.department.name,
+        idRoute: [...idRoute, sourceItem.department.id],
+        children: [],
+        isDepartment: true,
+      });
+
+      treeData.push(
+        ...sourceItem.staffs.map((staff) => ({
+          id: staff.id,
+          title: staff.userName,
+          idRoute: [...idRoute, sourceItem.department.id, staff.id],
+          children: [],
+          isDepartment: false,
+        }))
+      );
+
+      if (sourceItem.childrens) {
+        flattenTreeDepartmentList(sourceItem.childrens, [
+          ...idRoute,
+          sourceItem.department.id,
+        ]);
+      }
+    }
+  };
+
+  staffDepartmentHierarchyTreeData.map((item) => {
+    const idRoute = [
+      item.companies.department.parentId,
+      item.companies.department.id,
+    ];
+
+    treeData.push({
+      id: item.companies.department.id,
+      title: item.companies.department.name,
+      idRoute,
+      children: [],
+      isDepartment: true,
+    });
+
+    flattenTreeDepartmentList(item.departments, idRoute);
+  });
 
   useEffect(() => {
     alreadySelectData.length === 0

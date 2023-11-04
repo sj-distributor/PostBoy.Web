@@ -50,13 +50,11 @@ export const TreeSelectList: React.FC<{
 
     const isIndeterminate = indeterminateNodes.has(item.id);
 
-    const hasChildren = item.children.length > 0;
-
     return (
       <div style={style}>
         <ListItem
           key={item.idRoute.toString()}
-          style={{ paddingLeft: `${2 * (item.idRoute.length - 1)}rem` }}
+          style={{ paddingLeft: `${1.6 * (item.idRoute.length - 1)}rem` }}
         >
           <ListItemIcon>
             <Checkbox
@@ -66,7 +64,7 @@ export const TreeSelectList: React.FC<{
                 selectNode(item);
               }}
             />
-            {hasChildren && (
+            {item.isDepartment && (
               <div onClick={() => toggleNode(item)} className={styles.iconWrap}>
                 <div>
                   {isExpanded ? (
@@ -81,7 +79,9 @@ export const TreeSelectList: React.FC<{
               </div>
             )}
           </ListItemIcon>
-          <ListItemText primary={item.title} />
+          <div className={styles.one}>
+            <ListItemText primary={item.title} className={styles.text} />
+          </div>
         </ListItem>
       </div>
     );
@@ -96,8 +96,8 @@ export const TreeSelectList: React.FC<{
             ? searchDisplayTreeData.length
             : displayFlatUpdateTreeData.length
         }
-        itemSize={46}
-        width={360}
+        itemSize={45}
+        width={410}
       >
         {renderListItem}
       </FixedSizeList>
