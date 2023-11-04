@@ -4,7 +4,6 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { v4 as uuidv4 } from "uuid";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 
@@ -29,8 +28,6 @@ export const RoleFrom = () => {
     location,
     checkboxData,
     showLabel,
-    roleDto,
-    setRoleDto,
     navigate,
     setCheckboxData,
     isHaveExpand,
@@ -180,10 +177,6 @@ export const RoleFrom = () => {
                 <Input
                   disableUnderline={true}
                   sx={inputStyles}
-                  value={roleDto.name}
-                  onChange={(e) =>
-                    setRoleDto((prev) => ({ ...prev, name: e.target.value }))
-                  }
                   placeholder="請輸入角色名稱"
                 />
               </div>
@@ -195,13 +188,6 @@ export const RoleFrom = () => {
                 <Input
                   disableUnderline={true}
                   sx={inputStyles}
-                  value={roleDto.id}
-                  onChange={(e) =>
-                    setRoleDto((prev) => ({
-                      ...prev,
-                      id: uuidv4(),
-                    }))
-                  }
                   placeholder="請輸入角色描述"
                 />
               </div>
