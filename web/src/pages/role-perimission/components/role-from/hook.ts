@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { IDepartmentDto } from "../../../../dtos/role";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
+import jsonData from "./departments.json";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
@@ -300,6 +301,11 @@ export const useAction = () => {
   useUpdateEffect(() => {
     renderShowLabel("notificationData");
   }, [checkboxData.notificationData]);
+
+  useEffect(() => {
+    console.log(jsonData);
+    console.log(flatOptions);
+  }, []);
 
   return {
     flatOptions,
