@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { PageDto, RoleUserResponse } from "../../../../dtos/role";
+import {
+  PageDto,
+  RoleUserResponse,
+} from "../../../../dtos/role-user-permissions";
 import { useNavigate, useParams } from "react-router-dom";
-import { DeleteRoleUser, GetRoleUser } from "../../../../api/role-user";
+import {
+  DeleteRoleUser,
+  GetRoleUser,
+} from "../../../../api/role-user-permissions";
 import { useBoolean } from "ahooks";
 import { useSnackbar } from "notistack";
 

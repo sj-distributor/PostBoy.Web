@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useRef, useState } from "react";
 import { TreeNode } from "./props";
 import { TreeSelectRef } from "../tree-select/props";
-import { AddRoleUser } from "../../../../api/role-user";
+import { AddRoleUser } from "../../../../api/role-user-permissions";
 import { useSnackbar } from "notistack";
 import { ModalBoxRef } from "../../../../dtos/modal";
 
