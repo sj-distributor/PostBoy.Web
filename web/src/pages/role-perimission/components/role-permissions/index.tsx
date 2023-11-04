@@ -132,7 +132,6 @@ export const RolePermissions = () => {
           page={pageDto.pageIndex}
           showCellRightBorder
           showColumnRightBorder
-          rowsPerPageOptions={[5, 10, 15, 20]}
           disableSelectionOnClick
           pagination
           paginationMode="server"
