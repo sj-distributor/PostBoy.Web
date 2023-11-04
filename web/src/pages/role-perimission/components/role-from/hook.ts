@@ -277,10 +277,6 @@ export const useAction = () => {
     index: number,
     option: DepartmentDto
   ) => {
-    const parentIndex = cloneCheckboxData[dataSource].findIndex(
-      (x) => cloneCheckboxData[dataSource][index].parentId === x.id
-    );
-
     const data = cloneCheckboxData[dataSource];
 
     data.forEach((item, index) => {
@@ -288,26 +284,72 @@ export const useAction = () => {
       item.id === option.id && (item.indeterminate = false);
     });
 
-    const idRoute = option.idRoute?.slice(0, option.idRoute.length - 1);
-    console.log(idRoute);
-    if (idRoute?.length) {
-      idRoute.map((id) => {
-        const allChildrenSelected = data
-          .filter((aItem) => aItem.parentId === id)
-          .every((cItem) => cItem.isSelected);
-        const allChildrenIn = data
-          .filter((aItem) => aItem.parentId === id)
-          .some((cItem) => cItem.isSelected);
-        const fItem = data.find((fItem) => fItem.id === id);
-        console.log(fItem, allChildrenSelected);
-        data.forEach(
-          (item) =>
-            item.id === id &&
-            (item.isSelected = allChildrenSelected) &&
-            (item.indeterminate = allChildrenIn)
-        );
+    const setIndeterminateAllStatus = (superiors: string[]) => {
+      const setFatherItemStatus = (idRoutes: string[]) => {
+        if (idRoutes.length) {
+          const id = idRoutes.splice(0, 1);
+          const allChildrenSelected = data
+            .filter((aItem) => aItem.parentId === String(id))
+            .every((cItem) => cItem.isSelected);
+          const allChildrenIn = data
+            .filter((aItem) => aItem.parentId === String(id))
+            .some((cItem) => cItem.isSelected);
+          console.log(allChildrenIn);
+          data.forEach((item) => {
+            if (item.id === String(id)) {
+              item.isSelected = allChildrenSelected;
+              item.indeterminate = allChildrenIn;
+            }
+          });
+
+          setFatherItemStatus(idRoutes);
+        }
+      };
+
+      superiors?.length && setFatherItemStatus(superiors);
+    };
+
+    const superiors = option.idRoute
+      ?.slice(0, option.idRoute.length - 1)
+      .reverse();
+    superiors?.length && setIndeterminateAllStatus(superiors);
+
+    console.log(option);
+
+    function findDepartmentsWithParentId(
+      departmentList: DepartmentDto[],
+      parentId: string
+    ) {
+      const result: DepartmentDto[] = [];
+
+      function findDepartmentsRecursively(
+        departments: DepartmentDto[],
+        parentId: string
+      ) {
+        for (const department of departments) {
+          if (department.idRoute && department.idRoute.includes(parentId)) {
+            result.push(department);
+            if (department.childrens) {
+              findDepartmentsRecursively(department.childrens, department.id);
+            }
+          }
+        }
+      }
+
+      findDepartmentsRecursively(departmentList, parentId);
+
+      return result;
+    }
+    if (option.childrens?.length) {
+      const childrenList = findDepartmentsWithParentId(data, option.id);
+      const fItem = data.find((item) => item.id === option.id);
+      data.forEach((item) => {
+        if (childrenList.some((cItem) => cItem.id === item.id)) {
+          item.isSelected = !!fItem?.isSelected;
+        }
       });
     }
+
     setCheckboxData((preValue) => {
       return { ...preValue, [dataSource]: data };
     });
