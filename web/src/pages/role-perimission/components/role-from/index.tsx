@@ -156,7 +156,7 @@ export const RoleFrom = () => {
             onChange={(_, value, reason, details) => {
               reason === "removeOption" &&
                 details?.option &&
-                removeOption(dataName, details.option);
+                updateChildrenCheckbox(dataName, 0, details?.option);
 
               reason === "clear" &&
                 setCheckboxData((preValue) => {
