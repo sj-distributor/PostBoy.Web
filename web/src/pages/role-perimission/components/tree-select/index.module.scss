@@ -12,3 +12,14 @@
     padding-top: 0.2rem;
   }
 }
+
+.one {
+  :global(.MuiTypography-root) {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+}

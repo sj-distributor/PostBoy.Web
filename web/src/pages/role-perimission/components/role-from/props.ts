@@ -1,7 +1,7 @@
-import { StaffDepartmentHierarchyList } from "./hook";
+import { StaffFoundationHierarchyList } from "./hook";
 
 export type DepartmentDto = {
-  [key: string]: string | boolean | undefined | StaffDepartmentHierarchyList[];
+  [key: string]: string | boolean | undefined | StaffFoundationHierarchyList[];
   name: string;
   id: string;
   isSelected: boolean;
@@ -9,7 +9,7 @@ export type DepartmentDto = {
   indeterminate?: boolean;
   parentId?: string;
   isHide?: boolean;
-  childrens?: StaffDepartmentHierarchyList[];
+  childrens?: StaffFoundationHierarchyList[];
 };
 
 export type AllDepartmentData = {

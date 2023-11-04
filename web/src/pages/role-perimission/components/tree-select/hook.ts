@@ -7,42 +7,22 @@ export const useAction = (
   searchValue: string,
   setSelectedData: (data: TreeNode[]) => void
 ) => {
-  //平铺树结构
-  const flattenTreeTotalList = (
-    tree: TreeNode[],
-    parentIdRoute: number[] = []
-  ): TreeNode[] => {
-    let flattenedList: TreeNode[] = [];
-
-    for (const node of tree) {
-      const idRoute = [...parentIdRoute, node.id];
-
-      flattenedList.push(node);
-
-      node.children &&
-        node.children.length > 0 &&
-        flattenedList.push(...flattenTreeTotalList(node.children, idRoute));
-    }
-
-    return flattenedList;
-  };
-
-  const flatTreeTotalListData = flattenTreeTotalList(treeData);
+  const flatTreeTotalListData = treeData;
 
   const [expandedNodes, setExpandedNodes] = useState<{
-    displayExpandedNodes: Set<number>;
-    searchExpandedNodes: Set<number>;
+    displayExpandedNodes: Set<string>;
+    searchExpandedNodes: Set<string>;
   }>({ displayExpandedNodes: new Set(), searchExpandedNodes: new Set() });
 
-  const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
-  const [indeterminateNodes, setIndeterminateNodes] = useState<Set<number>>(
+  const [indeterminateNodes, setIndeterminateNodes] = useState<Set<string>>(
     new Set()
   );
 
   const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
     TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 2));
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
@@ -55,7 +35,7 @@ export const useAction = (
 
   const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
-    currentIdRoute: number[]
+    currentIdRoute: string[]
   ) => {
     return {
       allChildrenIncludeParentList: currentList.filter(
@@ -128,7 +108,7 @@ export const useAction = (
 
     const displayData: TreeNode[] = idRouteList
       .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
-      .filter((item): item is TreeNode => !!item);
+      .filter((item) => !!item) as TreeNode[];
 
     if (value !== "") {
       setExpandedNodes((prevExpandedNodes) => ({
@@ -264,7 +244,7 @@ export const useAction = (
 
     setSelectedData(
       flatTreeTotalListData.filter(
-        (item) => selectedNodes.has(item.id) && item.children.length === 0
+        (item) => selectedNodes.has(item.id) && item.status === false
       )
     );
   }, [searchValue, selectedNodes]);

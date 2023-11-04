@@ -17,8 +17,8 @@ export interface DepartmentData {
   parentId: string;
 }
 
-export interface StaffDepartmentHierarchyList {
-  childrens: StaffDepartmentHierarchyList[];
+export interface StaffFoundationHierarchyList {
+  childrens: StaffFoundationHierarchyList[];
   department: DepartmentData;
   staffs: UserData[];
 }
@@ -321,7 +321,7 @@ export const useAction = () => {
   }, [checkboxData.notificationData]);
 
   useEffect(() => {
-    const data: StaffDepartmentHierarchyList[][] =
+    const data: StaffFoundationHierarchyList[][] =
       jsonData.data.staffDepartmentHierarchy;
     console.log(data);
     const flatData: DepartmentDto[] = [];
