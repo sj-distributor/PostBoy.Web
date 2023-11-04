@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { IDepartmentDto, IRoleAddData } from "../../../../dtos/role";
+import { IDepartmentDto } from "../../../../dtos/role";
 import { useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
