@@ -28,6 +28,7 @@ export const RoleFrom = () => {
     location,
     checkboxData,
     showLabel,
+    treeData,
     navigate,
     setCheckboxData,
     isHaveExpand,
@@ -84,7 +85,6 @@ export const RoleFrom = () => {
                     >
                       <div
                         onClick={() => {
-                          console.log(option.childrens);
                           expandTreeCheckbox(dataName, state.index, option);
                         }}
                       >
@@ -106,13 +106,7 @@ export const RoleFrom = () => {
                       </div>
                       <div
                         onClickCapture={() => {
-                          // isHaveExpand(option)
-                          //   ? updateParentCheckbox(
-                          //       dataName,
-                          //       state.index,
-                          //       option
-                          //     )
-                          //   : updateChildrenCheckbox(dataName, state.index);
+                          updateChildrenCheckbox(dataName, state.index, option);
                         }}
                       >
                         <Checkbox
@@ -120,7 +114,9 @@ export const RoleFrom = () => {
                           checkedIcon={checkedIcon}
                           style={{ marginRight: 8 }}
                           checked={option.isSelected}
-                          indeterminate={option.indeterminate}
+                          indeterminate={
+                            option.isSelected ? false : option.indeterminate
+                          }
                           indeterminateIcon={
                             <IndeterminateCheckBoxIcon fontSize="small" />
                           }
@@ -145,7 +141,7 @@ export const RoleFrom = () => {
                 setCheckboxData((preValue) => {
                   return {
                     ...preValue,
-                    [dataName]: flatOptions,
+                    [dataName]: treeData,
                   };
                 });
             }}

@@ -117,6 +117,8 @@ export const useAction = () => {
 
   const cloneCheckboxData = clone(checkboxData);
 
+  const [treeData, setTreeData] = useState<DepartmentDto[]>([]);
+
   const isHaveExpand = (option: DepartmentDto) => {
     return Object.hasOwn(option, "isExpand");
   };
@@ -174,34 +176,56 @@ export const useAction = () => {
   const updateCloneCheckboxDatas = (
     dataSource: keyof AllDepartmentData,
     id: string,
-    key: keyof DepartmentDto
+    key: keyof DepartmentDto,
+    option: DepartmentDto
   ) => {
-    console.log(cloneCheckboxData);
-    const data = cloneCheckboxData[dataSource].map((item) => {
-      if (item.idRoute?.find((item) => item.includes(id))) {
-        console.log(item);
-        return {
-          ...item,
-          isExpand: !item.isExpand,
-        };
-      } else {
-        return item;
-      }
-    });
+    function updateDepartmentsWithParentId(
+      departmentList: any,
+      parentId: any,
+      option: DepartmentDto
+    ) {
+      function updateDepartmentsRecursively(departments: any, parentId: any) {
+        for (const department of departments) {
+          if (
+            department.idRoute &&
+            department.idRoute.length &&
+            department.idRoute.includes(parentId)
+          ) {
+            if (department.idRoute.length === option.idRoute?.length) {
+              department.isExpand = !department.isExpand;
+            } else if (
+              department.idRoute.length === (option.idRoute?.length ?? 0) + 1 &&
+              department.idRoute.includes(parentId)
+            ) {
+              department.isHide = !department.isHide;
+              department.isExpand = false;
+            } else if (
+              department.idRoute.length > 1 &&
+              department.idRoute.includes(parentId)
+            ) {
+              !!option.isExpand && (department.isHide = true);
+              department.isExpand = false;
+            }
 
-    const setChildrenData = (data: any) => {
-      console.log(data);
-    };
-
-    data.forEach((item) => {
-      if (item.parentId === id) {
-        item.isHide = !item.isHide;
-        item.isExpand = item.isHide;
+            if (department.children) {
+              updateDepartmentsRecursively(department.children, department.id);
+            }
+          }
+        }
       }
-    });
+
+      updateDepartmentsRecursively(departmentList, parentId);
+
+      return departmentList;
+    }
+    const newData = updateDepartmentsWithParentId(
+      cloneCheckboxData[dataSource],
+      option.id,
+      option
+    );
 
     setCheckboxData((preValue) => {
-      return { ...preValue, [dataSource]: data };
+      return { ...preValue, [dataSource]: newData };
     });
   };
 
@@ -210,18 +234,7 @@ export const useAction = () => {
     index: number,
     option: DepartmentDto
   ) => {
-    console.log(dataSource, index, option);
-    updateCloneCheckboxDatas(dataSource, option.id, "isExpand");
-    // updateCloneCheckboxData(dataSource, index, "isExpand", undefined, true);
-
-    // cloneCheckboxData[dataSource].forEach((item, index) => {
-    //   item.parentId === option.id &&
-    //     updateCloneCheckboxData(dataSource, index, "isHide", undefined, true);
-    // });
-
-    // setCheckboxData((preValue) => {
-    //   return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
-    // });
+    updateCloneCheckboxDatas(dataSource, option.id, "isExpand", option);
   };
 
   const updateParentCheckbox = (
@@ -229,7 +242,7 @@ export const useAction = () => {
     parameterIndex: number,
     option: DepartmentDto
   ) => {
-    updateCloneCheckboxData(dataSource, parameterIndex, "indeterminate", false);
+    // updateCloneCheckboxData(dataSource, parameterIndex, "indeterminate", false);
 
     updateCloneCheckboxData(
       dataSource,
@@ -259,37 +272,22 @@ export const useAction = () => {
 
   const updateChildrenCheckbox = (
     dataSource: keyof AllDepartmentData,
-    index: number
+    index: number,
+    option: DepartmentDto
   ) => {
     const parentIndex = cloneCheckboxData[dataSource].findIndex(
       (x) => cloneCheckboxData[dataSource][index].parentId === x.id
     );
 
-    updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", true);
+    const data = cloneCheckboxData[dataSource];
 
-    updateCloneCheckboxData(dataSource, index, "isSelected", undefined, true);
-
-    const { isAllTrue, isAllFalse } = getChildrenUnifiedState(
-      dataSource,
-      parentIndex
-    );
-
-    const changeIndeterminateToFalse = () => {
-      updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", false);
-    };
-
-    if (isAllTrue) {
-      changeIndeterminateToFalse();
-      updateCloneCheckboxData(dataSource, parentIndex, "isSelected", true);
-    }
-
-    if (isAllFalse) {
-      changeIndeterminateToFalse();
-      updateCloneCheckboxData(dataSource, parentIndex, "isSelected", false);
-    }
+    data.forEach((item, index) => {
+      item.id === option.id && (item.isSelected = !item.isSelected);
+      item.id === option.id && (item.indeterminate = false);
+    });
 
     setCheckboxData((preValue) => {
-      return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
+      return { ...preValue, [dataSource]: data };
     });
   };
 
@@ -313,19 +311,10 @@ export const useAction = () => {
         "isSelected",
         false
       );
-
-      updateCloneCheckboxData(
-        dataSource,
-        removeOptionIndex,
-        "indeterminate",
-        false
-      );
     } else {
       const parentIndex = cloneCheckboxData[dataSource].findIndex(
         (x) => x.id === option.parentId
       );
-
-      updateCloneCheckboxData(dataSource, parentIndex, "indeterminate", true);
 
       updateCloneCheckboxData(
         dataSource,
@@ -333,17 +322,6 @@ export const useAction = () => {
         "isSelected",
         false
       );
-
-      if (getChildrenUnifiedState(dataSource, parentIndex).isAllFalse) {
-        updateCloneCheckboxData(
-          dataSource,
-          parentIndex,
-          "indeterminate",
-          false
-        );
-
-        updateCloneCheckboxData(dataSource, parentIndex, "isSelected", false);
-      }
     }
 
     setCheckboxData((preValue) => {
@@ -361,8 +339,8 @@ export const useAction = () => {
 
   useEffect(() => {
     const data: DepartmentTreeList[] = jsonData.data.staffDepartmentHierarchy;
-    console.log(data);
-    const flatData: any[] = [];
+
+    const flatData: DepartmentDto[] = [];
     data.map((fItem) => {
       flatData.push({
         name: fItem.companies.department.name,
@@ -371,6 +349,7 @@ export const useAction = () => {
         isHide: false,
         childrens: flatOptions,
         idRoute: [fItem.companies.department.id],
+        indeterminate: false,
       });
 
       const getChildrenData = (
@@ -383,9 +362,10 @@ export const useAction = () => {
             id: item.department.id,
             isSelected: false,
             isHide: true,
-            childrens: flatOptions,
+            childrens: item.childrens.length ? flatOptions : [],
             idRoute: [...idRoute, item.department.id],
             parentId: item.department.parentId,
+            indeterminate: false,
           });
           if (item.childrens.length) {
             getChildrenData(item.childrens, [...idRoute, item.department.id]);
@@ -395,7 +375,7 @@ export const useAction = () => {
       getChildrenData(fItem.departments, [fItem.companies.department.id]);
     }, [] as DepartmentDto[]);
 
-    console.log(flatData);
+    setTreeData(flatData);
     setCheckboxData((prev) => ({
       pullCrowdData: flatData,
       notificationData: flatData,
@@ -410,6 +390,7 @@ export const useAction = () => {
     location,
     checkboxData,
     showLabel,
+    treeData,
     navigate,
     setCheckboxData,
     isHaveExpand,
