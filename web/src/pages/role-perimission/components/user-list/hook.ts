@@ -58,8 +58,8 @@ export const useAction = () => {
         enqueueSnackbar("移除成功!", { variant: "success" });
         initUserList();
       })
-      .catch(() => {
-        enqueueSnackbar("移除失败!", { variant: "error" });
+      .catch((error) => {
+        enqueueSnackbar((error as Error).message, { variant: "error" });
       })
       .finally(() => {
         setSelectId([]);

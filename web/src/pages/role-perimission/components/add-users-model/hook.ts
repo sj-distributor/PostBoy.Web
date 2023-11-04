@@ -134,8 +134,8 @@ export const useAction = (props: {
     //     addUsersRef.current?.close();
     //     initUserList();
     //   })
-    //   .catch(() => {
-    //     enqueueSnackbar("添加用户失败!", { variant: "error" });
+    //   .catch((error) => {
+    //     enqueueSnackbar((error as Error).message, { variant: "error" });
     //   });
   };
 
