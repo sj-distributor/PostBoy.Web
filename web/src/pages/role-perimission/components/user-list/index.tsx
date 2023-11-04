@@ -4,6 +4,10 @@ import {
   Alert,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
   IconButton,
   Pagination,
   Snackbar,
@@ -25,6 +29,8 @@ export const UserList = () => {
     selectId,
     loading,
     openError,
+    openConfirm,
+    openConfirmAction,
     alertType,
     promptText,
     navigate,
@@ -37,7 +43,7 @@ export const UserList = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "name",
+      field: "userName",
       headerName: "用戶名",
       width: 300,
       sortable: false,
@@ -57,7 +63,13 @@ export const UserList = () => {
       width: 150,
       sortable: false,
       renderCell: (params) => (
-        <Button variant="text" onClick={() => handleDelete([params.row.id])}>
+        <Button
+          variant="text"
+          onClick={() => {
+            setSelectId([params.row.id]);
+            openConfirmAction.setTrue();
+          }}
+        >
           移除
         </Button>
       ),
@@ -75,6 +87,27 @@ export const UserList = () => {
       >
         <Alert severity={alertType}>{promptText}</Alert>
       </Snackbar>
+
+      <Dialog
+        PaperProps={{
+          style: {
+            width: "500px",
+          },
+        }}
+        open={openConfirm}
+        onClose={() => openConfirmAction.setFalse()}
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            确定移除选中用户吗？
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => openConfirmAction.setFalse()}>取消</Button>
+          <Button onClick={() => handleDelete()}>确定</Button>
+        </DialogActions>
+      </Dialog>
+
       <div className={styles.nav}>
         <div className={styles.navTitle}>用戶列表</div>
         <div className={styles.navSearch}>
@@ -114,7 +147,7 @@ export const UserList = () => {
           <Button
             className={styles.btnDel}
             variant="contained"
-            onClick={() => handleDelete(selectId)}
+            onClick={() => openConfirmAction.setTrue()}
           >
             批量移除
           </Button>

@@ -38,10 +38,11 @@ export const UserRoleType = {
 export interface PageDto {
   PageIndex: number;
   PageSize: number;
+  RoleId: string;
 }
 
 export interface RoleUserResponse {
-  count: 0;
+  count: number;
   roleUsers: RoleUserItemDto[];
 }
 
@@ -54,6 +55,8 @@ export interface RoleUsersDto {
   id: string;
   roleId: string;
   userId: string;
+  roleName: string;
+  userName: string;
 }
 
 export interface DeleteRoleUserRequest {
