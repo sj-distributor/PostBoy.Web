@@ -291,14 +291,14 @@ export const useAction = () => {
           const allChildrenSelected = data
             .filter((aItem) => aItem.parentId === String(id))
             .every((cItem) => cItem.isSelected);
-          const allChildrenIn = data
+          const allChildrenIndeterminate = data
             .filter((aItem) => aItem.parentId === String(id))
             .some((cItem) => cItem.isSelected);
-          console.log(allChildrenIn);
+
           data.forEach((item) => {
             if (item.id === String(id)) {
               item.isSelected = allChildrenSelected;
-              item.indeterminate = allChildrenIn;
+              item.indeterminate = allChildrenIndeterminate;
             }
           });
 
@@ -313,8 +313,6 @@ export const useAction = () => {
       ?.slice(0, option.idRoute.length - 1)
       .reverse();
     superiors?.length && setIndeterminateAllStatus(superiors);
-
-    console.log(option);
 
     function findDepartmentsWithParentId(
       departmentList: DepartmentDto[],

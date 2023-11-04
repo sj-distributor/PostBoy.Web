@@ -55,7 +55,28 @@ export const RoleFrom = () => {
         <div className={styles.itemInput}>
           <Autocomplete
             size="small"
-            sx={selectStyles}
+            // sx={selectStyles}
+            sx={{
+              "& .MuiInputBase-root.MuiOutlinedInput-root": {
+                maxHeight: "10rem",
+                overflowY: "auto",
+                position: "unset",
+              },
+              "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderBottomColor: "transparent",
+                borderLeftColor: "transparent",
+                borderRightColor: "transparent",
+              },
+              "& .MuiTextField-root": {
+                marginTop: 0,
+                marginBottom: 0,
+              },
+              "& .MuiOutlinedInput-root .MuiAutocomplete-endAdornment": {
+                right: 20,
+              },
+              marginLeft: "0.3rem",
+              flex: 1,
+            }}
             multiple
             options={optionSource}
             value={valueSource}
