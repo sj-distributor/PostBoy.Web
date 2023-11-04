@@ -7,7 +7,7 @@ const settings = (window as any).appSettings;
 export async function InitialAppSetting() {
   if ((window as any).appSettings) return (window as any).appSettings;
 
-  await fetch(`${process.env.PUBLIC_URL}`, {
+  await fetch(`${process.env.PUBLIC_URL}/appsetting.json`, {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
