@@ -6,6 +6,23 @@ import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
 import jsonData from "./departments.json";
 
+export interface UserData {
+  id: string;
+  userName: string;
+}
+
+export interface DepartmentData {
+  id: string;
+  name: string;
+  parentId: string;
+}
+
+export interface StaffDepartmentHierarchyList {
+  childrens: StaffDepartmentHierarchyList[];
+  department: DepartmentData;
+  staffs: UserData[];
+}
+
 export const useAction = () => {
   const options: IDepartmentDto = {
     allDepartment: [
@@ -141,6 +158,7 @@ export const useAction = () => {
     if (fixedValue !== undefined) {
       cloneCheckboxData[dataSource][index][key] = fixedValue;
     } else if (isRebellionSelfValue !== undefined && isRebellionSelfValue) {
+      console.log(index);
       cloneCheckboxData[dataSource][index][key] =
         !cloneCheckboxData[dataSource][index][key];
     } else if (parentIndex !== undefined) {
@@ -156,11 +174,11 @@ export const useAction = () => {
   ) => {
     updateCloneCheckboxData(dataSource, index, "isExpand", undefined, true);
 
-    cloneCheckboxData[dataSource].forEach(
-      (item, index) =>
-        item.parentId === option.id &&
-        updateCloneCheckboxData(dataSource, index, "isHide", undefined, true)
-    );
+    cloneCheckboxData[dataSource].forEach((item, index) => {
+      console.log(item);
+      item.parentId === option.id &&
+        updateCloneCheckboxData(dataSource, index, "isHide", undefined, true);
+    });
 
     setCheckboxData((preValue) => {
       return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
@@ -303,8 +321,46 @@ export const useAction = () => {
   }, [checkboxData.notificationData]);
 
   useEffect(() => {
-    console.log(jsonData);
-    console.log(flatOptions);
+    const data: StaffDepartmentHierarchyList[][] =
+      jsonData.data.staffDepartmentHierarchy;
+    console.log(data);
+    const flatData: DepartmentDto[] = [];
+    data.map((item) => {
+      const flatOptions = item.reduce((accumulator: DepartmentDto[], item) => {
+        const higherDepartment: DepartmentDto = {
+          name: item.department.name,
+          id: item.department.id,
+          isSelected: false,
+          isHide: false,
+          childrens: item.childrens,
+        };
+        higherDepartment.isExpand = false;
+        higherDepartment.indeterminate = false;
+        accumulator.push(higherDepartment);
+
+        if (item.childrens && item.childrens.length > 0) {
+          accumulator.push(
+            ...item.childrens.map((childrenItem) => ({
+              name: childrenItem.department.name,
+              id: childrenItem.department.id,
+              isSelected: false,
+              parentId: childrenItem.department.parentId,
+              isHide: true,
+              childrens: item.childrens,
+            }))
+          );
+        }
+
+        return accumulator;
+      }, []);
+      flatData.push(...flatOptions);
+    }, [] as DepartmentDto[]);
+
+    console.log(flatData);
+    setCheckboxData((prev) => ({
+      pullCrowdData: flatData,
+      notificationData: flatData,
+    }));
   }, []);
 
   return {

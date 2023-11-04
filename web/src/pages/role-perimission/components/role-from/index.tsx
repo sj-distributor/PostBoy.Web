@@ -73,11 +73,12 @@ export const RoleFrom = () => {
                     style={{
                       translate: "0 .3125rem",
                     }}
-                    onClick={() =>
-                      expandTreeCheckbox(dataName, state.index, option)
-                    }
+                    onClick={() => {
+                      expandTreeCheckbox(dataName, state.index, option);
+                    }}
                   >
-                    {isHaveExpand(option) &&
+                    {option.childrens?.length ? (
+                      isHaveExpand(option) &&
                       (option.isExpand ? (
                         <ArrowDropDownIcon
                           fontSize="large"
@@ -88,7 +89,10 @@ export const RoleFrom = () => {
                           fontSize="large"
                           sx={{ color: "#1876d3", cursor: "pointer" }}
                         />
-                      ))}
+                      ))
+                    ) : (
+                      <></>
+                    )}
                   </div>
                   {!option.isHide && (
                     <li
