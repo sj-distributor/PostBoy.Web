@@ -79,9 +79,7 @@ export const TreeSelectList: React.FC<{
               </div>
             )}
           </ListItemIcon>
-          <div className={styles.one}>
-            <ListItemText primary={item.title} className={styles.text} />
-          </div>
+          <ListItemText primary={item.title} className={styles.text} />
         </ListItem>
       </div>
     );
@@ -97,7 +95,7 @@ export const TreeSelectList: React.FC<{
             : displayFlatUpdateTreeData.length
         }
         itemSize={45}
-        width={410}
+        width={420}
       >
         {renderListItem}
       </FixedSizeList>
