@@ -180,11 +180,14 @@ export const useAction = () => {
     option: DepartmentDto
   ) => {
     function updateDepartmentsWithParentId(
-      departmentList: any,
-      parentId: any,
+      departmentList: DepartmentDto[],
+      parentId: string,
       option: DepartmentDto
     ) {
-      function updateDepartmentsRecursively(departments: any, parentId: any) {
+      function updateDepartmentsRecursively(
+        departments: DepartmentDto[],
+        parentId: string
+      ) {
         for (const department of departments) {
           if (
             department.idRoute &&
@@ -206,10 +209,9 @@ export const useAction = () => {
               !!option.isExpand && (department.isHide = true);
               department.isExpand = false;
             }
-
-            if (department.children) {
-              updateDepartmentsRecursively(department.children, department.id);
-            }
+          }
+          if (department.childrens) {
+            updateDepartmentsRecursively(department.childrens, department.id);
           }
         }
       }
@@ -244,26 +246,26 @@ export const useAction = () => {
   ) => {
     // updateCloneCheckboxData(dataSource, parameterIndex, "indeterminate", false);
 
-    updateCloneCheckboxData(
-      dataSource,
-      parameterIndex,
-      "isSelected",
-      undefined,
-      true
-    );
+    // updateCloneCheckboxData(
+    //   dataSource,
+    //   parameterIndex,
+    //   "isSelected",
+    //   undefined,
+    //   true
+    // );
 
-    cloneCheckboxData[dataSource].forEach((item, index) => {
-      if (item.parentId === option.id) {
-        updateCloneCheckboxData(
-          dataSource,
-          index,
-          "isSelected",
-          undefined,
-          undefined,
-          parameterIndex
-        );
-      }
-    });
+    // cloneCheckboxData[dataSource].forEach((item, index) => {
+    //   if (item.parentId === option.id) {
+    //     updateCloneCheckboxData(
+    //       dataSource,
+    //       index,
+    //       "isSelected",
+    //       undefined,
+    //       undefined,
+    //       parameterIndex
+    //     );
+    //   }
+    // });
 
     setCheckboxData((preValue) => {
       return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
@@ -286,6 +288,26 @@ export const useAction = () => {
       item.id === option.id && (item.indeterminate = false);
     });
 
+    const idRoute = option.idRoute?.slice(0, option.idRoute.length - 1);
+    console.log(idRoute);
+    if (idRoute?.length) {
+      idRoute.map((id) => {
+        const allChildrenSelected = data
+          .filter((aItem) => aItem.parentId === id)
+          .every((cItem) => cItem.isSelected);
+        const allChildrenIn = data
+          .filter((aItem) => aItem.parentId === id)
+          .some((cItem) => cItem.isSelected);
+        const fItem = data.find((fItem) => fItem.id === id);
+        console.log(fItem, allChildrenSelected);
+        data.forEach(
+          (item) =>
+            item.id === id &&
+            (item.isSelected = allChildrenSelected) &&
+            (item.indeterminate = allChildrenIn)
+        );
+      });
+    }
     setCheckboxData((preValue) => {
       return { ...preValue, [dataSource]: data };
     });
@@ -299,30 +321,30 @@ export const useAction = () => {
       (item) => item.id === option.id
     );
 
-    if (isHaveExpand(option)) {
-      cloneCheckboxData[dataSource].forEach((item, index) => {
-        item.parentId === option.id &&
-          updateCloneCheckboxData(dataSource, index, "isSelected", false);
-      });
+    // if (isHaveExpand(option)) {
+    //   cloneCheckboxData[dataSource].forEach((item, index) => {
+    //     item.parentId === option.id &&
+    //       updateCloneCheckboxData(dataSource, index, "isSelected", false);
+    //   });
 
-      updateCloneCheckboxData(
-        dataSource,
-        removeOptionIndex,
-        "isSelected",
-        false
-      );
-    } else {
-      const parentIndex = cloneCheckboxData[dataSource].findIndex(
-        (x) => x.id === option.parentId
-      );
+    //   updateCloneCheckboxData(
+    //     dataSource,
+    //     removeOptionIndex,
+    //     "isSelected",
+    //     false
+    //   );
+    // } else {
+    //   const parentIndex = cloneCheckboxData[dataSource].findIndex(
+    //     (x) => x.id === option.parentId
+    //   );
 
-      updateCloneCheckboxData(
-        dataSource,
-        removeOptionIndex,
-        "isSelected",
-        false
-      );
-    }
+    //   updateCloneCheckboxData(
+    //     dataSource,
+    //     removeOptionIndex,
+    //     "isSelected",
+    //     false
+    //   );
+    // }
 
     setCheckboxData((preValue) => {
       return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
