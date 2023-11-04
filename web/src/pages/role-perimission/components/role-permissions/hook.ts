@@ -10,8 +10,11 @@ import {
   DeleteRoles,
   GetRolesList,
 } from "../../../../api/role-user-permissions";
+import { useSnackbar } from "notistack";
 
 export const useAction = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const confirmTipsRef = useRef<ModalBoxRef>(null);
 
   const navigate = useNavigate();
@@ -46,9 +49,9 @@ export const useAction = () => {
         }, 500);
       })
       .catch((error) => {
-        console.log((error as Error).message);
-
         setTimeout(() => {
+          enqueueSnackbar((error as Error).message, { variant: "error" });
+
           updateRoleDto("count", 0);
           updateRoleDto("roles", []);
 
@@ -63,7 +66,9 @@ export const useAction = () => {
         loadRoles();
         setRoleId("");
       })
-      .catch((error) => console.log((error as Error).message));
+      .catch((error) =>
+        enqueueSnackbar((error as Error).message, { variant: "error" })
+      );
   };
 
   const updatePageDto = (k: keyof IPageDto, v: string | number) => {
