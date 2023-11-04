@@ -73,52 +73,60 @@ export const RoleFrom = () => {
                     style={{
                       translate: "0 .3125rem",
                     }}
-                    onClick={() => {
-                      expandTreeCheckbox(dataName, state.index, option);
-                    }}
-                  >
-                    {option.childrens?.length ? (
-                      isHaveExpand(option) &&
-                      (option.isExpand ? (
-                        <ArrowDropDownIcon
-                          fontSize="large"
-                          sx={{ color: "#1876d3", cursor: "pointer" }}
-                        />
-                      ) : (
-                        <ArrowRightIcon
-                          fontSize="large"
-                          sx={{ color: "#1876d3", cursor: "pointer" }}
-                        />
-                      ))
-                    ) : (
-                      <></>
-                    )}
-                  </div>
+                  ></div>
                   {!option.isHide && (
                     <li
                       {...props}
-                      style={
-                        isHaveExpand(option)
-                          ? { paddingLeft: 0, flex: 1 }
-                          : { marginLeft: "2.2rem", flex: 1 }
-                      }
-                      onClickCapture={() => {
-                        isHaveExpand(option)
-                          ? updateParentCheckbox(dataName, state.index, option)
-                          : updateChildrenCheckbox(dataName, state.index);
+                      style={{
+                        marginLeft: (option.idRoute?.length ?? 0) * 15,
+                        flex: 1,
                       }}
                     >
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={option.isSelected}
-                        indeterminate={option.indeterminate}
-                        indeterminateIcon={
-                          <IndeterminateCheckBoxIcon fontSize="small" />
-                        }
-                      />
-                      {option.name}
+                      <div
+                        onClick={() => {
+                          console.log(option.childrens);
+                          expandTreeCheckbox(dataName, state.index, option);
+                        }}
+                      >
+                        {option.childrens?.length ? (
+                          option.isExpand ? (
+                            <ArrowDropDownIcon
+                              fontSize="large"
+                              sx={{ color: "#1876d3", cursor: "pointer" }}
+                            />
+                          ) : (
+                            <ArrowRightIcon
+                              fontSize="large"
+                              sx={{ color: "#1876d3", cursor: "pointer" }}
+                            />
+                          )
+                        ) : (
+                          <></>
+                        )}
+                      </div>
+                      <div
+                        onClickCapture={() => {
+                          // isHaveExpand(option)
+                          //   ? updateParentCheckbox(
+                          //       dataName,
+                          //       state.index,
+                          //       option
+                          //     )
+                          //   : updateChildrenCheckbox(dataName, state.index);
+                        }}
+                      >
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={option.isSelected}
+                          indeterminate={option.indeterminate}
+                          indeterminateIcon={
+                            <IndeterminateCheckBoxIcon fontSize="small" />
+                          }
+                        />
+                        {option.name}
+                      </div>
                     </li>
                   )}
                 </div>

@@ -1,7 +1,12 @@
 import { StaffDepartmentHierarchyList } from "./hook";
 
 export type DepartmentDto = {
-  [key: string]: string | boolean | undefined | StaffDepartmentHierarchyList[];
+  [key: string]:
+    | string
+    | boolean
+    | undefined
+    | StaffDepartmentHierarchyList[]
+    | string[];
   name: string;
   id: string;
   isSelected: boolean;
@@ -10,6 +15,7 @@ export type DepartmentDto = {
   parentId?: string;
   isHide?: boolean;
   childrens?: StaffDepartmentHierarchyList[];
+  idRoute?: string[];
 };
 
 export type AllDepartmentData = {

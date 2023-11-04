@@ -20,7 +20,12 @@ export interface DepartmentData {
 export interface StaffDepartmentHierarchyList {
   childrens: StaffDepartmentHierarchyList[];
   department: DepartmentData;
-  staffs: UserData[];
+  staffs: UserData[] | null;
+}
+
+export interface DepartmentTreeList {
+  departments: StaffDepartmentHierarchyList[];
+  companies: StaffDepartmentHierarchyList;
 }
 
 export const useAction = () => {
@@ -158,7 +163,6 @@ export const useAction = () => {
     if (fixedValue !== undefined) {
       cloneCheckboxData[dataSource][index][key] = fixedValue;
     } else if (isRebellionSelfValue !== undefined && isRebellionSelfValue) {
-      console.log(index);
       cloneCheckboxData[dataSource][index][key] =
         !cloneCheckboxData[dataSource][index][key];
     } else if (parentIndex !== undefined) {
@@ -167,22 +171,57 @@ export const useAction = () => {
     }
   };
 
+  const updateCloneCheckboxDatas = (
+    dataSource: keyof AllDepartmentData,
+    id: string,
+    key: keyof DepartmentDto
+  ) => {
+    console.log(cloneCheckboxData);
+    const data = cloneCheckboxData[dataSource].map((item) => {
+      if (item.idRoute?.find((item) => item.includes(id))) {
+        console.log(item);
+        return {
+          ...item,
+          isExpand: !item.isExpand,
+        };
+      } else {
+        return item;
+      }
+    });
+
+    const setChildrenData = (data: any) => {
+      console.log(data);
+    };
+
+    data.forEach((item) => {
+      if (item.parentId === id) {
+        item.isHide = !item.isHide;
+        item.isExpand = item.isHide;
+      }
+    });
+
+    setCheckboxData((preValue) => {
+      return { ...preValue, [dataSource]: data };
+    });
+  };
+
   const expandTreeCheckbox = (
     dataSource: keyof AllDepartmentData,
     index: number,
     option: DepartmentDto
   ) => {
-    updateCloneCheckboxData(dataSource, index, "isExpand", undefined, true);
+    console.log(dataSource, index, option);
+    updateCloneCheckboxDatas(dataSource, option.id, "isExpand");
+    // updateCloneCheckboxData(dataSource, index, "isExpand", undefined, true);
 
-    cloneCheckboxData[dataSource].forEach((item, index) => {
-      console.log(item);
-      item.parentId === option.id &&
-        updateCloneCheckboxData(dataSource, index, "isHide", undefined, true);
-    });
+    // cloneCheckboxData[dataSource].forEach((item, index) => {
+    //   item.parentId === option.id &&
+    //     updateCloneCheckboxData(dataSource, index, "isHide", undefined, true);
+    // });
 
-    setCheckboxData((preValue) => {
-      return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
-    });
+    // setCheckboxData((preValue) => {
+    //   return { ...preValue, [dataSource]: cloneCheckboxData[dataSource] };
+    // });
   };
 
   const updateParentCheckbox = (
@@ -321,39 +360,39 @@ export const useAction = () => {
   }, [checkboxData.notificationData]);
 
   useEffect(() => {
-    const data: StaffDepartmentHierarchyList[][] =
-      jsonData.data.staffDepartmentHierarchy;
+    const data: DepartmentTreeList[] = jsonData.data.staffDepartmentHierarchy;
     console.log(data);
-    const flatData: DepartmentDto[] = [];
-    data.map((item) => {
-      const flatOptions = item.reduce((accumulator: DepartmentDto[], item) => {
-        const higherDepartment: DepartmentDto = {
-          name: item.department.name,
-          id: item.department.id,
-          isSelected: false,
-          isHide: false,
-          childrens: item.childrens,
-        };
-        higherDepartment.isExpand = false;
-        higherDepartment.indeterminate = false;
-        accumulator.push(higherDepartment);
+    const flatData: any[] = [];
+    data.map((fItem) => {
+      flatData.push({
+        name: fItem.companies.department.name,
+        id: fItem.companies.department.id,
+        isSelected: false,
+        isHide: false,
+        childrens: flatOptions,
+        idRoute: [fItem.companies.department.id],
+      });
 
-        if (item.childrens && item.childrens.length > 0) {
-          accumulator.push(
-            ...item.childrens.map((childrenItem) => ({
-              name: childrenItem.department.name,
-              id: childrenItem.department.id,
-              isSelected: false,
-              parentId: childrenItem.department.parentId,
-              isHide: true,
-              childrens: item.childrens,
-            }))
-          );
-        }
-
-        return accumulator;
-      }, []);
-      flatData.push(...flatOptions);
+      const getChildrenData = (
+        data: StaffDepartmentHierarchyList[],
+        idRoute: string[]
+      ) => {
+        data.map((item) => {
+          flatData.push({
+            name: item.department.name,
+            id: item.department.id,
+            isSelected: false,
+            isHide: true,
+            childrens: flatOptions,
+            idRoute: [...idRoute, item.department.id],
+            parentId: item.department.parentId,
+          });
+          if (item.childrens.length) {
+            getChildrenData(item.childrens, [...idRoute, item.department.id]);
+          }
+        });
+      };
+      getChildrenData(fItem.departments, [fItem.companies.department.id]);
     }, [] as DepartmentDto[]);
 
     console.log(flatData);
