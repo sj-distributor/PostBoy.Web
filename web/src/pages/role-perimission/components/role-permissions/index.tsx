@@ -1,33 +1,65 @@
 import styles from "./index.module.scss";
-
-import {
-  Button,
-  IconButton,
-  Pagination,
-  Snackbar,
-  TextField,
-} from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
-import { UserRoleEnum } from "../../../../dtos/role";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
 
+// return params.row.role === UserRoleEnum.SuperAdmin ? (
+//   <Button
+//     variant="text"
+//     onClick={() => navigate(`/roles/userList/${params.id}`)}
+//   >
+//     分配
+//   </Button>
+// ) : params.row.role === UserRoleEnum.User ? (
+//   <Button
+//     variant="text"
+//     onClick={() => navigate(`/roles/edit/${params.id}`)}
+//   >
+//     編輯
+//   </Button>
+// ) : (
+//   <>
+//     <Button
+//       variant="text"
+//       onClick={() => navigate(`/roles/userList/${params.id}`)}
+//     >
+//       分配
+//     </Button>
+//     <Button
+//       variant="text"
+//       onClick={() => navigate(`/roles/edit/${params.id}`)}
+//     >
+//       編輯
+//     </Button>
+//     <Button
+//       variant="text"
+//       // disabled
+//       onClick={() => {
+//         confirmTipsRef.current?.open();
+//         setRoleId(params.row.id);
+//       }}
+//     >
+//       刪除
+//     </Button>
+//   </>
+// );
+
 export const RolePermissions = () => {
   const {
-    userId,
-    rows,
-    inputVal,
-    rowId,
     confirmTipsRef,
-    tipsText,
-    isLoading,
     navigate,
-    setRowId,
-    handleInputChange,
-    handleSearch,
-    handleDelete,
+    pageDto,
+    updatePageDto,
+    roleDto,
+    loading,
+    roleId,
+    setRoleId,
+    deleteRole,
+    inputVal,
+    setInputVal,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -35,57 +67,24 @@ export const RolePermissions = () => {
       field: "name",
       headerName: "角色名稱",
       width: 300,
+      disableColumnMenu: true,
+      sortable: false,
     },
     {
-      field: "details",
+      field: "description",
       headerName: "角色描述",
       width: 600,
+      disableColumnMenu: true,
+      sortable: false,
     },
     {
-      field: "actions",
+      field: "action",
       headerName: "操作",
       width: 300,
+      disableColumnMenu: true,
+      sortable: false,
       renderCell: (params) => {
-        return params.row.role === UserRoleEnum.SuperAdmin ? (
-          <Button
-            variant="text"
-            onClick={() => navigate(`/roles/userList/${params.id}`)}
-          >
-            分配
-          </Button>
-        ) : params.row.role === UserRoleEnum.User ? (
-          <Button
-            variant="text"
-            onClick={() => navigate(`/roles/edit/${params.id}`)}
-          >
-            編輯
-          </Button>
-        ) : (
-          <>
-            <Button
-              variant="text"
-              onClick={() => navigate(`/roles/userList/${params.id}`)}
-            >
-              分配
-            </Button>
-            <Button
-              variant="text"
-              onClick={() => navigate(`/roles/edit/${params.id}`)}
-            >
-              編輯
-            </Button>
-            <Button
-              variant="text"
-              disabled
-              onClick={() => {
-                confirmTipsRef.current?.open();
-                setRowId(params.row.id);
-              }}
-            >
-              刪除
-            </Button>
-          </>
-        );
+        return <div>123</div>;
       },
     },
   ];
@@ -103,15 +102,17 @@ export const RolePermissions = () => {
             fullWidth
             autoComplete="off"
             value={inputVal}
-            onChange={handleInputChange}
+            onChange={(e) => setInputVal(e.target.value)}
             onKeyDown={(event) =>
-              event.key === "Enter" && inputVal && handleSearch()
+              event.key === "Enter" &&
+              inputVal &&
+              updatePageDto("keyword", inputVal)
             }
           />
           <div className={styles.navIcon}>
             <IconButton
               aria-label="Search"
-              onClick={() => inputVal && handleSearch()}
+              onClick={() => inputVal && updatePageDto("keyword", inputVal)}
             >
               <SearchIcon className={styles.navFont} />
             </IconButton>
@@ -125,16 +126,21 @@ export const RolePermissions = () => {
       </div>
       <div className={styles.content}>
         <DataGrid
+          rows={roleDto.roles}
           columns={columns}
-          rows={rows}
-          loading={isLoading}
-          hideFooter
-          checkboxSelection
-          disableColumnMenu
+          pageSize={pageDto.pageSize}
+          page={pageDto.pageIndex}
+          showCellRightBorder
+          showColumnRightBorder
+          rowsPerPageOptions={[5, 10, 15, 20]}
+          disableSelectionOnClick
+          pagination
+          paginationMode="server"
+          rowCount={roleDto.count}
+          onPageChange={(value) => updatePageDto("pageIndex", value)}
+          onPageSizeChange={(value) => updatePageDto("pageSize", value)}
+          loading={loading}
         />
-      </div>
-      <div className={styles.footer}>
-        <Pagination count={10} shape="rounded" color="primary" />
       </div>
       <ModalBox
         ref={confirmTipsRef}
@@ -157,7 +163,7 @@ export const RolePermissions = () => {
             <Button
               variant="contained"
               onClick={() => {
-                rowId && handleDelete([rowId]);
+                roleId && deleteRole(roleId);
                 confirmTipsRef.current?.close();
               }}
               className={styles.confirmButton}
@@ -167,14 +173,6 @@ export const RolePermissions = () => {
           </div>
         </div>
       </ModalBox>
-      <Snackbar
-        message={tipsText}
-        open={!!tipsText}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      />
     </div>
   );
 };
