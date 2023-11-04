@@ -1,9 +1,9 @@
 import {
-  DeleteRoleUserRequest,
   PageDto,
   RoleUserItemDto,
   RoleUserResponse,
   AddRoleUsersDto,
+  DeleteRoleUserRequest,
 } from "../../dtos/role-user-permissions";
 import { Get, Post } from "../http-client";
 
