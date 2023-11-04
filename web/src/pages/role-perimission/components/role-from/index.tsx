@@ -40,7 +40,6 @@ export const RoleFrom = () => {
     role,
     updateRole,
     addOrModifyRolePermission,
-    permissionOptions,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;

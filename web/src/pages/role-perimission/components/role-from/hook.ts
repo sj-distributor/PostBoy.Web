@@ -416,6 +416,5 @@ export const useAction = () => {
     role,
     rolePermission,
     addOrModifyRolePermission,
-    permissionOptions,
   };
 };
