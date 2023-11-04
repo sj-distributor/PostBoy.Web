@@ -45,16 +45,6 @@ export const useAction = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [dto, setDto] = useState<{
-    pageIndex: number;
-    pageSize: number;
-    count: number;
-  }>({
-    pageIndex: 1,
-    pageSize: 20,
-    count: 0,
-  });
-
   const navigate = useNavigate();
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -69,29 +59,9 @@ export const useAction = () => {
     PostDeleteRole({ roleIds: roles })
       .then((res) => {
         setTipsText("删除成功");
-        getRolesList();
       })
       .catch((err) => {
         setTipsText((err as Error).message);
-      });
-  };
-
-  const getRolesList = () => {
-    setIsLoading(true);
-    GetRolesList({ PageIndex: dto.pageIndex, PageSize: dto.pageSize })
-      .then((res) => {
-        if (res) {
-          const { count, roles } = res;
-
-          setDto((prev) => ({ ...prev, count }));
-          setRows(roles);
-        }
-      })
-      .catch((err) => {
-        setTipsText((err as Error).message);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   };
 
@@ -105,10 +75,6 @@ export const useAction = () => {
       };
     }
   }, [tipsText]);
-
-  useEffect(() => {
-    getRolesList();
-  }, []);
 
   return {
     userId,
