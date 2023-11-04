@@ -18,6 +18,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import { IPermissionItem } from "../../../../dtos/role-user-permissions";
 
 export const RoleFrom = () => {
   const {
@@ -223,13 +224,13 @@ export const RoleFrom = () => {
               <div className={styles.itemPermission}>
                 <div className={styles.itemPermissionTitle}>功能權限</div>
                 <div className={styles.itemPerssionsForm}>
-                  {permissionOptions.map(
-                    (optionItems: string, index: number) => {
+                  {permissions.permissions.map(
+                    (optionItems: IPermissionItem, index: number) => {
                       return (
                         <FormControlLabel
                           key={index}
                           control={<Checkbox />}
-                          label={optionItems}
+                          label={optionItems.name}
                           className={styles.formLabel}
                         />
                       );
