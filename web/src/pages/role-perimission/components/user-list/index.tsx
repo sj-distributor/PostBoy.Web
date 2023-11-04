@@ -1,7 +1,6 @@
 import styles from "./index.module.scss";
 
 import {
-  Alert,
   Button,
   CircularProgress,
   Dialog,
@@ -10,7 +9,6 @@ import {
   DialogContentText,
   IconButton,
   Pagination,
-  Snackbar,
   TextField,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -26,19 +24,17 @@ export const UserList = () => {
     addUsersRef,
     pageDto,
     userData,
-    selectId,
     loading,
-    openError,
     openConfirm,
     openConfirmAction,
-    alertType,
-    promptText,
+    batchBtnDisable,
     navigate,
     setSelectId,
-    handleInputChange,
     handleSearch,
     handleDelete,
     setPageDto,
+    setInputVal,
+    initUserList,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -78,16 +74,6 @@ export const UserList = () => {
 
   return (
     <div className={styles.container}>
-      <Snackbar
-        open={openError}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      >
-        <Alert severity={alertType}>{promptText}</Alert>
-      </Snackbar>
-
       <Dialog
         PaperProps={{
           style: {
@@ -119,7 +105,7 @@ export const UserList = () => {
             fullWidth
             autoComplete="off"
             value={inputVal}
-            onChange={handleInputChange}
+            onChange={(e) => setInputVal(e.target.value)}
           />
           <div className={styles.navIcon}>
             <IconButton aria-label="Search" onClick={handleSearch}>
@@ -133,7 +119,10 @@ export const UserList = () => {
             onCancel={() => addUsersRef.current?.close()}
             headComponent={<></>}
           >
-            <AddUsersModel addUsersRef={addUsersRef} />
+            <AddUsersModel
+              addUsersRef={addUsersRef}
+              initUserList={initUserList}
+            />
           </ModalBox>
           <Button
             className={styles.btn}
@@ -147,6 +136,7 @@ export const UserList = () => {
           <Button
             className={styles.btnDel}
             variant="contained"
+            disabled={batchBtnDisable}
             onClick={() => openConfirmAction.setTrue()}
           >
             批量移除
@@ -168,6 +158,7 @@ export const UserList = () => {
             hideFooter
             checkboxSelection
             disableColumnMenu
+            sortingMode={"server"}
             onSelectionModelChange={(selectionModel) => {
               setSelectId(selectionModel as string[]);
             }}
@@ -189,7 +180,7 @@ export const UserList = () => {
         <Pagination
           page={pageDto.PageIndex}
           count={userData.count}
-          onChange={(event, page) => {
+          onChange={(_event, page) => {
             setPageDto((prev) => ({ ...prev, PageIndex: page }));
           }}
         />

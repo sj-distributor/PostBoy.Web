@@ -3,7 +3,7 @@ import {
   PageDto,
   RoleUserItemDto,
   RoleUserResponse,
-  RoleUsersDto,
+  AddRoleUsersDto,
 } from "../../dtos/role";
 import { Get, Post } from "../http-client";
 
@@ -15,11 +15,6 @@ export const DeleteRoleUser = async (data: DeleteRoleUserRequest) => {
   return await Post("/api/Security/role/users/delete");
 };
 
-// add update做二合一
-// export const AddRoleUser = async (data: RoleUsersDto) => {
-//   return await Post<RoleUserItemDto>("/api/Security/role/users/create");
-// };
-
-// export const UpdateRoleUser = async (data: RoleUsersDto) => {
-//   return await Post<RoleUserItemDto>("/api/Security/role/users/update");
-// };
+export const AddRoleUser = async (data: AddRoleUsersDto) => {
+  return await Post<RoleUserItemDto>("/api/Security/role/users/create");
+};

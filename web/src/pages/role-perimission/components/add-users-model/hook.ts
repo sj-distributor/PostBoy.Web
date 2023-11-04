@@ -1,8 +1,14 @@
-import { useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { TreeNode } from "./props";
 import { TreeSelectRef } from "../tree-select/props";
+import { AddRoleUser } from "../../../../api/role-user";
+import { useSnackbar } from "notistack";
+import { ModalBoxRef } from "../../../../dtos/modal";
 
-export const useAction = () => {
+export const useAction = (props: {
+  addUsersRef: RefObject<ModalBoxRef>;
+  initUserList: () => void;
+}) => {
   const treeData: TreeNode[] = [
     {
       id: 1,
@@ -104,15 +110,39 @@ export const useAction = () => {
     },
   ];
 
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { addUsersRef, initUserList } = props;
+
   const [searchValue, setSearchValue] = useState<string>("");
 
   const treeSelectRef = useRef<TreeSelectRef>(null);
 
   const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
 
+  const [isConfirmDisbale, setIsConfirmDisbale] = useState<boolean>(true);
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
+
+  const handleAddRoleUsers = () => {
+    // AddRoleUser({ roleUsers })
+    //   .then(() => {
+    //     enqueueSnackbar("添加用户成功!", { variant: "success" });
+    //     addUsersRef.current?.close();
+    //     initUserList();
+    //   })
+    //   .catch(() => {
+    //     enqueueSnackbar("添加用户失败!", { variant: "error" });
+    //   });
+  };
+
+  useEffect(() => {
+    alreadySelectData.length === 0
+      ? setIsConfirmDisbale(true)
+      : setIsConfirmDisbale(false);
+  }, [alreadySelectData]);
 
   return {
     treeData,
@@ -120,6 +150,8 @@ export const useAction = () => {
     handleSearchChange,
     treeSelectRef,
     alreadySelectData,
+    isConfirmDisbale,
     setAlreadySelectData,
+    handleAddRoleUsers,
   };
 };
