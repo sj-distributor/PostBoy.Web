@@ -40,6 +40,8 @@ export const RoleFrom = () => {
     role,
     updateRole,
     addOrModifyRolePermission,
+    handleOptionPermissionChange,
+    optionItemsChecked,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -230,7 +232,10 @@ export const RoleFrom = () => {
                           key={index}
                           control={<Checkbox />}
                           label={optionItems.name}
+                          value={optionItems.name}
                           className={styles.formLabel}
+                          checked={optionItemsChecked}
+                          onChange={() => handleOptionPermissionChange}
                         />
                       );
                     }

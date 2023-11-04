@@ -335,6 +335,8 @@ export const useAction = () => {
     []
   );
 
+  const [optionItemsChecked, setOptionItemsChecked] = useState<boolean>();
+
   const updateRole = (k: keyof IRole, v: string) => {
     setRole((prev) => ({ ...prev, [k]: v }));
   };
@@ -361,6 +363,12 @@ export const useAction = () => {
     else {
       console.log("修改未填完");
     }
+  };
+
+  const handleOptionPermissionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setOptionItemsChecked(event.target.checked);
   };
 
   useEffect(() => {
@@ -416,5 +424,7 @@ export const useAction = () => {
     role,
     rolePermission,
     addOrModifyRolePermission,
+    handleOptionPermissionChange,
+    optionItemsChecked,
   };
 };
