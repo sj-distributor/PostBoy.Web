@@ -80,7 +80,7 @@ export const routerArray: RouteItem[] = [
         elementChild: <RoleFrom />,
       },
       {
-        path: "/roles/roleList",
+        path: "/roles/roleList/:id",
         title: "",
         elementChild: <RolePermissions />,
       },
