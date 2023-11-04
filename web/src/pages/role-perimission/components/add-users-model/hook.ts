@@ -1,6 +1,8 @@
-import { useRef, useState } from "react";
-import { TreeNode } from "./props";
+import { useEffect, useRef, useState } from "react";
+import { StaffDepartmentHierarchyListProps, TreeNode } from "./props";
 import { TreeSelectRef } from "../tree-select/props";
+import jsonData from "./new tree structure.json";
+import { clone } from "ramda";
 
 export const useAction = () => {
   const treeData: TreeNode[] = [
@@ -113,6 +115,16 @@ export const useAction = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
+
+  useEffect(() => {
+    const treeData = jsonData.data.staffDepartmentHierarchy;
+    console.log(treeData);
+    treeData.map((item, index) => {
+      const data = clone(treeData);
+
+      item.companies.childrens = item.departments;
+    });
+  }, []);
 
   return {
     treeData,

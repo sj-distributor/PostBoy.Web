@@ -93,7 +93,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
           [...idRoute, source.department.id]
         );
     });
-
+    console.log(resultList);
     return resultList;
   };
 
