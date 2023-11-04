@@ -7,6 +7,7 @@ import { useSnackbar } from "notistack";
 
 import {
   PageDto,
+  RoleUserItemDto,
   RoleUserResponse,
 } from "../../../../dtos/role-user-permissions";
 
@@ -28,7 +29,7 @@ export const useAction = () => {
   const addUsersRef = useRef<ModalBoxRef>(null);
 
   const [pageDto, setPageDto] = useState<PageDto>({
-    PageIndex: 1,
+    PageIndex: 0,
     PageSize: 20,
     RoleId: roleId,
     Keyword: inputVal,
@@ -48,6 +49,7 @@ export const useAction = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
+    inputVal && updatePageDto("Keyword", inputVal);
     initUserList();
   };
 
@@ -83,13 +85,33 @@ export const useAction = () => {
     })
       .then((res) => {
         setUserData(res);
-      })
-      .catch(() => setUserData({ count: 0, roleUsers: [] }))
-      .finally(() => {
+
         setTimeout(() => {
+          updateUsersDto("count", res.count ?? 0);
+          updateUsersDto("roleUsers", res.roleUsers ?? []);
+
           setLoading(false);
         }, 300);
+      })
+      .catch((error) => {
+        setUserData({ count: 0, roleUsers: [] });
+
+        enqueueSnackbar((error as Error).message, { variant: "error" });
+
+        updateUsersDto("count", 0);
+        updateUsersDto("roleUsers", []);
       });
+  };
+
+  const updatePageDto = (k: keyof PageDto, v: string | number) => {
+    setPageDto((prev) => ({ ...prev, [k]: v }));
+  };
+
+  const updateUsersDto = (
+    k: keyof RoleUserResponse,
+    v: RoleUserItemDto[] | number
+  ) => {
+    setUserData((prev) => ({ ...prev, [k]: v }));
   };
 
   useEffect(() => {
@@ -120,5 +142,6 @@ export const useAction = () => {
     setPageDto,
     setInputVal,
     initUserList,
+    updatePageDto,
   };
 };

@@ -36,6 +36,7 @@ export const UserList = () => {
     setPageDto,
     setInputVal,
     initUserList,
+    updatePageDto,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -107,6 +108,11 @@ export const UserList = () => {
             autoComplete="off"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
+            onKeyDown={(event) =>
+              event.key === "Enter" &&
+              inputVal &&
+              updatePageDto("Keyword", inputVal)
+            }
           />
           <div className={styles.navIcon}>
             <IconButton aria-label="Search" onClick={handleSearch}>
@@ -153,37 +159,24 @@ export const UserList = () => {
         </div>
       </div>
       <div className={styles.content}>
-        {!loading ? (
-          <DataGrid
-            columns={columns}
-            rows={userData.roleUsers}
-            hideFooter
-            checkboxSelection
-            disableColumnMenu
-            sortingMode={"server"}
-            onSelectionModelChange={(selectionModel) => {
-              setSelectId(selectionModel as string[]);
-            }}
-          />
-        ) : (
-          <CircularProgress
-            style={{
-              position: "absolute",
-              width: "2rem",
-              height: "2rem",
-              left: "50%",
-              top: "50%",
-              margin: "-1rem 0 0 -1rem",
-            }}
-          />
-        )}
-      </div>
-      <div className={styles.footer}>
-        <Pagination
+        <DataGrid
+          columns={columns}
+          rows={userData.roleUsers}
+          pageSize={pageDto.PageSize}
           page={pageDto.PageIndex}
-          count={userData.count}
-          onChange={(_event, page) => {
-            setPageDto((prev) => ({ ...prev, PageIndex: page }));
+          showCellRightBorder
+          showColumnRightBorder
+          disableSelectionOnClick
+          pagination
+          paginationMode="server"
+          rowCount={userData.count}
+          checkboxSelection
+          disableColumnMenu
+          loading={loading}
+          onPageChange={(value) => updatePageDto("PageIndex", value)}
+          onPageSizeChange={(value) => updatePageDto("PageSize", value)}
+          onSelectionModelChange={(selectionModel) => {
+            setSelectId(selectionModel as string[]);
           }}
         />
       </div>
