@@ -15,6 +15,16 @@ export interface IPermissionItem {
 export interface IRolePermission {
   role: IRole;
   rolePermissions: IRolePermissionItem[];
+  rolePermissionUnits?: IRolePermissionUnitItem[] | []
+}
+
+export interface IRolePermissionUnitItem {
+  id: string,
+  roleId: string,
+  permissionId: string,
+  unitId: string,
+  createdDate: string,
+  modifiedDate: string
 }
 
 export interface IRole {

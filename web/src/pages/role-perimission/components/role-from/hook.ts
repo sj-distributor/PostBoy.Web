@@ -43,8 +43,8 @@ export const useAction = () => {
 
   const navigate = useNavigate();
 
-  const flatOptions = useMemo(() => {
-    return options.reduce((accumulator, item) => {
+  const getFlatOptionsList = (data: DepartmentTreeDto[]) => {
+    return data.reduce((accumulator, item) => {
       const higherDepartment: DepartmentDto = {
         name: item.department.name,
         id: item.department.id,
@@ -74,6 +74,10 @@ export const useAction = () => {
 
       return accumulator;
     }, [] as DepartmentDto[])
+  }
+
+  const flatOptions = useMemo(() => {
+    return getFlatOptionsList(options)
   }, [options])
 
 
@@ -319,8 +323,6 @@ export const useAction = () => {
     []
   );
 
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([])
-
   const updateRole = (k: keyof IRole, v: string) => {
     setRole((prev) => ({ ...prev, [k]: v }));
   };
@@ -363,7 +365,7 @@ export const useAction = () => {
             enqueueSnackbar("修改角色成功!", { variant: "success" });
           }
         })
-        .catch((error) => enqueueSnackbar((error as Error).message ?? '修改失败', { variant: "error" }));
+        .catch((error) => enqueueSnackbar((error as Error).message ?? '修改失败', { variant: "error", }));
     else {
       enqueueSnackbar('修改失败', { variant: "error" })
     }
@@ -375,26 +377,40 @@ export const useAction = () => {
     setRolePermissionsCheckedList(cloneData)
   }
 
-
-  useEffect(() => {
-    const data = jsonData.data.staffDepartmentHierarchy;
-    setOptions(data)
-  }, [])
-
   useEffect(() => {
     (async () => {
-      const { count, permissions } = await GetPermissions()
+      const data = jsonData.data.staffDepartmentHierarchy;
+      setOptions(data)
 
+      const options = getFlatOptionsList(data)
+
+
+      const { count, permissions } = await GetPermissions()
+      const permissionsList: RolePermissionsDto[] = []
+      permissions?.map(item => permissionsList.push({ ...item, checked: false }))
+
+      permissionsList.length && setRolePermissionsCheckedList(permissionsList)
       setPermissions({
         count: count ?? 0,
         permissions: permissions ?? [],
       });
 
+      const informationRoleIds = permissions.filter(item => item.name === "创建群组" || item.name === '发送群聊信息').map(item => item.id)
+      const groupRoleIds = permissions.filter(item => item.name === "信息发送" || item.name === '发送通知').map(item => item.id)
+
       if (id) {
         // 获取角色信息
-        const { role, rolePermissions } = await GetRolePermission('1c207b08-e8b3-4406-b78a-df7a5c29512b')
+        const { role, rolePermissions, rolePermissionUnits } = await GetRolePermission('3455efc5-6481-4d48-b9d2-9f15b6d5f899')
         setRole(role ?? defaultRole);
         setRolePermission(rolePermissions ?? []);
+        const groupUsersList = rolePermissionUnits?.filter(item => groupRoleIds.some(gId => gId === item.permissionId)).map(item => item.unitId)
+        const informationList = rolePermissionUnits?.filter(item => informationRoleIds.some(iId => iId === item.permissionId)).map(item => item.unitId)
+
+
+        const pullCrowdData = options.map(item => groupUsersList?.some(userId => userId === item.id) ? { ...item, isSelected: true } : item)
+        const notificationData = options.map(item => informationList?.some(userId => userId === item.id) ? { ...item, isSelected: true } : item)
+
+        setCheckboxData({ pullCrowdData, notificationData })
 
         if (rolePermissions.length) {
           const ids: string[] = []
