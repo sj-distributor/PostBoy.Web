@@ -18,8 +18,12 @@ const Main = () => {
   const { clickMainIndex, setMainClickIndex, haveAdministrator } =
     useMainAction();
 
-  const verifyPermissions = (item: RouteItem) =>
-    !["/user", "/manager", "/roles"].includes(item.path) || !!haveAdministrator;
+  const verifyPermissions = (item: RouteItem) => {
+    if (["/user", "/manager"].includes(item.path)) return !!haveAdministrator;
+    if (["/home"].includes(item.path)) return false;
+    if (["/roles"].includes(item.path)) return false;
+    return true;
+  };
 
   const routerTabBar = () => {
     return routerArray.map((item, index) => {

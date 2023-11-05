@@ -16,6 +16,7 @@ import { RolePermission } from "../pages/role-perimission";
 import { UserList } from "../pages/role-perimission/components/user-list";
 import { RoleFrom } from "../pages/role-perimission/components/role-from";
 import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
+import { None } from "../pages/none";
 
 export const routerArray: RouteItem[] = [
   {
@@ -95,5 +96,10 @@ export const routerArray: RouteItem[] = [
     path: "/meeting",
     head: "",
     element: <MeetingList />,
+  },
+  {
+    path: "/none",
+    head: "",
+    element: <None />,
   },
 ];

@@ -38,8 +38,9 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<Main />}>
-              <Route path="" element={<Navigate to={"/home"} />} />
-              {getSubRoute(routerArray)}
+              {/* <Route path="" element={<Navigate to={"/home"} />} /> */}
+              <Route path="" element={<Navigate to={"/none"} />} />
+              {getSubRoute(routerArray.filter((item) => item.path !== "/home"))}
             </Route>
           </Routes>
         </div>
