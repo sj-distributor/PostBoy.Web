@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { IDepartmentDto } from "../../../../dtos/role";
 import { useEffect, useMemo, useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
@@ -8,32 +7,6 @@ import { AllDepartmentData, DepartmentDto, DepartmentTreeDto } from "./props";
 import jsonData from './departments.json'
 
 export const useAction = () => {
-  // const initOptions: IDepartmentDto = {
-  //   allDepartment: [
-  //     {
-  //       higherDepartment: {
-  //         name: "WXF Office",
-  //         id: "888",
-  //         childrenDepartment: [
-  //           { name: "Operating Support Center", id: "81" },
-  //           { name: "Department A", id: "82" },
-  //           { name: "Department B", id: "83" },
-  //         ],
-  //       },
-  //     },
-  //     {
-  //       higherDepartment: {
-  //         name: "IS Office",
-  //         id: "999",
-  //         childrenDepartment: [
-  //           { name: "Department C", id: "91" },
-  //           { name: "Department D", id: "92" },
-  //         ],
-  //       },
-  //     },
-  //   ],
-  // };
-
   const [options, setOptions] = useState<DepartmentTreeDto[]>([])
 
   const inputStyles = {
@@ -46,8 +19,6 @@ export const useAction = () => {
     borderRadius: 1,
     boxShadow: 1,
   };
-
-  const selectStyles = { marginLeft: "0.3rem", flex: 1 };
 
   const formStyles = { flexBasis: "25%" };
 
@@ -313,9 +284,7 @@ export const useAction = () => {
 
   useEffect(() => {
     const data = jsonData.data.staffDepartmentHierarchy;
-
     setOptions(data)
-
   }, [])
 
   useEffect(() => {
@@ -325,7 +294,6 @@ export const useAction = () => {
   return {
     flatOptions,
     inputStyles,
-    selectStyles,
     formStyles,
     location,
     checkboxData,
