@@ -135,11 +135,9 @@ export const useAction = () => {
     updateCloneCheckboxData(dataSource, index, "isExpand", undefined, true);
 
     cloneCheckboxData[dataSource].forEach(
-      (item, index) => {
-        console.log(item, item.parentId, option.id)
+      (item, index) =>
         item.parentId === option.id &&
-          updateCloneCheckboxData(dataSource, index, "isHide", undefined, true)
-      }
+        updateCloneCheckboxData(dataSource, index, "isHide", undefined, true)
     );
 
     setCheckboxData((preValue) => {
