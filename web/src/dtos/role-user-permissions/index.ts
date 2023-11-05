@@ -48,11 +48,6 @@ export interface StaffDepartmentHierarchyListProps {
   staffs: StaffsData[];
 }
 
-export interface StaffFoundationHierarchyList {
-  companies: StaffDepartmentHierarchyListProps;
-  departments: StaffDepartmentHierarchyListProps[];
-}
-
 export interface StaffFoundationHierarchyDataRequest {
-  staffDepartmentHierarchy: StaffFoundationHierarchyList[];
+  staffDepartmentHierarchy: StaffDepartmentHierarchyListProps[];
 }

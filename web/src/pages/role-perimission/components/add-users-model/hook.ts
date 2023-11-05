@@ -5,12 +5,10 @@ import { TreeSelectRef } from "../tree-select/props";
 import { useSnackbar } from "notistack";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { AddRoleUser } from "../../../../api/role-user-permissions";
-import {
-  StaffDepartmentHierarchyListProps,
-  StaffFoundationHierarchyList,
-} from "../../../../dtos/role-user-permissions";
-import jsonData from "./new tree structure.json";
+import { StaffDepartmentHierarchyListProps } from "../../../../dtos/role-user-permissions";
+import jsonData from "./latest tree.json";
 import { clone } from "ramda";
+import { log } from "console";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -55,6 +53,7 @@ export const useAction = (props: {
   const staffDepartmentHierarchyTreeData = clone(
     staffDepartmentHierarchyTestData
   );
+
   const treeData: TreeNode[] = [];
 
   const flattenTreeDepartmentList = (
@@ -65,7 +64,11 @@ export const useAction = (props: {
       treeData.push({
         id: sourceItem.department.id,
         title: sourceItem.department.name,
-        idRoute: [...idRoute, sourceItem.department.id],
+        idRoute: [
+          ...idRoute,
+          sourceItem.department.parentId,
+          sourceItem.department.id,
+        ],
         children: [],
         isDepartment: true,
       });
@@ -74,7 +77,12 @@ export const useAction = (props: {
         ...sourceItem.staffs.map((staff) => ({
           id: staff.id,
           title: staff.userName,
-          idRoute: [...idRoute, sourceItem.department.id, staff.id],
+          idRoute: [
+            ...idRoute,
+            sourceItem.department.parentId,
+            sourceItem.department.id,
+            staff.id,
+          ],
           children: [],
           isDepartment: false,
         }))
@@ -83,28 +91,13 @@ export const useAction = (props: {
       if (sourceItem.childrens) {
         flattenTreeDepartmentList(sourceItem.childrens, [
           ...idRoute,
-          sourceItem.department.id,
+          sourceItem.department.parentId,
         ]);
       }
     }
   };
 
-  staffDepartmentHierarchyTreeData.map((item) => {
-    const idRoute = [
-      item.companies.department.parentId,
-      item.companies.department.id,
-    ];
-
-    treeData.push({
-      id: item.companies.department.id,
-      title: item.companies.department.name,
-      idRoute,
-      children: [],
-      isDepartment: true,
-    });
-
-    flattenTreeDepartmentList(item.departments, idRoute);
-  });
+  flattenTreeDepartmentList(staffDepartmentHierarchyTreeData, []);
 
   useEffect(() => {
     alreadySelectData.length === 0

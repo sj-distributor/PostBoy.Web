@@ -2,16 +2,13 @@
   "data": {
     "staffDepartmentHierarchy": [
       {
-        "companies": {
-          "department": {
-            "id": "040f563b-7be8-43bc-81eb-f429f84db6a7",
-            "name": "WXF Office",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "040f563b-7be8-43bc-81eb-f429f84db6a7",
+          "name": "WXF Office",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "054796e4-81ce-465e-9b56-4ebd4e2c21c5",
@@ -8100,16 +8097,13 @@
         ]
       },
       {
-        "companies": {
-          "department": {
-            "id": "36055713-fbb3-4509-a0c2-2f2dd34bbb61",
-            "name": "M WXF Office",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "36055713-fbb3-4509-a0c2-2f2dd34bbb61",
+          "name": "M WXF Office",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "1c191f2f-8843-4e23-9150-a9e4d63ccfc7",
@@ -8236,16 +8230,13 @@
         ]
       },
       {
-        "companies": {
-          "department": {
-            "id": "36ff0707-715e-4a51-8e45-6ef89483b4b5",
-            "name": "协成",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "36ff0707-715e-4a51-8e45-6ef89483b4b5",
+          "name": "协成",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "14deb64d-7c62-4766-88f2-84fe396a3e2d",
@@ -10288,16 +10279,13 @@
         ]
       },
       {
-        "companies": {
-          "department": {
-            "id": "bde430bb-57ba-4d14-91a9-35811f609468",
-            "name": "S.J. Distributors Inc.",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "bde430bb-57ba-4d14-91a9-35811f609468",
+          "name": "S.J. Distributors Inc.",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "0adf907d-fa24-4fbb-b8fb-601f42226bf8",
@@ -20665,16 +20653,13 @@
         ]
       },
       {
-        "companies": {
-          "department": {
-            "id": "bf2c0195-f5f6-48a0-9377-c76e803fe141",
-            "name": "IS Office",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "bf2c0195-f5f6-48a0-9377-c76e803fe141",
+          "name": "IS Office",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "07d379b7-eaaf-4318-90f1-5b8e901614cb",
@@ -21988,16 +21973,13 @@
         ]
       },
       {
-        "companies": {
-          "department": {
-            "id": "ea68cd5b-e1e6-4470-9428-865d020b8866",
-            "name": "测试公司",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "ea68cd5b-e1e6-4470-9428-865d020b8866",
+          "name": "测试公司",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "90290f1c-4b90-48d8-a4e6-5decdcc0a08b",
@@ -22051,16 +22033,13 @@
         ]
       },
       {
-        "companies": {
-          "department": {
-            "id": "f1ea4ec8-94c5-423e-9506-a06f391f8d2f",
-            "name": "HK KXC Office",
-            "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
-          },
-          "staffs": null,
-          "childrens": []
+        "department": {
+          "id": "f1ea4ec8-94c5-423e-9506-a06f391f8d2f",
+          "name": "HK KXC Office",
+          "parentId": "5e2d8554-cdc7-4d7f-95e4-20ce9b62ee92"
         },
-        "departments": [
+        "staffs": [],
+        "childrens": [
           {
             "department": {
               "id": "7966f7ae-60c8-448a-98f5-922c42ad4a69",
