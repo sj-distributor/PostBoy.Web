@@ -1,9 +1,7 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IDepartmentDto } from "../../../../dtos/role";
-import { useEffect, useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
-import { AllDepartmentData, DepartmentDto } from "./props";
 import {
   AddRolePermission,
   GetPermissions,
@@ -17,33 +15,13 @@ import {
   IRolePermissionItem,
 } from "../../../../dtos/role-user-permissions";
 import { error } from "console";
+import { useEffect, useMemo, useState } from "react";
+import { AllDepartmentData, DepartmentDto, DepartmentTreeDto } from "./props";
+
+import jsonData from './departments.json'
 
 export const useAction = () => {
-  const options: IDepartmentDto = {
-    allDepartment: [
-      {
-        higherDepartment: {
-          name: "WXF Office",
-          id: "888",
-          childrenDepartment: [
-            { name: "Operating Support Center", id: "81" },
-            { name: "Department A", id: "82" },
-            { name: "Department B", id: "83" },
-          ],
-        },
-      },
-      {
-        higherDepartment: {
-          name: "IS Office",
-          id: "999",
-          childrenDepartment: [
-            { name: "Department C", id: "91" },
-            { name: "Department D", id: "92" },
-          ],
-        },
-      },
-    ],
-  };
+  const [options, setOptions] = useState<DepartmentTreeDto[]>([])
 
   const inputStyles = {
     border: 1,
@@ -56,44 +34,46 @@ export const useAction = () => {
     boxShadow: 1,
   };
 
-  const selectStyles = { marginLeft: "0.3rem", flex: 1 };
-
   const formStyles = { flexBasis: "25%" };
 
   const location = useLocation();
 
   const navigate = useNavigate();
 
-  const flatOptions = options.allDepartment.reduce((accumulator, item) => {
-    const higherDepartment: DepartmentDto = {
-      name: item.higherDepartment.name,
-      id: item.higherDepartment.id,
-      isSelected: false,
-      isHide: false,
-    };
+  const flatOptions = useMemo(() => {
+    return options.reduce((accumulator, item) => {
+      const higherDepartment: DepartmentDto = {
+        name: item.department.name,
+        id: item.department.id,
+        isSelected: false,
+        isHide: false,
+      };
 
-    accumulator.push(higherDepartment);
+      accumulator.push(higherDepartment);
 
-    if (
-      item.higherDepartment.childrenDepartment &&
-      item.higherDepartment.childrenDepartment.length > 0
-    ) {
-      higherDepartment.isExpand = false;
-      higherDepartment.indeterminate = false;
+      if (
+        item.childrens &&
+        item.childrens.length > 0
+      ) {
+        higherDepartment.isExpand = false;
+        higherDepartment.indeterminate = false;
 
-      accumulator.push(
-        ...item.higherDepartment.childrenDepartment.map((childrenItem) => ({
-          name: childrenItem.name,
-          id: childrenItem.id,
-          isSelected: false,
-          parentId: item.higherDepartment.id,
-          isHide: true,
-        }))
-      );
-    }
+        accumulator.push(
+          ...item.childrens.map((childrenItem) => ({
+            name: childrenItem.department.name,
+            id: childrenItem.department.id,
+            isSelected: false,
+            parentId: childrenItem.department.parentId,
+            isHide: true,
+          }))
+        );
+      }
 
-    return accumulator;
-  }, [] as DepartmentDto[]);
+      return accumulator;
+    }, [] as DepartmentDto[])
+  }, [options])
+
+
 
   const [checkboxData, setCheckboxData] = useState<AllDepartmentData>({
     pullCrowdData: flatOptions,
@@ -397,11 +377,18 @@ export const useAction = () => {
         });
       });
   }, []);
+  useEffect(() => {
+    const data = jsonData.data.staffDepartmentHierarchy;
+    setOptions(data)
+  }, [])
+
+  useEffect(() => {
+    setCheckboxData({ pullCrowdData: flatOptions, notificationData: flatOptions })
+  }, [flatOptions])
 
   return {
     flatOptions,
     inputStyles,
-    selectStyles,
     formStyles,
     location,
     checkboxData,
