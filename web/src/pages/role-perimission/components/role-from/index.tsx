@@ -36,7 +36,7 @@ export const RoleFrom = () => {
     removeOption,
     //new
     permissions,
-    rolePermissions,
+    rolePermissionsCheckedList,
     role,
     updateRole,
     addOrModifyRolePermission,
@@ -233,9 +233,9 @@ export const RoleFrom = () => {
             <div className={styles.item}>
               <div className={styles.itemPermission}>
                 <div className={styles.itemPerssionsForm}>
-                  {rolePermissions.map((roleItem, index) => {
+                  {rolePermissionsCheckedList.map((roleItem, index) => {
                     return (
-                      <div style={{ width: 150 }}>
+                      <div style={{ marginRight: 15 }}>
                         <FormControlLabel
                           key={index}
                           control={
@@ -249,7 +249,7 @@ export const RoleFrom = () => {
                               checked={roleItem.checked}
                             />
                           }
-                          label={roleItem.permissionName}
+                          label={roleItem.name}
                         />
                       </div>
                     );

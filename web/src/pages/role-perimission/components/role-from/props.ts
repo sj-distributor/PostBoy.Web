@@ -32,13 +32,11 @@ export interface DepartmentTreeDto {
 }
 
 export interface RolePermissionsDto {
-  id: string,
-  createdDate: string,
-  lastModifiedDate: string,
-  roleId: string,
-  roleName: string,
-  permissionId: string,
-  permissionName: string,
-  description: string,
+  id: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
   checked?: boolean
 }

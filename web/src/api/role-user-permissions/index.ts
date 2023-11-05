@@ -6,7 +6,7 @@ import { Get, Post } from "../http-client";
 
 // 获取功能权限
 export const GetPermissions = async () => {
-  return await Get<IPermissionsDto>(`/api/Security/role/permissions`);
+  return await Get<IPermissionsDto>('/api/Security/permissions');
 };
 
 // 查询角色

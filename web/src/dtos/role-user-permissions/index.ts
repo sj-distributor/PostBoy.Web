@@ -1,17 +1,15 @@
 export interface IPermissionsDto {
   count: number;
-  rolePermissions: IPermissionItem[];
+  permissions: IPermissionItem[];
 }
 
 export interface IPermissionItem {
-  id: string,
-  createdDate: string,
-  lastModifiedDate: string,
-  roleId: string,
-  roleName: string,
-  permissionId: string,
-  permissionName: string,
-  description: string,
+  id: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
 }
 
 export interface IRolePermission {
@@ -20,18 +18,17 @@ export interface IRolePermission {
 }
 
 export interface IRole {
-  id: string;
   name: string;
   description: string;
+  id?: string;
   createdDate?: string;
   modifiedDate?: string;
 }
 
 export interface IRolePermissionItem {
-  id: string,
-  roleId: string,
   permissionId: string,
   unitIds?: string[]
+  id?: string,
 }
 
 export interface IGetPermissionsDto {

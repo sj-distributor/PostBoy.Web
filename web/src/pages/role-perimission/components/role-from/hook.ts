@@ -15,102 +15,14 @@ import {
 } from "../../../../dtos/role-user-permissions";
 import { useEffect, useMemo, useState } from "react";
 import { AllDepartmentData, DepartmentDto, DepartmentTreeDto, RolePermissionsDto } from "./props";
+import { useSnackbar } from "notistack";
 
 import jsonData from './departments.json'
 
 export const useAction = () => {
   const [options, setOptions] = useState<DepartmentTreeDto[]>([])
 
-  const [rolePermissions, setRolePermissions] = useState<RolePermissionsDto[]>([
-    {
-      id: '1',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '信息发送',
-      roleName: '信息发送',
-      description: '信息发送',
-      checked: false
-    },
-    {
-      id: '2',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '创建群组',
-      roleName: '创建群组',
-      description: '创建群组',
-      checked: false
-    },
-    {
-      id: '3',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '添加群组成员',
-      roleName: '添加群组成员',
-      description: '添加群组成员',
-      checked: false
-    },
-    {
-      id: '4',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '发送通知',
-      roleName: '发送通知',
-      description: '发送通知',
-      checked: false
-    },
-    {
-      id: '5',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '发送记录',
-      roleName: '发送记录',
-      description: '发送记录',
-      checked: false
-    },
-    {
-      id: '6',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '角色权限',
-      roleName: '角色权限',
-      description: '角色权限',
-      checked: false
-    },
-    {
-      id: '7',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '新增角色',
-      roleName: '新增角色',
-      description: '新增角色',
-      checked: false
-    },
-    {
-      id: '8',
-      createdDate: '1',
-      lastModifiedDate: '2',
-      roleId: '3',
-      permissionId: '22',
-      permissionName: '分配',
-      roleName: '分配',
-      description: '分配',
-      checked: false
-    }
-  ])
+  const [rolePermissionsCheckedList, setRolePermissionsCheckedList] = useState<RolePermissionsDto[]>([])
 
   const inputStyles = {
     border: 1,
@@ -124,6 +36,8 @@ export const useAction = () => {
   };
 
   const formStyles = { flexBasis: "25%" };
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const location = useLocation();
 
@@ -388,14 +302,13 @@ export const useAction = () => {
   const { id } = useParams();
 
   const defaultRole: IRole = {
-    id: "",
     name: "",
     description: "",
   };
 
   const [permissions, setPermissions] = useState<IPermissionsDto>({
     count: 0,
-    rolePermissions: [],
+    permissions: [],
   });
 
   const [role, setRole] = useState<IRole>(defaultRole);
@@ -405,6 +318,8 @@ export const useAction = () => {
   const [rolePermission, setRolePermission] = useState<IRolePermissionItem[]>(
     []
   );
+
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([])
 
   const updateRole = (k: keyof IRole, v: string) => {
     setRole((prev) => ({ ...prev, [k]: v }));
@@ -422,10 +337,15 @@ export const useAction = () => {
 
     if (role.name && role.description)
       AddRolePermission(data)
-        .then((res) => console.log(res))
-        .catch((error) => console.log((error as Error).message));
+        .then((res) => {
+          if (res) {
+            navigate("/roles/roleList")
+            enqueueSnackbar("创建角色成功!", { variant: "success" });
+          }
+        })
+        .catch((error) => enqueueSnackbar((error as Error).message, { variant: "error" }));
     else {
-      console.log("添加未填完");
+      enqueueSnackbar('添加未填完', { variant: "error" })
     }
   };
 
@@ -437,60 +357,59 @@ export const useAction = () => {
 
     if (role.name && role.description)
       UpdateRolePermission(data)
-        .then((res) => console.log(res))
-        .catch((error) => console.log((error as Error).message));
+        .then((res) => {
+          if (res) {
+            navigate("/roles/roleList")
+            enqueueSnackbar("修改角色成功!", { variant: "success" });
+          }
+        })
+        .catch((error) => enqueueSnackbar((error as Error).message ?? '修改失败', { variant: "error" }));
     else {
-      console.log("修改未填完");
+      enqueueSnackbar('修改失败', { variant: "error" })
     }
   };
 
   const handleUpdateRolePermissionsChecked = (id: string, v: boolean) => {
-    const cloneData = clone(rolePermissions)
+    const cloneData = clone(rolePermissionsCheckedList)
     cloneData.forEach(item => item.id === id && (item.checked = v))
-    setRolePermissions(cloneData)
+    setRolePermissionsCheckedList(cloneData)
   }
 
 
   useEffect(() => {
-    if (id) {
-      // 获取角色信息
-      GetRolePermission('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-        .then((res) => {
-          const { role, rolePermissions } = res;
-          setRole(role ?? defaultRole);
-          setRolePermission(rolePermissions ?? []);
-          console.log(res)
-        })
-        .catch((err) => {
-          // console.log((err as Error).message);
-          setRole(defaultRole);
-          setRolePermission([]);
-        });
-    }
-  }, [id]);
-
-  useEffect(() => {
-    GetPermissions()
-      .then((res) => {
-        const permissionsList: RolePermissionsDto[] = []
-        res.rolePermissions.map(item => permissionsList.push({ ...item, checked: false }))
-        setPermissions({
-          count: res.count ?? 0,
-          rolePermissions: res.rolePermissions ?? [],
-        });
-        setRolePermissions(permissionsList)
-      })
-      .catch((err) => {
-        setPermissions({
-          count: 0,
-          rolePermissions: [],
-        });
-      });
-  }, []);
-  useEffect(() => {
     const data = jsonData.data.staffDepartmentHierarchy;
     setOptions(data)
   }, [])
+
+  useEffect(() => {
+    (async () => {
+      const { count, permissions } = await GetPermissions()
+
+      setPermissions({
+        count: count ?? 0,
+        permissions: permissions ?? [],
+      });
+
+      if (id) {
+        // 获取角色信息
+        const { role, rolePermissions } = await GetRolePermission('1c207b08-e8b3-4406-b78a-df7a5c29512b')
+        setRole(role ?? defaultRole);
+        setRolePermission(rolePermissions ?? []);
+
+        if (rolePermissions.length) {
+          const ids: string[] = []
+          rolePermissions.map(item => item.id && ids.push(item.id))
+
+          const permissionsList: RolePermissionsDto[] = []
+          permissions?.map(item => permissionsList.push({ ...item, checked: rolePermissions.some(rItem => rItem.permissionId === item.id) }))
+
+          permissionsList.length && setRolePermissionsCheckedList(permissionsList)
+        }
+
+      }
+    })()
+
+  }, [id]);
 
   useEffect(() => {
     setCheckboxData({ pullCrowdData: flatOptions, notificationData: flatOptions })
@@ -502,17 +421,15 @@ export const useAction = () => {
     const groupUnitIds = checkboxData.pullCrowdData.filter(item => item.isSelected).map(item => item.id)
     const informationUnitIds = checkboxData.notificationData.filter(item => item.isSelected).map(item => item.id)
 
-    rolePermissions.map(item => {
+    rolePermissionsCheckedList.map(item => {
       const list: IRolePermissionItem = {
-        id: item.id,
-        roleId: item.roleId,
-        permissionId: item.permissionId,
+        permissionId: item.id,
       }
-      if (item.permissionName === '创建群组' || item.permissionName === '添加群组成员') {
+      if (item.name === '创建群组' || item.name === '添加群组成员') {
         list.unitIds = groupUnitIds
 
       }
-      if (item.permissionName === '信息发送' || item.permissionName === '发送通知') {
+      if (item.name === '信息发送' || item.name === '发送通知') {
         list.unitIds = informationUnitIds
       }
       if (item.checked) {
@@ -521,7 +438,7 @@ export const useAction = () => {
 
     })
     setRolePermissionsDto(newRoleList)
-  }, [rolePermissions])
+  }, [rolePermissionsCheckedList, checkboxData])
 
   return {
     flatOptions,
@@ -542,7 +459,7 @@ export const useAction = () => {
     updateRole,
     role,
     rolePermission,
-    rolePermissions,
+    rolePermissionsCheckedList,
     handleUpdateRolePermissionsChecked,
     addOrModifyRolePermission,
   };
