@@ -1,0 +1,80 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.container .nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.25rem;
+}
+
+.container .nav .navTitle {
+  flex-basis: 80%;
+  font-weight: 600;
+}
+
+.container .nav .navBtn {
+  flex-basis: 20%;
+  display: flex;
+}
+
+.container .nav .navBtn .navButton {
+  flex: 1 1 0%;
+  margin: 0 0.5rem;
+}
+
+.container .card {
+  padding: 1.5rem 3rem 2rem 1.5rem;
+  border-radius: 1.5rem;
+}
+
+.container .card .itemTitle {
+  margin-left: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.container .card .item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.container .card .item .itemSubTitle {
+  font-weight: 600;
+}
+
+.container .card .item .itemVisiblePage {
+  flex-basis: 20%;
+  font-weight: 600;
+}
+
+.container .card .item .itemVisiblePage .itemVisiblePageTitle {
+  margin-bottom: 0.75rem;
+}
+
+.container .card .item .itemPermission {
+  flex-basis: 80%;
+  font-weight: 600;
+}
+
+.container .card .item .itemPermission .itemPermissionTitle {
+  margin-bottom: 0.75rem;
+}
+
+.container .card .item .itemPermission .itemPerssionsForm {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.container .card .item .itemInput {
+  display: flex;
+  flex: 1;
+}
+
+.container .card .lastItem {
+  margin-bottom: 10rem;
+}

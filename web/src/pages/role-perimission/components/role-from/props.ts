@@ -30,3 +30,15 @@ export interface DepartmentTreeDto {
   staffs: UsersDto[] | [],
   childrens: DepartmentTreeDto[]
 }
+
+export interface RolePermissionsDto {
+  id: string,
+  createdDate: string,
+  lastModifiedDate: string,
+  roleId: string,
+  roleName: string,
+  permissionId: string,
+  permissionName: string,
+  description: string,
+  checked?: boolean
+}

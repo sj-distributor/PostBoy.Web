@@ -36,9 +36,11 @@ export const RoleFrom = () => {
     removeOption,
     //new
     permissions,
+    rolePermissions,
     role,
     updateRole,
     addOrModifyRolePermission,
+    handleUpdateRolePermissionsChecked,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -229,20 +231,30 @@ export const RoleFrom = () => {
           <Stack spacing={3}>
             <div className={styles.itemTitle}>功能權限</div>
             <div className={styles.item}>
-              <div className={styles.itemVisiblePage}>
-                <FormGroup sx={{ flexBasis: "20%" }}>
-                  <div className={styles.itemVisiblePageTitle}>可見頁面</div>
-                  <FormControlLabel
-                    control={<Checkbox defaultChecked />}
-                    label="信息發送"
-                  />
-                  <FormControlLabel control={<Checkbox />} label="角色權限" />
-                </FormGroup>
-              </div>
               <div className={styles.itemPermission}>
-                <div className={styles.itemPermissionTitle}>功能權限</div>
                 <div className={styles.itemPerssionsForm}>
-                  <FormGroup sx={formStyles}>
+                  {rolePermissions.map((roleItem, index) => {
+                    return (
+                      <div style={{ width: 150 }}>
+                        <FormControlLabel
+                          key={index}
+                          control={
+                            <Checkbox
+                              onChange={(e) =>
+                                handleUpdateRolePermissionsChecked(
+                                  roleItem.id,
+                                  e.target.checked
+                                )
+                              }
+                              checked={roleItem.checked}
+                            />
+                          }
+                          label={roleItem.permissionName}
+                        />
+                      </div>
+                    );
+                  })}
+                  {/* <FormGroup sx={formStyles}>
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
                       label="創建群組"
@@ -270,7 +282,7 @@ export const RoleFrom = () => {
                       label="發送紀錄"
                     />
                     <FormControlLabel control={<Checkbox />} label="刪除" />
-                  </FormGroup>
+                  </FormGroup> */}
                 </div>
               </div>
             </div>
