@@ -19,6 +19,7 @@ export interface IRole {
   id?: string;
   createdDate?: string;
   modifiedDate?: string;
+  displayName: string;
 }
 
 export interface IPermissionItem {
@@ -28,4 +29,5 @@ export interface IPermissionItem {
   createdDate?: string;
   lastModifiedDate?: string;
   isSystem: boolean;
+  displayName: string;
 }

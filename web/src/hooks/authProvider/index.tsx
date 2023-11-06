@@ -61,20 +61,23 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   const filterRouter = useMemo(() => {
     const { rolePermissionData } = currentUserRolePermissions;
 
-    // 判断是否拥有发送页面权限
-    // const sendMessagePermission = rolePermissionData.some((item) => {
-    //   return item.permissions.some((permission) => permission.id === "12");
-    // });
-    // 判断是否拥有角色权限页面权限
-    // const rolePermission = rolePermissionData.some((item) => {
-    //   return item.permissions.some((permission) => permission.id === "12");
-    // });
+    const sendMessagePermission = rolePermissionData.some((item) => {
+      return item.permissions.some(
+        (permission) => permission.displayName === "信息發送"
+      );
+    });
+
+    const rolePermission = rolePermissionData.some((item) => {
+      return item.permissions.some(
+        (permission) => permission.displayName === "角色權限"
+      );
+    });
+
     const adminPermission = rolePermissionData.some(
       (item) => item.role.name === "Administrator"
     );
 
-    const sendMessagePermission = true;
-    const rolePermission = true;
+    setHaveAdminPermission(adminPermission);
 
     setDisplayPage(
       sendMessagePermission
@@ -84,10 +87,6 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
         : adminPermission
         ? "/user"
         : "/none"
-    );
-
-    setHaveAdminPermission(
-      rolePermissionData.some((item) => item.role.name === "Administrator")
     );
 
     return routerArray.filter(
