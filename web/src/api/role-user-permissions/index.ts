@@ -1,5 +1,6 @@
 import {
   IDeleteRole,
+  IFoundationTreeDto,
   IGetPermissionsDto,
   IPermissionsDto,
   IRoleDto,
@@ -45,4 +46,10 @@ export const GetRolesList = async (data: IGetPermissionsDto) => {
 //删除角色
 export const DeleteRoles = async (data: IDeleteRole) => {
   return await Post("/api/Security/roles/delete", data);
+};
+
+export const GetTreeList = async () => {
+  return await Get<IFoundationTreeDto>(
+    "/api/Foundation/department/staff/hierarchy/tree"
+  );
 };

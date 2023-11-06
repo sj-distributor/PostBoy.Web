@@ -5,9 +5,11 @@ import {
   AddRolePermission,
   GetPermissions,
   GetRolePermission,
+  GetTreeList,
   UpdateRolePermission,
 } from "../../../../api/role-user-permissions";
 import {
+  DepartmentTreeDto,
   IPermissionsDto,
   IRole,
   IRolePermission,
@@ -17,14 +19,11 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AllDepartmentData,
   DepartmentDto,
-  DepartmentTreeDto,
   RolePermissionsDto,
   groupPermissionsNames,
   informationPermissionsNames,
 } from "./props";
 import { useSnackbar } from "notistack";
-
-import jsonData from "./departments.json";
 
 export const useAction = () => {
   const [options, setOptions] = useState<DepartmentTreeDto[]>([]);
@@ -47,6 +46,8 @@ export const useAction = () => {
   const formStyles = { flexBasis: "25%" };
 
   const { enqueueSnackbar } = useSnackbar();
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const location = useLocation();
 
@@ -397,10 +398,10 @@ export const useAction = () => {
 
   useEffect(() => {
     (async () => {
-      const data = jsonData.data.staffDepartmentHierarchy;
-      setOptions(data);
+      const { staffDepartmentHierarchy } = await GetTreeList();
 
-      const options = getFlatOptionsList(data);
+      setOptions(staffDepartmentHierarchy ?? []);
+      const options = getFlatOptionsList(staffDepartmentHierarchy ?? []);
 
       const { count, permissions } = await GetPermissions();
       const permissionsList: RolePermissionsDto[] = [];
@@ -477,6 +478,8 @@ export const useAction = () => {
           permissionsList.length &&
             setRolePermissionsCheckedList(permissionsList);
         }
+
+        setIsLoading(false);
       }
     })();
   }, []);
@@ -533,6 +536,7 @@ export const useAction = () => {
     role,
     rolePermission,
     rolePermissionsCheckedList,
+    isLoading,
     handleUpdateRolePermissionsChecked,
     addOrModifyRolePermission,
   };
