@@ -14,11 +14,7 @@ import {
 } from "../../../../api/role-user-permissions";
 
 export const useAction = () => {
-  const userId = "225";
-
   const [inputVal, setInputVal] = useState<string>("");
-
-  const [rows, setRows] = useState<IRoleTabltDto[]>();
 
   const [rowId, setRowId] = useState<number>();
 
@@ -38,8 +34,6 @@ export const useAction = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [roleId, setRoleId] = useState<string>("");
-
   const [pageDto, setPageDto] = useState<IGetPermissionsDto>({
     PageIndex: 0,
     PageSize: 20,
@@ -57,10 +51,8 @@ export const useAction = () => {
     GetRolesList(pageDto)
       .then((res) => {
         setTimeout(() => {
-          console.log(res);
           updateRoleDto("count", res.count ?? 0);
           updateRoleDto("rolePermissionData", res.rolePermissionData ?? []);
-          console.log(roleDto);
           setLoading(false);
         }, 500);
       })
@@ -80,7 +72,6 @@ export const useAction = () => {
     DeleteRoles({ roleIds: [roleId] })
       .then(() => {
         loadRoles();
-        setRoleId("");
       })
       .catch((error) =>
         enqueueSnackbar((error as Error).message, { variant: "error" })
@@ -103,8 +94,6 @@ export const useAction = () => {
   }, [pageDto.PageIndex, pageDto.PageIndex, pageDto.Keyword]);
 
   return {
-    userId,
-    rows,
     inputVal,
     rowId,
     confirmTipsRef,

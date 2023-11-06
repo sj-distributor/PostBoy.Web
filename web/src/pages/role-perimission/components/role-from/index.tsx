@@ -231,7 +231,7 @@ export const RoleFrom = () => {
                 <div className={styles.itemPerssionsForm}>
                   {rolePermissionsCheckedList.map((roleItem, index) => {
                     return (
-                      <div style={{ marginRight: 15 }}>
+                      <div style={{ marginRight: 15 }} key={index}>
                         <FormControlLabel
                           key={index}
                           control={
