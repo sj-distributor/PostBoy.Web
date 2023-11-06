@@ -436,7 +436,7 @@ export const useAction = () => {
           rolePermissions,
           rolePermissionUnits,
           permissions: currentPermissions,
-        } = await GetRolePermission("3455efc5-6481-4d48-b9d2-9f15b6d5f899");
+        } = await GetRolePermission(id);
         setRole(role ?? defaultRole);
         const selectedPermissions = currentPermissions?.map((item) => item.id);
         setRolePermission(rolePermissions ?? []);

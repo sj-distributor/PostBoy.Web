@@ -1,5 +1,7 @@
 import {
+  IGetPermissionsDto,
   IPermissionsDto,
+  IRoleDto,
   IRolePermission,
 } from "../../dtos/role-user-permissions";
 import { Get, Post } from "../http-client";
@@ -29,3 +31,17 @@ export const UpdateRolePermission = async (data: IRolePermission) => {
     data
   );
 };
+
+// 获取角色list
+export const GetRolesList = async (data: IGetPermissionsDto) => {
+  return await Get<IRoleDto>(
+    `/api/Security/roles/by/permissions?PageIndex=${
+      data.PageIndex + 1
+    }&PageSize=${data.PageSize}`
+  );
+};
+
+// 删除角色
+// export const DeleteRoles = async (data: IDeleteRole) => {
+//   return await Post("/api/Security/roles/delete", data);
+// };

@@ -1,6 +1,6 @@
 import styles from "./index.module.scss";
 
-import { Button, IconButton, Pagination, TextField } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
@@ -11,10 +11,13 @@ import ErrorIcon from "@mui/icons-material/Error";
 export const RolePermissions = () => {
   const {
     userId,
-    rows,
     inputVal,
     rowId,
     confirmTipsRef,
+    pageDto,
+    loading,
+    roleDto,
+    updatePageDto,
     navigate,
     setRowId,
     handleInputChange,
@@ -29,7 +32,7 @@ export const RolePermissions = () => {
       width: 300,
     },
     {
-      field: "details",
+      field: "description",
       headerName: "角色描述",
       width: 600,
     },
@@ -45,7 +48,7 @@ export const RolePermissions = () => {
         ) : params.row.role === UserRoleEnum.User ? (
           <Button
             variant="text"
-            onClick={() => navigate(`/roles/edit/${userId}`)}
+            onClick={() => navigate(`/roles/edit/${params.row.id}`)}
           >
             編輯
           </Button>
@@ -56,7 +59,7 @@ export const RolePermissions = () => {
             </Button>
             <Button
               variant="text"
-              onClick={() => navigate(`/roles/edit/${userId}`)}
+              onClick={() => navigate(`/roles/edit/${params.row.id}`)}
             >
               編輯
             </Button>
@@ -110,16 +113,22 @@ export const RolePermissions = () => {
       </div>
       <div className={styles.content}>
         <DataGrid
+          rows={roleDto.rolePermissionData.map((item) => item.role)}
           columns={columns}
-          rows={rows}
-          hideFooter
-          checkboxSelection
-          disableColumnMenu
+          pageSize={pageDto.PageSize}
+          page={pageDto.PageIndex}
+          showCellRightBorder
+          showColumnRightBorder
+          disableSelectionOnClick
+          pagination
+          paginationMode="server"
+          rowCount={roleDto.count}
+          onPageChange={(value) => updatePageDto("PageIndex", value)}
+          onPageSizeChange={(value) => updatePageDto("PageSize", value)}
+          loading={loading}
         />
       </div>
-      <div className={styles.footer}>
-        <Pagination count={10} shape="rounded" color="primary" />
-      </div>
+
       <ModalBox
         ref={confirmTipsRef}
         onCancel={() => confirmTipsRef.current?.close()}

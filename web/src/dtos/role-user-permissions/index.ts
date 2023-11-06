@@ -45,7 +45,7 @@ export interface IRolePermissionItem {
 export interface IGetPermissionsDto {
   PageIndex: number;
   PageSize: number;
-  Keyword: string;
+  Keyword?: string;
 }
 
 export interface IRolePermissionsItem {
@@ -57,4 +57,14 @@ export interface IRolePermissionsItem {
   permissionName: string | null;
   roleName: string | null;
   description: string | null;
+}
+
+export interface IRoleDto {
+  count: number;
+  rolePermissionData: IRolePermissionDataItem[];
+}
+
+export interface IRolePermissionDataItem {
+  role: IRole;
+  permissions: IPermissionItem[];
 }
