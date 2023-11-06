@@ -14,21 +14,11 @@ import {
 } from "../../../../api/role-user-permissions";
 
 export const useAction = () => {
-  const [inputVal, setInputVal] = useState<string>("");
-
   const [rowId, setRowId] = useState<number>();
 
   const confirmTipsRef = useRef<ModalBoxRef>(null);
 
   const navigate = useNavigate();
-
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputVal(event.target.value);
-  };
-
-  const handleSearch = () => {
-    console.log("Search content:", inputVal);
-  };
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -91,10 +81,9 @@ export const useAction = () => {
 
   useEffect(() => {
     loadRoles();
-  }, [pageDto.PageIndex, pageDto.PageIndex, pageDto.Keyword]);
+  }, [pageDto.PageIndex, pageDto.PageIndex]);
 
   return {
-    inputVal,
     rowId,
     confirmTipsRef,
     pageDto,
@@ -104,7 +93,6 @@ export const useAction = () => {
     updatePageDto,
     navigate,
     setRowId,
-    handleInputChange,
-    handleSearch,
+    loadRoles,
   };
 };

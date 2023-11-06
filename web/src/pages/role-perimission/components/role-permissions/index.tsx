@@ -10,7 +10,6 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 export const RolePermissions = () => {
   const {
-    inputVal,
     rowId,
     confirmTipsRef,
     pageDto,
@@ -19,9 +18,8 @@ export const RolePermissions = () => {
     updatePageDto,
     navigate,
     setRowId,
-    handleInputChange,
-    handleSearch,
     deleteRole,
+    loadRoles,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -89,16 +87,16 @@ export const RolePermissions = () => {
             placeholder="搜索角色名稱"
             fullWidth
             autoComplete="off"
-            value={inputVal}
-            onChange={handleInputChange}
+            value={pageDto.Keyword}
+            onChange={(e) => updatePageDto("Keyword", e.target.value)}
             onKeyDown={(event) =>
-              event.key === "Enter" && inputVal && handleSearch()
+              event.key === "Enter" && pageDto.Keyword && loadRoles()
             }
           />
           <div className={styles.navIcon}>
             <IconButton
               aria-label="Search"
-              onClick={() => inputVal && handleSearch()}
+              onClick={() => pageDto.Keyword && loadRoles()}
             >
               <SearchIcon className={styles.navFont} />
             </IconButton>

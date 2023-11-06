@@ -39,7 +39,9 @@ export const GetRolesList = async (data: IGetPermissionsDto) => {
   return await Get<IRoleDto>(
     `/api/Security/roles/by/permissions?PageIndex=${
       data.PageIndex + 1
-    }&PageSize=${data.PageSize}`
+    }&PageSize=${data.PageSize}${
+      data.Keyword ? "&Keyword=" + data.Keyword : ""
+    }`
   );
 };
 
