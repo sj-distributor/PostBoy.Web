@@ -1,5 +1,9 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import jwt_decode from "jwt-decode";
+import { GetRolesByPermissions } from "../../api/role-user-permissions";
+import { IRolePermissionDto } from "../../dtos/role-user-permissions";
+import { routerArray } from "../../router/elementRoute";
+import { RouteItem } from "../../dtos/route";
 
 interface AuthContextOptions {
   token: string;
@@ -7,29 +11,10 @@ interface AuthContextOptions {
   authStatus: boolean;
   signIn: (token: string, callback?: Function) => void;
   signOut: (callback?: Function) => void;
-  // 需要补当前账号的角色权限数组
-}
-
-interface IRolePermission {
-  role: IRole;
-  permissions: IPermissionItem[];
-}
-
-export interface IRole {
-  id: string;
-  name: string;
-  description: string;
-  createdDate?: string;
-  modifiedDate?: string;
-}
-
-export interface IPermissionItem {
-  id: string;
-  name: string;
-  description: string;
-  createdDate?: string;
-  lastModifiedDate?: string;
-  isSystem: boolean;
+  currentUserRolePermissions: IRolePermissionDto;
+  filterRouter: RouteItem[];
+  haveAdminPermission: boolean;
+  displayPage: string;
 }
 
 export const AuthContext = createContext<AuthContextOptions>(null!);
@@ -44,10 +29,16 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string>(defaultToken);
   const [authStatus, setAuthStatus] = useState<boolean>(!!defaultToken);
 
-  // 当前账号的角色权限数组
-  const [currentUserRolePermissions, setCurrentUserRolePermissions] = useState<
-    IRolePermission[]
-  >([]);
+  const [displayPage, setDisplayPage] = useState<string>("1");
+
+  const [haveAdminPermission, setHaveAdminPermission] =
+    useState<boolean>(false);
+
+  const [currentUserRolePermissions, setCurrentUserRolePermissions] =
+    useState<IRolePermissionDto>({
+      count: 0,
+      rolePermissionData: [],
+    });
 
   const signIn = (token: string, callback?: Function) => {
     setToken(token);
@@ -67,14 +58,79 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     callback && callback();
   };
 
+  const filterRouter = useMemo(() => {
+    const { rolePermissionData } = currentUserRolePermissions;
+
+    // 判断是否拥有发送页面权限
+    // const sendMessagePermission = rolePermissionData.some((item) => {
+    //   return item.permissions.some((permission) => permission.id === "12");
+    // });
+    // 判断是否拥有角色权限页面权限
+    // const rolePermission = rolePermissionData.some((item) => {
+    //   return item.permissions.some((permission) => permission.id === "12");
+    // });
+    const adminPermission = rolePermissionData.some(
+      (item) => item.role.name === "Administrator"
+    );
+
+    const sendMessagePermission = true;
+    const rolePermission = true;
+
+    setDisplayPage(
+      sendMessagePermission
+        ? "/home"
+        : rolePermission
+        ? "/roles"
+        : adminPermission
+        ? "/user"
+        : "/none"
+    );
+
+    setHaveAdminPermission(
+      rolePermissionData.some((item) => item.role.name === "Administrator")
+    );
+
+    return routerArray.filter(
+      (item) =>
+        (sendMessagePermission || item.path !== "/home") &&
+        (rolePermission || item.path !== "/roles") &&
+        (adminPermission || (item.path !== "/user" && item.path !== "/manager"))
+    );
+  }, [currentUserRolePermissions]);
+
   useEffect(() => {
-    // 获取当前登陆账号的角色权限
-    // setCurrentUserRolePermissions([])
-  }, []);
+    if (username)
+      GetRolesByPermissions({
+        pageIndex: 0,
+        pageSize: 0,
+      })
+        .then((res) => {
+          setCurrentUserRolePermissions({
+            count: res?.count ?? 0,
+            rolePermissionData: res?.rolePermissionData ?? [],
+          });
+        })
+        .catch(() => {
+          setCurrentUserRolePermissions({
+            count: 0,
+            rolePermissionData: [],
+          });
+        });
+  }, [username]);
 
   return (
     <AuthContext.Provider
-      value={{ username, token, authStatus, signIn, signOut }}
+      value={{
+        username,
+        token,
+        authStatus,
+        signIn,
+        signOut,
+        currentUserRolePermissions,
+        filterRouter,
+        haveAdminPermission,
+        displayPage,
+      }}
     >
       {props.children}
     </AuthContext.Provider>
