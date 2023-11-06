@@ -352,10 +352,14 @@ export const useAction = () => {
           }
         })
         .catch((error) =>
-          enqueueSnackbar((error as Error).message, { variant: "error" })
+          enqueueSnackbar("角色创建失败", {
+            variant: "error",
+          })
         );
     else {
-      enqueueSnackbar("添加未填完", { variant: "error" });
+      enqueueSnackbar("角色新增失败，需要填写角色名和描述", {
+        variant: "error",
+      });
     }
   };
 
@@ -374,12 +378,14 @@ export const useAction = () => {
           }
         })
         .catch((error) =>
-          enqueueSnackbar((error as Error).message ?? "修改失败", {
+          enqueueSnackbar("角色修改失败", {
             variant: "error",
           })
         );
     else {
-      enqueueSnackbar("修改失败", { variant: "error" });
+      enqueueSnackbar("角色修改失败，需要填写角色名和描述", {
+        variant: "error",
+      });
     }
   };
 
