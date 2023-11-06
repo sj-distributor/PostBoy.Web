@@ -2,13 +2,11 @@ import styles from "./index.module.scss";
 
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   IconButton,
-  Pagination,
   TextField,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -33,7 +31,6 @@ export const UserList = () => {
     setSelectId,
     handleSearch,
     handleDelete,
-    setPageDto,
     setInputVal,
     initUserList,
     updatePageDto,

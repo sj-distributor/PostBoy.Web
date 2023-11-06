@@ -8,7 +8,6 @@ import { AddRoleUser } from "../../../../api/role-user-permissions";
 import { StaffDepartmentHierarchyListProps } from "../../../../dtos/role-user-permissions";
 import jsonData from "./latest tree.json";
 import { clone } from "ramda";
-import { log } from "console";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
