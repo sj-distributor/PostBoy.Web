@@ -494,10 +494,10 @@ export const useAction = () => {
       const list: IRolePermissionItem = {
         permissionId: item.id,
       };
-      if (item.name === "创建群组" || item.name === "添加群组成员") {
+      if (groupPermissionsNames.some((iId) => iId === item.name)) {
         list.unitIds = groupUnitIds;
       }
-      if (item.name === "信息发送" || item.name === "发送通知") {
+      if (informationPermissionsNames.some((iId) => iId === item.name)) {
         list.unitIds = informationUnitIds;
       }
       if (item.checked) {
