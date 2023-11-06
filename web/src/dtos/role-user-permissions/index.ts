@@ -68,3 +68,7 @@ export interface IRolePermissionDataItem {
   role: IRole;
   permissions: IPermissionItem[];
 }
+
+export interface IDeleteRole {
+  roleIds: string[];
+}

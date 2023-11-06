@@ -10,7 +10,6 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 export const RolePermissions = () => {
   const {
-    userId,
     inputVal,
     rowId,
     confirmTipsRef,
@@ -22,7 +21,7 @@ export const RolePermissions = () => {
     setRowId,
     handleInputChange,
     handleSearch,
-    handleDelete,
+    deleteRole,
   } = useAction();
 
   const columns: GridColDef[] = [
@@ -150,7 +149,7 @@ export const RolePermissions = () => {
             <Button
               variant="contained"
               onClick={() => {
-                rowId && handleDelete(rowId);
+                rowId && deleteRole(String(rowId));
                 confirmTipsRef.current?.close();
               }}
               className={styles.confirmButton}

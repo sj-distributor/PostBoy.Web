@@ -8,7 +8,10 @@ import {
   IRoleDto,
   IRolePermissionDataItem,
 } from "../../../../dtos/role-user-permissions";
-import { GetRolesList } from "../../../../api/role-user-permissions";
+import {
+  DeleteRoles,
+  GetRolesList,
+} from "../../../../api/role-user-permissions";
 
 export const useAction = () => {
   const userId = "225";
@@ -29,12 +32,6 @@ export const useAction = () => {
 
   const handleSearch = () => {
     console.log("Search content:", inputVal);
-  };
-
-  const handleDelete = (id: number) => {
-    const updatedRows = rows?.filter((row: IRoleTabltDto) => row.id !== id);
-
-    setRows(updatedRows);
   };
 
   const { enqueueSnackbar } = useSnackbar();
@@ -79,16 +76,16 @@ export const useAction = () => {
       });
   };
 
-  // const deleteRole = (roleId: string) => {
-  //   DeleteRoles({ roleIds: [roleId] })
-  //     .then(() => {
-  //       loadRoles();
-  //       setRoleId("");
-  //     })
-  //     .catch((error) =>
-  //       enqueueSnackbar((error as Error).message, { variant: "error" })
-  //     );
-  // };
+  const deleteRole = (roleId: string) => {
+    DeleteRoles({ roleIds: [roleId] })
+      .then(() => {
+        loadRoles();
+        setRoleId("");
+      })
+      .catch((error) =>
+        enqueueSnackbar((error as Error).message, { variant: "error" })
+      );
+  };
 
   const updatePageDto = (k: keyof IGetPermissionsDto, v: string | number) => {
     setPageDto((prev) => ({ ...prev, [k]: v }));
@@ -114,11 +111,11 @@ export const useAction = () => {
     pageDto,
     loading,
     roleDto,
+    deleteRole,
     updatePageDto,
     navigate,
     setRowId,
     handleInputChange,
     handleSearch,
-    handleDelete,
   };
 };

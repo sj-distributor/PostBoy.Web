@@ -1,4 +1,5 @@
 import {
+  IDeleteRole,
   IGetPermissionsDto,
   IPermissionsDto,
   IRoleDto,
@@ -41,7 +42,7 @@ export const GetRolesList = async (data: IGetPermissionsDto) => {
   );
 };
 
-// 删除角色
-// export const DeleteRoles = async (data: IDeleteRole) => {
-//   return await Post("/api/Security/roles/delete", data);
-// };
+//删除角色
+export const DeleteRoles = async (data: IDeleteRole) => {
+  return await Post("/api/Security/roles/delete", data);
+};
