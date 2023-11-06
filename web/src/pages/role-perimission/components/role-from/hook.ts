@@ -19,6 +19,8 @@ import {
   DepartmentDto,
   DepartmentTreeDto,
   RolePermissionsDto,
+  groupPermissionsNames,
+  informationPermissionsNames,
 } from "./props";
 import { useSnackbar } from "notistack";
 
@@ -409,18 +411,14 @@ export const useAction = () => {
       const informationRoleIds = Array.from(
         new Set(
           permissions
-            .filter(
-              (item) => item.name === "创建群组" || item.name === "发送群聊信息"
-            )
+            .filter((item) => informationPermissionsNames.includes(item.name))
             .map((item) => item.id)
         )
       );
       const groupRoleIds = Array.from(
         new Set(
           permissions
-            .filter(
-              (item) => item.name === "信息发送" || item.name === "发送通知"
-            )
+            .filter((item) => groupPermissionsNames.includes(item.name))
             .map((item) => item.id)
         )
       );
@@ -474,7 +472,7 @@ export const useAction = () => {
         }
       }
     })();
-  }, [id]);
+  }, []);
 
   useEffect(() => {
     setCheckboxData({

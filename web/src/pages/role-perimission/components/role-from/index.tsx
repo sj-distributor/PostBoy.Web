@@ -254,35 +254,6 @@ export const RoleFrom = () => {
                       </div>
                     );
                   })}
-                  {/* <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="創建群組"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="新增角色" />
-                  </FormGroup>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="添加群組成員"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="分配" />
-                  </FormGroup>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="發送通知"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="編輯" />
-                  </FormGroup>
-
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="發送紀錄"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="刪除" />
-                  </FormGroup> */}
                 </div>
               </div>
             </div>

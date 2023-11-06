@@ -15,20 +15,20 @@ export type AllDepartmentData = {
 };
 
 export interface DepartmentType {
-  id: string,
-  name: string,
-  parentId: string
+  id: string;
+  name: string;
+  parentId: string;
 }
 
 export interface UsersDto {
-  id: string,
-  userName: string
+  id: string;
+  userName: string;
 }
 
 export interface DepartmentTreeDto {
-  department: DepartmentType,
-  staffs: UsersDto[] | [],
-  childrens: DepartmentTreeDto[]
+  department: DepartmentType;
+  staffs: UsersDto[] | [];
+  childrens: DepartmentTreeDto[];
 }
 
 export interface RolePermissionsDto {
@@ -38,5 +38,8 @@ export interface RolePermissionsDto {
   name: string;
   description: string;
   isSystem: boolean;
-  checked?: boolean
+  checked?: boolean;
 }
+
+export const groupPermissionsNames = ["创建群组", "发送群聊信息"];
+export const informationPermissionsNames = ["信息发送", "发送通知"];
