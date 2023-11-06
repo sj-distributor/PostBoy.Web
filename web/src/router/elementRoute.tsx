@@ -115,7 +115,7 @@ export const Router = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (displayPage !== "/none" && username) {
+    if (displayPage && displayPage !== "/none" && username) {
       navigate(displayPage, { replace: true });
     }
   }, [displayPage]);

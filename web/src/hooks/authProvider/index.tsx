@@ -29,7 +29,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string>(defaultToken);
   const [authStatus, setAuthStatus] = useState<boolean>(!!defaultToken);
 
-  const [displayPage, setDisplayPage] = useState<string>("1");
+  const [displayPage, setDisplayPage] = useState<string>("");
 
   const [haveAdminPermission, setHaveAdminPermission] =
     useState<boolean>(false);
