@@ -89,15 +89,10 @@ export const RolePermissions = () => {
             autoComplete="off"
             value={pageDto.Keyword}
             onChange={(e) => updatePageDto("Keyword", e.target.value)}
-            onKeyDown={(event) =>
-              event.key === "Enter" && pageDto.Keyword && loadRoles()
-            }
+            onKeyDown={(event) => event.key === "Enter" && loadRoles()}
           />
           <div className={styles.navIcon}>
-            <IconButton
-              aria-label="Search"
-              onClick={() => pageDto.Keyword && loadRoles()}
-            >
+            <IconButton aria-label="Search" onClick={() => loadRoles()}>
               <SearchIcon className={styles.navFont} />
             </IconButton>
           </div>
