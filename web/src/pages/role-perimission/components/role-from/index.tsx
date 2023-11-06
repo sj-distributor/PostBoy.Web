@@ -13,7 +13,6 @@ import {
   Card,
   Checkbox,
   FormControlLabel,
-  FormGroup,
   Input,
   Stack,
   TextField,
@@ -23,7 +22,6 @@ export const RoleFrom = () => {
   const {
     flatOptions,
     inputStyles,
-    formStyles,
     location,
     checkboxData,
     showLabel,
@@ -34,8 +32,6 @@ export const RoleFrom = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
-    //new
-    permissions,
     rolePermissionsCheckedList,
     role,
     updateRole,

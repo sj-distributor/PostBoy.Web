@@ -15,16 +15,17 @@ export interface IPermissionItem {
 export interface IRolePermission {
   role: IRole;
   rolePermissions: IRolePermissionItem[];
-  rolePermissionUnits?: IRolePermissionUnitItem[] | []
+  permissions?: IPermissionItem[];
+  rolePermissionUnits?: IRolePermissionUnitItem[] | [];
 }
 
 export interface IRolePermissionUnitItem {
-  id: string,
-  roleId: string,
-  permissionId: string,
-  unitId: string,
-  createdDate: string,
-  modifiedDate: string
+  id: string;
+  roleId: string;
+  permissionId: string;
+  unitId: string;
+  createdDate: string;
+  modifiedDate: string;
 }
 
 export interface IRole {
@@ -36,13 +37,24 @@ export interface IRole {
 }
 
 export interface IRolePermissionItem {
-  permissionId: string,
-  unitIds?: string[]
-  id?: string,
+  permissionId: string;
+  unitIds?: string[];
+  id?: string;
 }
 
 export interface IGetPermissionsDto {
-  PageIndex: number,
-  PageSize: number,
-  Keyword: string
+  PageIndex: number;
+  PageSize: number;
+  Keyword: string;
+}
+
+export interface IRolePermissionsItem {
+  id: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  roleId: string;
+  permissionId: string;
+  permissionName: string | null;
+  roleName: string | null;
+  description: string | null;
 }

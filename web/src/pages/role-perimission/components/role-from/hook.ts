@@ -425,10 +425,16 @@ export const useAction = () => {
 
       if (id) {
         // 获取角色信息
-        const { role, rolePermissions, rolePermissionUnits } =
-          await GetRolePermission("3455efc5-6481-4d48-b9d2-9f15b6d5f899");
+        const {
+          role,
+          rolePermissions,
+          rolePermissionUnits,
+          permissions: currentPermissions,
+        } = await GetRolePermission("3455efc5-6481-4d48-b9d2-9f15b6d5f899");
         setRole(role ?? defaultRole);
+        const selectedPermissions = currentPermissions?.map((item) => item.id);
         setRolePermission(rolePermissions ?? []);
+
         const groupUsersList = rolePermissionUnits
           ?.filter((item) =>
             groupRoleIds.some((gId) => gId === item.permissionId)
@@ -453,17 +459,12 @@ export const useAction = () => {
 
         setCheckboxData({ pullCrowdData, notificationData });
 
-        if (rolePermissions.length) {
-          const ids: string[] = [];
-          rolePermissions.map((item) => item.id && ids.push(item.id));
-
+        if (selectedPermissions?.length) {
           const permissionsList: RolePermissionsDto[] = [];
           permissions?.map((item) =>
             permissionsList.push({
               ...item,
-              checked: rolePermissions.some(
-                (rItem) => rItem.permissionId === item.id
-              ),
+              checked: selectedPermissions.includes(item.id),
             })
           );
 
@@ -522,7 +523,6 @@ export const useAction = () => {
     updateChildrenCheckbox,
     removeOption,
     // new
-    permissions,
     updateRole,
     role,
     rolePermission,
