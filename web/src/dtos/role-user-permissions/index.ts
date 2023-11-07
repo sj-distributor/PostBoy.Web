@@ -10,6 +10,7 @@ export interface IPermissionItem {
   name: string;
   description: string;
   isSystem: boolean;
+  displayName: string;
 }
 
 export interface IRolePermission {
@@ -31,6 +32,7 @@ export interface IRolePermissionUnitItem {
 export interface IRole {
   name: string;
   description: string;
+  displayName?: string;
   id?: string;
   createdDate?: string;
   modifiedDate?: string;
