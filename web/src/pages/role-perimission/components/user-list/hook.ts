@@ -19,8 +19,7 @@ import {
 export const useAction = () => {
   const { enqueueSnackbar } = useSnackbar();
 
-  // const { roleId } = useParams(); 有带roleId后替换掉下面
-  const roleId = "5461b387-a9b2-11ed-8bef-0e1a84e7223a";
+  const { roleId } = useParams();
 
   const [inputVal, setInputVal] = useState<string>("");
 
@@ -31,7 +30,7 @@ export const useAction = () => {
   const [pageDto, setPageDto] = useState<IRoleUserPageDto>({
     PageIndex: 0,
     PageSize: 20,
-    RoleId: roleId,
+    RoleId: roleId ?? "",
     Keyword: inputVal,
   });
 
@@ -50,7 +49,6 @@ export const useAction = () => {
 
   const handleSearch = () => {
     inputVal && updatePageDto("Keyword", inputVal);
-    initUserList();
   };
 
   const handleDelete = useDebounceFn(
@@ -99,6 +97,8 @@ export const useAction = () => {
 
         updateUsersDto("count", 0);
         updateUsersDto("roleUsers", []);
+
+        setLoading(false);
       });
   };
 

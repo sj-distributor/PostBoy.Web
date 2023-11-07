@@ -126,7 +126,7 @@ export const UserList = () => {
             <AddUsersModel
               addUsersRef={addUsersRef}
               initUserList={initUserList}
-              roleId={roleId}
+              roleId={roleId ?? ""}
             />
           </ModalBox>
           <Button

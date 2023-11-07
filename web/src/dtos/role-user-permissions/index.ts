@@ -37,7 +37,7 @@ export interface IFoundationTreeDto {
 
 export interface IDepartmentTreeDto {
   department: IDepartmentType;
-  staffs: IUsersDto[] | [];
+  staffs: IUsersDto[];
   childrens: IDepartmentTreeDto[];
 }
 
