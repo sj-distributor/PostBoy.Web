@@ -6,9 +6,9 @@ import { useBoolean, useDebounceFn } from "ahooks";
 import { useSnackbar } from "notistack";
 
 import {
-  PageDto,
-  RoleUserItemDto,
-  RoleUserResponse,
+  IRoleUserPageDto,
+  IRoleUserItemDto,
+  IRoleUserResponse,
 } from "../../../../dtos/role-user-permissions";
 
 import {
@@ -28,14 +28,14 @@ export const useAction = () => {
 
   const addUsersRef = useRef<ModalBoxRef>(null);
 
-  const [pageDto, setPageDto] = useState<PageDto>({
+  const [pageDto, setPageDto] = useState<IRoleUserPageDto>({
     PageIndex: 0,
     PageSize: 20,
     RoleId: roleId,
     Keyword: inputVal,
   });
 
-  const [userData, setUserData] = useState<RoleUserResponse>({
+  const [userData, setUserData] = useState<IRoleUserResponse>({
     count: 0,
     roleUsers: [],
   });
@@ -106,13 +106,13 @@ export const useAction = () => {
       });
   };
 
-  const updatePageDto = (k: keyof PageDto, v: string | number) => {
+  const updatePageDto = (k: keyof IRoleUserPageDto, v: string | number) => {
     setPageDto((prev) => ({ ...prev, [k]: v }));
   };
 
   const updateUsersDto = (
-    k: keyof RoleUserResponse,
-    v: RoleUserItemDto[] | number
+    k: keyof IRoleUserResponse,
+    v: IRoleUserItemDto[] | number
   ) => {
     setUserData((prev) => ({ ...prev, [k]: v }));
   };

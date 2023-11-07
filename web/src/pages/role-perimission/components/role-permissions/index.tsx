@@ -1,12 +1,11 @@
 import styles from "./index.module.scss";
-
 import { Button, IconButton, Pagination, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
-import { UserRoleEnum } from "../../../../dtos/role";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
+import { UserRoleEnum } from "../../../../dtos/role-user-permissions";
 
 export const RolePermissions = () => {
   const {

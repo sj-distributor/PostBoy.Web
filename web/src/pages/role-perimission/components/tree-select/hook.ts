@@ -1,13 +1,13 @@
 import { clone, set } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
-import { RoleUserItemDto } from "../../../../dtos/role-user-permissions";
+import { IRoleUserItemDto } from "../../../../dtos/role-user-permissions";
 
 export const useAction = (
   treeData: TreeNode[],
   searchValue: string,
   setSelectedData: (data: TreeNode[]) => void,
-  roleUserList: RoleUserItemDto[]
+  roleUserList: IRoleUserItemDto[]
 ) => {
   const flatTreeTotalListData = treeData;
 

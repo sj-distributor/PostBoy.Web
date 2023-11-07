@@ -10,8 +10,8 @@ import {
   GetTreeList,
 } from "../../../../api/role-user-permissions";
 import {
-  DepartmentTreeDto,
-  RoleUserItemDto,
+  IDepartmentTreeDto,
+  IRoleUserItemDto,
 } from "../../../../dtos/role-user-permissions";
 import { useDebounceFn } from "ahooks";
 
@@ -34,12 +34,12 @@ export const useAction = (props: {
 
   const [isConfirmDisbale, setIsConfirmDisbale] = useState<boolean>(true);
 
-  const [totalRoleUserList, setTotalRoleUserList] = useState<RoleUserItemDto[]>(
-    []
-  );
+  const [totalRoleUserList, setTotalRoleUserList] = useState<
+    IRoleUserItemDto[]
+  >([]);
 
   const [foundationTreeData, setFoundationTreeData] = useState<
-    DepartmentTreeDto[]
+    IDepartmentTreeDto[]
   >([]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +93,7 @@ export const useAction = (props: {
   const foundationFlatTreeData: TreeNode[] = [];
 
   const flattenTreeDepartmentList = (
-    source: DepartmentTreeDto[],
+    source: IDepartmentTreeDto[],
     idRoute: string[]
   ) => {
     for (const sourceItem of source) {

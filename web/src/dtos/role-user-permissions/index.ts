@@ -1,53 +1,90 @@
-export interface PageDto {
+export interface IRoleUserPageDto {
   PageIndex: number;
   PageSize: number;
   RoleId: string;
   Keyword: string;
 }
 
-export interface RoleUserResponse {
+export interface IRoleUserResponse {
   count: number;
-  roleUsers: RoleUserItemDto[];
+  roleUsers: IRoleUserItemDto[];
 }
 
-export interface RoleUserItemDto extends RoleUsersDto {
+export interface IRoleUserItemDto extends IRoleUsersDto {
   createdDate: string;
   modifiedDate: string;
   roleName: string;
   userName: string;
 }
 
-export interface RoleUsersDto {
+export interface IRoleUsersDto {
   id?: string;
   roleId: string;
   userId: string;
 }
 
-export interface AddRoleUsersDto {
-  roleUsers: RoleUsersDto[];
+export interface IAddRoleUsersDto {
+  roleUsers: IRoleUsersDto[];
 }
 
-export interface DeleteRoleUserRequest {
+export interface IDeleteRoleUserRequest {
   roleUserIds: string[];
 }
 
 export interface IFoundationTreeDto {
-  staffDepartmentHierarchy: DepartmentTreeDto[];
+  staffDepartmentHierarchy: IDepartmentTreeDto[];
 }
 
-export interface DepartmentTreeDto {
-  department: DepartmentType;
-  staffs: UsersDto[] | [];
-  childrens: DepartmentTreeDto[];
+export interface IDepartmentTreeDto {
+  department: IDepartmentType;
+  staffs: IUsersDto[] | [];
+  childrens: IDepartmentTreeDto[];
 }
 
-export interface DepartmentType {
+export interface IDepartmentType {
   id: string;
   name: string;
   parentId: string;
 }
 
-export interface UsersDto {
+export interface IUsersDto {
   id: string;
   userName: string;
 }
+
+export interface IRoleTabltDto {
+  id: number;
+  name: string;
+  details: string;
+  role: UserRoleEnum;
+}
+
+export interface IDepartmentDto {
+  allDepartment: IDepartmentListDto[];
+}
+
+export interface IDepartmentListDto {
+  higherDepartment: {
+    name: string;
+    id: string;
+    childrenDepartment?: IDepartmentDetailsListDto[];
+  };
+}
+
+export interface IDepartmentDetailsListDto {
+  name: string;
+  id: string;
+  childrenDepartment?: IDepartmentDetailsListDto[];
+}
+
+export enum UserRoleEnum {
+  SuperAdmin,
+  Admin,
+  User,
+}
+
+export const UserRoleType = {
+  [UserRoleEnum.SuperAdmin]: "超級管理員",
+  [UserRoleEnum.Admin]: "管理員",
+  [UserRoleEnum.User]: "用戶",
+};
