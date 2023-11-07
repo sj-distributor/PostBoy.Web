@@ -51,7 +51,7 @@
   .footer {
     display: flex;
     margin: 1rem 0;
-    justify-content: end;
+    justify-content: flex-end;
   }
 
   .deleteBox {
@@ -72,7 +72,7 @@
 
     .buttonBox {
       display: flex;
-      justify-content: end;
+      justify-content: flex-end;
 
       .cancelButton {
         height: 1.7rem;

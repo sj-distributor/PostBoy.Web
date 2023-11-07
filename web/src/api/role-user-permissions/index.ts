@@ -3,8 +3,8 @@ import {
   IFoundationTreeDto,
   IPageDto,
   IPermissionsDto,
-  IRoleDto,
   IRolePermission,
+  IRolePermissionDto,
 } from "../../dtos/role-user-permissions";
 import { Get, Post } from "../http-client";
 
@@ -36,7 +36,7 @@ export const UpdateRolePermission = async (data: IRolePermission) => {
 
 // 获取角色list
 export const GetRolesList = async (data: IPageDto) => {
-  return await Get<IRoleDto>(
+  return await Get<IRolePermissionDto>(
     `/api/Security/roles/by/permissions?PageIndex=${
       data.pageIndex + 1
     }&PageSize=${data.pageSize}${
@@ -54,4 +54,14 @@ export const GetTreeList = async () => {
   return await Get<IFoundationTreeDto>(
     "/api/Foundation/department/staff/hierarchy/tree"
   );
+};
+
+export const GetRolesByPermissions = async (data: IPageDto) => {
+  return await Get<IRolePermissionDto>(
+    `/api/Security/roles/by/permissions?PageIndex=${data.pageIndex}&PageSize=${data.pageSize}&Keyword=${data.keyword}`
+  );
+};
+
+export const GetCurrentRolesByPermissions = async () => {
+  return await Get<IRolePermissionDto>(`/api/Security/roles/by/permissions`);
 };
