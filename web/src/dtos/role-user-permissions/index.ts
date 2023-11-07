@@ -31,27 +31,6 @@ export interface DeleteRoleUserRequest {
   roleUserIds: string[];
 }
 
-export interface StaffsData {
-  id: string;
-  userName: string;
-}
-
-export interface DepartmentData {
-  id: string;
-  name: string;
-  parentId: string;
-}
-
-export interface StaffDepartmentHierarchyListProps {
-  childrens: StaffDepartmentHierarchyListProps[];
-  department: DepartmentData;
-  staffs: StaffsData[];
-}
-
-export interface StaffFoundationHierarchyDataRequest {
-  staffDepartmentHierarchy: StaffDepartmentHierarchyListProps[];
-}
-
 export interface IFoundationTreeDto {
   staffDepartmentHierarchy: DepartmentTreeDto[];
 }

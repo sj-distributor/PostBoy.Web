@@ -6,15 +6,13 @@ import { useSnackbar } from "notistack";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import {
   AddRoleUser,
+  GetRoleUserList,
   GetTreeList,
 } from "../../../../api/role-user-permissions";
 import {
   DepartmentTreeDto,
-  StaffDepartmentHierarchyListProps,
+  RoleUserItemDto,
 } from "../../../../dtos/role-user-permissions";
-import jsonData from "./latest tree.json";
-import { clone, set } from "ramda";
-import { Message } from "@mui/icons-material";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -32,6 +30,10 @@ export const useAction = (props: {
   const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
 
   const [isConfirmDisbale, setIsConfirmDisbale] = useState<boolean>(true);
+
+  const [totalRoleUserList, setTotalRoleUserList] = useState<RoleUserItemDto[]>(
+    []
+  );
 
   const [foundationTreeData, setFoundationTreeData] = useState<
     DepartmentTreeDto[]
@@ -64,6 +66,16 @@ export const useAction = (props: {
         res &&
           res.staffDepartmentHierarchy.length > 0 &&
           setFoundationTreeData(res.staffDepartmentHierarchy);
+      })
+      .catch((error) => {
+        enqueueSnackbar((error as Error).message, { variant: "error" });
+      });
+  };
+
+  const handleTotalRoleUserList = () => {
+    GetRoleUserList()
+      .then((res) => {
+        res && res.roleUsers && setTotalRoleUserList(res.roleUsers);
       })
       .catch((error) => {
         enqueueSnackbar((error as Error).message, { variant: "error" });
@@ -124,6 +136,7 @@ export const useAction = (props: {
 
   useEffect(() => {
     handleFoundationTree();
+    handleTotalRoleUserList();
   }, []);
 
   return {
@@ -135,5 +148,6 @@ export const useAction = (props: {
     isConfirmDisbale,
     setAlreadySelectData,
     handleAddRoleUsers,
+    totalRoleUserList,
   };
 };

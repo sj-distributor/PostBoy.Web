@@ -23,6 +23,7 @@ export const AddUsersModel = (props: {
     isConfirmDisbale,
     setAlreadySelectData,
     handleAddRoleUsers,
+    totalRoleUserList,
   } = useAction({ addUsersRef, roleId, initUserList });
 
   return (
@@ -53,6 +54,7 @@ export const AddUsersModel = (props: {
             setSelectedData={(selectItems) => setAlreadySelectData(selectItems)}
             treeData={treeData}
             searchValue={searchValue}
+            roleUserList={totalRoleUserList}
           />
         </div>
       </div>

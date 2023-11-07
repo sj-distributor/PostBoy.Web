@@ -32,3 +32,7 @@ export const GetTreeList = async () => {
     "/api/Foundation/department/staff/hierarchy/tree"
   );
 };
+
+export const GetRoleUserList = async () => {
+  return await Get<RoleUserResponse>(`/api/Security/role/users`);
+};

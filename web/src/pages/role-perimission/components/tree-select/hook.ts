@@ -1,11 +1,13 @@
 import { clone, set } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
+import { RoleUserItemDto } from "../../../../dtos/role-user-permissions";
 
 export const useAction = (
   treeData: TreeNode[],
   searchValue: string,
-  setSelectedData: (data: TreeNode[]) => void
+  setSelectedData: (data: TreeNode[]) => void,
+  roleUserList: RoleUserItemDto[]
 ) => {
   const flatTreeTotalListData = treeData;
 
@@ -27,6 +29,8 @@ export const useAction = (
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >([]);
+
+  const [disabledNodes, setDisabledNodes] = useState<Set<string>>(new Set());
 
   const isSearch = useMemo(
     () => searchDisplayTreeData.length > 0,
@@ -239,12 +243,26 @@ export const useAction = (
     setIndeterminateNodes(newIndeterminateNode);
   };
 
+  //无法选中
+  const disableListData = () => {
+    const newDisabledNodes = new Set<string>();
+
+    roleUserList.forEach((item) => {
+      newDisabledNodes.add(item.userId);
+    });
+
+    setDisabledNodes(newDisabledNodes);
+  };
+
   useEffect(() => {
     handleSearchChange(searchValue);
 
     setSelectedData(
       flatTreeTotalListData.filter(
-        (item) => selectedNodes.has(item.id) && !item.isDepartment
+        (item) =>
+          selectedNodes.has(item.id) &&
+          !item.isDepartment &&
+          !disabledNodes.has(item.id)
       )
     );
   }, [searchValue, selectedNodes]);
@@ -260,6 +278,10 @@ export const useAction = (
     }
   }, [flatTreeTotalListData, displayFlatUpdateTreeData]);
 
+  useEffect(() => {
+    disableListData();
+  }, [displayFlatUpdateTreeData]);
+
   return {
     isSearch,
     searchDisplayTreeData,
@@ -271,5 +293,6 @@ export const useAction = (
     toggleNode,
     handleSearchChange,
     flatTreeTotalListData,
+    disabledNodes,
   };
 };
