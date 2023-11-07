@@ -1,15 +1,24 @@
-import styles from "./index.module.scss"
-import Accordion from "@mui/material/Accordion"
-import AccordionSummary from "@mui/material/AccordionSummary"
-import AccordionDetails from "@mui/material/AccordionDetails"
-import Typography from "@mui/material/Typography"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import useAction from "./hook"
-import { Alert, AlertTitle, Button, Snackbar } from "@mui/material"
-import ModalBox from "../../components/modal/modal"
-import AddApiKeyPopup from "./component/add-aipkey"
-import RegistrationPopup from "./component/registration"
-import { isEmpty } from "ramda"
+import styles from "./index.module.scss";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import useAction from "./hook";
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  Pagination,
+  Snackbar,
+} from "@mui/material";
+import ModalBox from "../../components/modal/modal";
+import AddApiKeyPopup from "./component/add-aipkey";
+import RegistrationPopup from "./component/registration";
+import Search from "@mui/icons-material/Search";
 
 const User = () => {
   const {
@@ -26,7 +35,9 @@ const User = () => {
     setUserAccountId,
     success,
     successAction,
-  } = useAction()
+    usersDto,
+    setUserDto,
+  } = useAction();
 
   return (
     <div className={styles.user}>
@@ -59,13 +70,35 @@ const User = () => {
           successAction={successAction}
         />
       </ModalBox>
-      <Button
-        variant="contained"
-        className={styles.registerButton}
-        onClick={registerRef.current?.open}
-      >
-        注册用户
-      </Button>
+      <div className={styles.registerButton}>
+        <Button variant="contained" onClick={registerRef.current?.open}>
+          注册用户
+        </Button>
+        <div>
+          <OutlinedInput
+            id="outlined-adornment-password"
+            type="text"
+            size="small"
+            autoComplete="off"
+            onKeyDown={(e) => e.code === "Enter"}
+            placeholder="输入用户搜索"
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton aria-label="toggle password visibility" edge="end">
+                  <Search />
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+          <Button
+            variant="contained"
+            component="label"
+            sx={{ marginLeft: "0.5rem" }}
+          >
+            搜索用户
+          </Button>
+        </div>
+      </div>
       <div>
         {usersList?.map((item, key) => (
           <Accordion className={styles.accordion} key={key}>
@@ -80,9 +113,9 @@ const User = () => {
                 variant="contained"
                 className={styles.addButton}
                 onClick={(event) => {
-                  setUserAccountId(item.id)
-                  event.stopPropagation()
-                  addApikeyRef.current?.open()
+                  setUserAccountId(item.id);
+                  event.stopPropagation();
+                  addApikeyRef.current?.open();
                 }}
               >
                 添加apikey
@@ -98,15 +131,33 @@ const User = () => {
                     >
                       <Typography>{apikeyItem.apiKey}</Typography>
                     </AccordionDetails>
-                  )
+                  );
                 }
-              })
+              });
             })}
           </Accordion>
         ))}
+        {usersList.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "end",
+              marginRight: "1.5rem",
+              marginTop: 10,
+            }}
+          >
+            <Pagination
+              count={10}
+              page={usersDto.page}
+              onChange={(e: React.ChangeEvent<unknown>, value: number) =>
+                setUserDto((prev) => ({ ...prev, page: value }))
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default User
+export default User;
