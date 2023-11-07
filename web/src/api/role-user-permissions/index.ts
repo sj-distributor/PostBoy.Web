@@ -1,7 +1,7 @@
 import {
   IDeleteRole,
   IFoundationTreeDto,
-  IGetPermissionsDto,
+  IPageDto,
   IPermissionsDto,
   IRoleDto,
   IRolePermission,
@@ -35,12 +35,12 @@ export const UpdateRolePermission = async (data: IRolePermission) => {
 };
 
 // 获取角色list
-export const GetRolesList = async (data: IGetPermissionsDto) => {
+export const GetRolesList = async (data: IPageDto) => {
   return await Get<IRoleDto>(
     `/api/Security/roles/by/permissions?PageIndex=${
-      data.PageIndex + 1
-    }&PageSize=${data.PageSize}${
-      data.Keyword ? "&Keyword=" + data.Keyword : ""
+      data.pageIndex + 1
+    }&PageSize=${data.pageSize}${
+      data.keyword ? "&Keyword=" + data.keyword : ""
     }`
   );
 };

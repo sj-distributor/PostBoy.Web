@@ -4,7 +4,7 @@ import { ModalBoxRef } from "../../../../dtos/modal";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import {
-  IGetPermissionsDto,
+  IPageDto,
   IRoleDto,
   IRolePermissionDataItem,
 } from "../../../../dtos/role-user-permissions";
@@ -24,10 +24,10 @@ export const useAction = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [pageDto, setPageDto] = useState<IGetPermissionsDto>({
-    PageIndex: 0,
-    PageSize: 20,
-    Keyword: "",
+  const [pageDto, setPageDto] = useState<IPageDto>({
+    pageIndex: 0,
+    pageSize: 20,
+    keyword: "",
   });
 
   const [roleDto, setRoleDto] = useState<IRoleDto>({
@@ -68,7 +68,7 @@ export const useAction = () => {
       );
   };
 
-  const updatePageDto = (k: keyof IGetPermissionsDto, v: string | number) => {
+  const updatePageDto = (k: keyof IPageDto, v: string | number) => {
     setPageDto((prev) => ({ ...prev, [k]: v }));
   };
 
@@ -81,7 +81,7 @@ export const useAction = () => {
 
   useEffect(() => {
     loadRoles();
-  }, [pageDto.PageIndex, pageDto.PageIndex]);
+  }, [pageDto.pageIndex, pageDto.pageSize]);
 
   return {
     rowId,

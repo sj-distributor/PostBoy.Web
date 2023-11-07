@@ -44,10 +44,10 @@ export interface IRolePermissionItem {
   id?: string;
 }
 
-export interface IGetPermissionsDto {
-  PageIndex: number;
-  PageSize: number;
-  Keyword?: string;
+export interface IPageDto {
+  pageIndex: number;
+  pageSize: number;
+  keyword?: string;
 }
 
 export interface IRolePermissionsItem {

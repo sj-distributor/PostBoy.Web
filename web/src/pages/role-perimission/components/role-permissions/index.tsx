@@ -87,8 +87,8 @@ export const RolePermissions = () => {
             placeholder="搜索角色名稱"
             fullWidth
             autoComplete="off"
-            value={pageDto.Keyword}
-            onChange={(e) => updatePageDto("Keyword", e.target.value)}
+            value={pageDto.keyword}
+            onChange={(e) => updatePageDto("keyword", e.target.value)}
             onKeyDown={(event) => event.key === "Enter" && loadRoles()}
           />
           <div className={styles.navIcon}>
@@ -107,16 +107,16 @@ export const RolePermissions = () => {
         <DataGrid
           rows={roleDto.rolePermissionData.map((item) => item.role)}
           columns={columns}
-          pageSize={pageDto.PageSize}
-          page={pageDto.PageIndex}
+          pageSize={pageDto.pageSize}
+          page={pageDto.pageIndex}
           showCellRightBorder
           showColumnRightBorder
           disableSelectionOnClick
           pagination
           paginationMode="server"
           rowCount={roleDto.count}
-          onPageChange={(value) => updatePageDto("PageIndex", value)}
-          onPageSizeChange={(value) => updatePageDto("PageSize", value)}
+          onPageChange={(value) => updatePageDto("pageIndex", value)}
+          onPageSizeChange={(value) => updatePageDto("pageSize", value)}
           loading={loading}
         />
       </div>
