@@ -4,20 +4,19 @@ import { useLocation } from "react-router-dom";
 import { GetAuthUser } from "../../api/user-management";
 import { IUserResponse } from "../../dtos/user-management";
 import { routerArray } from "../../router/elementRoute";
+import useAuth from "../../auth";
 
 const useMainAction = () => {
   const mainLocation = useLocation();
 
   const [clickMainIndex, setMainClickIndex] = useState<number>();
 
-  const [haveAdministrator, haveAdministratorAction] = useBoolean(false);
-
-  const [userData, setUserData] = useState<IUserResponse>();
+  const { filterRouter } = useAuth();
 
   useEffect(() => {
     const currentPath = mainLocation.pathname;
 
-    const indexInRouterArray = routerArray.findIndex((routeItem) => {
+    const indexInRouterArray = filterRouter.findIndex((routeItem) => {
       const currentPathSplit = currentPath.split("/");
 
       const currentPathFirstPart = currentPathSplit[1];
@@ -26,24 +25,12 @@ const useMainAction = () => {
     });
 
     setMainClickIndex(indexInRouterArray);
-  }, [mainLocation.pathname]);
-
-  useEffect(() => {
-    GetAuthUser().then((res) => {
-      if (!!res) {
-        setUserData(res);
-      }
-      if (res?.roles?.find((x) => x.name === "Administrator")) {
-        haveAdministratorAction.setTrue();
-      }
-    });
-  }, []);
+  }, [mainLocation.pathname, filterRouter]);
 
   return {
     mainLocation,
     clickMainIndex,
     setMainClickIndex,
-    haveAdministrator,
   };
 };
 

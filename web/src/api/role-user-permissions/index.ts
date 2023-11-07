@@ -13,6 +13,10 @@ import {
 } from "../../dtos/role-user-permissions";
 import { Get, Post } from "../http-client";
 
+export const GetCurrentRolesByPermissions = async () => {
+  return await Get<IRolePermissionDto>(`/api/Security/roles/by/permissions`);
+};
+
 // 获取用户list
 export const GetRoleUser = async (data: IRoleUserPageDto) => {
   return await Get<IRoleUserResponse>(
@@ -71,7 +75,7 @@ export const UpdateRolePermission = async (data: IRolePermission) => {
 };
 
 // 获取角色list
-export const GetRolesList = async (data: IPageDto) => {
+export const GetRolesByPermissions = async (data: IPageDto) => {
   return await Get<IRolePermissionDto>(
     `/api/Security/roles/by/permissions?PageIndex=${
       data.pageIndex + 1

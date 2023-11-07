@@ -9,7 +9,7 @@ import {
 } from "../../../../dtos/role-user-permissions";
 import {
   DeleteRoles,
-  GetRolesList,
+  GetRolesByPermissions,
 } from "../../../../api/role-user-permissions";
 import auth from "../../../../auth";
 import { useDebounceFn } from "ahooks";
@@ -105,7 +105,7 @@ export const useAction = () => {
   const loadRoles = () => {
     setLoading(true);
 
-    GetRolesList(pageDto)
+    GetRolesByPermissions(pageDto)
       .then((res) => {
         setTimeout(() => {
           updateRoleDto("count", res.count ?? 0);
