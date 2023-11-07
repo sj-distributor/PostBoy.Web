@@ -1,6 +1,6 @@
 import { createContext, useEffect, useMemo, useState } from "react";
 import jwt_decode from "jwt-decode";
-import { GetRolesByPermissions } from "../../api/role-user-permissions";
+import { GetCurrentRolesByPermissions } from "../../api/role-user-permissions";
 import { IRolePermissionDto } from "../../dtos/role-user-permissions";
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/route";
@@ -103,10 +103,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (username)
-      GetRolesByPermissions({
-        pageIndex: 0,
-        pageSize: 0,
-      })
+      GetCurrentRolesByPermissions()
         .then((res) => {
           setCurrentUserRolePermissions({
             count: res?.count ?? 0,

@@ -1,6 +1,7 @@
 export interface IPageDto {
   pageIndex: number;
   pageSize: number;
+  keyword: string;
 }
 
 export interface IRolePermissionDto {
