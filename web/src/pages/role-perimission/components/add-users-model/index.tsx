@@ -1,4 +1,4 @@
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
@@ -9,8 +9,10 @@ import { TreeSelectList } from "../tree-select";
 
 export const AddUsersModel = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
+  roleId: string;
+  initUserList: () => void;
 }) => {
-  const { addUsersRef } = props;
+  const { addUsersRef, initUserList, roleId } = props;
 
   const {
     treeData,
@@ -18,8 +20,12 @@ export const AddUsersModel = (props: {
     handleSearchChange,
     treeSelectRef,
     alreadySelectData,
+    isConfirmDisbale,
     setAlreadySelectData,
-  } = useAction();
+    handleAddRoleUsers,
+    totalRoleUserList,
+    isTreeLoading,
+  } = useAction({ addUsersRef, roleId, initUserList });
 
   return (
     <div className={styles.modelWrap}>
@@ -44,11 +50,21 @@ export const AddUsersModel = (props: {
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
+          {isTreeLoading && (
+            <CircularProgress
+              style={{
+                width: "4rem",
+                height: "4rem",
+                margin: "13rem 0 0 11rem",
+              }}
+            />
+          )}
           <TreeSelectList
             ref={treeSelectRef}
             setSelectedData={(selectItems) => setAlreadySelectData(selectItems)}
             treeData={treeData}
             searchValue={searchValue}
+            roleUserList={totalRoleUserList}
           />
         </div>
       </div>
@@ -78,7 +94,12 @@ export const AddUsersModel = (props: {
           </div>
         </div>
         <div className={styles.buttonBox}>
-          <Button variant="contained" className={styles.button}>
+          <Button
+            variant="contained"
+            className={styles.button}
+            disabled={isConfirmDisbale}
+            onClick={handleAddRoleUsers}
+          >
             確認
           </Button>
           <Button

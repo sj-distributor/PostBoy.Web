@@ -1,79 +1,146 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { IUserTableDto } from "../../../../dtos/role";
-import { useNavigate } from "react-router-dom";
-import { GridSelectionModel } from "@mui/x-data-grid";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { useBoolean, useDebounceFn } from "ahooks";
+import { useSnackbar } from "notistack";
+
+import {
+  IRoleUserPageDto,
+  IRoleUserItemDto,
+  IRoleUserResponse,
+} from "../../../../dtos/role-user-permissions";
+
+import {
+  DeleteRoleUser,
+  GetRoleUser,
+} from "../../../../api/role-user-permissions";
 
 export const useAction = () => {
-  const initData: IUserTableDto[] = [
-    {
-      id: 1,
-      name: "xxx",
-      date: "2014-12-24 23:12:00",
-    },
-    {
-      id: 2,
-      name: "xxx",
-      date: "2015-12-24 23:12:00",
-    },
-    {
-      id: 3,
-      name: "xxx",
-      date: "2016-12-24 23:12:00",
-    },
-    {
-      id: 4,
-      name: "xxx",
-      date: "2017-12-24 23:12:00",
-    },
-    {
-      id: 5,
-      name: "xxx",
-      date: "2018-12-24 23:12:00",
-    },
-  ];
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { roleId } = useParams();
 
   const [inputVal, setInputVal] = useState<string>("");
 
-  const [rows, setRows] = useState<IUserTableDto[]>(initData);
-
-  const [selectId, setSelectId] = useState<GridSelectionModel>([]);
+  const [selectId, setSelectId] = useState<string[]>([]);
 
   const addUsersRef = useRef<ModalBoxRef>(null);
 
+  const [pageDto, setPageDto] = useState<IRoleUserPageDto>({
+    PageIndex: 0,
+    PageSize: 20,
+    RoleId: roleId ?? "",
+    Keyword: inputVal,
+  });
+
+  const [userData, setUserData] = useState<IRoleUserResponse>({
+    count: 0,
+    roleUsers: [],
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const [openConfirm, openConfirmAction] = useBoolean(false);
+
+  const [batchBtnDisable, batchBtnDisableAction] = useBoolean(true);
+
   const navigate = useNavigate();
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputVal(event.target.value);
-  };
-
   const handleSearch = () => {
-    console.log("Search content:", inputVal);
+    inputVal && updatePageDto("Keyword", inputVal);
   };
 
-  const handleDelete = (id: number) => {
-    const updatedRows = rows.filter((row: IUserTableDto) => row.id !== id);
+  const handleDelete = useDebounceFn(
+    () => {
+      openConfirmAction.setTrue();
 
-    setRows(updatedRows);
+      const data = {
+        roleUserIds: selectId,
+      };
+
+      DeleteRoleUser(data)
+        .then(() => {
+          enqueueSnackbar("移除成功!", { variant: "success" });
+          initUserList();
+        })
+        .catch((error) => {
+          enqueueSnackbar((error as Error).message, { variant: "error" });
+        })
+        .finally(() => {
+          setSelectId([]);
+          openConfirmAction.setFalse();
+        });
+    },
+    { wait: 500 }
+  ).run;
+
+  const initUserList = () => {
+    setLoading(true);
+
+    GetRoleUser({
+      PageIndex: pageDto.PageIndex,
+      PageSize: pageDto.PageSize,
+      RoleId: pageDto.RoleId,
+      Keyword: inputVal,
+    })
+      .then((res) => {
+        setTimeout(() => {
+          updateUsersDto("count", res?.count ?? 0);
+          updateUsersDto("roleUsers", res?.roleUsers ?? []);
+
+          setLoading(false);
+        }, 300);
+      })
+      .catch((error) => {
+        enqueueSnackbar((error as Error).message, { variant: "error" });
+
+        updateUsersDto("count", 0);
+        updateUsersDto("roleUsers", []);
+
+        setLoading(false);
+      });
   };
 
-  const batchDelete = () => {
-    const updatedRows = rows.filter(
-      (row: IUserTableDto) => !selectId.includes(row.id)
-    );
-
-    setRows(updatedRows);
+  const updatePageDto = (k: keyof IRoleUserPageDto, v: string | number) => {
+    setPageDto((prev) => ({ ...prev, [k]: v }));
   };
+
+  const updateUsersDto = (
+    k: keyof IRoleUserResponse,
+    v: IRoleUserItemDto[] | number
+  ) => {
+    setUserData((prev) => ({ ...prev, [k]: v }));
+  };
+
+  useEffect(() => {
+    initUserList();
+  }, [pageDto.PageIndex, inputVal]);
+
+  useEffect(() => {
+    selectId.length === 0
+      ? batchBtnDisableAction.setTrue()
+      : batchBtnDisableAction.setFalse();
+  }, [selectId]);
 
   return {
-    rows,
     inputVal,
     addUsersRef,
+    pageDto,
+    userData,
+    selectId,
+    loading,
+    openConfirm,
+    openConfirmAction,
+    batchBtnDisable,
+    roleId,
     navigate,
     setSelectId,
-    handleInputChange,
     handleSearch,
     handleDelete,
-    batchDelete,
+    setPageDto,
+    setInputVal,
+    initUserList,
+    updatePageDto,
   };
 };
