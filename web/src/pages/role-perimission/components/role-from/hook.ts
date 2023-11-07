@@ -1,9 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { IDepartmentDto } from "../../../../dtos/role";
 import { useState } from "react";
 import { clone } from "ramda";
 import { useUpdateEffect } from "ahooks";
 import { AllDepartmentData, DepartmentDto } from "./props";
+import { IDepartmentDto } from "../../../../dtos/role-user-permissions";
 
 export const useAction = () => {
   const options: IDepartmentDto = {
