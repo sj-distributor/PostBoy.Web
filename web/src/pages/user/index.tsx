@@ -36,7 +36,9 @@ const User = () => {
     success,
     successAction,
     usersDto,
+    isLoading,
     setUserDto,
+    getAllUsersData,
   } = useAction();
 
   return (
@@ -80,7 +82,12 @@ const User = () => {
             type="text"
             size="small"
             autoComplete="off"
-            onKeyDown={(e) => e.code === "Enter"}
+            onKeyDown={(e) =>
+              e.code === "Enter" && !isLoading && getAllUsersData()
+            }
+            onChange={(e) =>
+              setUserDto((prev) => ({ ...prev, keyword: e.target.value }))
+            }
             placeholder="输入用户搜索"
             endAdornment={
               <InputAdornment position="end">
@@ -94,6 +101,7 @@ const User = () => {
             variant="contained"
             component="label"
             sx={{ marginLeft: "0.5rem" }}
+            onClick={() => !isLoading && getAllUsersData()}
           >
             搜索用户
           </Button>

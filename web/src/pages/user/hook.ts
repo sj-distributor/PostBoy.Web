@@ -17,16 +17,19 @@ const useAction = () => {
   const [openApikeyUserId, setOpenApikeyUserId] = useState<string[]>([]);
   const registerRef = useRef<ModalBoxRef>(null);
   const addApikeyRef = useRef<ModalBoxRef>(null);
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [userAccountId, setUserAccountId] = useState<string>("");
   const [success, successAction] = useBoolean(false);
   const [usersDto, setUserDto] = useState<{
     count: number;
     page: number;
     pageSize: number;
+    keyword?: string;
   }>({
     count: 0,
     page: 1,
     pageSize: 20,
+    keyword: "",
   });
 
   const onRegisterCancel = () => {
@@ -54,16 +57,25 @@ const useAction = () => {
     openApikeyAction.toggle();
   };
 
-  useEffect(() => {
+  const getAllUsersData = () => {
+    setLoading(true);
     GetAllUsers({
       Page: usersDto.page,
       PageSize: usersDto.pageSize,
-    }).then((res) => {
-      if (!!res) {
-        console.log(res);
-        setUsersList(res.splice(0, 20));
-      }
-    });
+      UserName: usersDto.keyword,
+    })
+      .then((res) => {
+        if (!!res) {
+          setUsersList(res);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    getAllUsersData();
   }, []);
 
   useEffect(() => {
@@ -73,6 +85,10 @@ const useAction = () => {
       }, 3000);
     }
   }, [success]);
+
+  useEffect(() => {
+    getAllUsersData();
+  }, [usersDto.page, usersDto.pageSize]);
 
   return {
     usersList,
@@ -89,7 +105,9 @@ const useAction = () => {
     success,
     successAction,
     usersDto,
+    isLoading,
     setUserDto,
+    getAllUsersData,
   };
 };
 

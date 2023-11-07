@@ -7,6 +7,28 @@ export interface IUserResponse {
   roles: IUserDataRolesData[];
 }
 
+export interface IUserListItem {
+  id: string;
+  createdDate: string;
+  modifiedDate: string;
+  userName: string;
+  isActive: boolean;
+  thirdPartyUserId: string;
+  issuer: number;
+  roles: IUserDataRolesData[];
+  permissions: IPermissionsItem[];
+}
+
+export interface IPermissionsItem {
+  id: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  name: string;
+  displayName: string | null;
+  description: string;
+  isSystem: boolean;
+}
+
 export interface IUserDataRolesData {
   id: string;
   createdDate: string;
