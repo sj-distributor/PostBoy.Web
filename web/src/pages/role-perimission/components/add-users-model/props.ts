@@ -1,7 +1,8 @@
 export interface TreeNode {
-  id: number;
-  idRoute: number[];
+  id: string;
+  idRoute: string[];
   title: string;
-  childrenIdList?: number[];
+  childrenIdList?: string[];
   children: TreeNode[];
+  isDepartment?: boolean;
 }

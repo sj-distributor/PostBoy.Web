@@ -1,52 +1,36 @@
-import { clone } from "ramda";
+import { clone, set } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
+import { IRoleUserItemDto } from "../../../../dtos/role-user-permissions";
 
 export const useAction = (
   treeData: TreeNode[],
   searchValue: string,
-  setSelectedData: (data: TreeNode[]) => void
+  setSelectedData: (data: TreeNode[]) => void,
+  roleUserList: IRoleUserItemDto[]
 ) => {
-  //平铺树结构
-  const flattenTreeTotalList = (
-    tree: TreeNode[],
-    parentIdRoute: number[] = []
-  ): TreeNode[] => {
-    let flattenedList: TreeNode[] = [];
-
-    for (const node of tree) {
-      const idRoute = [...parentIdRoute, node.id];
-
-      flattenedList.push(node);
-
-      node.children &&
-        node.children.length > 0 &&
-        flattenedList.push(...flattenTreeTotalList(node.children, idRoute));
-    }
-
-    return flattenedList;
-  };
-
-  const flatTreeTotalListData = flattenTreeTotalList(treeData);
+  const flatTreeTotalListData = treeData;
 
   const [expandedNodes, setExpandedNodes] = useState<{
-    displayExpandedNodes: Set<number>;
-    searchExpandedNodes: Set<number>;
+    displayExpandedNodes: Set<string>;
+    searchExpandedNodes: Set<string>;
   }>({ displayExpandedNodes: new Set(), searchExpandedNodes: new Set() });
 
-  const [selectedNodes, setSelectedNodes] = useState<Set<number>>(new Set());
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
-  const [indeterminateNodes, setIndeterminateNodes] = useState<Set<number>>(
+  const [indeterminateNodes, setIndeterminateNodes] = useState<Set<string>>(
     new Set()
   );
 
   const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
     TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 1));
+  >([]);
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
   >([]);
+
+  const [disabledNodes, setDisabledNodes] = useState<Set<string>>(new Set());
 
   const isSearch = useMemo(
     () => searchDisplayTreeData.length > 0,
@@ -55,7 +39,7 @@ export const useAction = (
 
   const getCurrentNodeListByCurrentIdRoute = (
     currentList: TreeNode[],
-    currentIdRoute: number[]
+    currentIdRoute: string[]
   ) => {
     return {
       allChildrenIncludeParentList: currentList.filter(
@@ -128,7 +112,7 @@ export const useAction = (
 
     const displayData: TreeNode[] = idRouteList
       .map((nodeId) => flatTreeTotalListData.find(({ id }) => id === nodeId))
-      .filter((item): item is TreeNode => !!item);
+      .filter((item) => !!item) as TreeNode[];
 
     if (value !== "") {
       setExpandedNodes((prevExpandedNodes) => ({
@@ -259,15 +243,41 @@ export const useAction = (
     setIndeterminateNodes(newIndeterminateNode);
   };
 
+  //无法选中
+  const disableListData = () => {
+    const newDisabledNodes = new Set<string>();
+
+    roleUserList.forEach((item) => {
+      newDisabledNodes.add(item.userId);
+    });
+
+    setDisabledNodes(newDisabledNodes);
+  };
+
   useEffect(() => {
     handleSearchChange(searchValue);
 
     setSelectedData(
       flatTreeTotalListData.filter(
-        (item) => selectedNodes.has(item.id) && item.children.length === 0
+        (item) =>
+          selectedNodes.has(item.id) &&
+          !item.isDepartment &&
+          !disabledNodes.has(item.id)
       )
     );
   }, [searchValue, selectedNodes]);
+
+  useEffect(() => {
+    disableListData();
+    if (
+      flatTreeTotalListData.length > 0 &&
+      displayFlatUpdateTreeData.length === 0
+    ) {
+      setDisplayFlatUpdateTreeData(
+        flatTreeTotalListData.filter((node) => node.idRoute.length === 2)
+      );
+    }
+  }, [flatTreeTotalListData, displayFlatUpdateTreeData]);
 
   return {
     isSearch,
@@ -280,5 +290,6 @@ export const useAction = (
     toggleNode,
     handleSearchChange,
     flatTreeTotalListData,
+    disabledNodes,
   };
 };

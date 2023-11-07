@@ -1,3 +1,82 @@
+export interface IRoleUserPageDto {
+  PageIndex: number;
+  PageSize: number;
+  RoleId: string;
+  Keyword: string;
+}
+
+export interface IRoleUserResponse {
+  count: number;
+  roleUsers: IRoleUserItemDto[];
+}
+
+export interface IRoleUserItemDto extends IRoleUsersDto {
+  createdDate: string;
+  modifiedDate: string;
+  roleName: string;
+  userName: string;
+}
+
+export interface IRoleUsersDto {
+  id?: string;
+  roleId: string;
+  userId: string;
+}
+
+export interface IAddRoleUsersDto {
+  roleUsers: IRoleUsersDto[];
+}
+
+export interface IDeleteRoleUserRequest {
+  roleUserIds: string[];
+}
+
+export interface IFoundationTreeDto {
+  staffDepartmentHierarchy: IDepartmentTreeDto[];
+}
+
+export interface IDepartmentTreeDto {
+  department: IDepartmentType;
+  staffs: IUsersDto[];
+  childrens: IDepartmentTreeDto[];
+}
+
+export interface IDepartmentType {
+  id: string;
+  name: string;
+  parentId: string;
+}
+
+export interface IUsersDto {
+  id: string;
+  userName: string;
+}
+
+export interface IRoleTabltDto {
+  id: number;
+  name: string;
+  details: string;
+  role: number;
+}
+
+export interface IDepartmentDto {
+  allDepartment: IDepartmentListDto[];
+}
+
+export interface IDepartmentListDto {
+  higherDepartment: {
+    name: string;
+    id: string;
+    childrenDepartment?: IDepartmentDetailsListDto[];
+  };
+}
+
+export interface IDepartmentDetailsListDto {
+  name: string;
+  id: string;
+  childrenDepartment?: IDepartmentDetailsListDto[];
+}
+
 export interface IPermissionsDto {
   count: number;
   permissions: IPermissionItem[];
@@ -91,6 +170,13 @@ export interface DepartmentTreeDto {
   staffs: UsersDto[] | [];
   childrens: DepartmentTreeDto[];
 }
-export interface IFoundationTreeDto {
-  staffDepartmentHierarchy: DepartmentTreeDto[];
+
+export enum UserRoleEnum {
+  Administrator = "Administrator",
+  DefaultUser = "DefaultUser",
 }
+
+export const UserRoleType = {
+  [UserRoleEnum.Administrator]: "超級管理員",
+  [UserRoleEnum.DefaultUser]: "普通用戶",
+};
