@@ -54,7 +54,11 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setUsername("");
     localStorage.setItem("token", "");
     setAuthStatus(false);
-    setDisplayPage("/none");
+
+    setCurrentUserRolePermissions({
+      count: 0,
+      rolePermissionData: [],
+    });
     callback && callback();
   };
 

@@ -117,6 +117,8 @@ export const Router = () => {
   useEffect(() => {
     if (displayPage && displayPage !== "/none" && username) {
       navigate(displayPage, { replace: true });
+    } else if (!username) {
+      navigate("/login", { replace: true });
     }
   }, [displayPage]);
 
