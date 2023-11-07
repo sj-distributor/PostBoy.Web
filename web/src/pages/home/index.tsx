@@ -1,28 +1,29 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { ChildProps } from "../../dtos/route-type";
-import { routerArray } from "../../router/elementRoute";
-import useAction from "./hook";
+import { Link, Outlet, useLocation } from "react-router-dom"
+import { ChildProps } from "../../dtos/route-type"
+import { routerArray } from "../../router/elementRoute"
+import useAction from "./hook"
 
-import styles from "./index.module.scss";
-import useAuth from "../../auth";
+import styles from "./index.module.scss"
+import { useContext } from "react"
+import { AdministratorContext } from "../main"
 
 const Home = () => {
-  const { click, setClick } = useAction();
+  const { click, setClick } = useAction()
 
-  const { haveAdminPermission } = useAuth();
+  const { haveAdministrator } = useContext(AdministratorContext)
 
-  const location = useLocation();
+  const location = useLocation()
 
   const parentPath = location.pathname
     .split("/")
     .filter((item) => !!item)
-    .map((item) => `/${item}`)[0];
+    .map((item) => `/${item}`)[0]
 
   const routerTabBarContent = () => {
-    const homeRouter = routerArray.find((item) => item.path === parentPath);
+    const homeRouter = routerArray.find((item) => item.path === parentPath)
 
     const verifyPermissions = (item: ChildProps) =>
-      ["/home/request"].includes(item.path) ? !!haveAdminPermission : true;
+      ["/home/request"].includes(item.path) ? !!haveAdministrator : true
 
     return (
       <div className={styles.nav}>
@@ -33,7 +34,7 @@ const Home = () => {
                 key={childIndex}
                 to={childItem.path}
                 onClick={() => {
-                  setClick(childIndex);
+                  setClick(childIndex)
                 }}
                 className={
                   click === childIndex ? styles.navBarActive : styles.navBar
@@ -42,11 +43,11 @@ const Home = () => {
                 {childItem.title}
               </Link>
             )
-          );
+          )
         })}
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className={styles.home}>
@@ -55,7 +56,7 @@ const Home = () => {
         <Outlet />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

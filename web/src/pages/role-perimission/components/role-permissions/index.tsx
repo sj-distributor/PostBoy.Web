@@ -15,9 +15,9 @@ export const RolePermissions = () => {
     pageDto,
     loading,
     roleDto,
-    handleRoleAssignmentDebounce,
-    handleEditRoleDebounce,
-    handleRemoveRoleDebounce,
+    // handleRoleAssignmentDebounce,
+    // handleEditRoleDebounce,
+    // handleRemoveRoleDebounce,
     updatePageDto,
     navigate,
     deleteRole,
@@ -45,7 +45,7 @@ export const RolePermissions = () => {
             return (
               <Button
                 variant="text"
-                onClick={() => handleRoleAssignmentDebounce()}
+                // onClick={() => handleRoleAssignmentDebounce()}
               >
                 分配
               </Button>
@@ -53,7 +53,10 @@ export const RolePermissions = () => {
 
           case UserRoleEnum.DefaultUser:
             return (
-              <Button variant="text" onClick={() => handleEditRoleDebounce()}>
+              <Button
+                variant="text"
+                // onClick={() => handleEditRoleDebounce()}
+              >
                 編輯
               </Button>
             );
@@ -63,23 +66,24 @@ export const RolePermissions = () => {
               <>
                 <Button
                   variant="text"
-                  onClick={() => handleRoleAssignmentDebounce()}
+                  // onClick={() =>
+                  //   handleRoleAssignmentDebounce()}
                 >
                   分配
                 </Button>
                 <Button
                   variant="text"
-                  onClick={() =>
-                    handleRoleAssignmentDebounce(params.row.name, params.row.id)
-                  }
+                  // onClick={() =>
+                  //   handleRoleAssignmentDebounce(params.row.name, params.row.id)
+                  // }
                 >
                   編輯
                 </Button>
                 <Button
                   variant="text"
-                  onClick={() =>
-                    handleRemoveRoleDebounce(params.row.name, params.row.id)
-                  }
+                  // onClick={() =>
+                  //   handleRemoveRoleDebounce(params.row.name, params.row.id)
+                  // }
                 >
                   刪除
                 </Button>

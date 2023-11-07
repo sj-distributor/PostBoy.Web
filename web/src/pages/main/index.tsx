@@ -1,32 +1,46 @@
 import styles from "./index.module.scss";
 import { Link, Outlet } from "react-router-dom";
+import { routerArray } from "../../router/elementRoute";
 import useMainAction from "./hook";
 import UserInformation from "./components/user-information";
-import useAuth from "../../auth";
+import { RouteItem } from "../../dtos/route";
+import { createContext } from "react";
+
+interface AdministratorContextType {
+  haveAdministrator: boolean;
+}
+
+export const AdministratorContext = createContext<AdministratorContextType>(
+  null!
+);
 
 const Main = () => {
-  const { filterRouter } = useAuth();
+  const { clickMainIndex, setMainClickIndex, haveAdministrator } =
+    useMainAction();
 
-  const { clickMainIndex, setMainClickIndex } = useMainAction();
+  const verifyPermissions = (item: RouteItem) =>
+    !["/user", "/manager", "/roles"].includes(item.path) || !!haveAdministrator;
 
   const routerTabBar = () => {
-    return filterRouter?.map((item, index) => {
+    return routerArray.map((item, index) => {
       return (
         <div key={index} className={styles.item}>
-          <Link
-            to={item.path}
-            onClick={() => {
-              setMainClickIndex(index);
-            }}
-            className={
-              clickMainIndex === index ? styles.itemClick : styles.itemNone
-            }
-          >
-            <div className={styles.iconTitleContainer}>
-              {item.icons}
-              <span className={styles.title}>{item.head}</span>
-            </div>
-          </Link>
+          {verifyPermissions(item) && (
+            <Link
+              to={item.path}
+              onClick={() => {
+                setMainClickIndex(index);
+              }}
+              className={
+                clickMainIndex === index ? styles.itemClick : styles.itemNone
+              }
+            >
+              <div className={styles.iconTitleContainer}>
+                {item.icons}
+                <span className={styles.title}>{item.head}</span>
+              </div>
+            </Link>
+          )}
         </div>
       );
     });
@@ -42,7 +56,9 @@ const Main = () => {
           <UserInformation />
         </div>
         <div className={styles.contextLower}>
-          <Outlet />
+          <AdministratorContext.Provider value={{ haveAdministrator }}>
+            <Outlet />
+          </AdministratorContext.Provider>
         </div>
       </div>
     </div>

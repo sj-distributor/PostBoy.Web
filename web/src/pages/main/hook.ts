@@ -1,18 +1,23 @@
+import { useBoolean } from "ahooks";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import useAuth from "../../auth";
+import { GetAuthUser } from "../../api/user-management";
+import { IUserResponse } from "../../dtos/user-management";
+import { routerArray } from "../../router/elementRoute";
 
 const useMainAction = () => {
   const mainLocation = useLocation();
 
   const [clickMainIndex, setMainClickIndex] = useState<number>();
 
-  const { filterRouter } = useAuth();
+  const [haveAdministrator, haveAdministratorAction] = useBoolean(false);
+
+  const [userData, setUserData] = useState<IUserResponse>();
 
   useEffect(() => {
     const currentPath = mainLocation.pathname;
 
-    const indexInRouterArray = filterRouter.findIndex((routeItem) => {
+    const indexInRouterArray = routerArray.findIndex((routeItem) => {
       const currentPathSplit = currentPath.split("/");
 
       const currentPathFirstPart = currentPathSplit[1];
@@ -21,12 +26,24 @@ const useMainAction = () => {
     });
 
     setMainClickIndex(indexInRouterArray);
-  }, [mainLocation.pathname, filterRouter]);
+  }, [mainLocation.pathname]);
+
+  useEffect(() => {
+    GetAuthUser().then((res) => {
+      if (!!res) {
+        setUserData(res);
+      }
+      if (res?.roles?.find((x) => x.name === "Administrator")) {
+        haveAdministratorAction.setTrue();
+      }
+    });
+  }, []);
 
   return {
     mainLocation,
     clickMainIndex,
     setMainClickIndex,
+    haveAdministrator,
   };
 };
 
