@@ -70,20 +70,19 @@ export const useAction = (props: {
     setIsTreeLoading(true);
     GetTreeList()
       .then((res) => {
-        res &&
-          res.staffDepartmentHierarchy.length > 0 &&
-          setFoundationTreeData(res.staffDepartmentHierarchy);
+        setFoundationTreeData(res?.staffDepartmentHierarchy ?? []);
         setIsTreeLoading(false);
       })
       .catch((error) => {
         enqueueSnackbar((error as Error).message, { variant: "error" });
+        setIsTreeLoading(false);
       });
   };
 
   const handleTotalRoleUserList = () => {
     GetRoleUserList()
       .then((res) => {
-        res && res.roleUsers && setTotalRoleUserList(res.roleUsers);
+        setTotalRoleUserList(res?.roleUsers ?? []);
       })
       .catch((error) => {
         enqueueSnackbar((error as Error).message, { variant: "error" });

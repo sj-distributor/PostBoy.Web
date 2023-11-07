@@ -49,8 +49,10 @@ export const useAction = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    inputVal && updatePageDto("Keyword", inputVal);
-    initUserList();
+    if (inputVal) {
+      updatePageDto("Keyword", inputVal);
+      initUserList();
+    }
   };
 
   const handleDelete = useDebounceFn(
@@ -87,18 +89,14 @@ export const useAction = () => {
       Keyword: inputVal,
     })
       .then((res) => {
-        setUserData(res);
-
         setTimeout(() => {
-          updateUsersDto("count", res.count ?? 0);
-          updateUsersDto("roleUsers", res.roleUsers ?? []);
+          updateUsersDto("count", res?.count ?? 0);
+          updateUsersDto("roleUsers", res?.roleUsers ?? []);
 
           setLoading(false);
         }, 300);
       })
       .catch((error) => {
-        setUserData({ count: 0, roleUsers: [] });
-
         enqueueSnackbar((error as Error).message, { variant: "error" });
 
         updateUsersDto("count", 0);

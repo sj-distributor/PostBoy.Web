@@ -155,7 +155,7 @@ export const UserList = () => {
           </Button>
         </div>
       </div>
-      <div className={styles.content} id="123">
+      <div className={styles.content}>
         <DataGrid
           columns={columns}
           rows={userData.roleUsers}
