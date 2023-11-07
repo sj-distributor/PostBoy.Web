@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useBoolean } from "ahooks";
+import { useBoolean, useDebounceFn } from "ahooks";
 import { useSnackbar } from "notistack";
 
 import {
@@ -53,26 +53,29 @@ export const useAction = () => {
     initUserList();
   };
 
-  const handleDelete = () => {
-    openConfirmAction.setTrue();
+  const handleDelete = useDebounceFn(
+    () => {
+      openConfirmAction.setTrue();
 
-    const data = {
-      roleUserIds: selectId,
-    };
+      const data = {
+        roleUserIds: selectId,
+      };
 
-    DeleteRoleUser(data)
-      .then(() => {
-        enqueueSnackbar("移除成功!", { variant: "success" });
-        initUserList();
-      })
-      .catch((error) => {
-        enqueueSnackbar((error as Error).message, { variant: "error" });
-      })
-      .finally(() => {
-        setSelectId([]);
-        openConfirmAction.setFalse();
-      });
-  };
+      DeleteRoleUser(data)
+        .then(() => {
+          enqueueSnackbar("移除成功!", { variant: "success" });
+          initUserList();
+        })
+        .catch((error) => {
+          enqueueSnackbar((error as Error).message, { variant: "error" });
+        })
+        .finally(() => {
+          setSelectId([]);
+          openConfirmAction.setFalse();
+        });
+    },
+    { wait: 500 }
+  ).run;
 
   const initUserList = () => {
     setLoading(true);

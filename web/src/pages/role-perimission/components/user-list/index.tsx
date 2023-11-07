@@ -40,14 +40,14 @@ export const UserList = () => {
     {
       field: "userName",
       headerName: "用戶名",
-      width: 300,
       sortable: false,
+      flex: 1,
     },
     {
       field: "modifiedDate",
       headerName: "更新時間",
-      width: 600,
       sortable: false,
+      flex: 2,
       renderCell: (params) =>
         moment(params.row.modifiedDate).format("YYYY-MM-DD HH:mm:ss") ??
         moment(params.row.createdDate).format("YYYY-MM-DD HH:mm:ss"),
@@ -55,8 +55,8 @@ export const UserList = () => {
     {
       field: "actions",
       headerName: "操作",
-      width: 150,
       sortable: false,
+      flex: 1,
       renderCell: (params) => (
         <Button
           variant="text"
@@ -155,7 +155,7 @@ export const UserList = () => {
           </Button>
         </div>
       </div>
-      <div className={styles.content}>
+      <div className={styles.content} id="123">
         <DataGrid
           columns={columns}
           rows={userData.roleUsers}

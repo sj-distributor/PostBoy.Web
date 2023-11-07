@@ -268,6 +268,7 @@ export const useAction = (
   }, [searchValue, selectedNodes]);
 
   useEffect(() => {
+    disableListData();
     if (
       flatTreeTotalListData.length > 0 &&
       displayFlatUpdateTreeData.length === 0
@@ -277,10 +278,6 @@ export const useAction = (
       );
     }
   }, [flatTreeTotalListData, displayFlatUpdateTreeData]);
-
-  useEffect(() => {
-    disableListData();
-  }, [displayFlatUpdateTreeData]);
 
   return {
     isSearch,

@@ -13,6 +13,7 @@ import {
   DepartmentTreeDto,
   RoleUserItemDto,
 } from "../../../../dtos/role-user-permissions";
+import { useDebounceFn } from "ahooks";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -24,6 +25,8 @@ export const useAction = (props: {
   const { addUsersRef, initUserList, roleId } = props;
 
   const [searchValue, setSearchValue] = useState<string>("");
+
+  const [isTreeLoading, setIsTreeLoading] = useState<boolean>(false);
 
   const treeSelectRef = useRef<TreeSelectRef>(null);
 
@@ -43,29 +46,34 @@ export const useAction = (props: {
     setSearchValue(event.target.value);
   };
 
-  const handleAddRoleUsers = () => {
-    const roleUsers = alreadySelectData.map((item) => ({
-      userId: item.id,
-      roleId: roleId,
-    }));
+  const handleAddRoleUsers = useDebounceFn(
+    () => {
+      const roleUsers = alreadySelectData.map((item) => ({
+        userId: item.id,
+        roleId: roleId,
+      }));
 
-    AddRoleUser({ roleUsers })
-      .then(() => {
-        enqueueSnackbar("添加用户成功!", { variant: "success" });
-        addUsersRef.current?.close();
-        initUserList();
-      })
-      .catch((error) => {
-        enqueueSnackbar((error as Error).message, { variant: "error" });
-      });
-  };
+      AddRoleUser({ roleUsers })
+        .then(() => {
+          enqueueSnackbar("添加用户成功!", { variant: "success" });
+          addUsersRef.current?.close();
+          initUserList();
+        })
+        .catch((error) => {
+          enqueueSnackbar((error as Error).message, { variant: "error" });
+        });
+    },
+    { wait: 500 }
+  ).run;
 
   const handleFoundationTree = () => {
+    setIsTreeLoading(true);
     GetTreeList()
       .then((res) => {
         res &&
           res.staffDepartmentHierarchy.length > 0 &&
           setFoundationTreeData(res.staffDepartmentHierarchy);
+        setIsTreeLoading(false);
       })
       .catch((error) => {
         enqueueSnackbar((error as Error).message, { variant: "error" });
@@ -149,5 +157,6 @@ export const useAction = (props: {
     setAlreadySelectData,
     handleAddRoleUsers,
     totalRoleUserList,
+    isTreeLoading,
   };
 };

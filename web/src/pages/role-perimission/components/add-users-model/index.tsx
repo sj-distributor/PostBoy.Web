@@ -1,4 +1,4 @@
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import styles from "./index.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAction } from "./hook";
@@ -24,6 +24,7 @@ export const AddUsersModel = (props: {
     setAlreadySelectData,
     handleAddRoleUsers,
     totalRoleUserList,
+    isTreeLoading,
   } = useAction({ addUsersRef, roleId, initUserList });
 
   return (
@@ -49,6 +50,15 @@ export const AddUsersModel = (props: {
         />
         <div>
           <div className={styles.listTitle}>OPERATION INC.</div>
+          {isTreeLoading && (
+            <CircularProgress
+              style={{
+                width: "4rem",
+                height: "4rem",
+                margin: "13rem 0 0 11rem",
+              }}
+            />
+          )}
           <TreeSelectList
             ref={treeSelectRef}
             setSelectedData={(selectItems) => setAlreadySelectData(selectItems)}
