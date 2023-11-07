@@ -9,25 +9,33 @@ const useAction = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
-  const { authStatus, signIn } = useAuth();
+  const { authStatus, signIn, displayPage } = useAuth();
 
   const handleLoginButton = async () => {
     const data = await AuthAccont({ userName: username, password });
-    !!data ? signIn(data, navigateTo) : setOpenSnackBar(true);
+    !!data ? signIn(data, () => navigateTo("current")) : setOpenSnackBar(true);
   };
 
-  const navigateTo = () => {
+  const navigateTo = (scenes: string) => {
     if (authStatus || localStorage.getItem("token")) {
-      location.state?.from?.pathname
-        ? location.state?.from?.pathname === "/user"
-          ? navigate("/")
-          : navigate(location.state.from.pathname, { replace: true })
-        : navigate("/");
+      switch (scenes) {
+        case "current":
+          navigate(displayPage, { replace: true });
+          break;
+        case "history":
+          navigate(
+            location.state.from.pathname
+              ? location.state?.from?.pathname
+              : displayPage,
+            { replace: true }
+          );
+          break;
+      }
     }
   };
 
   useEffect(() => {
-    navigateTo();
+    navigateTo("history");
   }, []);
 
   return {
