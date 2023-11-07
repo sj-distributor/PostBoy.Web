@@ -49,10 +49,8 @@ export const useAction = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (inputVal) {
-      updatePageDto("Keyword", inputVal);
-      initUserList();
-    }
+    inputVal && updatePageDto("Keyword", inputVal);
+    initUserList();
   };
 
   const handleDelete = useDebounceFn(
@@ -117,7 +115,7 @@ export const useAction = () => {
 
   useEffect(() => {
     initUserList();
-  }, [pageDto.PageIndex]);
+  }, [pageDto.PageIndex, inputVal]);
 
   useEffect(() => {
     selectId.length === 0
