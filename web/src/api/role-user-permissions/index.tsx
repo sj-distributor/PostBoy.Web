@@ -4,6 +4,7 @@ import {
   RoleUserResponse,
   AddRoleUsersDto,
   DeleteRoleUserRequest,
+  IFoundationTreeDto,
 } from "../../dtos/role-user-permissions";
 import { Get, Post } from "../http-client";
 
@@ -24,4 +25,10 @@ export const DeleteRoleUser = async (data: DeleteRoleUserRequest) => {
 // 添加用户
 export const AddRoleUser = async (data: AddRoleUsersDto) => {
   return await Post<RoleUserItemDto>("/api/Security/role/users/create", data);
+};
+
+export const GetTreeList = async () => {
+  return await Get<IFoundationTreeDto>(
+    "/api/Foundation/department/staff/hierarchy/tree"
+  );
 };

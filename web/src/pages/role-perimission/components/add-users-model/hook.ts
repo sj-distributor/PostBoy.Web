@@ -4,10 +4,17 @@ import { TreeSelectRef } from "../tree-select/props";
 
 import { useSnackbar } from "notistack";
 import { ModalBoxRef } from "../../../../dtos/modal";
-import { AddRoleUser } from "../../../../api/role-user-permissions";
-import { StaffDepartmentHierarchyListProps } from "../../../../dtos/role-user-permissions";
+import {
+  AddRoleUser,
+  GetTreeList,
+} from "../../../../api/role-user-permissions";
+import {
+  DepartmentTreeDto,
+  StaffDepartmentHierarchyListProps,
+} from "../../../../dtos/role-user-permissions";
 import jsonData from "./latest tree.json";
-import { clone } from "ramda";
+import { clone, set } from "ramda";
+import { Message } from "@mui/icons-material";
 
 export const useAction = (props: {
   addUsersRef: RefObject<ModalBoxRef>;
@@ -25,6 +32,10 @@ export const useAction = (props: {
   const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
 
   const [isConfirmDisbale, setIsConfirmDisbale] = useState<boolean>(true);
+
+  const [foundationTreeData, setFoundationTreeData] = useState<
+    DepartmentTreeDto[]
+  >([]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -47,20 +58,27 @@ export const useAction = (props: {
       });
   };
 
-  const staffDepartmentHierarchyTestData =
-    jsonData.data.staffDepartmentHierarchy;
-  const staffDepartmentHierarchyTreeData = clone(
-    staffDepartmentHierarchyTestData
-  );
+  const handleFoundationTree = () => {
+    GetTreeList()
+      .then((res) => {
+        console.log(res.staffDepartmentHierarchy);
 
-  const treeData: TreeNode[] = [];
+        res &&
+          res.staffDepartmentHierarchy &&
+          setFoundationTreeData(res.staffDepartmentHierarchy);
+      })
+      .catch((error) => {
+        enqueueSnackbar((error as Error).message, { variant: "error" });
+      });
+  };
+  const foundationFlatTreeData: TreeNode[] = [];
 
   const flattenTreeDepartmentList = (
-    source: StaffDepartmentHierarchyListProps[],
+    source: DepartmentTreeDto[],
     idRoute: string[]
   ) => {
     for (const sourceItem of source) {
-      treeData.push({
+      foundationFlatTreeData.push({
         id: sourceItem.department.id,
         title: sourceItem.department.name,
         idRoute: [
@@ -72,7 +90,7 @@ export const useAction = (props: {
         isDepartment: true,
       });
 
-      treeData.push(
+      foundationFlatTreeData.push(
         ...sourceItem.staffs.map((staff) => ({
           id: staff.id,
           title: staff.userName,
@@ -94,15 +112,20 @@ export const useAction = (props: {
         ]);
       }
     }
+    return foundationFlatTreeData;
   };
 
-  flattenTreeDepartmentList(staffDepartmentHierarchyTreeData, []);
+  const treeData = flattenTreeDepartmentList(foundationTreeData, []);
 
   useEffect(() => {
     alreadySelectData.length === 0
       ? setIsConfirmDisbale(true)
       : setIsConfirmDisbale(false);
   }, [alreadySelectData]);
+
+  useEffect(() => {
+    handleFoundationTree();
+  }, []);
 
   return {
     treeData,
