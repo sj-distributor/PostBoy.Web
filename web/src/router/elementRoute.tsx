@@ -76,7 +76,7 @@ export const routerArray: RouteItem[] = [
         elementChild: <Navigate to={"/roles/roleList"} />,
       },
       {
-        path: "/roles/userList/:id",
+        path: "/roles/userList/:roleId",
         title: "",
         elementChild: <UserList />,
       },
@@ -91,7 +91,7 @@ export const routerArray: RouteItem[] = [
         elementChild: <RolePermissions />,
       },
       {
-        path: "/roles/edit/:id",
+        path: "/roles/edit/:roleId",
         title: "",
         elementChild: <RoleFrom />,
       },

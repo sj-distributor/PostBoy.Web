@@ -15,7 +15,7 @@ import auth from "../../../../auth";
 import { useDebounceFn } from "ahooks";
 
 export const useAction = () => {
-  // const { currentUserRolePermissions } = auth();
+  const { currentUserRolePermissions } = auth();
 
   const [rowId, setRowId] = useState<string>();
 
@@ -38,69 +38,73 @@ export const useAction = () => {
     rolePermissionData: [],
   });
 
-  // const handleRoleAssignment = (name: string) => {
-  //   if (
-  //     currentUserRolePermissions.rolePermissionData
-  //       .map((item) => item.role)
-  //       .some((item) => item.name === name)
-  //   ) {
-  //     navigate("/roles/userList");
-  //   } else {
-  //     enqueueSnackbar("没有权限分配", {
-  //       variant: "info",
-  //     });
-  //   }
-  // };
+  const handleRoleAssignment = (name: string, id: string) => {
+    // if (
+    //   currentUserRolePermissions.rolePermissionData
+    //     .map((item) => item.role)
+    //     .some((item) => item.name === name)
+    // ) {
+    //   navigate(`/roles/userList/${id}`);
+    // } else {
+    //   enqueueSnackbar("没有权限分配", {
+    //     variant: "info",
+    //   });
+    // }
+    navigate(`/roles/userList/${id}`);
+  };
 
-  // const { run: handleRoleAssignmentDebounce } = useDebounceFn(
-  //   handleRoleAssignment,
-  //   {
-  //     wait: 800,
-  //   }
-  // );
+  const { run: handleRoleAssignmentDebounce } = useDebounceFn(
+    (name: string, id: string) => handleRoleAssignment(name, id),
+    {
+      wait: 800,
+    }
+  );
 
-  // const handleEditRole = (name: string, id: string) => {
-  //   if (
-  //     currentUserRolePermissions.rolePermissionData
-  //       .map((item) => item.role)
-  //       .some((item) => item.name === name)
-  //   ) {
-  //     navigate(`/roles/edit/${id}`);
-  //   } else {
-  //     enqueueSnackbar("没有编辑角色权限", {
-  //       variant: "info",
-  //     });
-  //   }
-  // };
+  const handleEditRole = (name: string, id: string) => {
+    // if (
+    //   currentUserRolePermissions.rolePermissionData
+    //     .map((item) => item.role)
+    //     .some((item) => item.name === name)
+    // ) {
+    //   navigate(`/roles/edit/${id}`);
+    // } else {
+    //   enqueueSnackbar("没有编辑角色权限", {
+    //     variant: "info",
+    //   });
+    // }
+    navigate(`/roles/edit/${id}`);
+  };
 
-  // const { run: handleEditRoleDebounce } = useDebounceFn(
-  //   (name: string, id: string) => handleEditRole(name, id),
-  //   {
-  //     wait: 800,
-  //   }
-  // );
+  const { run: handleEditRoleDebounce } = useDebounceFn(
+    (name: string, id: string) => handleEditRole(name, id),
+    {
+      wait: 800,
+    }
+  );
 
-  // const handleRemoveRole = (name: string, id: string) => {
-  //   if (
-  //     currentUserRolePermissions.rolePermissionData
-  //       .map((item) => item.role)
-  //       .some((item) => item.name === name)
-  //   ) {
-  //     confirmTipsRef.current?.open();
-  //     setRowId(id);
-  //   } else {
-  //     enqueueSnackbar("没有删除角色权限", {
-  //       variant: "info",
-  //     });
-  //   }
-  // };
+  const handleRemoveRole = (name: string, id: string) => {
+    // if (
+    //   currentUserRolePermissions.rolePermissionData
+    //     .map((item) => item.role)
+    //     .some((item) => item.name === name)
+    // ) {
+    //   confirmTipsRef.current?.open();
+    //   setRowId(id);
+    // } else {
+    //   enqueueSnackbar("没有删除角色权限", {
+    //     variant: "info",
+    //   });
+    // }
+    confirmTipsRef.current?.open();
+    setRowId(id);
+  };
 
-  // const { run: handleRemoveRoleDebounce } = useDebounceFn(
-  //   (name: string, id: string) => handleRemoveRole(name, id),
-  //   {
-  //     wait: 800,
-  //   }
-  // );
+  const { run: handleRemoveRoleDebounce } = useDebounceFn(
+    (name: string, id: string) => handleRemoveRole(name, id),
+    {
+      wait: 800,
+    }
+  );
 
   const loadRoles = () => {
     setLoading(true);
@@ -108,8 +112,8 @@ export const useAction = () => {
     GetRolesByPermissions(pageDto)
       .then((res) => {
         setTimeout(() => {
-          updateRoleDto("count", res.count ?? 0);
-          updateRoleDto("rolePermissionData", res.rolePermissionData ?? []);
+          updateRoleDto("count", res?.count ?? 0);
+          updateRoleDto("rolePermissionData", res?.rolePermissionData ?? []);
           setLoading(false);
         }, 500);
       })
@@ -156,9 +160,9 @@ export const useAction = () => {
     pageDto,
     loading,
     roleDto,
-    // handleRoleAssignmentDebounce,
-    // handleEditRoleDebounce,
-    // handleRemoveRoleDebounce,
+    handleRoleAssignmentDebounce,
+    handleEditRoleDebounce,
+    handleRemoveRoleDebounce,
     deleteRole,
     updatePageDto,
     navigate,

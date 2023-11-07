@@ -308,7 +308,7 @@ export const useAction = () => {
 
   // new
 
-  const { id } = useParams();
+  const { roleId } = useParams();
 
   const defaultRole: IRole = {
     name: "",
@@ -335,7 +335,7 @@ export const useAction = () => {
   };
 
   const addOrModifyRolePermission = () => {
-    id ? updateRolePermissionDebounce() : addRolePermissionDebounce();
+    roleId ? updateRolePermissionDebounce() : addRolePermissionDebounce();
   };
 
   const addRolePermission = () => {
@@ -441,14 +441,14 @@ export const useAction = () => {
         )
       );
 
-      if (id) {
+      if (roleId) {
         // 获取角色信息
         const {
           role,
           rolePermissions,
           rolePermissionUnits,
           permissions: currentPermissions,
-        } = await GetRolePermission(id);
+        } = await GetRolePermission(roleId);
         setRole(role ?? defaultRole);
         const selectedPermissions = currentPermissions?.map((item) => item.id);
         setRolePermission(rolePermissions ?? []);

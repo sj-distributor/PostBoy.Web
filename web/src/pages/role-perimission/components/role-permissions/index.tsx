@@ -6,7 +6,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
-import { useSnackbar } from "notistack";
 import { UserRoleEnum } from "../../../../dtos/role-user-permissions";
 
 export const RolePermissions = () => {
@@ -16,9 +15,9 @@ export const RolePermissions = () => {
     pageDto,
     loading,
     roleDto,
-    // handleRoleAssignmentDebounce,
-    // handleEditRoleDebounce,
-    // handleRemoveRoleDebounce,
+    handleRoleAssignmentDebounce,
+    handleEditRoleDebounce,
+    handleRemoveRoleDebounce,
     updatePageDto,
     navigate,
     deleteRole,
@@ -29,24 +28,24 @@ export const RolePermissions = () => {
     {
       field: "name",
       headerName: "角色名稱",
-      width: 300,
+      flex: 1,
     },
     {
       field: "description",
       headerName: "角色描述",
-      width: 600,
+      flex: 2,
     },
     {
       field: "actions",
       headerName: "操作",
-      width: 300,
+      flex: 1,
       renderCell: (params) => {
         switch (params.row.displayName) {
           case UserRoleEnum.Administrator:
             return (
               <Button
                 variant="text"
-                // onClick={() => handleRoleAssignmentDebounce()}
+                onClick={() => handleRoleAssignmentDebounce()}
               >
                 分配
               </Button>
@@ -54,10 +53,7 @@ export const RolePermissions = () => {
 
           case UserRoleEnum.DefaultUser:
             return (
-              <Button
-                variant="text"
-                // onClick={() => handleEditRoleDebounce()}
-              >
+              <Button variant="text" onClick={() => handleEditRoleDebounce()}>
                 編輯
               </Button>
             );
@@ -67,24 +63,25 @@ export const RolePermissions = () => {
               <>
                 <Button
                   variant="text"
-                  // onClick={() =>
-                  //   handleRoleAssignmentDebounce()}
+                  onClick={() =>
+                    handleRoleAssignmentDebounce(params.row.name, params.row.id)
+                  }
                 >
                   分配
                 </Button>
                 <Button
                   variant="text"
-                  // onClick={() =>
-                  //   handleRoleAssignmentDebounce(params.row.name, params.row.id)
-                  // }
+                  onClick={() =>
+                    handleEditRoleDebounce(params.row.name, params.row.id)
+                  }
                 >
                   編輯
                 </Button>
                 <Button
                   variant="text"
-                  // onClick={() =>
-                  //   handleRemoveRoleDebounce(params.row.name, params.row.id)
-                  // }
+                  onClick={() =>
+                    handleRemoveRoleDebounce(params.row.name, params.row.id)
+                  }
                 >
                   刪除
                 </Button>
