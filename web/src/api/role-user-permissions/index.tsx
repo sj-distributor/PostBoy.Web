@@ -27,12 +27,14 @@ export const AddRoleUser = async (data: AddRoleUsersDto) => {
   return await Post<RoleUserItemDto>("/api/Security/role/users/create", data);
 };
 
+//人员层级tree
 export const GetTreeList = async () => {
   return await Get<IFoundationTreeDto>(
     "/api/Foundation/department/staff/hierarchy/tree"
   );
 };
 
+//获取全部角色用户列表
 export const GetRoleUserList = async () => {
   return await Get<RoleUserResponse>(`/api/Security/role/users`);
 };
