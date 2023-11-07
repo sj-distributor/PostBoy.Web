@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { clone } from "ramda";
-import { useUpdateEffect } from "ahooks";
+import { useUpdateEffect, useDebounceFn } from "ahooks";
 import {
   AddRolePermission,
   GetPermissions,
@@ -335,7 +335,7 @@ export const useAction = () => {
   };
 
   const addOrModifyRolePermission = () => {
-    id ? updateRolePermission() : addRolePermission();
+    id ? updateRolePermissionDebounce() : addRolePermissionDebounce();
   };
 
   const addRolePermission = () => {
@@ -364,6 +364,10 @@ export const useAction = () => {
     }
   };
 
+  const { run: addRolePermissionDebounce } = useDebounceFn(addRolePermission, {
+    wait: 800,
+  });
+
   const updateRolePermission = () => {
     const data: IRolePermission = {
       role: role,
@@ -389,6 +393,13 @@ export const useAction = () => {
       });
     }
   };
+
+  const { run: updateRolePermissionDebounce } = useDebounceFn(
+    updateRolePermission,
+    {
+      wait: 800,
+    }
+  );
 
   const handleUpdateRolePermissionsChecked = (id: string, v: boolean) => {
     const cloneData = clone(rolePermissionsCheckedList);
