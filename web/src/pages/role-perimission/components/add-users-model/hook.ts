@@ -61,16 +61,15 @@ export const useAction = (props: {
   const handleFoundationTree = () => {
     GetTreeList()
       .then((res) => {
-        console.log(res.staffDepartmentHierarchy);
-
         res &&
-          res.staffDepartmentHierarchy &&
+          res.staffDepartmentHierarchy.length > 0 &&
           setFoundationTreeData(res.staffDepartmentHierarchy);
       })
       .catch((error) => {
         enqueueSnackbar((error as Error).message, { variant: "error" });
       });
   };
+
   const foundationFlatTreeData: TreeNode[] = [];
 
   const flattenTreeDepartmentList = (

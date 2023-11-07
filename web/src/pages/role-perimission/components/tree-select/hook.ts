@@ -1,4 +1,4 @@
-import { clone } from "ramda";
+import { clone, set } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
 
@@ -22,7 +22,7 @@ export const useAction = (
 
   const [displayFlatUpdateTreeData, setDisplayFlatUpdateTreeData] = useState<
     TreeNode[]
-  >(flatTreeTotalListData.filter((node) => node.idRoute.length === 2));
+  >([]);
 
   const [searchDisplayTreeData, setSearchDisplayTreeData] = useState<
     TreeNode[]
@@ -248,6 +248,17 @@ export const useAction = (
       )
     );
   }, [searchValue, selectedNodes]);
+
+  useEffect(() => {
+    if (
+      flatTreeTotalListData.length > 0 &&
+      displayFlatUpdateTreeData.length === 0
+    ) {
+      setDisplayFlatUpdateTreeData(
+        flatTreeTotalListData.filter((node) => node.idRoute.length === 2)
+      );
+    }
+  }, [flatTreeTotalListData, displayFlatUpdateTreeData]);
 
   return {
     isSearch,
