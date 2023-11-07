@@ -11,11 +11,17 @@ import EmailIcon from "@mui/icons-material/Email";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { Navigate } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { RolePermission } from "../pages/role-perimission";
 import { UserList } from "../pages/role-perimission/components/user-list";
 import { RoleFrom } from "../pages/role-perimission/components/role-from";
 import { RolePermissions } from "../pages/role-perimission/components/role-permissions";
+import { None } from "../pages/none";
+import Login from "../pages/login";
+import Main from "../pages/main";
+import IsAuthUser from "../pages/auth";
+import useAuth from "../auth";
+import { useEffect } from "react";
 
 export const routerArray: RouteItem[] = [
   {
@@ -92,8 +98,61 @@ export const routerArray: RouteItem[] = [
     ],
   },
   {
+    path: "/none",
+    head: "",
+    element: <None />,
+  },
+  {
     path: "/meeting",
     head: "",
     element: <MeetingList />,
   },
 ];
+
+export const Router = () => {
+  const { filterRouter, displayPage, username } = useAuth();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (displayPage && displayPage !== "/none" && username) {
+      navigate(displayPage, { replace: true });
+    } else if (!username) {
+      navigate("/login", { replace: true });
+    }
+  }, [displayPage]);
+
+  const getSubRoute = (list: RouteItem[]) => {
+    return (
+      <>
+        <Route path="" element={<Navigate to={list[0].path} />} />
+        {list.map((item, index) => {
+          return (
+            <Route
+              key={index}
+              path={item.path}
+              element={<IsAuthUser>{item.element}</IsAuthUser>}
+            >
+              {item.children?.map((childrenItem, childrenIndex) => {
+                return (
+                  <Route
+                    key={childrenIndex}
+                    path={childrenItem.path}
+                    element={childrenItem.elementChild}
+                  />
+                );
+              })}
+            </Route>
+          );
+        })}
+      </>
+    );
+  };
+
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route element={<Main />}>{getSubRoute(filterRouter)}</Route>
+    </Routes>
+  );
+};
