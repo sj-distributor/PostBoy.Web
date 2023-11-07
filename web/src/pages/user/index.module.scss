@@ -50,4 +50,13 @@
     align-items: end;
     justify-content: space-between;
   }
+
+  .userListBox {
+    max-height: 39rem;
+    overflow-y: auto;
+  }
+
+  .userListBox::-webkit-scrollbar {
+    width: 0;
+  }
 }

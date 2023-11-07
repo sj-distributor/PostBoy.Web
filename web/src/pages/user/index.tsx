@@ -100,43 +100,45 @@ const User = () => {
         </div>
       </div>
       <div>
-        {usersList?.map((item, key) => (
-          <Accordion className={styles.accordion} key={key}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              className={styles.accordionSummary}
-              onClick={() => onListClick(item.id)}
-              id="AccordionSummary"
-            >
-              <Typography>{item.userName}</Typography>
-              <Button
-                variant="contained"
-                className={styles.addButton}
-                onClick={(event) => {
-                  setUserAccountId(item.id);
-                  event.stopPropagation();
-                  addApikeyRef.current?.open();
-                }}
+        <div className={styles.userListBox}>
+          {usersList?.map((item, key) => (
+            <Accordion className={styles.accordion} key={key}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                className={styles.accordionSummary}
+                onClick={() => onListClick(item.id)}
+                id="AccordionSummary"
               >
-                添加apikey
-              </Button>
-            </AccordionSummary>
-            {userApikeyList.map((items) => {
-              return items.map((apikeyItem, apikeyIndex) => {
-                if (apikeyItem.userAccountId === item.id) {
-                  return (
-                    <AccordionDetails
-                      key={apikeyIndex}
-                      className={styles.accordionDetails}
-                    >
-                      <Typography>{apikeyItem.apiKey}</Typography>
-                    </AccordionDetails>
-                  );
-                }
-              });
-            })}
-          </Accordion>
-        ))}
+                <Typography>{item.userName}</Typography>
+                <Button
+                  variant="contained"
+                  className={styles.addButton}
+                  onClick={(event) => {
+                    setUserAccountId(item.id);
+                    event.stopPropagation();
+                    addApikeyRef.current?.open();
+                  }}
+                >
+                  添加apikey
+                </Button>
+              </AccordionSummary>
+              {userApikeyList.map((items) => {
+                return items.map((apikeyItem, apikeyIndex) => {
+                  if (apikeyItem.userAccountId === item.id) {
+                    return (
+                      <AccordionDetails
+                        key={apikeyIndex}
+                        className={styles.accordionDetails}
+                      >
+                        <Typography>{apikeyItem.apiKey}</Typography>
+                      </AccordionDetails>
+                    );
+                  }
+                });
+              })}
+            </Accordion>
+          ))}
+        </div>
         {usersList.length > 0 && (
           <div
             style={{
