@@ -44,7 +44,6 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setToken(token);
     localStorage.setItem("token", token);
     const tokenObj = jwt_decode<{ unique_name: string }>(token);
-    setDisplayPage("/none");
     setUsername(tokenObj.unique_name);
     setAuthStatus(true);
     callback && callback();
@@ -55,6 +54,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setUsername("");
     localStorage.setItem("token", "");
     setAuthStatus(false);
+    setDisplayPage("/none");
     callback && callback();
   };
 
