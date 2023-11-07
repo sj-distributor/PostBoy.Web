@@ -61,7 +61,7 @@ export interface IRolePermissionsItem {
   description: string | null;
 }
 
-export interface IRoleDto {
+export interface IRolePermissionDto {
   count: number;
   rolePermissionData: IRolePermissionDataItem[];
 }

@@ -4,49 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import {
   IPageDto,
-  IRoleDto,
+  IRolePermissionDto,
   IRolePermissionDataItem,
 } from "../../../../dtos/role-user-permissions";
 import {
   DeleteRoles,
   GetRolesList,
 } from "../../../../api/role-user-permissions";
+import auth from "../../../../auth";
+import { useDebounceFn } from "ahooks";
 
 export const useAction = () => {
-  const userRoleData = [
-    {
-      role: {
-        id: "3455efc5-6481-4d48-b9d2-9f15b6d5f899",
-        createdDate: "2023-11-05T10:01:14.722+00:00",
-        modifiedDate: "2023-11-05T10:01:14.722+00:00",
-        name: "Administrator",
-        displayName: "Administrator",
-        description: "超級管理員",
-      },
-      permissions: [
-        {
-          id: "08dbddd2-ac9d-4ce7-815f-c7ca37f2224d",
-          createdDate: "0001-01-01T00:00:00+00:00",
-          lastModifiedDate: "0001-01-01T00:00:00+00:00",
-          name: "信息发送",
-          displayName: null,
-          description: "sry",
-          isSystem: true,
-        },
-        {
-          id: "08dbdddd-7166-41bb-831e-d6e09ac88254",
-          createdDate: "0001-01-01T00:00:00+00:00",
-          lastModifiedDate: "0001-01-01T00:00:00+00:00",
-          name: "创建群组",
-          displayName: null,
-          description: "awsl",
-          isSystem: true,
-        },
-      ],
-    },
-  ];
+  const { currentUserRolePermissions } = auth();
 
-  const [rowId, setRowId] = useState<number>();
+  const [rowId, setRowId] = useState<string>();
 
   const confirmTipsRef = useRef<ModalBoxRef>(null);
 
@@ -62,12 +33,75 @@ export const useAction = () => {
     keyword: "",
   });
 
-  const [roleDto, setRoleDto] = useState<IRoleDto>({
+  const [roleDto, setRoleDto] = useState<IRolePermissionDto>({
     count: 0,
     rolePermissionData: [],
   });
 
-  const handleRoleAssignment = (name: string) => {};
+  const handleRoleAssignment = (name: string) => {
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === name)
+    ) {
+      navigate("/roles/userList");
+    } else {
+      enqueueSnackbar("没有权限分配", {
+        variant: "info",
+      });
+    }
+  };
+
+  const { run: handleRoleAssignmentDebounce } = useDebounceFn(
+    handleRoleAssignment,
+    {
+      wait: 800,
+    }
+  );
+
+  const handleEditRole = (name: string, id: string) => {
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === name)
+    ) {
+      navigate(`/roles/edit/${id}`);
+    } else {
+      enqueueSnackbar("没有编辑角色权限", {
+        variant: "info",
+      });
+    }
+  };
+
+  const { run: handleEditRoleDebounce } = useDebounceFn(
+    (name: string, id: string) => handleEditRole(name, id),
+    {
+      wait: 800,
+    }
+  );
+
+  const handleRemoveRole = (name: string, id: string) => {
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === name)
+    ) {
+      confirmTipsRef.current?.open();
+      setRowId(id);
+    } else {
+      enqueueSnackbar("没有删除角色权限", {
+        variant: "info",
+      });
+    }
+  };
+
+  const { run: handleRemoveRoleDebounce } = useDebounceFn(
+    (name: string, id: string) => handleRemoveRole(name, id),
+    {
+      wait: 800,
+    }
+  );
+
   const loadRoles = () => {
     setLoading(true);
 
@@ -106,7 +140,7 @@ export const useAction = () => {
   };
 
   const updateRoleDto = (
-    k: keyof IRoleDto,
+    k: keyof IRolePermissionDto,
     v: IRolePermissionDataItem[] | number
   ) => {
     setRoleDto((prev) => ({ ...prev, [k]: v }));
@@ -122,7 +156,9 @@ export const useAction = () => {
     pageDto,
     loading,
     roleDto,
-    userRoleData,
+    handleRoleAssignmentDebounce,
+    handleEditRoleDebounce,
+    handleRemoveRoleDebounce,
     deleteRole,
     updatePageDto,
     navigate,

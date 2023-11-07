@@ -8,7 +8,6 @@ import { UserRoleEnum } from "../../../../dtos/role";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useSnackbar } from "notistack";
-import { useDebounceFn } from "ahooks";
 export const RolePermissions = () => {
   const {
     rowId,
@@ -16,14 +15,14 @@ export const RolePermissions = () => {
     pageDto,
     loading,
     roleDto,
-    userRoleData,
+    handleRoleAssignmentDebounce,
+    handleEditRoleDebounce,
+    handleRemoveRoleDebounce,
     updatePageDto,
     navigate,
-    setRowId,
     deleteRole,
     loadRoles,
   } = useAction();
-  const { enqueueSnackbar } = useSnackbar();
 
   const columns: GridColDef[] = [
     {
@@ -46,17 +45,7 @@ export const RolePermissions = () => {
             return (
               <Button
                 variant="text"
-                onClick={() => {
-                  if (
-                    userRoleData.some((item) => item.role === params.row.name)
-                  ) {
-                    navigate("/roles/userList");
-                  } else {
-                    enqueueSnackbar("没有权限分配", {
-                      variant: "info",
-                    });
-                  }
-                }}
+                onClick={() => handleRoleAssignmentDebounce()}
               >
                 分配
               </Button>
@@ -64,20 +53,7 @@ export const RolePermissions = () => {
 
           case UserRoleEnum.DefaultUser:
             return (
-              <Button
-                variant="text"
-                onClick={() => {
-                  if (
-                    userRoleData.some((item) => item.role === params.row.name)
-                  ) {
-                    navigate(`/roles/edit/${params.row.id}`);
-                  } else {
-                    enqueueSnackbar("没有编辑角色权限", {
-                      variant: "info",
-                    });
-                  }
-                }}
-              >
+              <Button variant="text" onClick={() => handleEditRoleDebounce()}>
                 編輯
               </Button>
             );
@@ -87,50 +63,23 @@ export const RolePermissions = () => {
               <>
                 <Button
                   variant="text"
-                  onClick={() => {
-                    if (
-                      userRoleData.some((item) => item.role === params.row.name)
-                    ) {
-                      navigate("/roles/userList");
-                    } else {
-                      enqueueSnackbar("没有权限分配", {
-                        variant: "info",
-                      });
-                    }
-                  }}
+                  onClick={() => handleRoleAssignmentDebounce()}
                 >
                   分配
                 </Button>
                 <Button
                   variant="text"
-                  onClick={() => {
-                    if (
-                      userRoleData.some((item) => item.role === params.row.name)
-                    ) {
-                      navigate(`/roles/edit/${params.row.id}`);
-                    } else {
-                      enqueueSnackbar("没有编辑角色权限", {
-                        variant: "info",
-                      });
-                    }
-                  }}
+                  onClick={() =>
+                    handleRoleAssignmentDebounce(params.row.name, params.row.id)
+                  }
                 >
                   編輯
                 </Button>
                 <Button
                   variant="text"
-                  onClick={() => {
-                    if (
-                      userRoleData.some((item) => item.role === params.row.name)
-                    ) {
-                      confirmTipsRef.current?.open();
-                      setRowId(params.row.id);
-                    } else {
-                      enqueueSnackbar("没有删除角色权限", {
-                        variant: "info",
-                      });
-                    }
-                  }}
+                  onClick={() =>
+                    handleRemoveRoleDebounce(params.row.name, params.row.id)
+                  }
                 >
                   刪除
                 </Button>
