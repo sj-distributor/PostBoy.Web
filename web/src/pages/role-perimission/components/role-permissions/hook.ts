@@ -1,5 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { IRoleTabltDto } from "../../../../dtos/role";
+import { useEffect, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -14,6 +13,39 @@ import {
 } from "../../../../api/role-user-permissions";
 
 export const useAction = () => {
+  const userRoleData = [
+    {
+      role: {
+        id: "3455efc5-6481-4d48-b9d2-9f15b6d5f899",
+        createdDate: "2023-11-05T10:01:14.722+00:00",
+        modifiedDate: "2023-11-05T10:01:14.722+00:00",
+        name: "Administrator",
+        displayName: "Administrator",
+        description: "超級管理員",
+      },
+      permissions: [
+        {
+          id: "08dbddd2-ac9d-4ce7-815f-c7ca37f2224d",
+          createdDate: "0001-01-01T00:00:00+00:00",
+          lastModifiedDate: "0001-01-01T00:00:00+00:00",
+          name: "信息发送",
+          displayName: null,
+          description: "sry",
+          isSystem: true,
+        },
+        {
+          id: "08dbdddd-7166-41bb-831e-d6e09ac88254",
+          createdDate: "0001-01-01T00:00:00+00:00",
+          lastModifiedDate: "0001-01-01T00:00:00+00:00",
+          name: "创建群组",
+          displayName: null,
+          description: "awsl",
+          isSystem: true,
+        },
+      ],
+    },
+  ];
+
   const [rowId, setRowId] = useState<number>();
 
   const confirmTipsRef = useRef<ModalBoxRef>(null);
@@ -35,6 +67,7 @@ export const useAction = () => {
     rolePermissionData: [],
   });
 
+  const handleRoleAssignment = (name: string) => {};
   const loadRoles = () => {
     setLoading(true);
 
@@ -89,6 +122,7 @@ export const useAction = () => {
     pageDto,
     loading,
     roleDto,
+    userRoleData,
     deleteRole,
     updatePageDto,
     navigate,

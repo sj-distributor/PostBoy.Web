@@ -7,7 +7,8 @@ import { useAction } from "./hook";
 import { UserRoleEnum } from "../../../../dtos/role";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
-
+import { useSnackbar } from "notistack";
+import { useDebounceFn } from "ahooks";
 export const RolePermissions = () => {
   const {
     rowId,
@@ -15,12 +16,14 @@ export const RolePermissions = () => {
     pageDto,
     loading,
     roleDto,
+    userRoleData,
     updatePageDto,
     navigate,
     setRowId,
     deleteRole,
     loadRoles,
   } = useAction();
+  const { enqueueSnackbar } = useSnackbar();
 
   const columns: GridColDef[] = [
     {
@@ -38,39 +41,102 @@ export const RolePermissions = () => {
       headerName: "操作",
       width: 300,
       renderCell: (params) => {
-        return params.row.role === UserRoleEnum.SuperAdmin ? (
-          <Button variant="text" onClick={() => navigate("/roles/userList")}>
-            分配
-          </Button>
-        ) : params.row.role === UserRoleEnum.User ? (
-          <Button
-            variant="text"
-            onClick={() => navigate(`/roles/edit/${params.row.id}`)}
-          >
-            編輯
-          </Button>
-        ) : (
-          <>
-            <Button variant="text" onClick={() => navigate("/roles/userList")}>
-              分配
-            </Button>
-            <Button
-              variant="text"
-              onClick={() => navigate(`/roles/edit/${params.row.id}`)}
-            >
-              編輯
-            </Button>
-            <Button
-              variant="text"
-              onClick={() => {
-                confirmTipsRef.current?.open();
-                setRowId(params.row.id);
-              }}
-            >
-              刪除
-            </Button>
-          </>
-        );
+        switch (params.row.displayName) {
+          case UserRoleEnum.Administrator:
+            return (
+              <Button
+                variant="text"
+                onClick={() => {
+                  if (
+                    userRoleData.some((item) => item.role === params.row.name)
+                  ) {
+                    navigate("/roles/userList");
+                  } else {
+                    enqueueSnackbar("没有权限分配", {
+                      variant: "info",
+                    });
+                  }
+                }}
+              >
+                分配
+              </Button>
+            );
+
+          case UserRoleEnum.DefaultUser:
+            return (
+              <Button
+                variant="text"
+                onClick={() => {
+                  if (
+                    userRoleData.some((item) => item.role === params.row.name)
+                  ) {
+                    navigate(`/roles/edit/${params.row.id}`);
+                  } else {
+                    enqueueSnackbar("没有编辑角色权限", {
+                      variant: "info",
+                    });
+                  }
+                }}
+              >
+                編輯
+              </Button>
+            );
+
+          default:
+            return (
+              <>
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    if (
+                      userRoleData.some((item) => item.role === params.row.name)
+                    ) {
+                      navigate("/roles/userList");
+                    } else {
+                      enqueueSnackbar("没有权限分配", {
+                        variant: "info",
+                      });
+                    }
+                  }}
+                >
+                  分配
+                </Button>
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    if (
+                      userRoleData.some((item) => item.role === params.row.name)
+                    ) {
+                      navigate(`/roles/edit/${params.row.id}`);
+                    } else {
+                      enqueueSnackbar("没有编辑角色权限", {
+                        variant: "info",
+                      });
+                    }
+                  }}
+                >
+                  編輯
+                </Button>
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    if (
+                      userRoleData.some((item) => item.role === params.row.name)
+                    ) {
+                      confirmTipsRef.current?.open();
+                      setRowId(params.row.id);
+                    } else {
+                      enqueueSnackbar("没有删除角色权限", {
+                        variant: "info",
+                      });
+                    }
+                  }}
+                >
+                  刪除
+                </Button>
+              </>
+            );
+        }
       },
     },
   ];

@@ -30,15 +30,13 @@ export interface IDepartmentDetailsListDto {
 }
 
 export enum UserRoleEnum {
-  SuperAdmin,
-  Admin,
-  User,
+  Administrator = "Administrator",
+  DefaultUser = "DefaultUser",
 }
 
 export const UserRoleType = {
-  [UserRoleEnum.SuperAdmin]: "超級管理員",
-  [UserRoleEnum.Admin]: "管理員",
-  [UserRoleEnum.User]: "用戶",
+  [UserRoleEnum.Administrator]: "超級管理員",
+  [UserRoleEnum.DefaultUser]: "普通用戶",
 };
 
 export interface IRoleData {
