@@ -165,7 +165,7 @@ export const UserList = () => {
           showColumnRightBorder
           disableSelectionOnClick
           pagination
-          paginationMode="server"
+          paginationMode="client"
           rowCount={userData.count}
           checkboxSelection
           disableColumnMenu
