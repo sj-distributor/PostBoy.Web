@@ -82,9 +82,12 @@ const User = () => {
             type="text"
             size="small"
             autoComplete="off"
-            onKeyDown={(e) =>
-              e.code === "Enter" && !isLoading && getAllUsersData()
-            }
+            onKeyDown={(e) => {
+              if (e.code === "Enter" && !isLoading) {
+                setUserDto((prev) => ({ ...prev, page: 1 }));
+                getAllUsersData();
+              }
+            }}
             onChange={(e) =>
               setUserDto((prev) => ({ ...prev, keyword: e.target.value }))
             }
@@ -101,7 +104,12 @@ const User = () => {
             variant="contained"
             component="label"
             sx={{ marginLeft: "0.5rem" }}
-            onClick={() => !isLoading && getAllUsersData()}
+            onClick={() => {
+              if (!isLoading) {
+                setUserDto((prev) => ({ ...prev, page: 1 }));
+                getAllUsersData();
+              }
+            }}
           >
             搜索用户
           </Button>
