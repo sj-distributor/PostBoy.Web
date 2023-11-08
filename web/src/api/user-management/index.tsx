@@ -1,6 +1,7 @@
 import { ILoginRequest } from "../../dtos/login";
 import {
   IGetAllUserDto,
+  IUserAllResponse,
   IUserApikeyAddData,
   IUserApikeysResponse,
   IUserResponse,
@@ -16,7 +17,7 @@ export const PostAuthRegister = async (data: ILoginRequest) => {
 };
 
 export const GetAllUsers = async (data: IGetAllUserDto) => {
-  return await Get<IUserResponse[]>(
+  return await Get<IUserAllResponse>(
     `/auth/allUsers?Page=${data.Page}&PageSize=${data.PageSize}${
       data.UserName ? "&UserName=" + data.UserName : ""
     }`

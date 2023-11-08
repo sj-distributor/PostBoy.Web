@@ -6,7 +6,10 @@ export interface IUserResponse {
   isActive: boolean;
   roles: IUserDataRolesData[];
 }
-
+export interface IUserAllResponse {
+  count: number;
+  users: IUserListItem[];
+}
 export interface IUserListItem {
   id: string;
   createdDate: string;

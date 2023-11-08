@@ -5,11 +5,11 @@ import { GetAllUsers, GetUserApikeys } from "../../api/user-management";
 import { ModalBoxRef } from "../../dtos/modal";
 import {
   IUserApikeysResponse,
-  IUserResponse,
+  IUserListItem,
 } from "../../dtos/user-management";
 
 const useAction = () => {
-  const [usersList, setUsersList] = useState<IUserResponse[]>([]);
+  const [usersList, setUsersList] = useState<IUserListItem[]>([]);
   const [openApikey, openApikeyAction] = useBoolean(false);
   const [userApikeyList, setUserApikey] = useState<IUserApikeysResponse[][]>(
     []
@@ -65,9 +65,8 @@ const useAction = () => {
       UserName: usersDto.keyword,
     })
       .then((res) => {
-        if (!!res) {
-          setUsersList(res);
-        }
+        setUsersList(res?.users ?? []);
+        setUserDto((prev) => ({ ...prev, count: res?.count ?? 0 }));
       })
       .finally(() => {
         setLoading(false);

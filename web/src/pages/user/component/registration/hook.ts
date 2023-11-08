@@ -1,11 +1,11 @@
 import useBoolean, { Actions } from "ahooks/lib/useBoolean";
 import { useState } from "react";
 import { GetAllUsers, PostAuthRegister } from "../../../../api/user-management";
-import { IUserResponse } from "../../../../dtos/user-management";
+import { IUserListItem } from "../../../../dtos/user-management";
 
 const useAction = (props: {
   onRegisterCancel: () => void;
-  setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>;
+  setUsersList: React.Dispatch<React.SetStateAction<IUserListItem[]>>;
   successAction: Actions;
 }) => {
   const { onRegisterCancel, setUsersList, successAction } = props;
@@ -32,9 +32,8 @@ const useAction = (props: {
         Page: usersDto.page,
         PageSize: usersDto.pageSize,
       }).then((res) => {
-        if (!!res) {
-          setUsersList(res);
-        }
+        setUsersList(res?.users ?? []);
+        setUserDto((prev) => ({ ...prev, count: res?.count ?? 0 }));
       });
     });
 

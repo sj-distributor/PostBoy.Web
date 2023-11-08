@@ -157,7 +157,7 @@ const User = () => {
             }}
           >
             <Pagination
-              count={10}
+              count={Math.ceil(usersDto.count / usersDto.pageSize)}
               page={usersDto.page}
               onChange={(e: React.ChangeEvent<unknown>, value: number) =>
                 setUserDto((prev) => ({ ...prev, page: value }))

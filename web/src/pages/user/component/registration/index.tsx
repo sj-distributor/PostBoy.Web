@@ -1,17 +1,17 @@
-import styles from "./index.module.scss"
-import { Button, CircularProgress, TextField } from "@mui/material"
-import useAction from "./hook"
-import { IUserResponse } from "../../../../dtos/user-management"
-import { memo } from "react"
-import { Actions } from "ahooks/lib/useBoolean"
+import styles from "./index.module.scss";
+import { Button, CircularProgress, TextField } from "@mui/material";
+import useAction from "./hook";
+import { IUserListItem } from "../../../../dtos/user-management";
+import { memo } from "react";
+import { Actions } from "ahooks/lib/useBoolean";
 
 const RegistrationPopup = memo(
   (props: {
-    onRegisterCancel: () => void
-    setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>
-    successAction: Actions
+    onRegisterCancel: () => void;
+    setUsersList: React.Dispatch<React.SetStateAction<IUserListItem[]>>;
+    successAction: Actions;
   }) => {
-    const { onRegisterCancel, setUsersList, successAction } = props
+    const { onRegisterCancel, setUsersList, successAction } = props;
 
     const {
       username,
@@ -20,7 +20,7 @@ const RegistrationPopup = memo(
       setPassword,
       registerSubmit,
       isLoading,
-    } = useAction({ onRegisterCancel, setUsersList, successAction })
+    } = useAction({ onRegisterCancel, setUsersList, successAction });
 
     return (
       <div className={styles.pageWrap}>
@@ -66,8 +66,8 @@ const RegistrationPopup = memo(
           </Button>
         </div>
       </div>
-    )
+    );
   }
-)
+);
 
-export default RegistrationPopup
+export default RegistrationPopup;
