@@ -126,7 +126,7 @@ export const Router = () => {
   useEffect(() => {
     if (displayPage && displayPage !== "/none" && username) {
       navigate(
-        location.pathname.includes(displayPage)
+        location.pathname.includes(displayPage) || location.pathname === "/none"
           ? displayPage
           : location.pathname,
         { replace: true }
