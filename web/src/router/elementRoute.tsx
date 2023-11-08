@@ -80,25 +80,25 @@ export const routerArray: RouteItem[] = [
       {
         path: "",
         title: "",
-        elementChild: <Navigate to={"/roles/roleList"} />,
+        elementChild: <Navigate to={"/roles/permission"} />,
       },
       {
-        path: "/roles/userList/:roleId",
+        path: "/roles/assigningUsers/:roleId",
         title: "",
         elementChild: <UserList />,
       },
       {
-        path: "/roles/add",
+        path: "/roles/createRole",
         title: "",
         elementChild: <RoleFrom />,
       },
       {
-        path: "/roles/roleList",
+        path: "/roles/permission",
         title: "",
         elementChild: <RolePermissions />,
       },
       {
-        path: "/roles/edit/:roleId",
+        path: "/roles/updateRole/:roleId",
         title: "",
         elementChild: <RoleFrom />,
       },

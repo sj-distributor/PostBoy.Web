@@ -18,6 +18,7 @@ export const RolePermissions = () => {
     handleRoleAssignmentDebounce,
     handleEditRoleDebounce,
     handleRemoveRoleDebounce,
+    handleAddRole,
     updatePageDto,
     navigate,
     deleteRole,
@@ -115,7 +116,7 @@ export const RolePermissions = () => {
           </div>
         </div>
         <div className={styles.navBtn}>
-          <Button variant="contained" onClick={() => navigate(`/roles/add`)}>
+          <Button variant="contained" onClick={() => handleAddRole()}>
             新增角色
           </Button>
         </div>

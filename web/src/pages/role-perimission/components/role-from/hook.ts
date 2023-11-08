@@ -348,7 +348,7 @@ export const useAction = () => {
       AddRolePermission(data)
         .then((res) => {
           if (res) {
-            navigate("/roles/roleList");
+            navigate("/roles/permission");
             enqueueSnackbar("创建角色成功!", { variant: "success" });
           }
         })
@@ -378,7 +378,7 @@ export const useAction = () => {
       UpdateRolePermission(data)
         .then((res) => {
           if (res) {
-            navigate("/roles/roleList");
+            navigate("/roles/permission");
             enqueueSnackbar("修改角色成功!", { variant: "success" });
           }
         })

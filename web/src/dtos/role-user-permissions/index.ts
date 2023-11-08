@@ -180,3 +180,29 @@ export const UserRoleType = {
   [UserRoleEnum.Administrator]: "超級管理員",
   [UserRoleEnum.DefaultUser]: "普通用戶",
 };
+
+export enum FunctionalPermissionsEnum {
+  CanGetPermissionsByRoles = "CanGetPermissionsByRoles",
+  CanGetMessage = "CanGetMessage",
+  CanCreateWorkWeChatGroup = "CanCreateWorkWeChatGroup",
+  CanUpdateWorkWeChatGroup = "CanUpdateWorkWeChatGroup",
+  CanCreateRoleUser = "CanCreateRoleUser",
+  CanDeleteRoles = "CanDeleteRoles",
+  CanUpdateGrantPermissionsIntoRole = "CanUpdateGrantPermissionsIntoRole",
+  CanSendWorkWeChatAppNotification = "CanSendWorkWeChatAppNotification",
+  CanGrantPermissionsIntoRole = "CanGrantPermissionsIntoRole",
+  CanSendMessage = "CanSendMessage",
+}
+
+export const FunctionalPermissions = {
+  [FunctionalPermissionsEnum.CanGetPermissionsByRoles]: "角色權限",
+  [FunctionalPermissionsEnum.CanSendMessage]: "信息發送",
+  [FunctionalPermissionsEnum.CanGetMessage]: "發送記錄",
+  [FunctionalPermissionsEnum.CanCreateWorkWeChatGroup]: "創建群組",
+  [FunctionalPermissionsEnum.CanUpdateWorkWeChatGroup]: "添加群組成員",
+  [FunctionalPermissionsEnum.CanCreateRoleUser]: "新增角色",
+  [FunctionalPermissionsEnum.CanDeleteRoles]: "刪除",
+  [FunctionalPermissionsEnum.CanUpdateGrantPermissionsIntoRole]: "編輯",
+  [FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification]: "發送通知",
+  [FunctionalPermissionsEnum.CanGrantPermissionsIntoRole]: "分配",
+};

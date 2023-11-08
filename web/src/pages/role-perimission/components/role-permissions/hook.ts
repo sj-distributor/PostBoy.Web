@@ -38,13 +38,27 @@ export const useAction = () => {
     rolePermissionData: [],
   });
 
+  const handleAddRole = () => {
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === "新增")
+    ) {
+      navigate(`/roles/createRole`);
+    } else {
+      enqueueSnackbar("没有权限新增角色", {
+        variant: "info",
+      });
+    }
+  };
+
   const handleRoleAssignment = (name: string, id: string) => {
     if (
       currentUserRolePermissions.rolePermissionData
         .map((item) => item.role)
         .some((item) => item.name === name)
     ) {
-      navigate(`/roles/userList/${id}`);
+      navigate(`/roles/assigningUsers/${id}`);
     } else {
       enqueueSnackbar("没有权限分配", {
         variant: "info",
@@ -65,7 +79,7 @@ export const useAction = () => {
         .map((item) => item.role)
         .some((item) => item.name === name)
     ) {
-      navigate(`/roles/edit/${id}`);
+      navigate(`/roles/updateRole/${id}`);
     } else {
       enqueueSnackbar("没有编辑角色权限", {
         variant: "info",
@@ -159,6 +173,7 @@ export const useAction = () => {
     handleRoleAssignmentDebounce,
     handleEditRoleDebounce,
     handleRemoveRoleDebounce,
+    handleAddRole,
     deleteRole,
     updatePageDto,
     navigate,

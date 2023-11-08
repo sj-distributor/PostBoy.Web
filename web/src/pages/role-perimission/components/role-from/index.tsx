@@ -14,10 +14,15 @@ import {
   Checkbox,
   CircularProgress,
   FormControlLabel,
+  FormGroup,
   Input,
   Stack,
   TextField,
 } from "@mui/material";
+import {
+  FunctionalPermissions,
+  FunctionalPermissionsEnum,
+} from "../../../../dtos/role-user-permissions";
 
 export const RoleFrom = () => {
   const {
@@ -45,7 +50,8 @@ export const RoleFrom = () => {
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-  const isShowLoading = isLoading && location.pathname.includes("/roles/edit");
+  const isShowLoading =
+    isLoading && location.pathname.includes("/roles/updateRole");
 
   const renderInputBox = (
     title: string,
@@ -175,7 +181,9 @@ export const RoleFrom = () => {
       <Stack spacing={5}>
         <div className={styles.nav}>
           <div className={styles.navTitle}>
-            {location.pathname === "/roles/add" ? "新增角色" : "編輯角色"}
+            {location.pathname === "/roles/createRole"
+              ? "新增角色"
+              : "編輯角色"}
           </div>
           <div className={styles.navBtn}>
             <Button
@@ -183,7 +191,7 @@ export const RoleFrom = () => {
               variant="contained"
               onClick={() => {
                 addOrModifyRolePermission();
-                // navigate("/roles/roleList")
+                // navigate("/roles/permission")
               }}
             >
               確認
@@ -191,7 +199,7 @@ export const RoleFrom = () => {
             <Button
               className={styles.navButton}
               variant="outlined"
-              onClick={() => navigate("/roles/roleList")}
+              onClick={() => navigate("/roles/permission")}
             >
               返回
             </Button>
@@ -243,29 +251,92 @@ export const RoleFrom = () => {
             <Stack spacing={3}>
               <div className={styles.itemTitle}>功能權限</div>
               <div className={styles.item}>
+                <div className={styles.itemVisiblePage}>
+                  <FormGroup sx={{ flexBasis: "20%" }}>
+                    <div className={styles.itemVisiblePageTitle}>可見頁面</div>
+                    <div
+                      style={{
+                        minHeight: 100,
+                        maxHeight: 100,
+                        overflowY: "auto",
+                      }}
+                    >
+                      {rolePermissionsCheckedList
+                        .filter(
+                          (item) =>
+                            item.name ===
+                              FunctionalPermissionsEnum.CanGetPermissionsByRoles ||
+                            item.name ===
+                              FunctionalPermissionsEnum.CanSendMessage
+                        )
+                        .map((roleItem, index) => {
+                          return (
+                            <FormControlLabel
+                              key={index}
+                              control={
+                                <Checkbox
+                                  onChange={(e) =>
+                                    handleUpdateRolePermissionsChecked(
+                                      roleItem.id,
+                                      e.target.checked
+                                    )
+                                  }
+                                  checked={roleItem.checked}
+                                />
+                              }
+                              label={
+                                FunctionalPermissions[
+                                  roleItem.name as FunctionalPermissionsEnum
+                                ] ?? roleItem.name
+                              }
+                            />
+                          );
+                        })}
+                    </div>
+                  </FormGroup>
+                </div>
                 <div className={styles.itemPermission}>
-                  <div className={styles.itemPerssionsForm}>
-                    {rolePermissionsCheckedList.map((roleItem, index) => {
-                      return (
-                        <div style={{ marginRight: 15 }} key={index}>
-                          <FormControlLabel
-                            key={index}
-                            control={
-                              <Checkbox
-                                onChange={(e) =>
-                                  handleUpdateRolePermissionsChecked(
-                                    roleItem.id,
-                                    e.target.checked
-                                  )
-                                }
-                                checked={roleItem.checked}
-                              />
-                            }
-                            label={roleItem.name}
-                          />
-                        </div>
-                      );
-                    })}
+                  <div className={styles.itemPermissionTitle}>功能權限</div>
+                  <div
+                    className={styles.itemPerssionsForm}
+                    style={{
+                      minHeight: 100,
+                      maxHeight: 100,
+                      overflowY: "auto",
+                    }}
+                  >
+                    {rolePermissionsCheckedList
+                      .filter(
+                        (item) =>
+                          item.name !==
+                            FunctionalPermissionsEnum.CanGetPermissionsByRoles &&
+                          item.name !== FunctionalPermissionsEnum.CanSendMessage
+                      )
+                      .map((roleItem, index) => {
+                        return (
+                          <div style={{ marginRight: 15 }} key={index}>
+                            <FormControlLabel
+                              key={index}
+                              control={
+                                <Checkbox
+                                  onChange={(e) =>
+                                    handleUpdateRolePermissionsChecked(
+                                      roleItem.id,
+                                      e.target.checked
+                                    )
+                                  }
+                                  checked={roleItem.checked}
+                                />
+                              }
+                              label={
+                                FunctionalPermissions[
+                                  roleItem.name as FunctionalPermissionsEnum
+                                ] ?? roleItem.name
+                              }
+                            />
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               </div>
