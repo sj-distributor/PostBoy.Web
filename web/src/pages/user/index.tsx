@@ -9,6 +9,7 @@ import {
   Alert,
   AlertTitle,
   Button,
+  CircularProgress,
   IconButton,
   InputAdornment,
   OutlinedInput,
@@ -116,7 +117,14 @@ const User = () => {
         </div>
       </div>
       <div>
-        <div className={styles.userListBox}>
+        <div
+          className={styles.userListBox}
+          style={{ opacity: isLoading ? 0.6 : undefined }}
+        >
+          <div className={styles.loadingStyle}>
+            {isLoading && <CircularProgress />}
+          </div>
+          {!usersList?.length && <div className={styles.notData}>notData</div>}
           {usersList?.map((item, key) => (
             <Accordion className={styles.accordion} key={key}>
               <AccordionSummary

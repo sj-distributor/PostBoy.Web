@@ -54,9 +54,28 @@
   .userListBox {
     max-height: 39rem;
     overflow-y: auto;
+    position: relative;
   }
 
   .userListBox::-webkit-scrollbar {
     width: 0;
+  }
+
+  .loadingStyle {
+    text-align: center;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 13rem;
+    z-index: 9;
+    font-size: 1.5rem;
+    color: #535050;
+    position: absolute;
+  }
+
+  .notData {
+    text-align: center;
+    margin-top: 13rem;
+    color: #71717a;
   }
 }
