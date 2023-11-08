@@ -11,7 +11,13 @@ import EmailIcon from "@mui/icons-material/Email";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { RolePermission } from "../pages/role-perimission";
 import { UserList } from "../pages/role-perimission/components/user-list";
 import { RoleFrom } from "../pages/role-perimission/components/role-from";
@@ -22,6 +28,7 @@ import Main from "../pages/main";
 import IsAuthUser from "../pages/auth";
 import useAuth from "../auth";
 import { useEffect } from "react";
+import { IRolePermissionDataItem } from "../dtos/role-user-permissions";
 
 export const routerArray: RouteItem[] = [
   {
@@ -114,9 +121,16 @@ export const Router = () => {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   useEffect(() => {
     if (displayPage && displayPage !== "/none" && username) {
-      navigate(displayPage, { replace: true });
+      navigate(
+        location.pathname.includes(displayPage)
+          ? displayPage
+          : location.pathname,
+        { replace: true }
+      );
     } else if (!username) {
       navigate("/login", { replace: true });
     }

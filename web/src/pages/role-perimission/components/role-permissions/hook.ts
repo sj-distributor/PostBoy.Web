@@ -39,18 +39,17 @@ export const useAction = () => {
   });
 
   const handleRoleAssignment = (name: string, id: string) => {
-    // if (
-    //   currentUserRolePermissions.rolePermissionData
-    //     .map((item) => item.role)
-    //     .some((item) => item.name === name)
-    // ) {
-    //   navigate(`/roles/userList/${id}`);
-    // } else {
-    //   enqueueSnackbar("没有权限分配", {
-    //     variant: "info",
-    //   });
-    // }
-    navigate(`/roles/userList/${id}`);
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === name)
+    ) {
+      navigate(`/roles/userList/${id}`);
+    } else {
+      enqueueSnackbar("没有权限分配", {
+        variant: "info",
+      });
+    }
   };
 
   const { run: handleRoleAssignmentDebounce } = useDebounceFn(
@@ -61,18 +60,17 @@ export const useAction = () => {
   );
 
   const handleEditRole = (name: string, id: string) => {
-    // if (
-    //   currentUserRolePermissions.rolePermissionData
-    //     .map((item) => item.role)
-    //     .some((item) => item.name === name)
-    // ) {
-    //   navigate(`/roles/edit/${id}`);
-    // } else {
-    //   enqueueSnackbar("没有编辑角色权限", {
-    //     variant: "info",
-    //   });
-    // }
-    navigate(`/roles/edit/${id}`);
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === name)
+    ) {
+      navigate(`/roles/edit/${id}`);
+    } else {
+      enqueueSnackbar("没有编辑角色权限", {
+        variant: "info",
+      });
+    }
   };
 
   const { run: handleEditRoleDebounce } = useDebounceFn(
@@ -83,20 +81,18 @@ export const useAction = () => {
   );
 
   const handleRemoveRole = (name: string, id: string) => {
-    // if (
-    //   currentUserRolePermissions.rolePermissionData
-    //     .map((item) => item.role)
-    //     .some((item) => item.name === name)
-    // ) {
-    //   confirmTipsRef.current?.open();
-    //   setRowId(id);
-    // } else {
-    //   enqueueSnackbar("没有删除角色权限", {
-    //     variant: "info",
-    //   });
-    // }
-    confirmTipsRef.current?.open();
-    setRowId(id);
+    if (
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.role)
+        .some((item) => item.name === name)
+    ) {
+      confirmTipsRef.current?.open();
+      setRowId(id);
+    } else {
+      enqueueSnackbar("没有删除角色权限", {
+        variant: "info",
+      });
+    }
   };
 
   const { run: handleRemoveRoleDebounce } = useDebounceFn(
