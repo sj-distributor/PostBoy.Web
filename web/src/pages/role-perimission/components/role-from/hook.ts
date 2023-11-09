@@ -9,7 +9,7 @@ import {
   UpdateRolePermission,
 } from "../../../../api/role-user-permissions";
 import {
-  DepartmentTreeDto,
+  IDepartmentTreeDto,
   IPermissionsDto,
   IRole,
   IRolePermission,
@@ -27,7 +27,7 @@ import { useSnackbar } from "notistack";
 import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 export const useAction = () => {
-  const [options, setOptions] = useState<DepartmentTreeDto[]>([]);
+  const [options, setOptions] = useState<IDepartmentTreeDto[]>([]);
 
   const [rolePermissionsCheckedList, setRolePermissionsCheckedList] = useState<
     RolePermissionsDto[]
@@ -54,7 +54,7 @@ export const useAction = () => {
 
   const navigate = useNavigate();
 
-  const getFlatOptionsList = (data: DepartmentTreeDto[]) => {
+  const getFlatOptionsList = (data: IDepartmentTreeDto[]) => {
     return data.reduce((accumulator, item) => {
       const higherDepartment: DepartmentDto = {
         name: item.department.name,
