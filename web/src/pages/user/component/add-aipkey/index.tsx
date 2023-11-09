@@ -1,27 +1,34 @@
-import styles from "./index.module.scss"
-import { Button, CircularProgress, TextField } from "@mui/material"
-import useAction from "./hook"
-import { IUserApikeysResponse } from "../../../../dtos/user-management"
-import { memo } from "react"
-import { Actions } from "ahooks/lib/useBoolean"
+import styles from "./index.module.scss";
+import { AlertColor, Button, CircularProgress, TextField } from "@mui/material";
+import useAction from "./hook";
+import { IUserApikeysResponse } from "../../../../dtos/user-management";
+import { memo } from "react";
+import { Actions } from "ahooks/lib/useBoolean";
 
 const AddApiKeyPopup = memo(
   (props: {
-    userAccountId: string
-    onAddApikeyCancel: () => void
-    userApikeyList: IUserApikeysResponse[][]
+    userAccountId: string;
+    onAddApikeyCancel: () => void;
+    userApikeyList: IUserApikeysResponse[][];
     setUserApikey: React.Dispatch<
       React.SetStateAction<IUserApikeysResponse[][]>
-    >
-    successAction: Actions
+    >;
+    snackbarAction: Actions;
+    setSnackBarData: React.Dispatch<
+      React.SetStateAction<{
+        severity: AlertColor | undefined;
+        text: string;
+      }>
+    >;
   }) => {
     const {
       userAccountId,
       onAddApikeyCancel,
       userApikeyList,
       setUserApikey,
-      successAction,
-    } = props
+      snackbarAction,
+      setSnackBarData,
+    } = props;
 
     const {
       apiKey,
@@ -35,8 +42,9 @@ const AddApiKeyPopup = memo(
       onAddApikeyCancel,
       userApikeyList,
       setUserApikey,
-      successAction,
-    })
+      snackbarAction,
+      setSnackBarData,
+    });
 
     return (
       <div className={styles.pageWrap}>
@@ -83,8 +91,8 @@ const AddApiKeyPopup = memo(
           </Button>
         </div>
       </div>
-    )
+    );
   }
-)
+);
 
-export default AddApiKeyPopup
+export default AddApiKeyPopup;

@@ -34,25 +34,26 @@ const User = () => {
     setUserApikey,
     onListClick,
     setUserAccountId,
-    success,
-    successAction,
+    snackbar,
+    snackbarAction,
     usersDto,
     isLoading,
     setUserDto,
-    getAllUsersData,
+    snackbarData,
+    setSnackBarData,
   } = useAction();
 
   return (
     <div className={styles.user}>
       <Snackbar
-        open={success}
+        open={snackbar}
         anchorOrigin={{
           vertical: "top",
           horizontal: "center",
         }}
       >
-        <Alert severity="success">
-          <AlertTitle>Success!</AlertTitle>
+        <Alert severity={snackbarData.severity}>
+          <AlertTitle>{snackbarData.text}</AlertTitle>
         </Alert>
       </Snackbar>
       {/* 注册用户弹窗 */}
@@ -60,7 +61,8 @@ const User = () => {
         <RegistrationPopup
           onRegisterCancel={onRegisterCancel}
           setUsersList={setUsersList}
-          successAction={successAction}
+          snackbarAction={snackbarAction}
+          setSnackBarData={setSnackBarData}
         />
       </ModalBox>
       {/* 添加apikey弹窗 */}
@@ -70,7 +72,8 @@ const User = () => {
           onAddApikeyCancel={onAddApikeyCancel}
           userApikeyList={userApikeyList}
           setUserApikey={setUserApikey}
-          successAction={successAction}
+          snackbarAction={snackbarAction}
+          setSnackBarData={setSnackBarData}
         />
       </ModalBox>
       <div className={styles.registerButton}>
@@ -83,12 +86,11 @@ const User = () => {
             type="text"
             size="small"
             autoComplete="off"
-            onKeyDown={(e) => {
-              if (e.code === "Enter" && !isLoading) {
-                setUserDto((prev) => ({ ...prev, page: 1 }));
-                getAllUsersData();
-              }
-            }}
+            onKeyDown={(e) =>
+              e.code === "Enter" &&
+              !isLoading &&
+              setUserDto((prev) => ({ ...prev, page: 1 }))
+            }
             onChange={(e) =>
               setUserDto((prev) => ({ ...prev, keyword: e.target.value }))
             }
@@ -105,12 +107,9 @@ const User = () => {
             variant="contained"
             component="label"
             sx={{ marginLeft: "0.5rem" }}
-            onClick={() => {
-              if (!isLoading) {
-                setUserDto((prev) => ({ ...prev, page: 1 }));
-                getAllUsersData();
-              }
-            }}
+            onClick={() =>
+              !isLoading && setUserDto((prev) => ({ ...prev, page: 1 }))
+            }
           >
             搜索用户
           </Button>
@@ -124,44 +123,48 @@ const User = () => {
           <div className={styles.loadingStyle}>
             {isLoading && <CircularProgress />}
           </div>
-          {!usersList?.length && <div className={styles.notData}>notData</div>}
-          {usersList?.map((item, key) => (
-            <Accordion className={styles.accordion} key={key}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                className={styles.accordionSummary}
-                onClick={() => onListClick(item.id)}
-                id="AccordionSummary"
-              >
-                <Typography>{item.userName}</Typography>
-                <Button
-                  variant="contained"
-                  className={styles.addButton}
-                  onClick={(event) => {
-                    setUserAccountId(item.id);
-                    event.stopPropagation();
-                    addApikeyRef.current?.open();
-                  }}
+
+          {usersList?.length ? (
+            usersList.map((item, key) => (
+              <Accordion className={styles.accordion} key={key}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  className={styles.accordionSummary}
+                  onClick={() => onListClick(item.id)}
+                  id="AccordionSummary"
                 >
-                  添加apikey
-                </Button>
-              </AccordionSummary>
-              {userApikeyList.map((items) => {
-                return items.map((apikeyItem, apikeyIndex) => {
-                  if (apikeyItem.userAccountId === item.id) {
-                    return (
-                      <AccordionDetails
-                        key={apikeyIndex}
-                        className={styles.accordionDetails}
-                      >
-                        <Typography>{apikeyItem.apiKey}</Typography>
-                      </AccordionDetails>
-                    );
-                  }
-                });
-              })}
-            </Accordion>
-          ))}
+                  <Typography>{item.userName}</Typography>
+                  <Button
+                    variant="contained"
+                    className={styles.addButton}
+                    onClick={(event) => {
+                      setUserAccountId(item.id);
+                      event.stopPropagation();
+                      addApikeyRef.current?.open();
+                    }}
+                  >
+                    添加apikey
+                  </Button>
+                </AccordionSummary>
+                {userApikeyList.map((items) => {
+                  return items.map((apikeyItem, apikeyIndex) => {
+                    if (apikeyItem.userAccountId === item.id) {
+                      return (
+                        <AccordionDetails
+                          key={apikeyIndex}
+                          className={styles.accordionDetails}
+                        >
+                          <Typography>{apikeyItem.apiKey}</Typography>
+                        </AccordionDetails>
+                      );
+                    }
+                  });
+                })}
+              </Accordion>
+            ))
+          ) : (
+            <div className={styles.notData}>notData</div>
+          )}
         </div>
         {usersList.length > 0 && (
           <div

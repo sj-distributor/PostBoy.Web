@@ -1,5 +1,5 @@
 import styles from "./index.module.scss";
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { AlertColor, Button, CircularProgress, TextField } from "@mui/material";
 import useAction from "./hook";
 import { IUserListItem } from "../../../../dtos/user-management";
 import { memo } from "react";
@@ -9,9 +9,16 @@ const RegistrationPopup = memo(
   (props: {
     onRegisterCancel: () => void;
     setUsersList: React.Dispatch<React.SetStateAction<IUserListItem[]>>;
-    successAction: Actions;
+    snackbarAction: Actions;
+    setSnackBarData: React.Dispatch<
+      React.SetStateAction<{
+        severity: AlertColor | undefined;
+        text: string;
+      }>
+    >;
   }) => {
-    const { onRegisterCancel, setUsersList, successAction } = props;
+    const { onRegisterCancel, setUsersList, snackbarAction, setSnackBarData } =
+      props;
 
     const {
       username,
@@ -20,7 +27,12 @@ const RegistrationPopup = memo(
       setPassword,
       registerSubmit,
       isLoading,
-    } = useAction({ onRegisterCancel, setUsersList, successAction });
+    } = useAction({
+      onRegisterCancel,
+      setUsersList,
+      snackbarAction,
+      setSnackBarData,
+    });
 
     return (
       <div className={styles.pageWrap}>

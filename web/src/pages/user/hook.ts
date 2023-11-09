@@ -7,6 +7,7 @@ import {
   IUserApikeysResponse,
   IUserListItem,
 } from "../../dtos/user-management";
+import { AlertColor } from "@mui/material";
 
 const useAction = () => {
   const [usersList, setUsersList] = useState<IUserListItem[]>([]);
@@ -19,7 +20,14 @@ const useAction = () => {
   const addApikeyRef = useRef<ModalBoxRef>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [userAccountId, setUserAccountId] = useState<string>("");
-  const [success, successAction] = useBoolean(false);
+  const [snackbar, snackbarAction] = useBoolean(false);
+  const [snackbarData, setSnackBarData] = useState<{
+    severity: AlertColor | undefined;
+    text: string;
+  }>({
+    severity: "success",
+    text: "",
+  });
   const [usersDto, setUserDto] = useState<{
     count: number;
     page: number;
@@ -46,13 +54,18 @@ const useAction = () => {
       const clickApiKeyUserId: string[] = openApikeyUserId;
       clickApiKeyUserId.push(userId);
       setOpenApikeyUserId(clickApiKeyUserId);
-      await GetUserApikeys(userId).then((res) => {
-        if (!!res) {
-          const apikeyList = clone(userApikeyList);
-          apikeyList.push(res);
-          setUserApikey(apikeyList);
-        }
-      });
+      await GetUserApikeys(userId)
+        .then((res) => {
+          if (!!res) {
+            const apikeyList = clone(userApikeyList);
+            apikeyList.push(res);
+            setUserApikey(apikeyList);
+          }
+        })
+        .catch((error) => {
+          setSnackBarData({ severity: "error", text: "获取用户APIKEY失败" });
+          snackbarAction.setTrue();
+        });
     }
     openApikeyAction.toggle();
   };
@@ -68,6 +81,10 @@ const useAction = () => {
         setUsersList(res?.users ?? []);
         setUserDto((prev) => ({ ...prev, count: res?.count ?? 0 }));
       })
+      .catch((error) => {
+        setSnackBarData({ severity: "error", text: "获取用户数据失败" });
+        snackbarAction.setTrue();
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -78,12 +95,12 @@ const useAction = () => {
   }, []);
 
   useEffect(() => {
-    if (success) {
+    if (snackbar) {
       setTimeout(() => {
-        successAction.setFalse();
+        snackbarAction.setFalse();
       }, 3000);
     }
-  }, [success]);
+  }, [snackbar]);
 
   useEffect(() => {
     getAllUsersData();
@@ -101,12 +118,14 @@ const useAction = () => {
     setUserApikey,
     onListClick,
     setUserAccountId,
-    success,
-    successAction,
+    snackbar,
+    snackbarAction,
     usersDto,
     isLoading,
     setUserDto,
     getAllUsersData,
+    snackbarData,
+    setSnackBarData,
   };
 };
 
