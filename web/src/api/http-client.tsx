@@ -49,11 +49,14 @@ export async function base<T>(
   const fullUrl =
     convertGetData(data ?? {}) === "?" ? "" : convertGetData(data ?? {});
 
-  return await fetch(`${settings.serverUrl}${url}${fullUrl}`, {
-    method: method,
-    body: method === "get" ? undefined : body,
-    headers: headers,
-  })
+  return await fetch(
+    `${settings.serverUrl}${url}${method === "get" ? fullUrl : ""}`,
+    {
+      method: method,
+      body: method === "get" ? undefined : body,
+      headers: headers,
+    }
+  )
     .then((res) => res.json())
     .then((res: IResponse<T>) => {
       if (res.code === ResponseCode.Ok) {
