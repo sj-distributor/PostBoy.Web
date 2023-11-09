@@ -1,34 +1,39 @@
-import useBoolean, { Actions } from "ahooks/lib/useBoolean"
-import { useState } from "react"
-import { GetAllUsers, PostAuthRegister } from "../../../../api/user-management"
-import { IUserResponse } from "../../../../dtos/user-management"
+import useBoolean, { Actions } from "ahooks/lib/useBoolean";
+import { useState } from "react";
+import { PostAuthRegister } from "../../../../api/user-management";
+import { AlertColor } from "@mui/material";
 
 const useAction = (props: {
-  onRegisterCancel: () => void
-  setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>
-  successAction: Actions
+  onRegisterCancel: () => void;
+  getAllUsersData: () => void;
+  snackbarAction: Actions;
+  setSnackBarData: React.Dispatch<
+    React.SetStateAction<{
+      severity: AlertColor | undefined;
+      text: string;
+    }>
+  >;
 }) => {
-  const { onRegisterCancel, setUsersList, successAction } = props
-  const [username, setUsername] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [isLoading, isLoadingAction] = useBoolean(false)
+  const { onRegisterCancel, snackbarAction, setSnackBarData, getAllUsersData } =
+    props;
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isLoading, isLoadingAction] = useBoolean(false);
 
   const registerSubmit = () => {
-    isLoadingAction.setTrue()
+    isLoadingAction.setTrue();
     PostAuthRegister({ userName: username, password: password }).then(() => {
-      onRegisterCancel()
-      successAction.setTrue()
-      isLoadingAction.setFalse()
-      GetAllUsers().then((res) => {
-        if (!!res) {
-          setUsersList(res)
-        }
-      })
-    })
+      onRegisterCancel();
 
-    setPassword("")
-    setUsername("")
-  }
+      setSnackBarData({ severity: "success", text: "注册成功!" });
+      snackbarAction.setTrue();
+      isLoadingAction.setFalse();
+      getAllUsersData();
+    });
+
+    setPassword("");
+    setUsername("");
+  };
 
   return {
     username,
@@ -37,7 +42,7 @@ const useAction = (props: {
     setPassword,
     registerSubmit,
     isLoading,
-  }
-}
+  };
+};
 
-export default useAction
+export default useAction;

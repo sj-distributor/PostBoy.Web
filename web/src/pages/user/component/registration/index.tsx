@@ -1,17 +1,27 @@
-import styles from "./index.module.scss"
-import { Button, CircularProgress, TextField } from "@mui/material"
-import useAction from "./hook"
-import { IUserResponse } from "../../../../dtos/user-management"
-import { memo } from "react"
-import { Actions } from "ahooks/lib/useBoolean"
+import styles from "./index.module.scss";
+import { AlertColor, Button, CircularProgress, TextField } from "@mui/material";
+import useAction from "./hook";
+import { memo } from "react";
+import { Actions } from "ahooks/lib/useBoolean";
 
 const RegistrationPopup = memo(
   (props: {
-    onRegisterCancel: () => void
-    setUsersList: React.Dispatch<React.SetStateAction<IUserResponse[]>>
-    successAction: Actions
+    onRegisterCancel: () => void;
+    getAllUsersData: () => void;
+    snackbarAction: Actions;
+    setSnackBarData: React.Dispatch<
+      React.SetStateAction<{
+        severity: AlertColor | undefined;
+        text: string;
+      }>
+    >;
   }) => {
-    const { onRegisterCancel, setUsersList, successAction } = props
+    const {
+      onRegisterCancel,
+      getAllUsersData,
+      snackbarAction,
+      setSnackBarData,
+    } = props;
 
     const {
       username,
@@ -20,7 +30,12 @@ const RegistrationPopup = memo(
       setPassword,
       registerSubmit,
       isLoading,
-    } = useAction({ onRegisterCancel, setUsersList, successAction })
+    } = useAction({
+      onRegisterCancel,
+      getAllUsersData,
+      snackbarAction,
+      setSnackBarData,
+    });
 
     return (
       <div className={styles.pageWrap}>
@@ -66,8 +81,8 @@ const RegistrationPopup = memo(
           </Button>
         </div>
       </div>
-    )
+    );
   }
-)
+);
 
-export default RegistrationPopup
+export default RegistrationPopup;
