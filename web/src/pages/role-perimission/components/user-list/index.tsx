@@ -149,7 +149,7 @@ export const UserList = () => {
           <Button
             className={styles.btn}
             variant="outlined"
-            onClick={() => navigate("/roles/permission")}
+            onClick={() => navigate("/role/permission")}
           >
             返回
           </Button>

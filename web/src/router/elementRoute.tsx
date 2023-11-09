@@ -28,7 +28,6 @@ import Main from "../pages/main";
 import IsAuthUser from "../pages/auth";
 import useAuth from "../auth";
 import { useEffect } from "react";
-import { IRolePermissionDataItem } from "../dtos/role-user-permissions";
 
 export const routerArray: RouteItem[] = [
   {
@@ -72,7 +71,7 @@ export const routerArray: RouteItem[] = [
     element: <Manager />,
   },
   {
-    path: "/roles",
+    path: "/role",
     head: "角色权限",
     icons: <PersonOutlineIcon />,
     element: <RolePermission />,
@@ -80,25 +79,25 @@ export const routerArray: RouteItem[] = [
       {
         path: "",
         title: "",
-        elementChild: <Navigate to={"/roles/permission"} />,
+        elementChild: <Navigate to={"/role/permission"} />,
       },
       {
-        path: "/roles/assigningUsers/:roleId",
+        path: "/role/users/:roleId",
         title: "",
         elementChild: <UserList />,
       },
       {
-        path: "/roles/createRole",
+        path: "/role/create",
         title: "",
         elementChild: <RoleFrom />,
       },
       {
-        path: "/roles/permission",
+        path: "/role/permission",
         title: "",
         elementChild: <RolePermissions />,
       },
       {
-        path: "/roles/updateRole/:roleId",
+        path: "/role/edit/:roleId",
         title: "",
         elementChild: <RoleFrom />,
       },

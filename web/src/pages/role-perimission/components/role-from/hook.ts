@@ -307,8 +307,6 @@ export const useAction = () => {
     renderShowLabel("notificationData");
   }, [checkboxData.notificationData]);
 
-  // new
-
   const { roleId } = useParams();
 
   const defaultRole: IRole = {
@@ -358,7 +356,7 @@ export const useAction = () => {
         );
     else {
       enqueueSnackbar("角色新增失败，需要填写角色名和描述", {
-        variant: "error",
+        variant: "info",
       });
     }
   };
@@ -548,7 +546,6 @@ export const useAction = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
-    // new
     updateRole,
     role,
     rolePermission,

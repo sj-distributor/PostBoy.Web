@@ -42,20 +42,26 @@ export const useAction = () => {
   });
 
   const userPermissions = useMemo(() => {
-    return (
-      currentUserRolePermissions.rolePermissionData.map(
-        (item) => item.permissions
-      )[0] ?? []
-    );
+    const data = new Set<string>();
+
+    if (currentUserRolePermissions?.rolePermissionData.length) {
+      currentUserRolePermissions.rolePermissionData
+        .map((item) => item.permissions)
+        .map((item) =>
+          item?.map((item) => item.name)?.map((item) => item && data.add(item))
+        );
+    }
+    console.log(data);
+    return Array.from(data);
   }, [currentUserRolePermissions.rolePermissionData]);
 
   const handleAddRole = () => {
     if (
       userPermissions.some(
-        (item) => item.name === FunctionalPermissionsEnum.CanCreateRoleUser
+        (item) => item === FunctionalPermissionsEnum.CanCreateRoleUser
       )
     ) {
-      navigate(`/roles/createRole`);
+      navigate("/role/create");
     } else {
       enqueueSnackbar("没有权限新增角色", {
         variant: "info",
@@ -70,8 +76,7 @@ export const useAction = () => {
 
     if (
       userPermissions.some(
-        (item) =>
-          item.name === FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
+        (item) => item === FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
       )
     ) {
       if (
@@ -83,7 +88,7 @@ export const useAction = () => {
         });
         return;
       }
-      navigate(`/roles/assigningUsers/${id}`);
+      navigate(`/role/users/${id}`);
     } else {
       enqueueSnackbar("没有权限分配", {
         variant: "info",
@@ -101,11 +106,10 @@ export const useAction = () => {
   const handleEditRole = (name: string, id: string) => {
     if (
       userPermissions.some(
-        (item) =>
-          item.name === FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
+        (item) => item === FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
       )
     ) {
-      navigate(`/roles/updateRole/${id}`);
+      navigate(`/role/edit/${id}`);
     } else {
       enqueueSnackbar("没有编辑角色权限", {
         variant: "info",
@@ -123,7 +127,7 @@ export const useAction = () => {
   const handleRemoveRole = (name: string, id: string) => {
     if (
       userPermissions.some(
-        (item) => item.name === FunctionalPermissionsEnum.CanDeleteRoles
+        (item) => item === FunctionalPermissionsEnum.CanDeleteRoles
       )
     ) {
       confirmTipsRef.current?.open();
@@ -188,7 +192,7 @@ export const useAction = () => {
 
   useEffect(() => {
     loadRoles();
-  }, [pageDto.pageIndex, pageDto.pageSize]);
+  }, [pageDto.pageIndex, pageDto.pageSize, pageDto.keyword]);
 
   return {
     rowId,

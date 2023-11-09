@@ -198,8 +198,8 @@ const useAction = (
             setPromptText("发送失败");
           }
         })
-        .catch((error) => {
-          showErrorPrompt(convertRoleErrorText(error as Error));
+        .catch((error: Error) => {
+          showErrorPrompt(convertRoleErrorText(error));
         });
     setSendLoading(false);
   };
@@ -449,15 +449,20 @@ const useAction = (
   }, [openError]);
 
   useEffect(() => {
-    GetEmailData().then((data) => {
-      // 获取发送信息
-      if (data && data.length > 0) {
-        setEmailList(data);
-        setEmailFrom(
-          data.find((x) => x.senderId === emailObj?.senderId) ?? data[0]
-        );
-      }
-    });
+    GetEmailData()
+      .then((data) => {
+        // 获取发送信息
+        if (data && data.length > 0) {
+          setEmailList(data);
+          setEmailFrom(
+            data.find((x) => x.senderId === emailObj?.senderId) ?? data[0]
+          );
+        }
+      })
+      .catch((error: Error) => {
+        openErrorAction.setTrue();
+        setPromptText(convertRoleErrorText(error));
+      });
   }, []);
 
   // 及时销毁 editor

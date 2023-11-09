@@ -161,7 +161,7 @@ export const RolePermissions = () => {
             <Button
               variant="contained"
               onClick={() => {
-                rowId && deleteRole(String(rowId));
+                rowId && deleteRole(rowId);
                 confirmTipsRef.current?.close();
               }}
               className={styles.confirmButton}

@@ -8,6 +8,7 @@ import {
   IUpdateMessageCommand,
 } from "../../dtos/enterprise";
 import { ModalBoxRef } from "../../dtos/modal";
+import { convertRoleErrorText } from "../../uilts/convert-error";
 
 export const judgeDataIsCorrect = (
   data: ISendMessageCommand | IUpdateMessageCommand,
@@ -128,13 +129,7 @@ export const useAction = () => {
         })
         .catch((error: Error) => {
           setAlertType("error");
-          showErrorPrompt(
-            error.message.includes(
-              "PostBoy.Core.Middlewares.Authorization.ForbiddenAccessException"
-            )
-              ? "没有此功能权限"
-              : "This request save error!"
-          );
+          showErrorPrompt(convertRoleErrorText(error));
           successAction.setFalse();
         });
     }

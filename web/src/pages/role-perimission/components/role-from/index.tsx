@@ -191,7 +191,6 @@ export const RoleFrom = () => {
               variant="contained"
               onClick={() => {
                 addOrModifyRolePermission();
-                // navigate("/roles/permission")
               }}
             >
               確認
@@ -199,7 +198,7 @@ export const RoleFrom = () => {
             <Button
               className={styles.navButton}
               variant="outlined"
-              onClick={() => navigate("/roles/permission")}
+              onClick={() => navigate("/role/permission")}
             >
               返回
             </Button>
