@@ -126,9 +126,15 @@ export const useAction = () => {
           showErrorPrompt("This request save success!");
           successAction.setTrue();
         })
-        .catch(() => {
+        .catch((error: Error) => {
           setAlertType("error");
-          showErrorPrompt("This request save error!");
+          showErrorPrompt(
+            error.message.includes(
+              "PostBoy.Core.Middlewares.Authorization.ForbiddenAccessException"
+            )
+              ? "没有此功能权限"
+              : "This request save error!"
+          );
           successAction.setFalse();
         });
     }

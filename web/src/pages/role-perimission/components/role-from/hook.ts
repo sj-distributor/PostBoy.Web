@@ -24,6 +24,7 @@ import {
   informationPermissionsNames,
 } from "./props";
 import { useSnackbar } from "notistack";
+import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 export const useAction = () => {
   const [options, setOptions] = useState<DepartmentTreeDto[]>([]);
@@ -352,10 +353,8 @@ export const useAction = () => {
             enqueueSnackbar("创建角色成功!", { variant: "success" });
           }
         })
-        .catch((error) =>
-          enqueueSnackbar("角色创建失败", {
-            variant: "error",
-          })
+        .catch((error: Error) =>
+          enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
         );
     else {
       enqueueSnackbar("角色新增失败，需要填写角色名和描述", {
@@ -382,10 +381,8 @@ export const useAction = () => {
             enqueueSnackbar("修改角色成功!", { variant: "success" });
           }
         })
-        .catch((error) =>
-          enqueueSnackbar("角色修改失败", {
-            variant: "error",
-          })
+        .catch((error: Error) =>
+          enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
         );
     else {
       enqueueSnackbar("角色修改失败，需要填写角色名和描述", {
@@ -409,88 +406,97 @@ export const useAction = () => {
 
   useEffect(() => {
     (async () => {
-      const { staffDepartmentHierarchy } = await GetTreeList();
+      try {
+        const { staffDepartmentHierarchy } = await GetTreeList();
 
-      setOptions(staffDepartmentHierarchy ?? []);
-      const options = getFlatOptionsList(staffDepartmentHierarchy ?? []);
+        setOptions(staffDepartmentHierarchy ?? []);
+        const options = getFlatOptionsList(staffDepartmentHierarchy ?? []);
 
-      const { count, permissions } = await GetPermissions();
-      const permissionsList: RolePermissionsDto[] = [];
-      permissions?.map((item) =>
-        permissionsList.push({ ...item, checked: false })
-      );
-
-      permissionsList.length && setRolePermissionsCheckedList(permissionsList);
-      setPermissions({
-        count: count ?? 0,
-        permissions: permissions ?? [],
-      });
-
-      const informationRoleIds = Array.from(
-        new Set(
-          permissions
-            .filter((item) => informationPermissionsNames.includes(item.name))
-            .map((item) => item.id)
-        )
-      );
-      const groupRoleIds = Array.from(
-        new Set(
-          permissions
-            .filter((item) => groupPermissionsNames.includes(item.name))
-            .map((item) => item.id)
-        )
-      );
-
-      if (roleId) {
-        // 获取角色信息
-        const {
-          role,
-          rolePermissions,
-          rolePermissionUnits,
-          permissions: currentPermissions,
-        } = await GetRolePermission(roleId);
-        setRole(role ?? defaultRole);
-        const selectedPermissions = currentPermissions?.map((item) => item.id);
-        setRolePermission(rolePermissions ?? []);
-
-        const groupUsersList = rolePermissionUnits
-          ?.filter((item) =>
-            groupRoleIds.some((gId) => gId === item.permissionId)
-          )
-          .map((item) => item.unitId);
-        const informationUsersList = rolePermissionUnits
-          ?.filter((item) =>
-            informationRoleIds.some((iId) => iId === item.permissionId)
-          )
-          .map((item) => item.unitId);
-
-        const pullCrowdData = options.map((item) =>
-          groupUsersList?.some((userId) => userId === item.id)
-            ? { ...item, isSelected: true }
-            : item
-        );
-        const notificationData = options.map((item) =>
-          informationUsersList?.some((userId) => userId === item.id)
-            ? { ...item, isSelected: true }
-            : item
+        const { count, permissions } = await GetPermissions();
+        const permissionsList: RolePermissionsDto[] = [];
+        permissions?.map((item) =>
+          permissionsList.push({ ...item, checked: false })
         );
 
-        setCheckboxData({ pullCrowdData, notificationData });
+        permissionsList.length &&
+          setRolePermissionsCheckedList(permissionsList);
+        setPermissions({
+          count: count ?? 0,
+          permissions: permissions ?? [],
+        });
 
-        if (selectedPermissions?.length) {
-          const permissionsList: RolePermissionsDto[] = [];
-          permissions?.map((item) =>
-            permissionsList.push({
-              ...item,
-              checked: selectedPermissions.includes(item.id),
-            })
+        const informationRoleIds = Array.from(
+          new Set(
+            permissions
+              .filter((item) => informationPermissionsNames.includes(item.name))
+              .map((item) => item.id)
+          )
+        );
+        const groupRoleIds = Array.from(
+          new Set(
+            permissions
+              .filter((item) => groupPermissionsNames.includes(item.name))
+              .map((item) => item.id)
+          )
+        );
+
+        if (roleId) {
+          // 获取角色信息
+          const {
+            role,
+            rolePermissions,
+            rolePermissionUnits,
+            permissions: currentPermissions,
+          } = await GetRolePermission(roleId);
+          setRole(role ?? defaultRole);
+          const selectedPermissions = currentPermissions?.map(
+            (item) => item.id
+          );
+          setRolePermission(rolePermissions ?? []);
+
+          const groupUsersList = rolePermissionUnits
+            ?.filter((item) =>
+              groupRoleIds.some((gId) => gId === item.permissionId)
+            )
+            .map((item) => item.unitId);
+          const informationUsersList = rolePermissionUnits
+            ?.filter((item) =>
+              informationRoleIds.some((iId) => iId === item.permissionId)
+            )
+            .map((item) => item.unitId);
+
+          const pullCrowdData = options.map((item) =>
+            groupUsersList?.some((userId) => userId === item.id)
+              ? { ...item, isSelected: true }
+              : item
+          );
+          const notificationData = options.map((item) =>
+            informationUsersList?.some((userId) => userId === item.id)
+              ? { ...item, isSelected: true }
+              : item
           );
 
-          permissionsList.length &&
-            setRolePermissionsCheckedList(permissionsList);
-        }
+          setCheckboxData({ pullCrowdData, notificationData });
 
-        setIsLoading(false);
+          if (selectedPermissions?.length) {
+            const permissionsList: RolePermissionsDto[] = [];
+            permissions?.map((item) =>
+              permissionsList.push({
+                ...item,
+                checked: selectedPermissions.includes(item.id),
+              })
+            );
+
+            permissionsList.length &&
+              setRolePermissionsCheckedList(permissionsList);
+          }
+
+          setIsLoading(false);
+        }
+      } catch (error) {
+        enqueueSnackbar(convertRoleErrorText(error as Error), {
+          variant: "error",
+        });
       }
     })();
   }, []);

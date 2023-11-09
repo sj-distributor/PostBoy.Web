@@ -15,6 +15,7 @@ import {
   DeleteRoleUser,
   GetRoleUser,
 } from "../../../../api/role-user-permissions";
+import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 export const useAction = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -92,8 +93,8 @@ export const useAction = () => {
           setLoading(false);
         }, 300);
       })
-      .catch((error) => {
-        enqueueSnackbar((error as Error).message, { variant: "error" });
+      .catch((error: Error) => {
+        enqueueSnackbar(convertRoleErrorText(error), { variant: "error" });
 
         updateUsersDto("count", 0);
         updateUsersDto("roleUsers", []);

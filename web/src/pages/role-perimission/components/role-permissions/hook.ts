@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -6,6 +6,8 @@ import {
   IPageDto,
   IRolePermissionDto,
   IRolePermissionDataItem,
+  FunctionalPermissionsEnum,
+  UserRoleEnum,
 } from "../../../../dtos/role-user-permissions";
 import {
   DeleteRoles,
@@ -13,6 +15,7 @@ import {
 } from "../../../../api/role-user-permissions";
 import auth from "../../../../auth";
 import { useDebounceFn } from "ahooks";
+import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 export const useAction = () => {
   const { currentUserRolePermissions } = auth();
@@ -38,11 +41,19 @@ export const useAction = () => {
     rolePermissionData: [],
   });
 
+  const userPermissions = useMemo(() => {
+    return (
+      currentUserRolePermissions.rolePermissionData.map(
+        (item) => item.permissions
+      )[0] ?? []
+    );
+  }, [currentUserRolePermissions.rolePermissionData]);
+
   const handleAddRole = () => {
     if (
-      currentUserRolePermissions.rolePermissionData
-        .map((item) => item.role)
-        .some((item) => item.name === "新增")
+      userPermissions.some(
+        (item) => item.name === FunctionalPermissionsEnum.CanCreateRoleUser
+      )
     ) {
       navigate(`/roles/createRole`);
     } else {
@@ -53,11 +64,25 @@ export const useAction = () => {
   };
 
   const handleRoleAssignment = (name: string, id: string) => {
+    const userRole = currentUserRolePermissions.rolePermissionData.map(
+      (item) => item.role.name
+    )[0];
+
     if (
-      currentUserRolePermissions.rolePermissionData
-        .map((item) => item.role)
-        .some((item) => item.name === name)
+      userPermissions.some(
+        (item) =>
+          item.name === FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
+      )
     ) {
+      if (
+        name === UserRoleEnum.Administrator &&
+        userRole !== UserRoleEnum.Administrator
+      ) {
+        enqueueSnackbar("需要登录超级管理员帐号进行分配！", {
+          variant: "info",
+        });
+        return;
+      }
       navigate(`/roles/assigningUsers/${id}`);
     } else {
       enqueueSnackbar("没有权限分配", {
@@ -69,15 +94,16 @@ export const useAction = () => {
   const { run: handleRoleAssignmentDebounce } = useDebounceFn(
     (name: string, id: string) => handleRoleAssignment(name, id),
     {
-      wait: 800,
+      wait: 300,
     }
   );
 
   const handleEditRole = (name: string, id: string) => {
     if (
-      currentUserRolePermissions.rolePermissionData
-        .map((item) => item.role)
-        .some((item) => item.name === name)
+      userPermissions.some(
+        (item) =>
+          item.name === FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
+      )
     ) {
       navigate(`/roles/updateRole/${id}`);
     } else {
@@ -90,15 +116,15 @@ export const useAction = () => {
   const { run: handleEditRoleDebounce } = useDebounceFn(
     (name: string, id: string) => handleEditRole(name, id),
     {
-      wait: 800,
+      wait: 300,
     }
   );
 
   const handleRemoveRole = (name: string, id: string) => {
     if (
-      currentUserRolePermissions.rolePermissionData
-        .map((item) => item.role)
-        .some((item) => item.name === name)
+      userPermissions.some(
+        (item) => item.name === FunctionalPermissionsEnum.CanDeleteRoles
+      )
     ) {
       confirmTipsRef.current?.open();
       setRowId(id);
@@ -112,7 +138,7 @@ export const useAction = () => {
   const { run: handleRemoveRoleDebounce } = useDebounceFn(
     (name: string, id: string) => handleRemoveRole(name, id),
     {
-      wait: 800,
+      wait: 300,
     }
   );
 
@@ -127,9 +153,9 @@ export const useAction = () => {
           setLoading(false);
         }, 500);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         setTimeout(() => {
-          enqueueSnackbar((error as Error).message, { variant: "error" });
+          enqueueSnackbar(convertRoleErrorText(error), { variant: "error" });
 
           updateRoleDto("count", 0);
           updateRoleDto("rolePermissionData", []);
@@ -144,8 +170,8 @@ export const useAction = () => {
       .then(() => {
         loadRoles();
       })
-      .catch((error) =>
-        enqueueSnackbar((error as Error).message, { variant: "error" })
+      .catch((error: Error) =>
+        enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
       );
   };
 

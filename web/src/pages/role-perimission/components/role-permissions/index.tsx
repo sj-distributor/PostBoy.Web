@@ -20,7 +20,6 @@ export const RolePermissions = () => {
     handleRemoveRoleDebounce,
     handleAddRole,
     updatePageDto,
-    navigate,
     deleteRole,
     loadRoles,
   } = useAction();
@@ -41,12 +40,14 @@ export const RolePermissions = () => {
       headerName: "操作",
       flex: 1,
       renderCell: (params) => {
-        switch (params.row.displayName) {
+        switch (params.row.name) {
           case UserRoleEnum.Administrator:
             return (
               <Button
                 variant="text"
-                onClick={() => handleRoleAssignmentDebounce()}
+                onClick={() =>
+                  handleRoleAssignmentDebounce(params.row.name, params.row.id)
+                }
               >
                 分配
               </Button>

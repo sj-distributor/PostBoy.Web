@@ -173,7 +173,7 @@ export interface DepartmentTreeDto {
 
 export enum UserRoleEnum {
   Administrator = "Administrator",
-  DefaultUser = "DefaultUser",
+  DefaultUser = "StandardUser",
 }
 
 export const UserRoleType = {
@@ -188,7 +188,7 @@ export enum FunctionalPermissionsEnum {
   CanUpdateWorkWeChatGroup = "CanUpdateWorkWeChatGroup",
   CanCreateRoleUser = "CanCreateRoleUser",
   CanDeleteRoles = "CanDeleteRoles",
-  CanUpdateGrantPermissionsIntoRole = "CanUpdateGrantPermissionsIntoRole",
+  CanUpdatePermissionsOfRole = "CanUpdatePermissionsOfRole",
   CanSendWorkWeChatAppNotification = "CanSendWorkWeChatAppNotification",
   CanGrantPermissionsIntoRole = "CanGrantPermissionsIntoRole",
   CanSendMessage = "CanSendMessage",
@@ -202,7 +202,7 @@ export const FunctionalPermissions = {
   [FunctionalPermissionsEnum.CanUpdateWorkWeChatGroup]: "添加群組成員",
   [FunctionalPermissionsEnum.CanCreateRoleUser]: "新增角色",
   [FunctionalPermissionsEnum.CanDeleteRoles]: "刪除",
-  [FunctionalPermissionsEnum.CanUpdateGrantPermissionsIntoRole]: "編輯",
+  [FunctionalPermissionsEnum.CanUpdatePermissionsOfRole]: "編輯",
   [FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification]: "發送通知",
   [FunctionalPermissionsEnum.CanGrantPermissionsIntoRole]: "分配",
 };
