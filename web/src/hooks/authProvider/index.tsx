@@ -87,7 +87,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
       sendMessagePermission
         ? "/home"
         : rolePermission
-        ? "/roles"
+        ? "/role"
         : adminPermission
         ? "/user"
         : "/none"
@@ -96,7 +96,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     return routerArray.filter(
       (item) =>
         (sendMessagePermission || item.path !== "/home") &&
-        (rolePermission || item.path !== "/roles") &&
+        (rolePermission || item.path !== "/role") &&
         (adminPermission || (item.path !== "/user" && item.path !== "/manager"))
     );
   }, [currentUserRolePermissions]);

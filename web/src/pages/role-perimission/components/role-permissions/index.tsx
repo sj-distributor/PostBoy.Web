@@ -55,7 +55,12 @@ export const RolePermissions = () => {
 
           case UserRoleEnum.DefaultUser:
             return (
-              <Button variant="text" onClick={() => handleEditRoleDebounce()}>
+              <Button
+                variant="text"
+                onClick={() =>
+                  handleEditRoleDebounce(params.row.name, params.row.id)
+                }
+              >
                 編輯
               </Button>
             );

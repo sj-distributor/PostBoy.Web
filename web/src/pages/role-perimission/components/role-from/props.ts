@@ -23,6 +23,3 @@ export interface RolePermissionsDto {
   isSystem: boolean;
   checked?: boolean;
 }
-
-export const groupPermissionsNames = ["创建群组", "发送群聊信息"];
-export const informationPermissionsNames = ["信息发送", "发送通知"];

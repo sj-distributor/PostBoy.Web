@@ -9,20 +9,17 @@ import {
   UpdateRolePermission,
 } from "../../../../api/role-user-permissions";
 import {
+  FunctionalPermissionsEnum,
   IDepartmentTreeDto,
   IPermissionsDto,
   IRole,
   IRolePermission,
   IRolePermissionItem,
-} from "../../../../dtos/role-user-permissions";
-import { useEffect, useMemo, useState } from "react";
-import {
-  AllDepartmentData,
-  DepartmentDto,
-  RolePermissionsDto,
   groupPermissionsNames,
   informationPermissionsNames,
-} from "./props";
+} from "../../../../dtos/role-user-permissions";
+import { useEffect, useMemo, useState } from "react";
+import { AllDepartmentData, DepartmentDto, RolePermissionsDto } from "./props";
 import { useSnackbar } from "notistack";
 import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
@@ -347,7 +344,7 @@ export const useAction = () => {
       AddRolePermission(data)
         .then((res) => {
           if (res) {
-            navigate("/roles/permission");
+            navigate("/role/permission");
             enqueueSnackbar("创建角色成功!", { variant: "success" });
           }
         })
@@ -375,7 +372,7 @@ export const useAction = () => {
       UpdateRolePermission(data)
         .then((res) => {
           if (res) {
-            navigate("/roles/permission");
+            navigate("/role/permission");
             enqueueSnackbar("修改角色成功!", { variant: "success" });
           }
         })
@@ -426,14 +423,22 @@ export const useAction = () => {
         const informationRoleIds = Array.from(
           new Set(
             permissions
-              .filter((item) => informationPermissionsNames.includes(item.name))
+              .filter((item) =>
+                informationPermissionsNames.includes(
+                  item.name as FunctionalPermissionsEnum
+                )
+              )
               .map((item) => item.id)
           )
         );
         const groupRoleIds = Array.from(
           new Set(
             permissions
-              .filter((item) => groupPermissionsNames.includes(item.name))
+              .filter((item) =>
+                groupPermissionsNames.includes(
+                  item.name as FunctionalPermissionsEnum
+                )
+              )
               .map((item) => item.id)
           )
         );

@@ -158,6 +158,8 @@ export const UserRoleType = {
 };
 
 export enum FunctionalPermissionsEnum {
+  CanViewSendMessage = "CanViewSendMessage",
+  CanViewSecurityManagement = "CanViewSecurityManagement",
   CanGetPermissionsByRoles = "CanGetPermissionsByRoles",
   CanGetMessage = "CanGetMessage",
   CanCreateWorkWeChatGroup = "CanCreateWorkWeChatGroup",
@@ -171,6 +173,8 @@ export enum FunctionalPermissionsEnum {
 }
 
 export const FunctionalPermissions = {
+  [FunctionalPermissionsEnum.CanViewSendMessage]: "信息發送",
+  [FunctionalPermissionsEnum.CanViewSecurityManagement]: "角色權限",
   [FunctionalPermissionsEnum.CanGetPermissionsByRoles]: "角色權限",
   [FunctionalPermissionsEnum.CanSendMessage]: "信息發送",
   [FunctionalPermissionsEnum.CanGetMessage]: "發送記錄",
@@ -182,3 +186,12 @@ export const FunctionalPermissions = {
   [FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification]: "發送通知",
   [FunctionalPermissionsEnum.CanGrantPermissionsIntoRole]: "分配",
 };
+
+export const groupPermissionsNames = [
+  FunctionalPermissionsEnum.CanCreateWorkWeChatGroup,
+  FunctionalPermissionsEnum.CanUpdateWorkWeChatGroup,
+];
+export const informationPermissionsNames = [
+  FunctionalPermissionsEnum.CanSendMessage,
+  FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification,
+];

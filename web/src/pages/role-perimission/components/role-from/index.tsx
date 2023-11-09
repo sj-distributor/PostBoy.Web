@@ -50,8 +50,7 @@ export const RoleFrom = () => {
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-  const isShowLoading =
-    isLoading && location.pathname.includes("/roles/updateRole");
+  const isShowLoading = isLoading && location.pathname.includes("/role/edit");
 
   const renderInputBox = (
     title: string,
@@ -181,9 +180,7 @@ export const RoleFrom = () => {
       <Stack spacing={5}>
         <div className={styles.nav}>
           <div className={styles.navTitle}>
-            {location.pathname === "/roles/createRole"
-              ? "新增角色"
-              : "編輯角色"}
+            {location.pathname === "/role/create" ? "新增角色" : "編輯角色"}
           </div>
           <div className={styles.navBtn}>
             <Button
@@ -261,13 +258,7 @@ export const RoleFrom = () => {
                       }}
                     >
                       {rolePermissionsCheckedList
-                        .filter(
-                          (item) =>
-                            item.name ===
-                              FunctionalPermissionsEnum.CanGetPermissionsByRoles ||
-                            item.name ===
-                              FunctionalPermissionsEnum.CanSendMessage
-                        )
+                        .filter((item) => item.name.includes("CanView"))
                         .map((roleItem, index) => {
                           return (
                             <FormControlLabel
@@ -305,12 +296,7 @@ export const RoleFrom = () => {
                     }}
                   >
                     {rolePermissionsCheckedList
-                      .filter(
-                        (item) =>
-                          item.name !==
-                            FunctionalPermissionsEnum.CanGetPermissionsByRoles &&
-                          item.name !== FunctionalPermissionsEnum.CanSendMessage
-                      )
+                      .filter((item) => !item.name.includes("CanView"))
                       .map((roleItem, index) => {
                         return (
                           <div style={{ marginRight: 15 }} key={index}>
