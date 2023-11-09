@@ -44,7 +44,10 @@ export const useAction = () => {
   const userPermissions = useMemo(() => {
     const data = new Set<string>();
 
-    if (currentUserRolePermissions?.rolePermissionData.length) {
+    if (
+      currentUserRolePermissions &&
+      currentUserRolePermissions.rolePermissionData?.length
+    ) {
       currentUserRolePermissions.rolePermissionData
         .map((item) => item.permissions)
         .map((item) =>
@@ -53,7 +56,7 @@ export const useAction = () => {
     }
 
     return Array.from(data);
-  }, [currentUserRolePermissions.rolePermissionData]);
+  }, [currentUserRolePermissions]);
 
   const handleAddRole = () => {
     if (
@@ -70,9 +73,9 @@ export const useAction = () => {
   };
 
   const handleRoleAssignment = (name: string, id: string) => {
-    const userRole = currentUserRolePermissions.rolePermissionData.map(
+    const userRoles = currentUserRolePermissions.rolePermissionData.map(
       (item) => item.role.name
-    )[0];
+    );
 
     if (
       userPermissions.some(
@@ -81,7 +84,7 @@ export const useAction = () => {
     ) {
       if (
         name === UserRoleEnum.Administrator &&
-        userRole !== UserRoleEnum.Administrator
+        !userRoles.includes(UserRoleEnum.Administrator)
       ) {
         enqueueSnackbar("需要登录超级管理员帐号进行分配！", {
           variant: "info",
