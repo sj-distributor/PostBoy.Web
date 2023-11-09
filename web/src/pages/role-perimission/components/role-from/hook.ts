@@ -384,7 +384,7 @@ export const useAction = () => {
         );
     else {
       enqueueSnackbar("角色修改失败，需要填写角色名和描述", {
-        variant: "error",
+        variant: "info",
       });
     }
   };

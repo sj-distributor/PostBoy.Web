@@ -51,7 +51,7 @@ export const useAction = () => {
           item?.map((item) => item.name)?.map((item) => item && data.add(item))
         );
     }
-    console.log(data);
+
     return Array.from(data);
   }, [currentUserRolePermissions.rolePermissionData]);
 
