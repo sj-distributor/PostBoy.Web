@@ -1,14 +1,13 @@
 import styles from "./index.module.scss";
 import { AlertColor, Button, CircularProgress, TextField } from "@mui/material";
 import useAction from "./hook";
-import { IUserListItem } from "../../../../dtos/user-management";
 import { memo } from "react";
 import { Actions } from "ahooks/lib/useBoolean";
 
 const RegistrationPopup = memo(
   (props: {
     onRegisterCancel: () => void;
-    setUsersList: React.Dispatch<React.SetStateAction<IUserListItem[]>>;
+    getAllUsersData: () => void;
     snackbarAction: Actions;
     setSnackBarData: React.Dispatch<
       React.SetStateAction<{
@@ -17,8 +16,12 @@ const RegistrationPopup = memo(
       }>
     >;
   }) => {
-    const { onRegisterCancel, setUsersList, snackbarAction, setSnackBarData } =
-      props;
+    const {
+      onRegisterCancel,
+      getAllUsersData,
+      snackbarAction,
+      setSnackBarData,
+    } = props;
 
     const {
       username,
@@ -29,7 +32,7 @@ const RegistrationPopup = memo(
       isLoading,
     } = useAction({
       onRegisterCancel,
-      setUsersList,
+      getAllUsersData,
       snackbarAction,
       setSnackBarData,
     });

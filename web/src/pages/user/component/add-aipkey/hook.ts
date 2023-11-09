@@ -61,7 +61,7 @@ const useAction = (props: {
               }
             }
           })
-          .catch(() => {
+          .catch((err) => {
             setSnackBarData({ severity: "error", text: "获取用户APIKEY失败" });
             snackbarAction.setTrue();
           });

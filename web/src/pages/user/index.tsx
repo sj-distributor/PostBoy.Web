@@ -61,7 +61,7 @@ const User = () => {
       <ModalBox ref={registerRef} onCancel={onRegisterCancel}>
         <RegistrationPopup
           onRegisterCancel={onRegisterCancel}
-          setUsersList={setUsersList}
+          getAllUsersData={getAllUsersData}
           snackbarAction={snackbarAction}
           setSnackBarData={setSnackBarData}
         />

@@ -91,10 +91,6 @@ const useAction = () => {
   };
 
   useEffect(() => {
-    getAllUsersData();
-  }, []);
-
-  useEffect(() => {
     if (snackbar) {
       setTimeout(() => {
         snackbarAction.setFalse();
