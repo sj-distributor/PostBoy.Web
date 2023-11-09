@@ -17,7 +17,11 @@ export const PostAuthRegister = async (data: ILoginRequest) => {
 };
 
 export const GetAllUsers = async (data: IGetAllUserDto) => {
-  return await Get<IUserAllResponse>(`/auth/allUsers`, { params: data });
+  return await Get<IUserAllResponse>(
+    `/auth/allUsers?PageIndex=${data.Page}&PageSize=${data.PageSize}${
+      data.UserName ? "&UserName=" + data.UserName : ""
+    }`
+  );
 };
 
 export const GetUserApikeys = async (userId: string) => {
