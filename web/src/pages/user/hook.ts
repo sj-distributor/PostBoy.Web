@@ -8,6 +8,7 @@ import {
   IUserListItem,
 } from "../../dtos/user-management";
 import { AlertColor } from "@mui/material";
+import { convertRoleErrorText } from "../../uilts/convert-error";
 
 const useAction = () => {
   const [usersList, setUsersList] = useState<IUserListItem[]>([]);
@@ -81,8 +82,11 @@ const useAction = () => {
         setUsersList(res?.users ?? []);
         setUserDto((prev) => ({ ...prev, count: res?.count ?? 0 }));
       })
-      .catch(() => {
-        setSnackBarData({ severity: "error", text: "获取用户数据失败" });
+      .catch((error: Error) => {
+        setSnackBarData({
+          severity: "error",
+          text: convertRoleErrorText(error),
+        });
         snackbarAction.setTrue();
       })
       .finally(() => {
