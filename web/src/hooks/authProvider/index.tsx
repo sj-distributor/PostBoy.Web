@@ -1,7 +1,11 @@
 import { createContext, useState, useEffect, useMemo } from "react";
 import jwt_decode from "jwt-decode";
 import { GetCurrentRolesByPermissions } from "../../api/role-user-permissions";
-import { IRolePermissionDto } from "../../dtos/role-user-permissions";
+import {
+  FunctionalPermissionsEnum,
+  IRolePermissionDto,
+  UserRoleEnum,
+} from "../../dtos/role-user-permissions";
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/route";
 
@@ -67,18 +71,21 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
 
     const sendMessagePermission = rolePermissionData.some((item) => {
       return item.permissions.some(
-        (permission) => permission.displayName === "信息發送"
+        (permission) =>
+          permission.name === FunctionalPermissionsEnum.CanViewSendMessage
       );
     });
 
     const rolePermission = rolePermissionData.some((item) => {
       return item.permissions.some(
-        (permission) => permission.displayName === "角色權限"
+        (permission) =>
+          permission.name ===
+          FunctionalPermissionsEnum.CanViewSecurityManagement
       );
     });
 
     const adminPermission = rolePermissionData.some(
-      (item) => item.role.name === "Administrator"
+      (item) => item.role.name === UserRoleEnum.Administrator
     );
 
     setHaveAdminPermission(adminPermission);
