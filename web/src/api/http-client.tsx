@@ -49,5 +49,8 @@ export async function base<T>(
       } else {
         throw new Error(res.msg);
       }
+    })
+    .catch((error) => {
+      throw new Error(error.message);
     });
 }
