@@ -52,13 +52,6 @@ export interface IUsersDto {
   userName: string;
 }
 
-export interface IRoleTabltDto {
-  id: number;
-  name: string;
-  details: string;
-  role: number;
-}
-
 export interface IDepartmentDto {
   allDepartment: IDepartmentListDto[];
 }
