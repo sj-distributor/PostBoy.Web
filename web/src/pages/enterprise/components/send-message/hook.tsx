@@ -98,7 +98,6 @@ const useAction = () => {
       .catch((error: Error) => {
         showErrorPrompt(convertRoleErrorText(error));
         loadingAction.setFalse();
-        failSendAction.setTrue();
       });
   };
 
