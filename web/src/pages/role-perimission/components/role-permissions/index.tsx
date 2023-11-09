@@ -1,12 +1,19 @@
 import styles from "./index.module.scss";
 
-import { Button, IconButton, TextField } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  TextField,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAction } from "./hook";
 import ModalBox from "../../../../components/modal/modal";
 import ErrorIcon from "@mui/icons-material/Error";
 import { UserRoleEnum } from "../../../../dtos/role-user-permissions";
+import { Search } from "@mui/icons-material";
 
 export const RolePermissions = () => {
   const {
@@ -104,22 +111,30 @@ export const RolePermissions = () => {
       <div className={styles.nav}>
         <div className={styles.navTitle}>角色權限</div>
         <div className={styles.navSearch}>
-          <TextField
-            className={styles.navInput}
+          <OutlinedInput
+            id="outlined-adornment-password"
+            type="text"
             size="small"
-            variant="outlined"
-            placeholder="搜索角色名稱"
-            fullWidth
             autoComplete="off"
-            value={pageDto.keyword}
             onChange={(e) => updatePageDto("keyword", e.target.value)}
             onKeyDown={(event) => event.key === "Enter" && loadRoles()}
+            placeholder="搜索角色名稱"
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton aria-label="toggle password visibility" edge="end">
+                  <Search />
+                </IconButton>
+              </InputAdornment>
+            }
           />
-          <div className={styles.navIcon}>
-            <IconButton aria-label="Search" onClick={() => loadRoles()}>
-              <SearchIcon className={styles.navFont} />
-            </IconButton>
-          </div>
+          <Button
+            variant="contained"
+            component="label"
+            sx={{ marginLeft: "0.5rem" }}
+            onClick={() => loadRoles()}
+          >
+            搜索
+          </Button>
         </div>
         <div className={styles.navBtn}>
           <Button variant="contained" onClick={() => handleAddRole()}>

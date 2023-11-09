@@ -58,18 +58,7 @@ export const routerArray: RouteItem[] = [
       },
     ],
   },
-  {
-    path: "/user",
-    head: "用户管理",
-    icons: <AccountCircleIcon />,
-    element: <User />,
-  },
-  {
-    path: "/manager",
-    head: "应用管理",
-    icons: <SettingsIcon />,
-    element: <Manager />,
-  },
+
   {
     path: "/role",
     head: "角色权限",
@@ -112,6 +101,18 @@ export const routerArray: RouteItem[] = [
     path: "/meeting",
     head: "",
     element: <MeetingList />,
+  },
+  {
+    path: "/user",
+    head: "",
+    // icons: <AccountCircleIcon />,
+    element: <User />,
+  },
+  {
+    path: "/manager",
+    head: "",
+    // icons: <SettingsIcon />,
+    element: <Manager />,
   },
 ];
 
