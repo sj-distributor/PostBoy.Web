@@ -46,7 +46,7 @@ const useAction = (props: {
           setUsersList(res?.users ?? []);
           setUserDto((prev) => ({ ...prev, count: res?.count ?? 0 }));
         })
-        .catch((error) => {
+        .catch(() => {
           setSnackBarData({ severity: "error", text: "获取用户数据失败" });
           snackbarAction.setTrue();
         });

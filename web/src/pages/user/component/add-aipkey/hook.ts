@@ -39,32 +39,37 @@ const useAction = (props: {
       apiKey: apiKey,
       description: description,
       userAccountId: userAccountId,
-    }).then(() => {
-      onAddApikeyCancel();
-      setSnackBarData({ severity: "success", text: "添加成功！" });
-      snackbarAction.setTrue();
-      isLoadingAction.setFalse();
+    })
+      .then(() => {
+        onAddApikeyCancel();
+        setSnackBarData({ severity: "success", text: "添加成功！" });
+        snackbarAction.setTrue();
+        isLoadingAction.setFalse();
 
-      GetUserApikeys(userAccountId)
-        .then((res) => {
-          if (!!res) {
-            if (!isEmpty(userApikeyList)) {
-              const newList = userApikeyList.map((items) => {
-                items.map((x) => x.userAccountId);
-                if (items[0].userAccountId === res[0].userAccountId) {
-                  items = res;
-                }
-                return items;
-              });
-              setUserApikey(newList);
+        GetUserApikeys(userAccountId)
+          .then((res) => {
+            if (!!res) {
+              if (!isEmpty(userApikeyList)) {
+                const newList = userApikeyList.map((items) => {
+                  items.map((x) => x.userAccountId);
+                  if (items[0].userAccountId === res[0].userAccountId) {
+                    items = res;
+                  }
+                  return items;
+                });
+                setUserApikey(newList);
+              }
             }
-          }
-        })
-        .catch((error) => {
-          setSnackBarData({ severity: "error", text: "获取用户APIKEY失败" });
-          snackbarAction.setTrue();
-        });
-    });
+          })
+          .catch(() => {
+            setSnackBarData({ severity: "error", text: "获取用户APIKEY失败" });
+            snackbarAction.setTrue();
+          });
+      })
+      .catch(() => {
+        setSnackBarData({ severity: "error", text: "添加失败！" });
+        snackbarAction.setTrue();
+      });
 
     setAipKey("");
     setDescription("");
