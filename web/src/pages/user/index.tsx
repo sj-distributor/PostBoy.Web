@@ -89,8 +89,9 @@ const User = () => {
             autoComplete="off"
             onKeyDown={(e) => {
               if (e.code === "Enter" && !isLoading) {
-                setUserDto((prev) => ({ ...prev, page: 1 }));
-                getAllUsersData();
+                usersDto.page === 1
+                  ? getAllUsersData()
+                  : setUserDto((prev) => ({ ...prev, page: 1 }));
               }
             }}
             onChange={(e) =>
@@ -111,8 +112,9 @@ const User = () => {
             sx={{ marginLeft: "0.5rem" }}
             onClick={() => {
               if (!isLoading) {
-                setUserDto((prev) => ({ ...prev, page: 1 }));
-                getAllUsersData();
+                usersDto.page === 1
+                  ? getAllUsersData()
+                  : setUserDto((prev) => ({ ...prev, page: 1 }));
               }
             }}
           >
