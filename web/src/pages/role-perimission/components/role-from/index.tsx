@@ -255,6 +255,8 @@ export const RoleFrom = () => {
                         minHeight: 100,
                         maxHeight: 100,
                         overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column",
                       }}
                     >
                       {rolePermissionsCheckedList
@@ -288,7 +290,7 @@ export const RoleFrom = () => {
                 <div className={styles.itemPermission}>
                   <div className={styles.itemPermissionTitle}>功能權限</div>
                   <div
-                    className={styles.itemPerssionsForm}
+                    className={styles.itemPermissionsForm}
                     style={{
                       minHeight: 100,
                       maxHeight: 100,
@@ -299,27 +301,26 @@ export const RoleFrom = () => {
                       .filter((item) => !item.name.includes("CanView"))
                       .map((roleItem, index) => {
                         return (
-                          <div style={{ marginRight: 15 }} key={index}>
-                            <FormControlLabel
-                              key={index}
-                              control={
-                                <Checkbox
-                                  onChange={(e) =>
-                                    handleUpdateRolePermissionsChecked(
-                                      roleItem.id,
-                                      e.target.checked
-                                    )
-                                  }
-                                  checked={roleItem.checked}
-                                />
-                              }
-                              label={
-                                FunctionalPermissions[
-                                  roleItem.name as FunctionalPermissionsEnum
-                                ] ?? roleItem.name
-                              }
-                            />
-                          </div>
+                          <FormControlLabel
+                            key={index}
+                            sx={{ height: 42, marginRight: 5 }}
+                            control={
+                              <Checkbox
+                                onChange={(e) =>
+                                  handleUpdateRolePermissionsChecked(
+                                    roleItem.id,
+                                    e.target.checked
+                                  )
+                                }
+                                checked={roleItem.checked}
+                              />
+                            }
+                            label={
+                              FunctionalPermissions[
+                                roleItem.name as FunctionalPermissionsEnum
+                              ] ?? roleItem.name
+                            }
+                          />
                         );
                       })}
                   </div>
