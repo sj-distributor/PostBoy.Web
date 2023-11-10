@@ -42,8 +42,9 @@ export const RoleFrom = () => {
     role,
     isLoading,
     updateRole,
-    addOrModifyRolePermission,
+    addOrModifyRolePermissionDebounce,
     handleUpdateRolePermissionsChecked,
+    isPostLoading,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -186,11 +187,19 @@ export const RoleFrom = () => {
             <Button
               className={styles.navButton}
               variant="contained"
+              disabled={isPostLoading}
               onClick={() => {
-                addOrModifyRolePermission();
+                addOrModifyRolePermissionDebounce();
               }}
             >
               確認
+              {isPostLoading && (
+                <CircularProgress
+                  size={16}
+                  color="primary"
+                  sx={{ marginLeft: 3 }}
+                />
+              )}
             </Button>
             <Button
               className={styles.navButton}

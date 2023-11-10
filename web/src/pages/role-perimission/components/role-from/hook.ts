@@ -47,12 +47,14 @@ export const useAction = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const [isPostLoading, setIsPostLoading] = useState<boolean>(false);
+
   const location = useLocation();
 
   const navigate = useNavigate();
 
   const getFlatOptionsList = (data: IDepartmentTreeDto[]) => {
-    return data.reduce((accumulator, item) => {
+    return data.reduce((accumulator: DepartmentDto[], item) => {
       const higherDepartment: DepartmentDto = {
         name: item.department.name,
         id: item.department.id,
@@ -78,7 +80,7 @@ export const useAction = () => {
       }
 
       return accumulator;
-    }, [] as DepartmentDto[]);
+    }, []);
   };
 
   const flatOptions = useMemo(() => {
@@ -331,65 +333,56 @@ export const useAction = () => {
   };
 
   const addOrModifyRolePermission = () => {
-    roleId ? updateRolePermissionDebounce() : addRolePermissionDebounce();
-  };
-
-  const addRolePermission = () => {
     const data: IRolePermission = {
       role: role,
       rolePermissions: rolePermissionsDto,
     };
 
-    if (role.name && role.description)
-      AddRolePermission(data)
-        .then((res) => {
-          if (res) {
-            navigate("/role/permission");
-            enqueueSnackbar("创建角色成功!", { variant: "success" });
-          }
-        })
-        .catch((error: Error) =>
-          enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
-        );
-    else {
-      enqueueSnackbar("角色新增失败，需要填写角色名和描述", {
-        variant: "info",
-      });
+    if (role.name && role.description) {
+      setIsPostLoading(true);
+      if (roleId) {
+        UpdateRolePermission(data)
+          .then((res) => {
+            if (res) {
+              navigate("/role/permission");
+              enqueueSnackbar("修改角色成功!", { variant: "success" });
+            }
+          })
+          .catch((error: Error) =>
+            enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
+          )
+          .finally(() => {
+            setIsPostLoading(false);
+          });
+      } else {
+        AddRolePermission(data)
+          .then((res) => {
+            if (res) {
+              navigate("/role/permission");
+              enqueueSnackbar("创建角色成功!", { variant: "success" });
+            }
+          })
+          .catch((error: Error) =>
+            enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
+          )
+          .finally(() => {
+            setIsPostLoading(false);
+          });
+      }
+    } else {
+      enqueueSnackbar(
+        `角色${roleId ? "修改" : "新增"}失败，需要填写角色名和描述`,
+        {
+          variant: "info",
+        }
+      );
     }
   };
 
-  const { run: addRolePermissionDebounce } = useDebounceFn(addRolePermission, {
-    wait: 800,
-  });
-
-  const updateRolePermission = () => {
-    const data: IRolePermission = {
-      role: role,
-      rolePermissions: rolePermissionsDto,
-    };
-
-    if (role.name && role.description)
-      UpdateRolePermission(data)
-        .then((res) => {
-          if (res) {
-            navigate("/role/permission");
-            enqueueSnackbar("修改角色成功!", { variant: "success" });
-          }
-        })
-        .catch((error: Error) =>
-          enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
-        );
-    else {
-      enqueueSnackbar("角色修改失败，需要填写角色名和描述", {
-        variant: "info",
-      });
-    }
-  };
-
-  const { run: updateRolePermissionDebounce } = useDebounceFn(
-    updateRolePermission,
+  const { run: addOrModifyRolePermissionDebounce } = useDebounceFn(
+    addOrModifyRolePermission,
     {
-      wait: 800,
+      wait: 300,
     }
   );
 
@@ -557,6 +550,7 @@ export const useAction = () => {
     rolePermissionsCheckedList,
     isLoading,
     handleUpdateRolePermissionsChecked,
-    addOrModifyRolePermission,
+    addOrModifyRolePermissionDebounce,
+    isPostLoading,
   };
 };

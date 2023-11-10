@@ -30,7 +30,7 @@ export const useAction = () => {
 
   const [pageDto, setPageDto] = useState<IRoleUserPageDto>({
     PageIndex: 0,
-    PageSize: 20,
+    PageSize: 100,
     RoleId: roleId ?? "",
     Keyword: inputVal,
   });
@@ -42,15 +42,13 @@ export const useAction = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [isDeLoading, setIsDeLoading] = useState(false);
+
   const [openConfirm, openConfirmAction] = useBoolean(false);
 
   const [batchBtnDisable, batchBtnDisableAction] = useBoolean(true);
 
   const navigate = useNavigate();
-
-  const handleSearch = () => {
-    inputVal && updatePageDto("Keyword", inputVal);
-  };
 
   const handleDelete = useDebounceFn(
     () => {
@@ -59,7 +57,7 @@ export const useAction = () => {
       const data = {
         roleUserIds: selectId,
       };
-
+      setIsDeLoading(true);
       DeleteRoleUser(data)
         .then(() => {
           enqueueSnackbar("移除成功!", { variant: "success" });
@@ -71,6 +69,7 @@ export const useAction = () => {
         .finally(() => {
           setSelectId([]);
           openConfirmAction.setFalse();
+          setIsDeLoading(false);
         });
     },
     { wait: 500 }
@@ -116,7 +115,7 @@ export const useAction = () => {
 
   useEffect(() => {
     initUserList();
-  }, [pageDto.PageIndex, inputVal]);
+  }, [pageDto.PageIndex]);
 
   useEffect(() => {
     selectId.length === 0
@@ -135,9 +134,9 @@ export const useAction = () => {
     openConfirmAction,
     batchBtnDisable,
     roleId,
+    isDeLoading,
     navigate,
     setSelectId,
-    handleSearch,
     handleDelete,
     setPageDto,
     setInputVal,

@@ -49,10 +49,8 @@ export const useAction = () => {
       currentUserRolePermissions.rolePermissionData?.length
     ) {
       currentUserRolePermissions.rolePermissionData
-        .map((item) => item.permissions)
-        .map((item) =>
-          item?.map((item) => item.name)?.map((item) => item && data.add(item))
-        );
+        .flatMap((item) => item.permissions || [])
+        .forEach((item) => item?.name && data.add(item.name));
     }
 
     return Array.from(data);
@@ -195,7 +193,7 @@ export const useAction = () => {
 
   useEffect(() => {
     loadRoles();
-  }, [pageDto.pageIndex, pageDto.pageSize, pageDto.keyword]);
+  }, [pageDto.pageIndex, pageDto.pageSize]);
 
   return {
     rowId,

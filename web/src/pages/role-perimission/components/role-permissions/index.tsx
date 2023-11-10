@@ -116,6 +116,7 @@ export const RolePermissions = () => {
             type="text"
             size="small"
             autoComplete="off"
+            sx={{ minWidth: 160 }}
             onChange={(e) => updatePageDto("keyword", e.target.value)}
             onKeyDown={(event) => event.key === "Enter" && loadRoles()}
             placeholder="搜索角色名稱"

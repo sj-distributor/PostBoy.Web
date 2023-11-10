@@ -89,7 +89,7 @@ export interface IRolePermission {
   role: IRole;
   rolePermissions: IRolePermissionItem[];
   permissions?: IPermissionItem[];
-  rolePermissionUnits?: IRolePermissionUnitItem[] | [];
+  rolePermissionUnits?: IRolePermissionUnitItem[];
 }
 
 export interface IRolePermissionUnitItem {

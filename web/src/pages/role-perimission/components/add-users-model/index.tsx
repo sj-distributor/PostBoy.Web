@@ -25,6 +25,7 @@ export const AddUsersModel = (props: {
     handleAddRoleUsers,
     totalRoleUserList,
     isTreeLoading,
+    isAddUserLoading,
   } = useAction({ addUsersRef, roleId, initUserList });
 
   return (
@@ -101,6 +102,7 @@ export const AddUsersModel = (props: {
             onClick={handleAddRoleUsers}
           >
             確認
+            {isAddUserLoading && <CircularProgress size={16} color="inherit" />}
           </Button>
           <Button
             variant="outlined"

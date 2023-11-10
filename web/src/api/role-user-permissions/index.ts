@@ -14,7 +14,7 @@ import {
 import { Get, Post } from "../http-client";
 
 export const GetCurrentRolesByPermissions = async () => {
-  return await Get<IRolePermissionDto>(`/api/Security/roles/by/permissions`);
+  return await Get<IRolePermissionDto>(`/api/Security/mine/roles`);
 };
 
 // 获取用户list
