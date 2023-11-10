@@ -188,18 +188,21 @@ export const RoleFrom = () => {
               className={styles.navButton}
               variant="contained"
               disabled={isPostLoading}
+              sx={{ width: 120 }}
               onClick={() => {
                 addOrModifyRolePermissionDebounce();
               }}
             >
-              確認
-              {isPostLoading && (
-                <CircularProgress
-                  size={16}
-                  color="primary"
-                  sx={{ marginLeft: 3 }}
-                />
-              )}
+              <span style={{ whiteSpace: "nowrap" }}>
+                確認
+                {isPostLoading && (
+                  <CircularProgress
+                    size={16}
+                    color="primary"
+                    sx={{ marginLeft: 3 }}
+                  />
+                )}
+              </span>
             </Button>
             <Button
               className={styles.navButton}

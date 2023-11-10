@@ -174,6 +174,7 @@ export const useAction = () => {
     DeleteRoles({ roleIds: [roleId] })
       .then(() => {
         loadRoles();
+        window.location.reload();
       })
       .catch((error: Error) =>
         enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })

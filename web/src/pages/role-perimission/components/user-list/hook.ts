@@ -62,6 +62,7 @@ export const useAction = () => {
         .then(() => {
           enqueueSnackbar("移除成功!", { variant: "success" });
           initUserList();
+          window.location.reload();
         })
         .catch((error) => {
           enqueueSnackbar((error as Error).message, { variant: "error" });

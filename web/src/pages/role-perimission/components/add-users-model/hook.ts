@@ -60,6 +60,7 @@ export const useAction = (props: {
           enqueueSnackbar("添加用户成功!", { variant: "success" });
           addUsersRef.current?.close();
           initUserList();
+          window.location.reload();
         })
         .catch((error) => {
           enqueueSnackbar((error as Error).message, { variant: "error" });

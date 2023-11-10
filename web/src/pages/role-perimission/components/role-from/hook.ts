@@ -346,6 +346,7 @@ export const useAction = () => {
             if (res) {
               navigate("/role/permission");
               enqueueSnackbar("修改角色成功!", { variant: "success" });
+              window.location.reload();
             }
           })
           .catch((error: Error) =>
@@ -360,6 +361,7 @@ export const useAction = () => {
             if (res) {
               navigate("/role/permission");
               enqueueSnackbar("创建角色成功!", { variant: "success" });
+              window.location.reload();
             }
           })
           .catch((error: Error) =>

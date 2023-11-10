@@ -101,8 +101,12 @@ export const AddUsersModel = (props: {
             disabled={isConfirmDisbale}
             onClick={handleAddRoleUsers}
           >
-            確認
-            {isAddUserLoading && <CircularProgress size={16} color="inherit" />}
+            <span style={{ whiteSpace: "nowrap" }}>
+              確認
+              {isAddUserLoading && (
+                <CircularProgress size={16} color="inherit" />
+              )}
+            </span>
           </Button>
           <Button
             variant="outlined"
