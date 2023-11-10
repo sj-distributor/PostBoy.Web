@@ -86,7 +86,7 @@ export const useAction = () => {
         name === UserRoleEnum.Administrator &&
         !userRoles.includes(UserRoleEnum.Administrator)
       ) {
-        enqueueSnackbar("需要登录超级管理员帐号进行分配！", {
+        enqueueSnackbar("需要超级管理员权限才能分配！", {
           variant: "info",
         });
         return;
