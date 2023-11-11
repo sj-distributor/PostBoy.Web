@@ -16,6 +16,7 @@ import {
   IFirstState,
   IWorkCorpAppGroup,
 } from "../../../../dtos/enterprise";
+import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 const useAction = (props: {
   departmentAndUserList: IDepartmentKeyControl[];
@@ -149,21 +150,28 @@ const useAction = (props: {
           if (requestData.owner === defaultGroupOwner.id)
             delete requestData.owner;
           setOpenFunction(false);
-          PostWeChatWorkGroupCreate(requestData).then((data) => {
-            if (data && data.errmsg === "ok") {
-              setTipsObject({ msg: "创建成功", show: true });
+          PostWeChatWorkGroupCreate(requestData)
+            .then((data) => {
+              if (data && data.errmsg === "ok") {
+                setTipsObject({ msg: "创建成功", show: true });
+
+                // 清空数据
+                setDepartmentSelectedList([]);
+                setGroupOwner(defaultGroupOwner);
+                setGroupName("");
+                GetWeChatWorkCorpAppGroups(CorpId).then((result) => {
+                  result && setGroupList(result);
+                });
+              } else {
+                data && setTipsObject({ msg: data.errmsg, show: true });
+              }
+            })
+            .catch((error: Error) => {
+              setTipsObject({ msg: convertRoleErrorText(error), show: true });
+            })
+            .finally(() => {
               setCreateLoading(false);
-              // 清空数据
-              setDepartmentSelectedList([]);
-              setGroupOwner(defaultGroupOwner);
-              setGroupName("");
-              GetWeChatWorkCorpAppGroups(CorpId).then((result) => {
-                result && setGroupList(result);
-              });
-            } else {
-              data && setTipsObject({ msg: data.errmsg, show: true });
-            }
-          });
+            });
         })();
   };
 
