@@ -57,10 +57,14 @@ export const useAction = (props: {
       setIsAddUserLoading(true);
       AddRoleUser({ roleUsers })
         .then(() => {
-          enqueueSnackbar("添加用户成功!", { variant: "success" });
+          enqueueSnackbar("添加用户成功!页面将在三秒后刷新", {
+            variant: "success",
+          });
           addUsersRef.current?.close();
           initUserList();
-          window.location.reload();
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         })
         .catch((error) => {
           enqueueSnackbar((error as Error).message, { variant: "error" });

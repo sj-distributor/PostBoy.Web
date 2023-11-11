@@ -345,8 +345,12 @@ export const useAction = () => {
           .then((res) => {
             if (res) {
               navigate("/role/permission");
-              enqueueSnackbar("修改角色成功!", { variant: "success" });
-              window.location.reload();
+              enqueueSnackbar("修改角色成功!页面将在三秒后刷新", {
+                variant: "success",
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 3000);
             }
           })
           .catch((error: Error) =>
@@ -361,7 +365,6 @@ export const useAction = () => {
             if (res) {
               navigate("/role/permission");
               enqueueSnackbar("创建角色成功!", { variant: "success" });
-              window.location.reload();
             }
           })
           .catch((error: Error) =>

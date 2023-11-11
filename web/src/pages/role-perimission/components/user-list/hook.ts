@@ -60,9 +60,13 @@ export const useAction = () => {
       setIsDeLoading(true);
       DeleteRoleUser(data)
         .then(() => {
-          enqueueSnackbar("移除成功!", { variant: "success" });
+          enqueueSnackbar("移除成功!页面将在三秒后刷新", {
+            variant: "success",
+          });
           initUserList();
-          window.location.reload();
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         })
         .catch((error) => {
           enqueueSnackbar((error as Error).message, { variant: "error" });

@@ -173,8 +173,11 @@ export const useAction = () => {
   const deleteRole = (roleId: string) => {
     DeleteRoles({ roleIds: [roleId] })
       .then(() => {
+        enqueueSnackbar("删除成功！页面将在三秒后刷新", { variant: "error" });
         loadRoles();
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       })
       .catch((error: Error) =>
         enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
