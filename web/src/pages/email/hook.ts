@@ -17,6 +17,7 @@ import { timeZone } from "../../dtos/send-message-job";
 import { clone } from "ramda";
 import moment from "moment";
 import { convertRoleErrorText } from "../../uilts/convert-error";
+import auth from "../../auth";
 
 const useAction = (
   outterGetUpdateData?: (x: () => IUpdateMessageCommand | undefined) => void,
@@ -30,6 +31,7 @@ const useAction = (
     displayName: "",
     senderId: "",
   };
+  const { username } = auth();
   // 富文本框实例
   const [editor, setEditor] = useState<wangEditor.IDomEditor | null>(null); // 存储 editor 实例
   // 富文本框html
@@ -152,8 +154,17 @@ const useAction = (
               key: "cleanContent",
               value: editor.getText(),
             },
+            {
+              key: "FromUserName",
+              value: username,
+            },
           ]
-        : [],
+        : [
+            {
+              key: "FromUserName",
+              value: username,
+            },
+          ],
       emailNotification: {
         senderId: emailFrom.senderId,
         subject: emailSubject,

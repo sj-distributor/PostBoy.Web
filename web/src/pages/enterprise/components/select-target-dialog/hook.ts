@@ -17,6 +17,7 @@ import {
   IWorkCorpAppGroup,
 } from "../../../../dtos/enterprise";
 import { convertRoleErrorText } from "../../../../uilts/convert-error";
+import auth from "../../../../auth";
 
 const useAction = (props: {
   departmentAndUserList: IDepartmentKeyControl[];
@@ -114,6 +115,8 @@ const useAction = (props: {
     null
   );
 
+  const { username } = auth();
+
   // 处理部门列表能否被选择
   const handleTypeIsCanSelect = (
     canSelect: DeptUserCanSelectStatus,
@@ -146,6 +149,7 @@ const useAction = (props: {
             userList: (departmentSelectedList ?? []).map(
               (item) => item.id as string
             ),
+            fromUserName: username,
           };
           if (requestData.owner === defaultGroupOwner.id)
             delete requestData.owner;
