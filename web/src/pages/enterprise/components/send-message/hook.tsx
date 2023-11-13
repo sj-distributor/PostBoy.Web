@@ -8,10 +8,8 @@ import { ModalBoxRef } from "../../../../dtos/modal";
 import { convertType } from "../../../../uilts/convert-type";
 import { parameterJudgment } from "../../../../uilts/parameter-judgment";
 import { convertRoleErrorText } from "../../../../uilts/convert-error";
-import auth from "../../../../auth";
 
 const useAction = () => {
-  const { username } = auth();
   const [sendData, setSendData] = useState<ISendMessageCommand>();
 
   const [promptText, setPromptText] = useState<string>("");
@@ -82,11 +80,6 @@ const useAction = () => {
     data: ISendMessageCommand,
     thenFun?: () => void
   ) => {
-    const newData = clone(data);
-    newData.metadata?.push({
-      key: "FromUserName",
-      value: username,
-    });
     const defaultThenFun = () => {
       successAction.setTrue();
       loadingAction.setFalse();
@@ -94,7 +87,7 @@ const useAction = () => {
         setClearData.setTrue();
       }, 2000);
     };
-    await PostMessageSend(newData)
+    await PostMessageSend(data)
       .then((res) => {
         if (res) thenFun ? thenFun() : defaultThenFun();
         else {

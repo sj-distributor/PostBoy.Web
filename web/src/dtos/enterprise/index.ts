@@ -389,7 +389,6 @@ export interface IWorkGroupCreate {
   owner?: string;
   chatId?: string;
   userList: string[];
-  fromUserName: string;
 }
 
 export interface IWorkCorpAppGroup {

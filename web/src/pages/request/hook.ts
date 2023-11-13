@@ -9,7 +9,6 @@ import {
 } from "../../dtos/enterprise";
 import { ModalBoxRef } from "../../dtos/modal";
 import { convertRoleErrorText } from "../../uilts/convert-error";
-import auth from "../../auth";
 
 export const judgeDataIsCorrect = (
   data: ISendMessageCommand | IUpdateMessageCommand,
@@ -98,7 +97,6 @@ export const judgeDataIsCorrect = (
 };
 
 export const useAction = () => {
-  const { username } = auth();
   const [promptText, setPromptText] = useState<string>("");
 
   const [openError, openErrorAction] = useBoolean(false);
@@ -120,11 +118,6 @@ export const useAction = () => {
 
   const RequestSend = () => {
     const data = judgeDataIsCorrect(sendData, showErrorPrompt, setAlertType);
-
-    data?.metadata?.push({
-      key: "FromUserName",
-      value: username,
-    });
 
     if (data) {
       PostMessageSend(data as ISendMessageCommand)
