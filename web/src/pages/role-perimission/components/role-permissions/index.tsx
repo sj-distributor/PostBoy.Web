@@ -33,7 +33,7 @@ export const RolePermissions = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "name",
+      field: "displayName",
       headerName: "角色名稱",
       flex: 1,
     },
