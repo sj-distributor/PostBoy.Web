@@ -78,3 +78,17 @@
     }
   }
 }
+
+.roleListItem {
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+
+  .itemVisiblePage {
+    flex-basis: 20%;
+    font-weight: 600;
+  }
+  .itemVisiblePageTitle {
+    margin-bottom: 0.75rem;
+  }
+}

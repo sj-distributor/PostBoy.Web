@@ -1,5 +1,5 @@
 import { useAction } from "./hook";
-import { AllDepartmentData, DepartmentDto } from "./props";
+import { AllDepartmentData, DepartmentDto, RolePermissionsDto } from "./props";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
@@ -14,7 +14,6 @@ import {
   Checkbox,
   CircularProgress,
   FormControlLabel,
-  FormGroup,
   Input,
   Stack,
   TextField,
@@ -22,6 +21,8 @@ import {
 import {
   FunctionalPermissions,
   FunctionalPermissionsEnum,
+  SecurityManagementFunction,
+  SendMessageFunction,
 } from "../../../../dtos/role-user-permissions";
 
 export const RoleFrom = () => {
@@ -52,6 +53,9 @@ export const RoleFrom = () => {
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
   const isShowLoading = isLoading && location.pathname.includes("/role/edit");
+
+  const rolePermissionFunctionList: RolePermissionsDto[] =
+    rolePermissionsCheckedList.filter((item) => item.name.includes("CanView"));
 
   const renderInputBox = (
     title: string,
@@ -258,85 +262,90 @@ export const RoleFrom = () => {
           ) : (
             <Stack spacing={3}>
               <div className={styles.itemTitle}>功能權限</div>
-              <div className={styles.item}>
-                <div className={styles.itemVisiblePage}>
-                  <FormGroup sx={{ flexBasis: "20%" }}>
-                    <div className={styles.itemVisiblePageTitle}>可見頁面</div>
+              <div>
+                <div className={styles.roleListItem}>
+                  <div className={styles.itemVisiblePage}>可見頁面</div>
+                  <div className={styles.itemVisiblePage}>功能權限</div>
+                </div>
+
+                {rolePermissionFunctionList.map((roleItem, index) => {
+                  return (
                     <div
-                      style={{
-                        minHeight: 100,
-                        maxHeight: 100,
-                        overflowY: "auto",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
+                      className={styles.roleListItem}
+                      style={
+                        index === rolePermissionFunctionList.length - 1
+                          ? { marginBottom: 0 }
+                          : undefined
+                      }
                     >
-                      {rolePermissionsCheckedList
-                        .filter((item) => item.name.includes("CanView"))
-                        .map((roleItem, index) => {
-                          return (
-                            <FormControlLabel
-                              key={index}
-                              control={
-                                <Checkbox
-                                  onChange={(e) =>
-                                    handleUpdateRolePermissionsChecked(
-                                      roleItem.id,
-                                      e.target.checked
-                                    )
-                                  }
-                                  checked={roleItem.checked}
-                                />
+                      <div className={styles.itemVisiblePage}>
+                        <FormControlLabel
+                          key={index}
+                          control={
+                            <Checkbox
+                              onChange={(e) =>
+                                handleUpdateRolePermissionsChecked(
+                                  roleItem.id,
+                                  e.target.checked
+                                )
                               }
-                              label={
-                                FunctionalPermissions[
-                                  roleItem.name as FunctionalPermissionsEnum
-                                ] ?? roleItem.name
-                              }
+                              checked={roleItem.checked}
                             />
-                          );
-                        })}
-                    </div>
-                  </FormGroup>
-                </div>
-                <div className={styles.itemPermission}>
-                  <div className={styles.itemPermissionTitle}>功能權限</div>
-                  <div
-                    className={styles.itemPermissionsForm}
-                    style={{
-                      minHeight: 100,
-                      maxHeight: 100,
-                      overflowY: "auto",
-                    }}
-                  >
-                    {rolePermissionsCheckedList
-                      .filter((item) => !item.name.includes("CanView"))
-                      .map((roleItem, index) => {
-                        return (
-                          <FormControlLabel
-                            key={index}
-                            sx={{ height: 42, marginRight: 5 }}
-                            control={
-                              <Checkbox
-                                onChange={(e) =>
-                                  handleUpdateRolePermissionsChecked(
-                                    roleItem.id,
-                                    e.target.checked
+                          }
+                          label={
+                            FunctionalPermissions[
+                              roleItem.name as FunctionalPermissionsEnum
+                            ] ?? roleItem.name
+                          }
+                        />
+                      </div>
+                      <div className={styles.itemPermissionTitle}>
+                        {rolePermissionsCheckedList
+                          .filter((item) => {
+                            const isCanViewFun =
+                              roleItem.name ===
+                              FunctionalPermissionsEnum.CanViewSendMessage
+                                ? SendMessageFunction.includes(
+                                    item.name as FunctionalPermissionsEnum
                                   )
+                                : roleItem.name ===
+                                    FunctionalPermissionsEnum.CanViewSecurityManagement &&
+                                  SecurityManagementFunction.includes(
+                                    item.name as FunctionalPermissionsEnum
+                                  );
+
+                            return (
+                              isCanViewFun && !item.name.includes("CanView")
+                            );
+                          })
+                          .map((roleItem, index) => {
+                            return (
+                              <FormControlLabel
+                                key={index}
+                                sx={{ height: 42, marginRight: 5 }}
+                                control={
+                                  <Checkbox
+                                    onChange={(e) =>
+                                      handleUpdateRolePermissionsChecked(
+                                        roleItem.id,
+                                        e.target.checked
+                                      )
+                                    }
+                                    checked={roleItem.checked}
+                                  />
                                 }
-                                checked={roleItem.checked}
+                                label={
+                                  FunctionalPermissions[
+                                    roleItem.name as FunctionalPermissionsEnum
+                                  ] ?? roleItem.name
+                                }
                               />
-                            }
-                            label={
-                              FunctionalPermissions[
-                                roleItem.name as FunctionalPermissionsEnum
-                              ] ?? roleItem.name
-                            }
-                          />
-                        );
-                      })}
-                  </div>
-                </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </Stack>
           )}
