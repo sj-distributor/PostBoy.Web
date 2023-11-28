@@ -187,6 +187,22 @@ export const FunctionalPermissions = {
   [FunctionalPermissionsEnum.CanGrantPermissionsIntoRole]: "分配",
 };
 
+export const SendMessageFunction = [
+  FunctionalPermissionsEnum.CanSendMessage,
+  FunctionalPermissionsEnum.CanGetMessage,
+  FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification,
+  FunctionalPermissionsEnum.CanCreateWorkWeChatGroup,
+  FunctionalPermissionsEnum.CanUpdateWorkWeChatGroup,
+];
+
+export const SecurityManagementFunction = [
+  FunctionalPermissionsEnum.CanGetPermissionsByRoles,
+  FunctionalPermissionsEnum.CanCreateRoleUser,
+  FunctionalPermissionsEnum.CanDeleteRoles,
+  FunctionalPermissionsEnum.CanUpdatePermissionsOfRole,
+  FunctionalPermissionsEnum.CanGrantPermissionsIntoRole,
+];
+
 export const groupPermissionsNames = [
   FunctionalPermissionsEnum.CanCreateWorkWeChatGroup,
   FunctionalPermissionsEnum.CanUpdateWorkWeChatGroup,

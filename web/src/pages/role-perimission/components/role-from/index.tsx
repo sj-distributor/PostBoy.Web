@@ -22,6 +22,8 @@ import {
 import {
   FunctionalPermissions,
   FunctionalPermissionsEnum,
+  SecurityManagementFunction,
+  SendMessageFunction,
 } from "../../../../dtos/role-user-permissions";
 
 export const RoleFrom = () => {
@@ -258,8 +260,87 @@ export const RoleFrom = () => {
           ) : (
             <Stack spacing={3}>
               <div className={styles.itemTitle}>功能權限</div>
-              <div className={styles.item}>
-                <div className={styles.itemVisiblePage}>
+              <div>
+                <div className={styles.roleListItem}>
+                  <div className={styles.itemVisiblePage}>可見頁面</div>
+                  <div className={styles.itemVisiblePage}>功能權限</div>
+                </div>
+
+                {rolePermissionsCheckedList
+                  .filter((item) => item.name.includes("CanView"))
+                  .map((roleItem, index) => {
+                    return (
+                      <div className={styles.roleListItem}>
+                        <div className={styles.itemVisiblePage}>
+                          <FormControlLabel
+                            key={index}
+                            control={
+                              <Checkbox
+                                onChange={(e) =>
+                                  handleUpdateRolePermissionsChecked(
+                                    roleItem.id,
+                                    e.target.checked
+                                  )
+                                }
+                                checked={roleItem.checked}
+                              />
+                            }
+                            label={
+                              FunctionalPermissions[
+                                roleItem.name as FunctionalPermissionsEnum
+                              ] ?? roleItem.name
+                            }
+                          />
+                        </div>
+                        <div className={styles.itemPermissionTitle}>
+                          {rolePermissionsCheckedList
+                            .filter((item) => {
+                              const isCanViewFun =
+                                roleItem.name ===
+                                FunctionalPermissionsEnum.CanViewSendMessage
+                                  ? SendMessageFunction.includes(
+                                      item.name as FunctionalPermissionsEnum
+                                    )
+                                  : roleItem.name ===
+                                      FunctionalPermissionsEnum.CanViewSecurityManagement &&
+                                    SecurityManagementFunction.includes(
+                                      item.name as FunctionalPermissionsEnum
+                                    );
+
+                              return (
+                                isCanViewFun && !item.name.includes("CanView")
+                              );
+                            })
+                            .map((roleItem, index) => {
+                              return (
+                                <FormControlLabel
+                                  key={index}
+                                  sx={{ height: 42, marginRight: 5 }}
+                                  control={
+                                    <Checkbox
+                                      onChange={(e) =>
+                                        handleUpdateRolePermissionsChecked(
+                                          roleItem.id,
+                                          e.target.checked
+                                        )
+                                      }
+                                      checked={roleItem.checked}
+                                    />
+                                  }
+                                  label={
+                                    FunctionalPermissions[
+                                      roleItem.name as FunctionalPermissionsEnum
+                                    ] ?? roleItem.name
+                                  }
+                                />
+                              );
+                            })}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                {/* <div className={styles.itemVisiblePage}>
                   <FormGroup sx={{ flexBasis: "20%" }}>
                     <div className={styles.itemVisiblePageTitle}>可見頁面</div>
                     <div
@@ -336,7 +417,7 @@ export const RoleFrom = () => {
                         );
                       })}
                   </div>
-                </div>
+                </div> */}
               </div>
             </Stack>
           )}
