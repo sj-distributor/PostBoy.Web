@@ -149,7 +149,7 @@ export interface IDeleteRole {
 
 export enum UserRoleEnum {
   Administrator = "Administrator",
-  DefaultUser = "StandardUser",
+  DefaultUser = "User",
 }
 
 export const UserRoleType = {
@@ -175,15 +175,15 @@ export enum FunctionalPermissionsEnum {
 export const FunctionalPermissions = {
   [FunctionalPermissionsEnum.CanViewSendMessage]: "信息發送",
   [FunctionalPermissionsEnum.CanViewSecurityManagement]: "角色權限",
-  [FunctionalPermissionsEnum.CanGetPermissionsByRoles]: "角色權限",
-  [FunctionalPermissionsEnum.CanSendMessage]: "信息發送",
+  [FunctionalPermissionsEnum.CanGetPermissionsByRoles]: "角色權限列表",
+  [FunctionalPermissionsEnum.CanSendMessage]: "平台信息發送",
   [FunctionalPermissionsEnum.CanGetMessage]: "發送記錄",
   [FunctionalPermissionsEnum.CanCreateWorkWeChatGroup]: "創建群組",
   [FunctionalPermissionsEnum.CanUpdateWorkWeChatGroup]: "添加群組成員",
   [FunctionalPermissionsEnum.CanCreateRoleUser]: "新增角色",
   [FunctionalPermissionsEnum.CanDeleteRoles]: "刪除",
   [FunctionalPermissionsEnum.CanUpdatePermissionsOfRole]: "編輯",
-  [FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification]: "發送通知",
+  [FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification]: "企微信息發送",
   [FunctionalPermissionsEnum.CanGrantPermissionsIntoRole]: "分配",
 };
 
