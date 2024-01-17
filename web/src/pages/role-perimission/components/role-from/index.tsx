@@ -233,8 +233,11 @@ export const RoleFrom = () => {
                     disableUnderline={true}
                     sx={inputStyles}
                     placeholder="請輸入角色名稱"
-                    value={role?.name ?? ""}
-                    onChange={(e) => updateRole("name", e.target.value)}
+                    value={role?.displayName ?? ""}
+                    onChange={(e) => {
+                      updateRole("displayName", e.target.value);
+                      updateRole("name", e.target.value);
+                    }}
                   />
                 </div>
               </div>
