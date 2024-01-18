@@ -7,7 +7,6 @@ import {
   IRolePermissionDto,
   IRolePermissionDataItem,
   FunctionalPermissionsEnum,
-  UserRoleEnum,
 } from "../../../../dtos/role-user-permissions";
 import {
   DeleteRoles,
@@ -56,6 +55,14 @@ export const useAction = () => {
     return Array.from(data);
   }, [currentUserRolePermissions]);
 
+  const isAdmin = useMemo(() => {
+    return Boolean(
+      currentUserRolePermissions?.rolePermissionData?.find(
+        (item) => item.role.name === "Administrator"
+      )
+    );
+  }, [currentUserRolePermissions]);
+
   const handleAddRole = () => {
     if (
       userPermissions.some(
@@ -71,27 +78,21 @@ export const useAction = () => {
   };
 
   const handleRoleAssignment = (name: string, id: string) => {
-    const userRoles = currentUserRolePermissions.rolePermissionData.map(
-      (item) => item.role.name
+    const assignmentRole = currentUserRolePermissions.rolePermissionData.find(
+      (item) => item.role.name === name
     );
 
     if (
-      userPermissions.some(
-        (item) => item === FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
-      )
+      (assignmentRole &&
+        assignmentRole.permissions.some(
+          (item) =>
+            item.name === FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
+        )) ||
+      isAdmin
     ) {
-      if (
-        name === UserRoleEnum.Administrator &&
-        !userRoles.includes(UserRoleEnum.Administrator)
-      ) {
-        enqueueSnackbar("需要超级管理员权限才能分配！", {
-          variant: "info",
-        });
-        return;
-      }
       navigate(`/role/users/${id}`);
     } else {
-      enqueueSnackbar("没有权限分配", {
+      enqueueSnackbar("没有权限分配當前角色", {
         variant: "info",
       });
     }
@@ -105,14 +106,21 @@ export const useAction = () => {
   );
 
   const handleEditRole = (name: string, id: string) => {
+    const assignmentRole = currentUserRolePermissions.rolePermissionData.find(
+      (item) => item.role.name === name
+    );
+
     if (
-      userPermissions.some(
-        (item) => item === FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
-      )
+      (assignmentRole &&
+        assignmentRole.permissions.some(
+          (item) =>
+            item.name === FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
+        )) ||
+      isAdmin
     ) {
       navigate(`/role/edit/${id}`);
     } else {
-      enqueueSnackbar("没有编辑角色权限", {
+      enqueueSnackbar("没有编辑當前角色权限", {
         variant: "info",
       });
     }
@@ -126,15 +134,21 @@ export const useAction = () => {
   );
 
   const handleRemoveRole = (name: string, id: string) => {
+    const assignmentRole = currentUserRolePermissions.rolePermissionData.find(
+      (item) => item.role.name === name
+    );
+
     if (
-      userPermissions.some(
-        (item) => item === FunctionalPermissionsEnum.CanDeleteRoles
-      )
+      (assignmentRole &&
+        assignmentRole.permissions.some(
+          (item) => item.name === FunctionalPermissionsEnum.CanDeleteRoles
+        )) ||
+      isAdmin
     ) {
       confirmTipsRef.current?.open();
       setRowId(id);
     } else {
-      enqueueSnackbar("没有删除角色权限", {
+      enqueueSnackbar("没有删除當前角色权限", {
         variant: "info",
       });
     }
