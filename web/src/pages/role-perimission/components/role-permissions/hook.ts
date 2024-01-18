@@ -81,13 +81,13 @@ export const useAction = () => {
     selectRoleName: string,
     role: FunctionalPermissionsEnum
   ) => {
-    const assignmentRole = currentUserRolePermissions?.rolePermissionData?.find(
+    const selectRoleData = currentUserRolePermissions?.rolePermissionData?.find(
       (item) => item.role.name === selectRoleName
     );
 
     return (
-      assignmentRole &&
-      assignmentRole.permissions?.some((item) => item.name === role)
+      selectRoleData &&
+      selectRoleData.permissions?.some((item) => item.name === role)
     );
   };
 
