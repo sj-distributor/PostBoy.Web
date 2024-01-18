@@ -77,17 +77,26 @@ export const useAction = () => {
     }
   };
 
-  const handleRoleAssignment = (name: string, id: string) => {
-    const assignmentRole = currentUserRolePermissions.rolePermissionData.find(
-      (item) => item.role.name === name
+  const getUserIsHaveRole = (
+    selectRoleName: string,
+    role: FunctionalPermissionsEnum
+  ) => {
+    const assignmentRole = currentUserRolePermissions?.rolePermissionData?.find(
+      (item) => item.role.name === selectRoleName
     );
 
+    return (
+      assignmentRole &&
+      assignmentRole.permissions?.some((item) => item.name === role)
+    );
+  };
+
+  const handleRoleAssignment = (name: string, id: string) => {
     if (
-      (assignmentRole &&
-        assignmentRole.permissions.some(
-          (item) =>
-            item.name === FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
-        )) ||
+      getUserIsHaveRole(
+        name,
+        FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
+      ) ||
       isAdmin
     ) {
       navigate(`/role/users/${id}`);
@@ -106,16 +115,11 @@ export const useAction = () => {
   );
 
   const handleEditRole = (name: string, id: string) => {
-    const assignmentRole = currentUserRolePermissions.rolePermissionData.find(
-      (item) => item.role.name === name
-    );
-
     if (
-      (assignmentRole &&
-        assignmentRole.permissions.some(
-          (item) =>
-            item.name === FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
-        )) ||
+      getUserIsHaveRole(
+        name,
+        FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
+      ) ||
       isAdmin
     ) {
       navigate(`/role/edit/${id}`);
@@ -134,15 +138,8 @@ export const useAction = () => {
   );
 
   const handleRemoveRole = (name: string, id: string) => {
-    const assignmentRole = currentUserRolePermissions.rolePermissionData.find(
-      (item) => item.role.name === name
-    );
-
     if (
-      (assignmentRole &&
-        assignmentRole.permissions.some(
-          (item) => item.name === FunctionalPermissionsEnum.CanDeleteRoles
-        )) ||
+      getUserIsHaveRole(name, FunctionalPermissionsEnum.CanDeleteRoles) ||
       isAdmin
     ) {
       confirmTipsRef.current?.open();
