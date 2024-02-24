@@ -7,8 +7,8 @@ export interface IUserResponse {
   roles: IUserDataRolesData[];
 }
 export interface IUserAllResponse {
-  count: number;
   users: IUserListItem[];
+  count: number;
 }
 export interface IUserListItem {
   id: string;
