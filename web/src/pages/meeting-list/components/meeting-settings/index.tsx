@@ -642,7 +642,7 @@ export default function MeetingSetting(props: MeetingSettingsProps) {
                         <div className={style.title}>{item.title}</div>
                         <div className={style.selectGroupData}>
                           <Select
-                            value={item.value}
+                            value={String(item.value)}
                             onChange={(e) =>
                               handleChange(e.target.value, item.key)
                             }
