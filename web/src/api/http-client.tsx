@@ -10,8 +10,8 @@ export async function Post<T>(url: string, data?: object | FormData) {
 
 export interface IResponse<T> {
   code: ResponseCode;
-  msg: string;
   data: T;
+  msg: string;
 }
 
 export enum ResponseCode {
