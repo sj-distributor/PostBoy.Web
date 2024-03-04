@@ -8,6 +8,7 @@ import {
   IUpdateMessageCommand,
 } from "../../dtos/enterprise";
 import { ModalBoxRef } from "../../dtos/modal";
+import { convertRoleErrorText } from "../../uilts/convert-error";
 
 export const judgeDataIsCorrect = (
   data: ISendMessageCommand | IUpdateMessageCommand,
@@ -126,9 +127,9 @@ export const useAction = () => {
           showErrorPrompt("This request save success!");
           successAction.setTrue();
         })
-        .catch(() => {
+        .catch((error: Error) => {
           setAlertType("error");
-          showErrorPrompt("This request save error!");
+          showErrorPrompt(convertRoleErrorText(error));
           successAction.setFalse();
         });
     }

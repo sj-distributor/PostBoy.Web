@@ -1,0 +1,90 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+
+    .navTitle {
+      font-weight: 600;
+      flex: 13;
+    }
+
+    .navSearch {
+      display: flex;
+      align-items: center;
+      flex: 6;
+      padding-right: 3rem;
+
+      .navInput {
+        background-color: #ffffff;
+        border-radius: 0;
+      }
+
+      .navIcon {
+        border: 0.1rem solid #808088;
+
+        .navFont {
+          font-size: 1.23rem;
+        }
+      }
+    }
+
+    .navBtn {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      min-width: 6rem;
+    }
+  }
+
+  .content {
+    display: flex;
+    flex: 1;
+  }
+
+  .footer {
+    display: flex;
+    margin: 1rem 0;
+    justify-content: flex-end;
+  }
+
+  .deleteBox {
+    width: 18rem;
+    height: 6rem;
+    margin: 1.5rem;
+
+    .confirmBox {
+      display: flex;
+      height: 4.5rem;
+
+      .title {
+        margin-top: 0.2rem;
+        margin-left: 0.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    .buttonBox {
+      display: flex;
+      justify-content: flex-end;
+
+      .cancelButton {
+        height: 1.7rem;
+        font-size: 0.9rem;
+      }
+
+      .confirmButton {
+        margin-left: 1rem;
+        width: 5.8rem;
+        height: 1.7rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

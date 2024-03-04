@@ -1,56 +1,37 @@
-import { useBoolean } from "ahooks"
-import { useEffect, useState } from "react"
-import { useLocation } from "react-router-dom"
-import { GetAuthUser } from "../../api/user-management"
-import { RouteState } from "../../dtos/route-index"
-import { RouteItem } from "../../dtos/route-type"
-import { IUserResponse } from "../../dtos/user-management"
-import { routerArray } from "../../router/elementRoute"
+import { useBoolean } from "ahooks";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { GetAuthUser } from "../../api/user-management";
+import { IUserResponse } from "../../dtos/user-management";
+import { routerArray } from "../../router/elementRoute";
+import useAuth from "../../auth";
 
 const useMainAction = () => {
-  const mainLocation = useLocation()
-  const [clickMainIndex, setMainClickIndex] = useState<number>()
-  const [haveAdministrator, haveAdministratorAction] = useBoolean(false)
-  const [userData, setUserData] = useState<IUserResponse>()
+  const mainLocation = useLocation();
+
+  const [clickMainIndex, setMainClickIndex] = useState<number>();
+
+  const { filterRouter } = useAuth();
 
   useEffect(() => {
-    const getMainClickIndex = () => {
-      const getMainIndex = 0
-      routerArray.map(
-        (item: RouteItem, index: number) =>
-          item?.children?.findIndex((x) => x.path === mainLocation.pathname) !==
-            RouteState.None && getMainIndex === index
-      )
-      return getMainIndex
-    }
+    const currentPath = mainLocation.pathname;
 
-    setMainClickIndex(
-      (routerArray.findIndex((x) => x.path === mainLocation.pathname) ===
-      RouteState.None
-        ? getMainClickIndex()
-        : routerArray.findIndex(
-            (x) => x.path === mainLocation.pathname
-          )) as number
-    )
-  }, [mainLocation.pathname])
+    const indexInRouterArray = filterRouter.findIndex((routeItem) => {
+      const currentPathSplit = currentPath.split("/");
 
-  useEffect(() => {
-    GetAuthUser().then((res) => {
-      if (!!res) {
-        setUserData(res)
-      }
-      if (res?.roles?.find((x) => x.name === "Administrator")) {
-        haveAdministratorAction.setTrue()
-      }
-    })
-  }, [])
+      const currentPathFirstPart = currentPathSplit[1];
+
+      return routeItem.path.includes(currentPathFirstPart);
+    });
+
+    setMainClickIndex(indexInRouterArray);
+  }, [mainLocation.pathname, filterRouter]);
 
   return {
     mainLocation,
     clickMainIndex,
     setMainClickIndex,
-    haveAdministrator,
-  }
-}
+  };
+};
 
-export default useMainAction
+export default useMainAction;

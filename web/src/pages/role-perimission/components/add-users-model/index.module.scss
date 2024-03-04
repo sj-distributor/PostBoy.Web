@@ -1,0 +1,74 @@
+.modelWrap {
+  width: 50rem;
+  height: 40rem;
+  display: flex;
+  margin: 2rem;
+
+  .leftGroupBox {
+    width: 28rem;
+    border-right: 0.1rem solid #e0e0df;
+
+    .listTitle {
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    .search {
+      width: 80%;
+      height: 0.5rem;
+      border-color: #d0d0d0;
+    }
+  }
+
+  .rightGroupBox {
+    margin-left: 2.5rem;
+    width: 22rem;
+
+    .countBox {
+      height: 37.5rem;
+
+      .selectTitleWrap {
+        display: flex;
+        font-size: 1.1rem;
+        font-weight: bold;
+        justify-content: space-between;
+
+        .cancel {
+          font-size: 1.8rem;
+          color: #90908f;
+          cursor: pointer;
+        }
+      }
+
+      .selectItemsBox {
+        height: 35rem;
+        overflow-y: scroll;
+
+        .selectListWrap {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.9rem;
+          margin-top: 1.5rem;
+
+          .delete {
+            margin-right: 1rem;
+            font-size: 1rem;
+            color: #90908f;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    .buttonBox {
+      float: right;
+
+      .button {
+        margin: 0.5rem;
+        width: 5rem;
+        height: 2.2rem;
+        text-align: center;
+      }
+    }
+  }
+}

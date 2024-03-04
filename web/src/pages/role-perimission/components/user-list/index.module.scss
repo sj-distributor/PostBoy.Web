@@ -1,0 +1,72 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+
+    .navTitle {
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .navSearch {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      padding-right: 3rem;
+
+      .navInput {
+        background-color: #ffffff;
+        border-radius: 0;
+      }
+
+      .navIcon {
+        border: 0.1rem solid #808088;
+
+        .navFont {
+          font-size: 1.23rem;
+        }
+      }
+    }
+
+    .navBtn {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+
+      .btn,
+      .btnDel {
+        flex: 1;
+        min-width: 6rem;
+      }
+
+      .btnDel {
+        margin: 0 2rem;
+        background-color: red;
+        color: white;
+      }
+
+      .addUsersModalBox {
+        width: 50%;
+        height: 50%;
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    flex: 1;
+  }
+
+  .footer {
+    display: flex;
+    margin: 1rem 0;
+    justify-content: flex-end;
+  }
+}

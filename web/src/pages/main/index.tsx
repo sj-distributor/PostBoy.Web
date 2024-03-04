@@ -1,48 +1,36 @@
-import styles from "./index.module.scss"
-import { Link, Outlet } from "react-router-dom"
-import { routerArray } from "../../router/elementRoute"
-import useMainAction from "./hook"
-import UserInformation from "./components/user-information"
-import { RouteItem } from "../../dtos/route-type"
-import { createContext } from "react"
-
-interface AdministratorContextType {
-  haveAdministrator: boolean
-}
-
-export const AdministratorContext = createContext<AdministratorContextType>(
-  null!
-)
+import styles from "./index.module.scss";
+import { Link, Outlet } from "react-router-dom";
+import useMainAction from "./hook";
+import UserInformation from "./components/user-information";
+import useAuth from "../../auth";
 
 const Main = () => {
-  const { clickMainIndex, setMainClickIndex, haveAdministrator } =
-    useMainAction()
+  const { filterRouter } = useAuth();
 
-  const verifyPermissions = (item: RouteItem) =>
-    ["/user", "/manager"].includes(item.path) ? !!haveAdministrator : true
+  const { clickMainIndex, setMainClickIndex } = useMainAction();
 
   const routerTabBar = () => {
-    return routerArray.map((item, index) => {
+    return filterRouter?.map((item, index) => {
       return (
         <div key={index} className={styles.item}>
-          {verifyPermissions(item) && (
-            <Link
-              to={item.path}
-              onClick={() => {
-                setMainClickIndex(index)
-              }}
-              className={
-                clickMainIndex === index ? styles.itemClick : styles.itemNone
-              }
-            >
-              <span className={item.icons} />
-              {item.head}
-            </Link>
-          )}
+          <Link
+            to={item.path}
+            onClick={() => {
+              setMainClickIndex(index);
+            }}
+            className={
+              clickMainIndex === index ? styles.itemClick : styles.itemNone
+            }
+          >
+            <div className={styles.iconTitleContainer}>
+              {item.icons}
+              <span className={styles.title}>{item.head}</span>
+            </div>
+          </Link>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   return (
     <div className={styles.main}>
@@ -54,13 +42,11 @@ const Main = () => {
           <UserInformation />
         </div>
         <div className={styles.contextLower}>
-          <AdministratorContext.Provider value={{ haveAdministrator }}>
-            <Outlet />
-          </AdministratorContext.Provider>
+          <Outlet />
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Main
+export default Main;
