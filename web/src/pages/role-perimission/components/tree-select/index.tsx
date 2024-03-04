@@ -1,4 +1,4 @@
-import React, { ForwardedRef, useEffect, useImperativeHandle } from "react";
+import React, { useEffect, useImperativeHandle } from "react";
 import {
   Box,
   Checkbox,
@@ -20,7 +20,7 @@ export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
   roleUserList: IRoleUserItemDto[];
   searchValue: string;
-  ref: ForwardedRef<TreeSelectRef>;
+  ref: React.Ref<any>;
   setSelectedData: (data: TreeNode[]) => void;
 }> = React.forwardRef(
   ({ treeData, searchValue, setSelectedData, roleUserList }, ref) => {
