@@ -9,10 +9,24 @@ import {
   useState,
   memo,
   useEffect,
+  RefObject,
 } from "react";
 import { useUnmount } from "ahooks";
 
-const ModalBox: Component<ModalBoxProps> = memo(
+const ModalBox: Component<
+  ModalBoxProps &
+    (
+      | RefAttributes<unknown>
+      | {
+          ref?:
+            | string
+            | ((instance: unknown) => void)
+            | RefObject<unknown>
+            | null
+            | undefined;
+        }
+    )
+> = memo(
   forwardRef(
     (
       {
