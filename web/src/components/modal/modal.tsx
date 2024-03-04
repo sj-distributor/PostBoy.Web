@@ -2,14 +2,11 @@ import style from "./modal.module.scss";
 import Close from "@mui/icons-material/Close";
 import { ModalBoxProps } from "./props";
 import {
-  FunctionComponent as Component,
   forwardRef,
-  RefAttributes,
   useImperativeHandle,
   useState,
   memo,
   useEffect,
-  RefObject,
 } from "react";
 import { useUnmount } from "ahooks";
 

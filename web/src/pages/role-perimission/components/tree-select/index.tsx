@@ -13,7 +13,6 @@ import { ArrowDropDownIcon } from "@mui/x-date-pickers";
 import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./index.module.scss";
 import { TreeNode } from "../add-users-model/props";
-import { TreeSelectRef } from "./props";
 import { IRoleUserItemDto } from "../../../../dtos/role-user-permissions";
 
 export const TreeSelectList: React.FC<{
