@@ -20,7 +20,7 @@ export const TreeSelectList: React.FC<{
   treeData: TreeNode[];
   roleUserList: IRoleUserItemDto[];
   searchValue: string;
-  ref: React.Ref<TreeSelectRef> | null;
+  ref: any;
   setSelectedData: (data: TreeNode[]) => void;
 }> = React.forwardRef(
   ({ treeData, searchValue, setSelectedData, roleUserList }, ref) => {
