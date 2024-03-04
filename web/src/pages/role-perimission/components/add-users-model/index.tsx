@@ -25,6 +25,7 @@ export const AddUsersModel = (props: {
     handleAddRoleUsers,
     totalRoleUserList,
     isTreeLoading,
+    isAddUserLoading,
   } = useAction({ addUsersRef, roleId, initUserList });
 
   return (
@@ -100,7 +101,12 @@ export const AddUsersModel = (props: {
             disabled={isConfirmDisbale}
             onClick={handleAddRoleUsers}
           >
-            確認
+            <span style={{ whiteSpace: "nowrap" }}>
+              確認
+              {isAddUserLoading && (
+                <CircularProgress size={16} color="inherit" />
+              )}
+            </span>
           </Button>
           <Button
             variant="outlined"

@@ -1,6 +1,6 @@
 import { Router } from "./router/elementRoute";
-import useAction from "./AppHook";
 import TokenProvider from "./hooks/authProvider";
+import useAction from "./AppHook";
 
 const App = () => {
   const { isLoaded } = useAction();

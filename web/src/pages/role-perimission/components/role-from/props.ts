@@ -13,3 +13,13 @@ export type AllDepartmentData = {
   pullCrowdData: DepartmentDto[];
   notificationData: DepartmentDto[];
 };
+
+export interface RolePermissionsDto {
+  id: string;
+  createdDate: string;
+  lastModifiedDate: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
+  checked?: boolean;
+}

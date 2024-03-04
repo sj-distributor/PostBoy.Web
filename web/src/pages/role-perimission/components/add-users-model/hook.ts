@@ -28,6 +28,8 @@ export const useAction = (props: {
 
   const [isTreeLoading, setIsTreeLoading] = useState<boolean>(false);
 
+  const [isAddUserLoading, setIsAddUserLoading] = useState<boolean>(false);
+
   const treeSelectRef = useRef<TreeSelectRef>(null);
 
   const [alreadySelectData, setAlreadySelectData] = useState<TreeNode[]>([]);
@@ -52,15 +54,23 @@ export const useAction = (props: {
         userId: item.id,
         roleId: roleId,
       }));
-
+      setIsAddUserLoading(true);
       AddRoleUser({ roleUsers })
         .then(() => {
-          enqueueSnackbar("添加用户成功!", { variant: "success" });
+          enqueueSnackbar("添加用户成功!页面将在三秒后刷新", {
+            variant: "success",
+          });
           addUsersRef.current?.close();
           initUserList();
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         })
         .catch((error) => {
           enqueueSnackbar((error as Error).message, { variant: "error" });
+        })
+        .finally(() => {
+          setIsAddUserLoading(false);
         });
     },
     { wait: 500 }
@@ -157,5 +167,6 @@ export const useAction = (props: {
     handleAddRoleUsers,
     totalRoleUserList,
     isTreeLoading,
+    isAddUserLoading,
   };
 };

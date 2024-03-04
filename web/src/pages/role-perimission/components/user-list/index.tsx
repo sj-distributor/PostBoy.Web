@@ -2,6 +2,7 @@ import styles from "./index.module.scss";
 
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -27,9 +28,9 @@ export const UserList = () => {
     openConfirmAction,
     batchBtnDisable,
     roleId,
+    isDeLoading,
     navigate,
     setSelectId,
-    handleSearch,
     handleDelete,
     setInputVal,
     initUserList,
@@ -86,6 +87,19 @@ export const UserList = () => {
           <DialogContentText id="alert-dialog-description">
             确定移除选中用户吗？
           </DialogContentText>
+
+          {isDeLoading && (
+            <DialogContentText
+              id="alert-dialog-description-loading"
+              sx={{ textAlign: "center", marginTop: 5 }}
+            >
+              <CircularProgress
+                size={24}
+                color="primary"
+                sx={{ marginLeft: 3 }}
+              />
+            </DialogContentText>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => openConfirmAction.setFalse()}>取消</Button>
@@ -105,14 +119,10 @@ export const UserList = () => {
             autoComplete="off"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
-            onKeyDown={(event) =>
-              event.key === "Enter" &&
-              inputVal &&
-              updatePageDto("Keyword", inputVal)
-            }
+            onKeyDown={(event) => event.key === "Enter" && initUserList()}
           />
           <div className={styles.navIcon}>
-            <IconButton aria-label="Search" onClick={handleSearch}>
+            <IconButton aria-label="Search" onClick={initUserList}>
               <SearchIcon className={styles.navFont} />
             </IconButton>
           </div>
@@ -149,7 +159,7 @@ export const UserList = () => {
           <Button
             className={styles.btn}
             variant="outlined"
-            onClick={() => navigate("/roles/roleList")}
+            onClick={() => navigate("/role/permission")}
           >
             返回
           </Button>

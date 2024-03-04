@@ -1,5 +1,9 @@
+import { useBoolean } from "ahooks";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { GetAuthUser } from "../../api/user-management";
+import { IUserResponse } from "../../dtos/user-management";
+import { routerArray } from "../../router/elementRoute";
 import useAuth from "../../auth";
 
 const useMainAction = () => {

@@ -1,7 +1,11 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 import jwt_decode from "jwt-decode";
 import { GetCurrentRolesByPermissions } from "../../api/role-user-permissions";
-import { IRolePermissionDto } from "../../dtos/role-user-permissions";
+import {
+  FunctionalPermissionsEnum,
+  IRolePermissionDto,
+  UserRoleEnum,
+} from "../../dtos/role-user-permissions";
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/route";
 
@@ -9,12 +13,12 @@ interface AuthContextOptions {
   token: string;
   username: string;
   authStatus: boolean;
-  signIn: (token: string, callback?: Function) => void;
-  signOut: (callback?: Function) => void;
   currentUserRolePermissions: IRolePermissionDto;
   filterRouter: RouteItem[];
   haveAdminPermission: boolean;
   displayPage: string;
+  signIn: (token: string, callback?: Function) => void;
+  signOut: (callback?: Function) => void;
 }
 
 export const AuthContext = createContext<AuthContextOptions>(null!);
@@ -44,6 +48,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setToken(token);
     localStorage.setItem("token", token);
     const tokenObj = jwt_decode<{ unique_name: string }>(token);
+
     setUsername(tokenObj.unique_name);
     setAuthStatus(true);
     callback && callback();
@@ -54,7 +59,6 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setUsername("");
     localStorage.setItem("token", "");
     setAuthStatus(false);
-
     setCurrentUserRolePermissions({
       count: 0,
       rolePermissionData: [],
@@ -67,18 +71,21 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
 
     const sendMessagePermission = rolePermissionData.some((item) => {
       return item.permissions.some(
-        (permission) => permission.displayName === "信息發送"
+        (permission) =>
+          permission.name === FunctionalPermissionsEnum.CanViewSendMessage
       );
     });
 
     const rolePermission = rolePermissionData.some((item) => {
       return item.permissions.some(
-        (permission) => permission.displayName === "角色權限"
+        (permission) =>
+          permission.name ===
+          FunctionalPermissionsEnum.CanViewSecurityManagement
       );
     });
 
     const adminPermission = rolePermissionData.some(
-      (item) => item.role.name === "Administrator"
+      (item) => item.role.name === UserRoleEnum.Administrator
     );
 
     setHaveAdminPermission(adminPermission);
@@ -87,7 +94,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
       sendMessagePermission
         ? "/home"
         : rolePermission
-        ? "/roles"
+        ? "/role"
         : adminPermission
         ? "/user"
         : "/none"
@@ -96,7 +103,7 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     return routerArray.filter(
       (item) =>
         (sendMessagePermission || item.path !== "/home") &&
-        (rolePermission || item.path !== "/roles") &&
+        (rolePermission || item.path !== "/role") &&
         (adminPermission || (item.path !== "/user" && item.path !== "/manager"))
     );
   }, [currentUserRolePermissions]);

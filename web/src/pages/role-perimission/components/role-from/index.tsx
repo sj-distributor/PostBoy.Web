@@ -1,30 +1,34 @@
 import { useAction } from "./hook";
-import { AllDepartmentData, DepartmentDto } from "./props";
+import { AllDepartmentData, DepartmentDto, RolePermissionsDto } from "./props";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import styles from "./index.module.scss";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
-
+import { v4 as uuidv4 } from "uuid";
 import {
   Autocomplete,
   Button,
   Card,
   Checkbox,
+  CircularProgress,
   FormControlLabel,
-  FormGroup,
   Input,
   Stack,
   TextField,
 } from "@mui/material";
+import {
+  FunctionalPermissions,
+  FunctionalPermissionsEnum,
+  SecurityManagementFunction,
+  SendMessageFunction,
+} from "../../../../dtos/role-user-permissions";
 
 export const RoleFrom = () => {
   const {
     flatOptions,
     inputStyles,
-    selectStyles,
-    formStyles,
     location,
     checkboxData,
     showLabel,
@@ -35,11 +39,23 @@ export const RoleFrom = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
+    rolePermissionsCheckedList,
+    role,
+    isLoading,
+    updateRole,
+    addOrModifyRolePermissionDebounce,
+    handleUpdateRolePermissionsChecked,
+    isPostLoading,
   } = useAction();
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+  const isShowLoading = isLoading && location.pathname.includes("/role/edit");
+
+  const rolePermissionFunctionList: RolePermissionsDto[] =
+    rolePermissionsCheckedList.filter((item) => item.name.includes("CanView"));
 
   const renderInputBox = (
     title: string,
@@ -54,7 +70,27 @@ export const RoleFrom = () => {
         <div className={styles.itemInput}>
           <Autocomplete
             size="small"
-            sx={selectStyles}
+            sx={{
+              "& .MuiInputBase-root.MuiOutlinedInput-root": {
+                maxHeight: "10rem",
+                overflowY: "auto",
+                position: "unset",
+              },
+              "&.limiting .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderBottomColor: "transparent",
+                borderLeftColor: "transparent",
+                borderRightColor: "transparent",
+              },
+              "& .MuiTextField-root": {
+                marginTop: 0,
+                marginBottom: 0,
+              },
+              "& .MuiOutlinedInput-root .MuiAutocomplete-endAdornment": {
+                right: 20,
+              },
+              marginLeft: "0.3rem",
+              flex: 1,
+            }}
             multiple
             options={optionSource}
             value={valueSource}
@@ -68,6 +104,7 @@ export const RoleFrom = () => {
                     display: "flex",
                     alignItems: "center",
                   }}
+                  key={uuidv4()}
                 >
                   <div
                     style={{
@@ -148,20 +185,33 @@ export const RoleFrom = () => {
       <Stack spacing={5}>
         <div className={styles.nav}>
           <div className={styles.navTitle}>
-            {location.pathname === "/roles/add" ? "新增角色" : "編輯角色"}
+            {location.pathname === "/role/create" ? "新增角色" : "編輯角色"}
           </div>
           <div className={styles.navBtn}>
             <Button
               className={styles.navButton}
               variant="contained"
-              onClick={() => navigate("/roles/roleList")}
+              disabled={isPostLoading}
+              sx={{ width: 120 }}
+              onClick={() => {
+                addOrModifyRolePermissionDebounce();
+              }}
             >
-              確認
+              <span style={{ whiteSpace: "nowrap" }}>
+                確認
+                {isPostLoading && (
+                  <CircularProgress
+                    size={16}
+                    color="primary"
+                    sx={{ marginLeft: 3 }}
+                  />
+                )}
+              </span>
             </Button>
             <Button
               className={styles.navButton}
               variant="outlined"
-              onClick={() => navigate("/roles/roleList")}
+              onClick={() => navigate("/role/permission")}
             >
               返回
             </Button>
@@ -169,100 +219,164 @@ export const RoleFrom = () => {
         </div>
 
         <Card className={styles.card} variant="outlined">
-          <Stack spacing={3}>
-            <div className={styles.itemTitle}>角色信息</div>
-            <div className={styles.item}>
-              <div className={styles.itemSubTitle}>角色名稱：</div>
-              <div className={styles.itemInput}>
-                <Input
-                  disableUnderline={true}
-                  sx={inputStyles}
-                  placeholder="請輸入角色名稱"
-                />
-              </div>
+          {isShowLoading ? (
+            <div style={{ textAlign: "center" }}>
+              <CircularProgress />
             </div>
-            <div className={styles.item}>
-              <div className={styles.itemSubTitle}>角色描述：</div>
-              <div className={styles.itemInput}>
-                <Input
-                  disableUnderline={true}
-                  sx={inputStyles}
-                  placeholder="請輸入角色描述"
-                />
-              </div>
-            </div>
-          </Stack>
-        </Card>
-
-        <Card className={styles.card} variant="outlined">
-          <Stack spacing={3}>
-            <div className={styles.itemTitle}>功能權限</div>
-            <div className={styles.item}>
-              <div className={styles.itemVisiblePage}>
-                <FormGroup sx={{ flexBasis: "20%" }}>
-                  <div className={styles.itemVisiblePageTitle}>可見頁面</div>
-                  <FormControlLabel
-                    control={<Checkbox defaultChecked />}
-                    label="信息發送"
+          ) : (
+            <Stack spacing={3}>
+              <div className={styles.itemTitle}>角色信息</div>
+              <div className={styles.item}>
+                <div className={styles.itemSubTitle}>角色名稱：</div>
+                <div className={styles.itemInput}>
+                  <Input
+                    disableUnderline={true}
+                    sx={inputStyles}
+                    placeholder="請輸入角色名稱"
+                    value={role?.displayName ?? ""}
+                    onChange={(e) => {
+                      updateRole("displayName", e.target.value);
+                      updateRole("name", e.target.value);
+                    }}
                   />
-                  <FormControlLabel control={<Checkbox />} label="角色權限" />
-                </FormGroup>
-              </div>
-              <div className={styles.itemPermission}>
-                <div className={styles.itemPermissionTitle}>功能權限</div>
-                <div className={styles.itemPerssionsForm}>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="創建群組"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="新增角色" />
-                  </FormGroup>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="添加群組成員"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="分配" />
-                  </FormGroup>
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="發送通知"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="編輯" />
-                  </FormGroup>
-
-                  <FormGroup sx={formStyles}>
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label="發送紀錄"
-                    />
-                    <FormControlLabel control={<Checkbox />} label="刪除" />
-                  </FormGroup>
                 </div>
               </div>
-            </div>
-          </Stack>
+              <div className={styles.item}>
+                <div className={styles.itemSubTitle}>角色描述：</div>
+                <div className={styles.itemInput}>
+                  <Input
+                    disableUnderline={true}
+                    sx={inputStyles}
+                    placeholder="請輸入角色描述"
+                    value={role?.description ?? ""}
+                    onChange={(e) => updateRole("description", e.target.value)}
+                  />
+                </div>
+              </div>
+            </Stack>
+          )}
         </Card>
 
         <Card className={styles.card} variant="outlined">
-          <Stack spacing={3}>
-            <div className={styles.itemTitle}>數據權限</div>
-            {renderInputBox(
-              "拉群功能：",
-              "pullCrowdData",
-              checkboxData.pullCrowdData,
-              showLabel.pullCrowdData
-            )}
-            {renderInputBox(
-              "通知功能：",
-              "notificationData",
-              checkboxData.notificationData,
-              showLabel.notificationData,
-              true
-            )}
-          </Stack>
+          {isShowLoading ? (
+            <div style={{ textAlign: "center" }}>
+              <CircularProgress />
+            </div>
+          ) : (
+            <Stack spacing={3}>
+              <div className={styles.itemTitle}>功能權限</div>
+              <div>
+                <div className={styles.roleListItem}>
+                  <div className={styles.itemVisiblePage}>可見頁面</div>
+                  <div className={styles.itemVisiblePage}>功能權限</div>
+                </div>
+
+                {rolePermissionFunctionList.map((roleItem, index) => {
+                  return (
+                    <div
+                      className={styles.roleListItem}
+                      style={
+                        index === rolePermissionFunctionList.length - 1
+                          ? { marginBottom: 0 }
+                          : undefined
+                      }
+                    >
+                      <div className={styles.itemVisiblePage}>
+                        <FormControlLabel
+                          key={index}
+                          control={
+                            <Checkbox
+                              onChange={(e) =>
+                                handleUpdateRolePermissionsChecked(
+                                  roleItem.id,
+                                  e.target.checked
+                                )
+                              }
+                              checked={roleItem.checked}
+                            />
+                          }
+                          label={
+                            FunctionalPermissions[
+                              roleItem.name as FunctionalPermissionsEnum
+                            ] ?? roleItem.name
+                          }
+                        />
+                      </div>
+                      <div className={styles.itemPermissionTitle}>
+                        {rolePermissionsCheckedList
+                          .filter((item) => {
+                            const isCanViewFun =
+                              roleItem.name ===
+                              FunctionalPermissionsEnum.CanViewSendMessage
+                                ? SendMessageFunction.includes(
+                                    item.name as FunctionalPermissionsEnum
+                                  )
+                                : roleItem.name ===
+                                    FunctionalPermissionsEnum.CanViewSecurityManagement &&
+                                  SecurityManagementFunction.includes(
+                                    item.name as FunctionalPermissionsEnum
+                                  );
+
+                            return (
+                              isCanViewFun && !item.name.includes("CanView")
+                            );
+                          })
+                          .map((roleItem, index) => {
+                            return (
+                              <FormControlLabel
+                                key={index}
+                                sx={{ height: 42, marginRight: 5 }}
+                                control={
+                                  <Checkbox
+                                    onChange={(e) =>
+                                      handleUpdateRolePermissionsChecked(
+                                        roleItem.id,
+                                        e.target.checked
+                                      )
+                                    }
+                                    checked={roleItem.checked}
+                                  />
+                                }
+                                label={
+                                  FunctionalPermissions[
+                                    roleItem.name as FunctionalPermissionsEnum
+                                  ] ?? roleItem.name
+                                }
+                              />
+                            );
+                          })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Stack>
+          )}
+        </Card>
+
+        <Card className={styles.card} variant="outlined">
+          {isShowLoading ? (
+            <div style={{ textAlign: "center" }}>
+              <CircularProgress />
+            </div>
+          ) : (
+            <Stack spacing={3}>
+              <div className={styles.itemTitle}>數據權限</div>
+              {renderInputBox(
+                "拉群功能：",
+                "pullCrowdData",
+                checkboxData.pullCrowdData,
+                showLabel.pullCrowdData
+              )}
+              {renderInputBox(
+                "通知功能：",
+                "notificationData",
+                checkboxData.notificationData,
+                showLabel.notificationData,
+                true
+              )}
+            </Stack>
+          )}
         </Card>
       </Stack>
     </div>

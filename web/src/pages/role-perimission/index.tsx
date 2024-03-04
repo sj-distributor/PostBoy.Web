@@ -7,7 +7,7 @@ export const RolePermission = () => {
   return (
     <div className={styles.container}>
       <SnackbarProvider
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         anchorOrigin={{ horizontal: "center", vertical: "top" }}
       >
         <Outlet />

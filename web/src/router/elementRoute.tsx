@@ -11,7 +11,13 @@ import EmailIcon from "@mui/icons-material/Email";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { RolePermission } from "../pages/role-perimission";
 import { UserList } from "../pages/role-perimission/components/user-list";
 import { RoleFrom } from "../pages/role-perimission/components/role-from";
@@ -52,20 +58,9 @@ export const routerArray: RouteItem[] = [
       },
     ],
   },
+
   {
-    path: "/user",
-    head: "用户管理",
-    icons: <AccountCircleIcon />,
-    element: <User />,
-  },
-  {
-    path: "/manager",
-    head: "应用管理",
-    icons: <SettingsIcon />,
-    element: <Manager />,
-  },
-  {
-    path: "/roles",
+    path: "/role",
     head: "角色权限",
     icons: <PersonOutlineIcon />,
     element: <RolePermission />,
@@ -73,25 +68,25 @@ export const routerArray: RouteItem[] = [
       {
         path: "",
         title: "",
-        elementChild: <Navigate to={"/roles/roleList"} />,
+        elementChild: <Navigate to={"/role/permission"} />,
       },
       {
-        path: "/roles/userList/:id",
+        path: "/role/users/:roleId",
         title: "",
         elementChild: <UserList />,
       },
       {
-        path: "/roles/add",
+        path: "/role/create",
         title: "",
         elementChild: <RoleFrom />,
       },
       {
-        path: "/roles/roleList",
+        path: "/role/permission",
         title: "",
         elementChild: <RolePermissions />,
       },
       {
-        path: "/roles/edit/:id",
+        path: "/role/edit/:roleId",
         title: "",
         elementChild: <RoleFrom />,
       },
@@ -107,6 +102,18 @@ export const routerArray: RouteItem[] = [
     head: "",
     element: <MeetingList />,
   },
+  {
+    path: "/user",
+    head: "",
+    // icons: <AccountCircleIcon />,
+    element: <User />,
+  },
+  {
+    path: "/manager",
+    head: "",
+    // icons: <SettingsIcon />,
+    element: <Manager />,
+  },
 ];
 
 export const Router = () => {
@@ -114,9 +121,16 @@ export const Router = () => {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   useEffect(() => {
     if (displayPage && displayPage !== "/none" && username) {
-      navigate(displayPage, { replace: true });
+      navigate(
+        location.pathname.includes(displayPage) || location.pathname === "/none"
+          ? displayPage
+          : location.pathname,
+        { replace: true }
+      );
     } else if (!username) {
       navigate("/login", { replace: true });
     }

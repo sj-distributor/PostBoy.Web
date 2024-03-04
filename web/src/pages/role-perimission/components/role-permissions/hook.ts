@@ -1,70 +1,229 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 import {
-  IRoleTabltDto,
-  UserRoleEnum,
-  UserRoleType,
+  IPageDto,
+  IRolePermissionDto,
+  IRolePermissionDataItem,
+  FunctionalPermissionsEnum,
 } from "../../../../dtos/role-user-permissions";
+import {
+  DeleteRoles,
+  GetRolesByPermissions,
+} from "../../../../api/role-user-permissions";
+import auth from "../../../../auth";
+import { useDebounceFn } from "ahooks";
+import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 export const useAction = () => {
-  const initData: IRoleTabltDto[] = [
-    {
-      id: 1,
-      name: UserRoleType[UserRoleEnum.SuperAdmin],
-      details: "系統默認角色，擁有全部權限，不能刪除",
-      role: UserRoleEnum.SuperAdmin,
-    },
-    {
-      id: 2,
-      name: UserRoleType[UserRoleEnum.User],
-      details: "系統默認角色，擁有基礎權限，不能刪除，人員範圍: all",
-      role: UserRoleEnum.User,
-    },
-    {
-      id: 3,
-      name: UserRoleType[UserRoleEnum.Admin],
-      details: "xxxxxxxxxxx",
-      role: UserRoleEnum.Admin,
-    },
-  ];
+  const { currentUserRolePermissions } = auth();
 
-  const userId = "225";
-
-  const [inputVal, setInputVal] = useState<string>("");
-
-  const [rows, setRows] = useState<IRoleTabltDto[]>(initData);
-
-  const [rowId, setRowId] = useState<number>();
+  const [rowId, setRowId] = useState<string>();
 
   const confirmTipsRef = useRef<ModalBoxRef>(null);
 
   const navigate = useNavigate();
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputVal(event.target.value);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [pageDto, setPageDto] = useState<IPageDto>({
+    pageIndex: 0,
+    pageSize: 20,
+    keyword: "",
+  });
+
+  const [roleDto, setRoleDto] = useState<IRolePermissionDto>({
+    count: 0,
+    rolePermissionData: [],
+  });
+
+  const userPermissions = useMemo(() => {
+    const data = new Set<string>();
+
+    if (
+      currentUserRolePermissions &&
+      currentUserRolePermissions.rolePermissionData?.length
+    ) {
+      currentUserRolePermissions.rolePermissionData
+        .flatMap((item) => item.permissions || [])
+        .forEach((item) => item?.name && data.add(item.name));
+    }
+
+    return Array.from(data);
+  }, [currentUserRolePermissions]);
+
+  const isAdmin = useMemo(() => {
+    return Boolean(
+      currentUserRolePermissions?.rolePermissionData?.find(
+        (item) => item.role.name === "Administrator"
+      )
+    );
+  }, [currentUserRolePermissions]);
+
+  const handleAddRole = () => {
+    if (
+      userPermissions.some(
+        (item) => item === FunctionalPermissionsEnum.CanCreateRoleUser
+      )
+    ) {
+      navigate("/role/create");
+    } else {
+      enqueueSnackbar("没有权限新增角色", {
+        variant: "info",
+      });
+    }
   };
 
-  const handleSearch = () => {
-    console.log("Search content:", inputVal);
+  const getUserIsHaveRole = (
+    selectRoleName: string,
+    role: FunctionalPermissionsEnum
+  ) => {
+    const selectRoleData = currentUserRolePermissions?.rolePermissionData?.find(
+      (item) => item.role.name === selectRoleName
+    );
+
+    return (
+      selectRoleData &&
+      selectRoleData.permissions?.some((item) => item.name === role)
+    );
   };
 
-  const handleDelete = (id: number) => {
-    const updatedRows = rows.filter((row: IRoleTabltDto) => row.id !== id);
-
-    setRows(updatedRows);
+  const handleRoleAssignment = (name: string, id: string) => {
+    if (
+      getUserIsHaveRole(
+        name,
+        FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
+      ) ||
+      isAdmin
+    ) {
+      navigate(`/role/users/${id}`);
+    } else {
+      enqueueSnackbar("没有权限分配當前角色", {
+        variant: "info",
+      });
+    }
   };
+
+  const { run: handleRoleAssignmentDebounce } = useDebounceFn(
+    (name: string, id: string) => handleRoleAssignment(name, id),
+    {
+      wait: 300,
+    }
+  );
+
+  const handleEditRole = (name: string, id: string) => {
+    if (
+      getUserIsHaveRole(
+        name,
+        FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
+      ) ||
+      isAdmin
+    ) {
+      navigate(`/role/edit/${id}`);
+    } else {
+      enqueueSnackbar("没有编辑當前角色权限", {
+        variant: "info",
+      });
+    }
+  };
+
+  const { run: handleEditRoleDebounce } = useDebounceFn(
+    (name: string, id: string) => handleEditRole(name, id),
+    {
+      wait: 300,
+    }
+  );
+
+  const handleRemoveRole = (name: string, id: string) => {
+    if (
+      getUserIsHaveRole(name, FunctionalPermissionsEnum.CanDeleteRoles) ||
+      isAdmin
+    ) {
+      confirmTipsRef.current?.open();
+      setRowId(id);
+    } else {
+      enqueueSnackbar("没有删除當前角色权限", {
+        variant: "info",
+      });
+    }
+  };
+
+  const { run: handleRemoveRoleDebounce } = useDebounceFn(
+    (name: string, id: string) => handleRemoveRole(name, id),
+    {
+      wait: 300,
+    }
+  );
+
+  const loadRoles = () => {
+    setLoading(true);
+
+    GetRolesByPermissions(pageDto)
+      .then((res) => {
+        setTimeout(() => {
+          updateRoleDto("count", res?.count ?? 0);
+          updateRoleDto("rolePermissionData", res?.rolePermissionData ?? []);
+          setLoading(false);
+        }, 500);
+      })
+      .catch((error: Error) => {
+        setTimeout(() => {
+          enqueueSnackbar(convertRoleErrorText(error), { variant: "error" });
+
+          updateRoleDto("count", 0);
+          updateRoleDto("rolePermissionData", []);
+
+          setLoading(false);
+        }, 500);
+      });
+  };
+
+  const deleteRole = (roleId: string) => {
+    DeleteRoles({ roleIds: [roleId] })
+      .then(() => {
+        enqueueSnackbar("删除成功！页面将在三秒后刷新", { variant: "error" });
+        loadRoles();
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      })
+      .catch((error: Error) =>
+        enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
+      );
+  };
+
+  const updatePageDto = (k: keyof IPageDto, v: string | number) => {
+    setPageDto((prev) => ({ ...prev, [k]: v }));
+  };
+
+  const updateRoleDto = (
+    k: keyof IRolePermissionDto,
+    v: IRolePermissionDataItem[] | number
+  ) => {
+    setRoleDto((prev) => ({ ...prev, [k]: v }));
+  };
+
+  useEffect(() => {
+    loadRoles();
+  }, [pageDto.pageIndex, pageDto.pageSize]);
 
   return {
-    userId,
-    rows,
-    inputVal,
     rowId,
     confirmTipsRef,
+    pageDto,
+    loading,
+    roleDto,
+    handleRoleAssignmentDebounce,
+    handleEditRoleDebounce,
+    handleRemoveRoleDebounce,
+    handleAddRole,
+    deleteRole,
+    updatePageDto,
     navigate,
     setRowId,
-    handleInputChange,
-    handleSearch,
-    handleDelete,
+    loadRoles,
   };
 };

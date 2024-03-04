@@ -1,36 +1,34 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { clone } from "ramda";
-import { useUpdateEffect } from "ahooks";
-import { AllDepartmentData, DepartmentDto } from "./props";
-import { IDepartmentDto } from "../../../../dtos/role-user-permissions";
+import { useUpdateEffect, useDebounceFn } from "ahooks";
+import {
+  AddRolePermission,
+  GetPermissions,
+  GetRolePermission,
+  GetTreeList,
+  UpdateRolePermission,
+} from "../../../../api/role-user-permissions";
+import {
+  FunctionalPermissionsEnum,
+  IDepartmentTreeDto,
+  IPermissionsDto,
+  IRole,
+  IRolePermission,
+  IRolePermissionItem,
+  groupPermissionsNames,
+  informationPermissionsNames,
+} from "../../../../dtos/role-user-permissions";
+import { useEffect, useMemo, useState } from "react";
+import { AllDepartmentData, DepartmentDto, RolePermissionsDto } from "./props";
+import { useSnackbar } from "notistack";
+import { convertRoleErrorText } from "../../../../uilts/convert-error";
 
 export const useAction = () => {
-  const options: IDepartmentDto = {
-    allDepartment: [
-      {
-        higherDepartment: {
-          name: "WXF Office",
-          id: "888",
-          childrenDepartment: [
-            { name: "Operating Support Center", id: "81" },
-            { name: "Department A", id: "82" },
-            { name: "Department B", id: "83" },
-          ],
-        },
-      },
-      {
-        higherDepartment: {
-          name: "IS Office",
-          id: "999",
-          childrenDepartment: [
-            { name: "Department C", id: "91" },
-            { name: "Department D", id: "92" },
-          ],
-        },
-      },
-    ],
-  };
+  const [options, setOptions] = useState<IDepartmentTreeDto[]>([]);
+
+  const [rolePermissionsCheckedList, setRolePermissionsCheckedList] = useState<
+    RolePermissionsDto[]
+  >([]);
 
   const inputStyles = {
     border: 1,
@@ -43,44 +41,51 @@ export const useAction = () => {
     boxShadow: 1,
   };
 
-  const selectStyles = { marginLeft: "0.3rem", flex: 1 };
-
   const formStyles = { flexBasis: "25%" };
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const [isPostLoading, setIsPostLoading] = useState<boolean>(false);
 
   const location = useLocation();
 
   const navigate = useNavigate();
 
-  const flatOptions = options.allDepartment.reduce((accumulator, item) => {
-    const higherDepartment: DepartmentDto = {
-      name: item.higherDepartment.name,
-      id: item.higherDepartment.id,
-      isSelected: false,
-      isHide: false,
-    };
+  const getFlatOptionsList = (data: IDepartmentTreeDto[]) => {
+    return data.reduce((accumulator: DepartmentDto[], item) => {
+      const higherDepartment: DepartmentDto = {
+        name: item.department.name,
+        id: item.department.id,
+        isSelected: false,
+        isHide: false,
+      };
 
-    accumulator.push(higherDepartment);
+      accumulator.push(higherDepartment);
 
-    if (
-      item.higherDepartment.childrenDepartment &&
-      item.higherDepartment.childrenDepartment.length > 0
-    ) {
-      higherDepartment.isExpand = false;
-      higherDepartment.indeterminate = false;
+      if (item.childrens && item.childrens.length > 0) {
+        higherDepartment.isExpand = false;
+        higherDepartment.indeterminate = false;
 
-      accumulator.push(
-        ...item.higherDepartment.childrenDepartment.map((childrenItem) => ({
-          name: childrenItem.name,
-          id: childrenItem.id,
-          isSelected: false,
-          parentId: item.higherDepartment.id,
-          isHide: true,
-        }))
-      );
-    }
+        accumulator.push(
+          ...item.childrens.map((childrenItem) => ({
+            name: childrenItem.department.name,
+            id: childrenItem.department.id,
+            isSelected: false,
+            parentId: childrenItem.department.parentId,
+            isHide: true,
+          }))
+        );
+      }
 
-    return accumulator;
-  }, [] as DepartmentDto[]);
+      return accumulator;
+    }, []);
+  };
+
+  const flatOptions = useMemo(() => {
+    return getFlatOptionsList(options);
+  }, [options]);
 
   const [checkboxData, setCheckboxData] = useState<AllDepartmentData>({
     pullCrowdData: flatOptions,
@@ -301,10 +306,238 @@ export const useAction = () => {
     renderShowLabel("notificationData");
   }, [checkboxData.notificationData]);
 
+  const { roleId } = useParams();
+
+  const defaultRole: IRole = {
+    name: "",
+    description: "",
+  };
+
+  const [permissions, setPermissions] = useState<IPermissionsDto>({
+    count: 0,
+    permissions: [],
+  });
+
+  const [role, setRole] = useState<IRole>(defaultRole);
+
+  const [rolePermissionsDto, setRolePermissionsDto] = useState<
+    IRolePermissionItem[]
+  >([]);
+
+  const [rolePermission, setRolePermission] = useState<IRolePermissionItem[]>(
+    []
+  );
+
+  const updateRole = (k: keyof IRole, v: string) => {
+    setRole((prev) => ({ ...prev, [k]: v }));
+  };
+
+  const addOrModifyRolePermission = () => {
+    const data: IRolePermission = {
+      role: role,
+      rolePermissions: rolePermissionsDto,
+    };
+
+    if (role.name && role.description) {
+      setIsPostLoading(true);
+      if (roleId) {
+        UpdateRolePermission(data)
+          .then((res) => {
+            if (res) {
+              navigate("/role/permission");
+              enqueueSnackbar("修改角色成功!页面将在三秒后刷新", {
+                variant: "success",
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 3000);
+            }
+          })
+          .catch((error: Error) =>
+            enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
+          )
+          .finally(() => {
+            setIsPostLoading(false);
+          });
+      } else {
+        AddRolePermission(data)
+          .then((res) => {
+            if (res) {
+              navigate("/role/permission");
+              enqueueSnackbar("创建角色成功!", { variant: "success" });
+            }
+          })
+          .catch((error: Error) =>
+            enqueueSnackbar(convertRoleErrorText(error), { variant: "error" })
+          )
+          .finally(() => {
+            setIsPostLoading(false);
+          });
+      }
+    } else {
+      enqueueSnackbar(
+        `角色${roleId ? "修改" : "新增"}失败，需要填写角色名和描述`,
+        {
+          variant: "info",
+        }
+      );
+    }
+  };
+
+  const { run: addOrModifyRolePermissionDebounce } = useDebounceFn(
+    addOrModifyRolePermission,
+    {
+      wait: 300,
+    }
+  );
+
+  const handleUpdateRolePermissionsChecked = (id: string, v: boolean) => {
+    const cloneData = clone(rolePermissionsCheckedList);
+    cloneData.forEach((item) => item.id === id && (item.checked = v));
+    setRolePermissionsCheckedList(cloneData);
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { staffDepartmentHierarchy } = await GetTreeList();
+
+        setOptions(staffDepartmentHierarchy ?? []);
+        const options = getFlatOptionsList(staffDepartmentHierarchy ?? []);
+
+        const { count, permissions } = await GetPermissions();
+        const permissionsList: RolePermissionsDto[] = [];
+        permissions?.map((item) =>
+          permissionsList.push({ ...item, checked: false })
+        );
+
+        permissionsList.length &&
+          setRolePermissionsCheckedList(permissionsList);
+        setPermissions({
+          count: count ?? 0,
+          permissions: permissions ?? [],
+        });
+
+        const informationRoleIds = Array.from(
+          new Set(
+            permissions
+              .filter((item) =>
+                informationPermissionsNames.includes(
+                  item.name as FunctionalPermissionsEnum
+                )
+              )
+              .map((item) => item.id)
+          )
+        );
+        const groupRoleIds = Array.from(
+          new Set(
+            permissions
+              .filter((item) =>
+                groupPermissionsNames.includes(
+                  item.name as FunctionalPermissionsEnum
+                )
+              )
+              .map((item) => item.id)
+          )
+        );
+
+        if (roleId) {
+          // 获取角色信息
+          const {
+            role,
+            rolePermissions,
+            rolePermissionUnits,
+            permissions: currentPermissions,
+          } = await GetRolePermission(roleId);
+          setRole(role ?? defaultRole);
+          const selectedPermissions = currentPermissions?.map(
+            (item) => item.id
+          );
+          setRolePermission(rolePermissions ?? []);
+
+          const groupUsersList = rolePermissionUnits
+            ?.filter((item) =>
+              groupRoleIds.some((gId) => gId === item.permissionId)
+            )
+            .map((item) => item.unitId);
+          const informationUsersList = rolePermissionUnits
+            ?.filter((item) =>
+              informationRoleIds.some((iId) => iId === item.permissionId)
+            )
+            .map((item) => item.unitId);
+
+          const pullCrowdData = options.map((item) =>
+            groupUsersList?.some((userId) => userId === item.id)
+              ? { ...item, isSelected: true }
+              : item
+          );
+          const notificationData = options.map((item) =>
+            informationUsersList?.some((userId) => userId === item.id)
+              ? { ...item, isSelected: true }
+              : item
+          );
+
+          setCheckboxData({ pullCrowdData, notificationData });
+
+          if (selectedPermissions?.length) {
+            const permissionsList: RolePermissionsDto[] = [];
+            permissions?.map((item) =>
+              permissionsList.push({
+                ...item,
+                checked: selectedPermissions.includes(item.id),
+              })
+            );
+
+            permissionsList.length &&
+              setRolePermissionsCheckedList(permissionsList);
+          }
+
+          setIsLoading(false);
+        }
+      } catch (error) {
+        enqueueSnackbar(convertRoleErrorText(error as Error), {
+          variant: "error",
+        });
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    setCheckboxData({
+      pullCrowdData: flatOptions,
+      notificationData: flatOptions,
+    });
+  }, [flatOptions]);
+
+  useEffect(() => {
+    const newRoleList: IRolePermissionItem[] = [];
+    const groupUnitIds = checkboxData.pullCrowdData
+      .filter((item) => item.isSelected)
+      .map((item) => item.id);
+    const informationUnitIds = checkboxData.notificationData
+      .filter((item) => item.isSelected)
+      .map((item) => item.id);
+
+    rolePermissionsCheckedList.map((item) => {
+      const list: IRolePermissionItem = {
+        permissionId: item.id,
+      };
+      if (groupPermissionsNames.some((iId) => iId === item.name)) {
+        list.unitIds = groupUnitIds;
+      }
+      if (informationPermissionsNames.some((iId) => iId === item.name)) {
+        list.unitIds = informationUnitIds;
+      }
+      if (item.checked) {
+        newRoleList.push(list);
+      }
+    });
+    setRolePermissionsDto(newRoleList);
+  }, [rolePermissionsCheckedList, checkboxData]);
+
   return {
     flatOptions,
     inputStyles,
-    selectStyles,
     formStyles,
     location,
     checkboxData,
@@ -316,5 +549,13 @@ export const useAction = () => {
     updateParentCheckbox,
     updateChildrenCheckbox,
     removeOption,
+    updateRole,
+    role,
+    rolePermission,
+    rolePermissionsCheckedList,
+    isLoading,
+    handleUpdateRolePermissionsChecked,
+    addOrModifyRolePermissionDebounce,
+    isPostLoading,
   };
 };

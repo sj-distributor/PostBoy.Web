@@ -15,7 +15,6 @@
     }
 
     .navBtn {
-      flex-basis: 20%;
       display: flex;
 
       .navButton {
@@ -54,15 +53,17 @@
       }
 
       .itemPermission {
-        flex-basis: 80%;
+        flex-basis: 100%;
         font-weight: 600;
 
         .itemPermissionTitle {
           margin-bottom: 0.75rem;
         }
 
-        .itemPerssionsForm {
+        .itemPermissionsForm {
           display: flex;
+          flex-wrap: wrap;
+          align-content: flex-start;
         }
       }
 
@@ -75,5 +76,19 @@
     .lastItem {
       margin-bottom: 10rem;
     }
+  }
+}
+
+.roleListItem {
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+
+  .itemVisiblePage {
+    flex-basis: 20%;
+    font-weight: 600;
+  }
+  .itemVisiblePageTitle {
+    margin-bottom: 0.75rem;
   }
 }
