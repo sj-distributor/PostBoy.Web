@@ -1,4 +1,4 @@
-import { clone, set } from "ramda";
+import { clone } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import { TreeNode } from "../add-users-model/props";
 import { IRoleUserItemDto } from "../../../../dtos/role-user-permissions";

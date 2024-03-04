@@ -8,8 +8,6 @@ import MeetingList from "../pages/meeting-list";
 import { SendRequest } from "../pages/request";
 
 import EmailIcon from "@mui/icons-material/Email";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SettingsIcon from "@mui/icons-material/Settings";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import {
   Navigate,

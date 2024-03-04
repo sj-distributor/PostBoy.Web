@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle } from "react";
+import React, { useImperativeHandle } from "react";
 import {
   Box,
   Checkbox,
