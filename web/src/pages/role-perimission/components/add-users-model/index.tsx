@@ -61,7 +61,7 @@ export const AddUsersModel = (props: {
             />
           )}
           <TreeSelectList
-            ref={treeSelectRef ?? undefined}
+            ref={treeSelectRef}
             setSelectedData={(selectItems) => setAlreadySelectData(selectItems)}
             treeData={treeData}
             searchValue={searchValue}
