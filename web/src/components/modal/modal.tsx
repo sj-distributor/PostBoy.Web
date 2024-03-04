@@ -1,18 +1,16 @@
-import style from "./modal.module.scss"
-import Close from "@mui/icons-material/Close"
-import { ModalBoxProps } from "./props"
+import style from "./modal.module.scss";
+import Close from "@mui/icons-material/Close";
+import { ModalBoxProps } from "./props";
 import {
-  FunctionComponent as Component,
   forwardRef,
-  RefAttributes,
   useImperativeHandle,
   useState,
   memo,
   useEffect,
-} from "react"
-import { useUnmount } from "ahooks"
+} from "react";
+import { useUnmount } from "ahooks";
 
-const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
+const ModalBox = memo(
   forwardRef(
     (
       {
@@ -25,33 +23,33 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
       }: ModalBoxProps,
       ref
     ) => {
-      const [visible, setVisible] = useState<boolean>(false)
-      const [index, setIndex] = useState<number>(0)
+      const [visible, setVisible] = useState<boolean>(false);
+      const [index, setIndex] = useState<number>(0);
 
       const open = () => {
-        setVisible(true)
-        setIndex((prev) => prev + 1)
-      }
+        setVisible(true);
+        setIndex((prev) => prev + 1);
+      };
 
       const close = () => {
-        setVisible(false)
-        setIndex(0)
-      }
+        setVisible(false);
+        setIndex(0);
+      };
 
       useUnmount(() => {
-        setIndex(0)
-      })
+        setIndex(0);
+      });
 
       useEffect(() => {
         if (index === 1 && !setVisible) {
-          onCancel()
+          onCancel();
         }
-      }, [index, setVisible])
+      }, [index, setVisible]);
 
       useImperativeHandle(ref, () => ({
         open,
         close,
-      }))
+      }));
 
       return (
         <div>
@@ -68,7 +66,7 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
                         <Close
                           className={style.icon}
                           onClick={() => {
-                            close()
+                            close();
                           }}
                         />
                       )}
@@ -81,9 +79,9 @@ const ModalBox: Component<ModalBoxProps & RefAttributes<unknown>> = memo(
             </div>
           )}
         </div>
-      )
+      );
     }
   )
-)
+);
 
-export default ModalBox
+export default ModalBox;
