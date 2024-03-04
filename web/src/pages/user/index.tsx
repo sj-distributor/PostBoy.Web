@@ -24,7 +24,6 @@ import Search from "@mui/icons-material/Search";
 const User = () => {
   const {
     usersList,
-    setUsersList,
     registerRef,
     onRegisterCancel,
     addApikeyRef,
