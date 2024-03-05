@@ -7,7 +7,6 @@ import { ModalBoxRef } from "../../../../dtos/modal";
 import {
   AddRoleUser,
   GetRoleUser,
-  GetRoleUserList,
   GetTreeList,
 } from "../../../../api/role-user-permissions";
 import {
