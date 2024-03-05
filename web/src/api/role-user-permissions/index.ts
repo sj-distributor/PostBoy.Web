@@ -1,3 +1,4 @@
+import queryString from "query-string";
 import {
   IAddRoleUsersDto,
   IDeleteRole,
@@ -19,10 +20,10 @@ export const GetCurrentRolesByPermissions = async () => {
 
 // 获取用户list
 export const GetRoleUser = async (data: IRoleUserPageDto) => {
+  const newQueryString = queryString.stringify(data);
+
   return await Get<IRoleUserResponse>(
-    `/api/Security/role/users?PageIndex=${data.PageIndex + 1}&PageSize=${
-      data.PageSize
-    }&RoleId=${data.RoleId}&Keyword=${data.Keyword}`
+    `/api/Security/role/users?${newQueryString}`
   );
 };
 
@@ -41,11 +42,6 @@ export const GetTreeList = async () => {
   return await Get<IFoundationTreeDto>(
     "/api/Foundation/department/staff/hierarchy/tree"
   );
-};
-
-//获取全部角色用户列表
-export const GetRoleUserList = async () => {
-  return await Get<IRoleUserResponse>(`/api/Security/role/users`);
 };
 
 // 获取功能权限

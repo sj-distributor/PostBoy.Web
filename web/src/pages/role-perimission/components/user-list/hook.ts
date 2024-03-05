@@ -84,7 +84,7 @@ export const useAction = () => {
     setLoading(true);
 
     GetRoleUser({
-      PageIndex: pageDto.PageIndex,
+      PageIndex: (pageDto.PageIndex ?? 0) + 1,
       PageSize: pageDto.PageSize,
       RoleId: pageDto.RoleId,
       Keyword: inputVal,

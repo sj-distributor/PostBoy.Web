@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack";
 import { ModalBoxRef } from "../../../../dtos/modal";
 import {
   AddRoleUser,
-  GetRoleUserList,
+  GetRoleUser,
   GetTreeList,
 } from "../../../../api/role-user-permissions";
 import {
@@ -90,7 +90,9 @@ export const useAction = (props: {
   };
 
   const handleTotalRoleUserList = () => {
-    GetRoleUserList()
+    GetRoleUser({
+      RoleId: roleId,
+    })
       .then((res) => {
         setTotalRoleUserList(res?.roleUsers ?? []);
       })
