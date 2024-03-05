@@ -91,7 +91,7 @@ export const useAction = (props: {
 
   const handleTotalRoleUserList = () => {
     GetRoleUser({
-      PageIndex: 1,
+      PageIndex: 0,
       PageSize: 2147483647,
       RoleId: roleId,
     })
