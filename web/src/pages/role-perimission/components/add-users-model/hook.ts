@@ -94,6 +94,7 @@ export const useAction = (props: {
       PageIndex: 0,
       PageSize: 2147483647,
       RoleId: roleId,
+      Keyword: "",
     })
       .then((res) => {
         setTotalRoleUserList(res?.roleUsers ?? []);
