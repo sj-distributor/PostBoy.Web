@@ -43,11 +43,6 @@ export const GetTreeList = async () => {
   );
 };
 
-//获取全部角色用户列表
-export const GetRoleUserList = async () => {
-  return await Get<IRoleUserResponse>(`/api/Security/role/users`);
-};
-
 // 获取功能权限
 export const GetPermissions = async () => {
   return await Get<IPermissionsDto>("/api/Security/permissions");
