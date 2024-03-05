@@ -1,6 +1,6 @@
 export interface IRoleUserPageDto {
-  PageIndex: number;
-  PageSize: number;
+  PageIndex?: number;
+  PageSize?: number;
   RoleId: string;
   Keyword?: string;
 }
