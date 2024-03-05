@@ -2,7 +2,7 @@ export interface IRoleUserPageDto {
   PageIndex: number;
   PageSize: number;
   RoleId: string;
-  Keyword: string;
+  Keyword?: string;
 }
 
 export interface IRoleUserResponse {
