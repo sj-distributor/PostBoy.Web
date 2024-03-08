@@ -13,7 +13,9 @@ const useAction = () => {
 
   const handleLoginButton = async () => {
     const data = await AuthAccont({ userName: username, password });
-    !!data ? signIn(data, () => navigateTo("current")) : setOpenSnackBar(true);
+    !!data
+      ? signIn(data, username, () => navigateTo("current"))
+      : setOpenSnackBar(true);
   };
 
   const navigateTo = (scenes: string) => {
@@ -24,7 +26,7 @@ const useAction = () => {
           break;
         case "history":
           navigate(
-            location.state.from.pathname
+            location.state?.from.pathname
               ? location.state?.from?.pathname
               : displayPage,
             { replace: true }

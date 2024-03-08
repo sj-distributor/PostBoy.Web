@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useMemo } from "react";
-import jwt_decode from "jwt-decode";
+
 import { GetCurrentRolesByPermissions } from "../../api/role-user-permissions";
 import {
   FunctionalPermissionsEnum,
@@ -8,6 +8,7 @@ import {
 } from "../../dtos/role-user-permissions";
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/route";
+import { GetAuthUser } from "../../api/user-management";
 
 interface AuthContextOptions {
   token: string;
@@ -17,7 +18,7 @@ interface AuthContextOptions {
   filterRouter: RouteItem[];
   haveAdminPermission: boolean;
   displayPage: string;
-  signIn: (token: string, callback?: Function) => void;
+  signIn: (token: string, username: string, callback?: Function) => void;
   signOut: (callback?: Function) => void;
 }
 
@@ -25,11 +26,10 @@ export const AuthContext = createContext<AuthContextOptions>(null!);
 
 const AuthProvider = (props: { children: React.ReactNode }) => {
   const defaultToken = localStorage.getItem("token") as string;
-  const [username, setUsername] = useState(
-    defaultToken
-      ? jwt_decode<{ unique_name: string }>(defaultToken).unique_name
-      : ""
-  );
+
+  const defaulUserName = localStorage.getItem("username") as string;
+
+  const [username, setUsername] = useState(defaulUserName);
   const [token, setToken] = useState<string>(defaultToken);
   const [authStatus, setAuthStatus] = useState<boolean>(!!defaultToken);
 
@@ -44,12 +44,12 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
       rolePermissionData: [],
     });
 
-  const signIn = (token: string, callback?: Function) => {
+  const signIn = (token: string, username: string, callback?: Function) => {
     setToken(token);
     localStorage.setItem("token", token);
-    const tokenObj = jwt_decode<{ unique_name: string }>(token);
+    localStorage.setItem("username", username);
 
-    setUsername(tokenObj.unique_name);
+    setUsername(username);
     setAuthStatus(true);
     callback && callback();
   };
@@ -57,7 +57,8 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   const signOut = (callback?: Function) => {
     setToken("");
     setUsername("");
-    localStorage.setItem("token", "");
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
     setAuthStatus(false);
     setCurrentUserRolePermissions({
       count: 0,
@@ -109,7 +110,12 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
   }, [currentUserRolePermissions]);
 
   useEffect(() => {
-    if (username)
+    if (token) {
+      !username &&
+        GetAuthUser().then((res) => {
+          const { userName } = res;
+          userName && setUsername(userName);
+        });
       GetCurrentRolesByPermissions()
         .then((res) => {
           setCurrentUserRolePermissions({
@@ -123,7 +129,8 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
             rolePermissionData: [],
           });
         });
-  }, [username]);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
