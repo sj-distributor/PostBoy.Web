@@ -52,6 +52,8 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
     setUsername(username);
     setAuthStatus(true);
     callback && callback();
+
+    getUserRole();
   };
 
   const signOut = (callback?: Function) => {
@@ -65,6 +67,22 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
       rolePermissionData: [],
     });
     callback && callback();
+  };
+
+  const getUserRole = () => {
+    GetCurrentRolesByPermissions()
+      .then((res) => {
+        setCurrentUserRolePermissions({
+          count: res?.count ?? 0,
+          rolePermissionData: res?.rolePermissionData ?? [],
+        });
+      })
+      .catch(() => {
+        setCurrentUserRolePermissions({
+          count: 0,
+          rolePermissionData: [],
+        });
+      });
   };
 
   const filterRouter = useMemo(() => {
@@ -111,24 +129,15 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (token) {
-      !username &&
-        GetAuthUser().then((res) => {
-          const { userName } = res;
-          userName && setUsername(userName);
-        });
-      GetCurrentRolesByPermissions()
-        .then((res) => {
-          setCurrentUserRolePermissions({
-            count: res?.count ?? 0,
-            rolePermissionData: res?.rolePermissionData ?? [],
-          });
-        })
-        .catch(() => {
-          setCurrentUserRolePermissions({
-            count: 0,
-            rolePermissionData: [],
-          });
-        });
+      GetAuthUser().then((res) => {
+        const { userName } = res;
+        if (userName && userName !== username) {
+          setUsername(userName);
+          localStorage.setItem("username", userName);
+        }
+      });
+
+      getUserRole();
     }
   }, []);
 
