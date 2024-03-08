@@ -115,7 +115,7 @@ export const routerArray: RouteItem[] = [
 ];
 
 export const Router = () => {
-  const { filterRouter, displayPage, username } = useAuth();
+  const { filterRouter, displayPage, username, token } = useAuth();
 
   const navigate = useNavigate();
 
@@ -129,7 +129,7 @@ export const Router = () => {
           : location.pathname,
         { replace: true }
       );
-    } else if (!username) {
+    } else if (!token) {
       navigate("/login", { replace: true });
     }
   }, [displayPage]);
