@@ -71,6 +71,27 @@ export const RolePermissions = () => {
                 編輯
               </Button>
             );
+          case UserRoleEnum.Admin:
+            return (
+              <>
+                <Button
+                  variant="text"
+                  onClick={() =>
+                    handleRoleAssignmentDebounce(params.row.name, params.row.id)
+                  }
+                >
+                  分配
+                </Button>
+                <Button
+                  variant="text"
+                  onClick={() =>
+                    handleEditRoleDebounce(params.row.name, params.row.id)
+                  }
+                >
+                  編輯
+                </Button>
+              </>
+            );
 
           default:
             return (

@@ -58,10 +58,18 @@ export const useAction = () => {
   const isAdmin = useMemo(() => {
     return Boolean(
       currentUserRolePermissions?.rolePermissionData?.find(
-        (item) => item.role.name === "Administrator"
+        (item) => item.role.name === "Administrator" && item.role.isSystem
       )
     );
   }, [currentUserRolePermissions]);
+
+  const getIsUserAdminRole = (name: FunctionalPermissionsEnum) => {
+    const adminRole = currentUserRolePermissions?.rolePermissionData?.find(
+      (item) => item.role.name === "Admin" && item.role.isSystem
+    );
+
+    return adminRole?.permissions.some((item) => item.name === name);
+  };
 
   const handleAddRole = () => {
     if (
@@ -97,7 +105,8 @@ export const useAction = () => {
         name,
         FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
       ) ||
-      isAdmin
+      isAdmin ||
+      getIsUserAdminRole(FunctionalPermissionsEnum.CanGrantPermissionsIntoRole)
     ) {
       navigate(`/role/users/${id}`);
     } else {
@@ -120,7 +129,8 @@ export const useAction = () => {
         name,
         FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
       ) ||
-      isAdmin
+      isAdmin ||
+      getIsUserAdminRole(FunctionalPermissionsEnum.CanUpdatePermissionsOfRole)
     ) {
       navigate(`/role/edit/${id}`);
     } else {
@@ -140,7 +150,8 @@ export const useAction = () => {
   const handleRemoveRole = (name: string, id: string) => {
     if (
       getUserIsHaveRole(name, FunctionalPermissionsEnum.CanDeleteRoles) ||
-      isAdmin
+      isAdmin ||
+      getIsUserAdminRole(FunctionalPermissionsEnum.CanDeleteRoles)
     ) {
       confirmTipsRef.current?.open();
       setRowId(id);

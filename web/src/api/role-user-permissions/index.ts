@@ -4,6 +4,7 @@ import {
   IDeleteRole,
   IDeleteRoleUserRequest,
   IFoundationTreeDto,
+  IGetPermissionsRequest,
   IPageDto,
   IPermissionsDto,
   IRolePermission,
@@ -45,8 +46,11 @@ export const GetTreeList = async () => {
 };
 
 // 获取功能权限
-export const GetPermissions = async () => {
-  return await Get<IPermissionsDto>("/api/Security/permissions");
+export const GetPermissions = async (data: IGetPermissionsRequest) => {
+  const newQueryString = queryString.stringify(data);
+  return await Get<IPermissionsDto>(
+    `/api/Security/permissions?${newQueryString}`
+  );
 };
 
 // 查询角色
