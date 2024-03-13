@@ -405,7 +405,7 @@ export const useAction = () => {
         setOptions(staffDepartmentHierarchy ?? []);
         const options = getFlatOptionsList(staffDepartmentHierarchy ?? []);
 
-        const { count, permissions } = await GetPermissions();
+        const { count, permissions } = await GetPermissions({ RoleId: roleId });
         const permissionsList: RolePermissionsDto[] = [];
         permissions?.map((item) =>
           permissionsList.push({ ...item, checked: false })

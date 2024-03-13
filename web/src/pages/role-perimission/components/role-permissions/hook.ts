@@ -7,6 +7,7 @@ import {
   IRolePermissionDto,
   IRolePermissionDataItem,
   FunctionalPermissionsEnum,
+  IPermissionItem,
 } from "../../../../dtos/role-user-permissions";
 import {
   DeleteRoles,
@@ -77,24 +78,19 @@ export const useAction = () => {
     }
   };
 
-  const getUserIsHaveRole = (
-    selectRoleName: string,
-    role: FunctionalPermissionsEnum
-  ) => {
-    const selectRoleData = currentUserRolePermissions?.rolePermissionData?.find(
-      (item) => item.role.name === selectRoleName
+  const getUserIsHaveRole = (role: FunctionalPermissionsEnum) => {
+    const selectRoleData: IPermissionItem[] = [];
+
+    currentUserRolePermissions?.rolePermissionData?.forEach((item) =>
+      item.permissions.forEach((item) => selectRoleData.push(item))
     );
 
-    return (
-      selectRoleData &&
-      selectRoleData.permissions?.some((item) => item.name === role)
-    );
+    return selectRoleData && selectRoleData?.some((item) => item.name === role);
   };
 
   const handleRoleAssignment = (name: string, id: string) => {
     if (
       getUserIsHaveRole(
-        name,
         FunctionalPermissionsEnum.CanGrantPermissionsIntoRole
       ) ||
       isAdmin
@@ -116,10 +112,7 @@ export const useAction = () => {
 
   const handleEditRole = (name: string, id: string) => {
     if (
-      getUserIsHaveRole(
-        name,
-        FunctionalPermissionsEnum.CanUpdatePermissionsOfRole
-      ) ||
+      getUserIsHaveRole(FunctionalPermissionsEnum.CanUpdatePermissionsOfRole) ||
       isAdmin
     ) {
       navigate(`/role/edit/${id}`);
@@ -139,7 +132,7 @@ export const useAction = () => {
 
   const handleRemoveRole = (name: string, id: string) => {
     if (
-      getUserIsHaveRole(name, FunctionalPermissionsEnum.CanDeleteRoles) ||
+      getUserIsHaveRole(FunctionalPermissionsEnum.CanDeleteRoles) ||
       isAdmin
     ) {
       confirmTipsRef.current?.open();

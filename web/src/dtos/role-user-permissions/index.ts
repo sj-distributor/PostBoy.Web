@@ -150,6 +150,7 @@ export interface IDeleteRole {
 export enum UserRoleEnum {
   Administrator = "Administrator",
   DefaultUser = "User",
+  Admin = "Admin",
 }
 
 export const UserRoleType = {
@@ -211,3 +212,9 @@ export const informationPermissionsNames = [
   FunctionalPermissionsEnum.CanSendMessage,
   FunctionalPermissionsEnum.CanSendWorkWeChatAppNotification,
 ];
+
+export interface IGetPermissionsRequest {
+  PageIndex?: number;
+  PageSize?: number;
+  RoleId?: string;
+}
