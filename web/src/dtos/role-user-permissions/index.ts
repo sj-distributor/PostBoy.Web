@@ -108,6 +108,7 @@ export interface IRole {
   id?: string;
   createdDate?: string;
   modifiedDate?: string;
+  isSystem?: boolean;
 }
 
 export interface IRolePermissionItem {
