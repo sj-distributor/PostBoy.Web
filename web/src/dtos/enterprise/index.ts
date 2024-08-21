@@ -97,6 +97,7 @@ export enum MessageDataFileType {
 export interface FileObject {
   fileContent?: string;
   fileName: string;
+  fileOriginalName: string;
   fileType: MessageDataFileType;
   fileUrl?: string;
 }
@@ -301,6 +302,12 @@ export interface SendData {
   mpNews?: {
     articles: PictureText[];
   };
+  textCard?: {
+    title: string;
+    description: string;
+    url: string;
+    btntxt: string;
+  };
 }
 
 export interface TextDto {
@@ -485,4 +492,32 @@ export enum UpdateListType {
   Fold,
   Flatten,
   All,
+}
+
+export interface IMessageFileResponse {
+  fileUrl: string;
+  hasAttachments: boolean;
+  destination: MessageJobDestination;
+  metadata: {
+    id: string;
+    createDate: string;
+    messageJobId: string;
+    key: string;
+    value: string;
+  }[];
+  sendHttpRequest: SendHttpRequestDto;
+  emailNotification: {
+    senderId: string;
+    subject: string;
+    body: string;
+    to: string[];
+    cc: string[];
+    attachments: {
+      fileName: string;
+      fileOriginalName: string;
+      fileUrl: string;
+      fileContent: string;
+    }[];
+  };
+  workWeChatAppNotification: IWorkWeChatAppNotificationDto;
 }
