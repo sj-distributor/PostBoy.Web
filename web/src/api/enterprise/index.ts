@@ -1,24 +1,25 @@
 import {
-  ICorpData,
-  ICorpAppListApiData,
   ICorpAppData,
+  ICorpAppListApiData,
+  ICorpData,
+  ICreateGroupResonse,
   IDepartmentListApiData,
-  IDepartmentUsersListApiData,
   IDepartmentResponse,
+  IDepartmentUsersListApiData,
   IDepartmentUsersResonse,
-  ITagsListResponse,
-  IMessageJobRecord,
+  IGetDeptAndUsersResponse,
+  IGroupDetailResponse,
+  IGroupUserResponse,
+  IMessageFileResponse,
   IMessageJobDto,
+  IMessageJobRecord,
   ISendMessageCommand,
-  MessageJobDestination,
+  ITagsListResponse,
   IUpdateMessageCommand,
   IWorkCorpAppGroup,
   IWorkGroupCreate,
-  IGetDeptAndUsersResponse,
-  ICreateGroupResonse,
+  MessageJobDestination,
   UploadAttachmentResponseData,
-  IGroupUserResponse,
-  IGroupDetailResponse,
 } from "../../dtos/enterprise"
 import { Get, Post } from "../http-client"
 
@@ -123,4 +124,10 @@ export const GetGroupUsersDetail = async (data: {
   userIds: string[]
 }) => {
   return await Post<IGroupUserResponse[]>("/api/Wechat/work/users", data)
+}
+
+export const GetMessageFileUrl = async (MessageJobId: string) => {
+  return await Get<IMessageFileResponse>(
+    `/api/Message/file/url?MessageJobId=${MessageJobId}`
+  )
 }
