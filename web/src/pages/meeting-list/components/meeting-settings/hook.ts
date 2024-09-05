@@ -820,6 +820,7 @@ const useAction = (props: MeetingSettingsProps) => {
         description,
         location,
         absentMember,
+        presentMember,
         password,
         enableWaitingRoom,
         allowEnterBeforeHost,
@@ -943,8 +944,13 @@ const useAction = (props: MeetingSettingsProps) => {
       setParticipantList((participant) => {
         let attendeesData: IDepartmentAndUserListValue[] = [];
 
-        absentMember.length > 0 &&
-          [...new Set(absentMember)].map((item) =>
+        const participantData = [
+          ...(presentMember ?? []),
+          ...(absentMember ?? []),
+        ];
+
+        participantData.length > 0 &&
+          [...new Set(participantData)].map((item) =>
             attendeesData.push({
               id: item,
               name: item,

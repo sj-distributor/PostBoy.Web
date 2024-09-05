@@ -72,7 +72,7 @@ const useDeptUserData = ({ appId }: IDeptUserDataHookProp) => {
         idRoute: [...idRoute, source.department.id],
         children: [],
       };
-      const users = source.users.map((user) => ({
+      const users = (source.users ?? []).map((user) => ({
         id: user.userid,
         name: user.userid,
         type: DepartmentAndUserType.User,
