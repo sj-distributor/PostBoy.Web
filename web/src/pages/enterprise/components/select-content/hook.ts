@@ -642,8 +642,6 @@ export const useAction = (props: SelectContentHookProps) => {
                 break;
               }
             }
-          } else {
-            showErrorPrompt("暂无附件");
           }
         })
         .catch(() => {
