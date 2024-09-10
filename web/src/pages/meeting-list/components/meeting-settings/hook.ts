@@ -833,11 +833,23 @@ const useAction = (props: MeetingSettingsProps) => {
         meetingRecordType,
         enableCloudRecordSummary,
         meetingSummaryDistributionEnabled,
+        workWeChatCorpApplicationId,
+        workWeChatCorpId,
       } = data;
 
       setMeetingTitle(title);
 
       loadingAction.setFalse();
+
+      const corp = corpsList?.find((item) => item.id === workWeChatCorpId);
+
+      const corpApp = corpAppList?.find(
+        (item) => item.id === workWeChatCorpApplicationId
+      );
+
+      corp && setCorpsValue(corp);
+
+      corpApp && setCorpAppValue(corpApp);
 
       setMeetingStartDate(dayjs.unix(meetingStart).format("YYYY-MM-DD"));
 
