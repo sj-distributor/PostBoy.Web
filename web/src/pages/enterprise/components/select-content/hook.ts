@@ -1,6 +1,4 @@
-import * as wangEditor from "@wangeditor/editor";
-import { useBoolean } from "ahooks";
-import { clone, isEmpty } from "ramda";
+import { clone, isEmpty, uniqWith } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GetCorpAppList,
@@ -8,7 +6,6 @@ import {
   GetDeptTreeList,
   GetGroupDetail,
   GetGroupUsersDetail,
-  GetMessageFileUrl,
   GetTagsList,
   GetWeChatWorkCorpAppGroups,
   PostAttachmentUpload,
@@ -34,10 +31,13 @@ import {
   SendParameter,
 } from "../../../../dtos/enterprise";
 import { messageTypeList, timeZone } from "../../../../dtos/send-message-job";
-import useDeptUserData from "../../../../hooks/deptUserData";
 import { convertBase64 } from "../../../../uilts/convert-base64";
-import { annexEditorConfig } from "../../../../uilts/wangEditor";
 import { SelectContentHookProps } from "./props";
+import * as wangEditor from "@wangeditor/editor";
+import { annexEditorConfig } from "../../../../uilts/wangEditor";
+import { useBoolean } from "ahooks";
+import useDeptUserData from "../../../../hooks/deptUserData";
+import { Preview } from "@mui/icons-material";
 
 type InsertImageFnType = (url: string, alt: string, href: string) => void;
 
@@ -114,7 +114,6 @@ export const useAction = (props: SelectContentHookProps) => {
   const [file, setFile] = useState<FileObject>({
     fileContent: "",
     fileName: "",
-    fileOriginalName: "",
     fileType: messageTypeValue.type,
   });
   // 发送时间
@@ -549,7 +548,6 @@ export const useAction = (props: SelectContentHookProps) => {
     if (name === "file") {
       setFile({
         fileName: "",
-        fileOriginalName: "",
         fileContent: "",
         fileType: 0,
       });
@@ -608,50 +606,6 @@ export const useAction = (props: SelectContentHookProps) => {
     return tagsValue.map((item) => item.tagName);
   }, [tagsValue]);
 
-  const getMessageFileUrl = () => {
-    if (updateMessageJobInformation?.id) {
-      GetMessageFileUrl(updateMessageJobInformation.id)
-        .then((data) => {
-          if (data.hasAttachments) {
-            const file = data.workWeChatAppNotification.file;
-
-            if (!file) return;
-
-            setLastTimeFile({
-              fileName: file.fileName,
-              fileOriginalName: file.fileOriginalName,
-              fileUrl: file.fileUrl,
-              fileType: file.fileType,
-            });
-
-            switch (file.fileType) {
-              case MessageDataFileType.Image: {
-                setMessageTypeValue(messageTypeList[2]);
-                break;
-              }
-              case MessageDataFileType.Voice: {
-                setMessageTypeValue(messageTypeList[3]);
-                break;
-              }
-              case MessageDataFileType.Video: {
-                setMessageTypeValue(messageTypeList[4]);
-                break;
-              }
-              case MessageDataFileType.File: {
-                setMessageTypeValue(messageTypeList[5]);
-                break;
-              }
-            }
-          } else {
-            showErrorPrompt("暂无附件");
-          }
-        })
-        .catch(() => {
-          showErrorPrompt("获取附件失败");
-        });
-    }
-  };
-
   // 消息类型更换时替换文件的字段
   useEffect(() => {
     if (
@@ -660,7 +614,6 @@ export const useAction = (props: SelectContentHookProps) => {
     ) {
       setFile({
         fileName: "",
-        fileOriginalName: "",
         fileUrl: "",
         fileType: messageTypeValue.type,
       });
@@ -851,6 +804,36 @@ export const useAction = (props: SelectContentHookProps) => {
         setLastTimePictureText(workWeChatAppNotification.mpNews?.articles);
         setMessageTypeValue(messageTypeList[1]);
         setHtml(workWeChatAppNotification.mpNews?.articles[0].content);
+      } else if (workWeChatAppNotification.file !== null) {
+        setLastTimeFile({
+          fileName: !!workWeChatAppNotification.file?.fileName
+            ? workWeChatAppNotification.file?.fileName
+            : "",
+          fileType:
+            workWeChatAppNotification.file?.fileType !== undefined
+              ? workWeChatAppNotification.file?.fileType
+              : 0,
+          fileUrl: workWeChatAppNotification.file?.fileUrl,
+        });
+
+        switch (workWeChatAppNotification.file?.fileType) {
+          case MessageDataFileType.Image: {
+            setMessageTypeValue(messageTypeList[2]);
+            break;
+          }
+          case MessageDataFileType.Voice: {
+            setMessageTypeValue(messageTypeList[3]);
+            break;
+          }
+          case MessageDataFileType.Video: {
+            setMessageTypeValue(messageTypeList[4]);
+            break;
+          }
+          case MessageDataFileType.File: {
+            setMessageTypeValue(messageTypeList[5]);
+            break;
+          }
+        }
       }
 
       // 发送类型
@@ -901,8 +884,6 @@ export const useAction = (props: SelectContentHookProps) => {
         setChatName(updateMessageJobInformation.groupName);
         setSendType(SendObjOrGroup.Group);
       }
-
-      getMessageFileUrl();
     }
   }, [updateMessageJobInformation]);
 
@@ -1031,7 +1012,6 @@ export const useAction = (props: SelectContentHookProps) => {
       setFile({
         fileContent: "",
         fileName: "",
-        fileOriginalName: "",
         fileType: messageTypeValue.type,
       });
       setDateValue("");
