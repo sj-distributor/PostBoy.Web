@@ -9,6 +9,7 @@ import { SendRequest } from "../pages/request";
 
 import EmailIcon from "@mui/icons-material/Email";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import SettingsIcon from "@mui/icons-material/Settings";
 import {
   Navigate,
   Route,
@@ -26,6 +27,7 @@ import Main from "../pages/main";
 import IsAuthUser from "../pages/auth";
 import useAuth from "../auth";
 import { useEffect } from "react";
+import MeetingWhiteList from "../pages/meeting-white-list";
 
 export const routerArray: RouteItem[] = [
   {
@@ -89,6 +91,12 @@ export const routerArray: RouteItem[] = [
         elementChild: <RoleFrom />,
       },
     ],
+  },
+  {
+    path: "/whiteList",
+    head: "会议总结设置",
+    icons: <SettingsIcon />,
+    element: <MeetingWhiteList />,
   },
   {
     path: "/none",
