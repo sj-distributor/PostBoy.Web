@@ -103,9 +103,15 @@ const MeetingWhiteList = () => {
           <Button
             variant="contained"
             size="small"
-            onClick={() => handelDeleteWhiteList(params.row.id)}
+            onClick={() => {
+              confirmDialogAction.setTrue();
+              setAddEditWhiteListDto((prev) => ({
+                ...prev,
+                Id: params.row.id,
+              }));
+            }}
           >
-            {delLoading ? <CircularProgress size={20} /> : "删除"}
+            删除
           </Button>
         </>
       ),
@@ -138,7 +144,10 @@ const MeetingWhiteList = () => {
         <Button
           variant="contained"
           component="label"
-          onClick={() => setOpenAddWhiteList(true)}
+          onClick={() => {
+            setOpenAddWhiteList(true);
+            setAddEditWhiteListDto((prev) => ({ ...prev, type: "add" }));
+          }}
         >
           创建
         </Button>
@@ -250,7 +259,7 @@ const MeetingWhiteList = () => {
                 handelAddEditWhiteList();
               }}
             >
-              {updateLoading ? <CircularProgress size={20} /> : "确认"}
+              {updateLoading && <CircularProgress size={16} />}确认
             </Button>
           </DialogActions>
         </Dialog>
@@ -272,7 +281,7 @@ const MeetingWhiteList = () => {
           </DialogTitle>
           <DialogContent sx={{ backgroundColor: "#f2f3f4" }}>
             <DialogContentText id="alert-dialog-description-cancel">
-              您正在取消预定会议，是否继续操作
+              您正在删除总结白名单，是否继续操作
             </DialogContentText>
           </DialogContent>
           <DialogActions
@@ -285,8 +294,13 @@ const MeetingWhiteList = () => {
             >
               取消
             </Button>
-            <Button variant="contained" size="small">
-              确认
+            <Button
+              variant="contained"
+              size="small"
+              disabled={delLoading}
+              onClick={() => handelDeleteWhiteList(addEditWhiteListDto.Id)}
+            >
+              {delLoading && <CircularProgress size={20} color="info" />}确认
             </Button>
           </DialogActions>
         </Dialog>

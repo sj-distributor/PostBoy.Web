@@ -119,12 +119,16 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
         : "/none"
     );
 
-    return routerArray.filter(
+    const routerList = routerArray.filter(
       (item) =>
         (sendMessagePermission || item.path !== "/home") &&
         (rolePermission || item.path !== "/role") &&
         (adminPermission || (item.path !== "/user" && item.path !== "/manager"))
     );
+
+    return adminPermission
+      ? routerList
+      : routerList.filter((item) => item.path !== "/whiteList");
   }, [currentUserRolePermissions]);
 
   useEffect(() => {

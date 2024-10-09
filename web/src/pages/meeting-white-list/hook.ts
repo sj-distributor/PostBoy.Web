@@ -104,13 +104,11 @@ const useAction = () => {
         .catch((err) => {
           failSendAction.setTrue();
           setFailSendText(`${addEditWhiteListDto.type} failed`);
-          loadingAction.setFalse();
         })
         .finally(() => setUpdateLoading(false));
     } else {
       failSendAction.setTrue();
       setFailSendText("Please fill in the form completely before submitting");
-      loadingAction.setFalse();
     }
   };
 
@@ -119,16 +117,15 @@ const useAction = () => {
       setDelLoading(true);
       PostDeleteWhiteList(id)
         .then(() => {
-          failSendAction.setTrue();
+          successAction.setTrue();
           setSuccessText("Delete ok");
-          loadingAction.setFalse();
+          confirmDialogAction.setFalse();
           getMeetingList();
         })
         .finally(() => setDelLoading(false));
     } else {
       failSendAction.setTrue();
       setFailSendText("Delete failed, unable to find whitelist ID");
-      loadingAction.setFalse();
     }
   };
 
