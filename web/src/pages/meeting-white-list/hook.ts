@@ -35,7 +35,6 @@ const useAction = () => {
     type: "add",
     Id: "",
   });
-
   const [rows, setRows] = useState<IIWhiteListsDto[]>([]);
 
   const handleCopyMeetingLink = (link: string) => {
