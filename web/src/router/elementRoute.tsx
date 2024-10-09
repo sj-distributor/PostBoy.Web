@@ -94,7 +94,7 @@ export const routerArray: RouteItem[] = [
   },
   {
     path: "/whiteList",
-    head: "会议总结设置",
+    head: "会议总结",
     icons: <SettingsIcon />,
     element: <MeetingWhiteList />,
   },
