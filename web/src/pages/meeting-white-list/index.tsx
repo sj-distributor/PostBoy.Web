@@ -26,8 +26,8 @@ const MeetingWhiteList = () => {
     failSend,
     failSendText,
     successText,
-    dto,
-    setDto,
+    whiteListsRequest,
+    setWhiteListsRequest,
     loading,
     isConfirmDialog,
     confirmDialogAction,
@@ -158,8 +158,8 @@ const MeetingWhiteList = () => {
             <DataGrid
               rows={rows}
               columns={columns}
-              pageSize={dto.pageSize}
-              page={dto.pageIndex}
+              pageSize={whiteListsRequest.pageSize}
+              page={whiteListsRequest.pageIndex}
               showCellRightBorder
               showColumnRightBorder
               rowsPerPageOptions={[5, 10, 15, 20]}
@@ -169,12 +169,12 @@ const MeetingWhiteList = () => {
               paginationMode="server"
               rowHeight={56}
               style={{ height: 700, width: "95%" }}
-              rowCount={dto.rowCount}
+              rowCount={whiteListsRequest.rowCount}
               onPageChange={(value) =>
-                setDto((prve) => ({ ...prve, pageIndex: value }))
+                setWhiteListsRequest((prve) => ({ ...prve, pageIndex: value }))
               }
               onPageSizeChange={(value) =>
-                setDto((prve) => ({ ...prve, pageSize: value }))
+                setWhiteListsRequest((prve) => ({ ...prve, pageSize: value }))
               }
             />
           </div>

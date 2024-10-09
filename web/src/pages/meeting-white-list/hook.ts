@@ -7,34 +7,43 @@ import {
   PostUpdateWhiteList,
 } from "../../api/white-list";
 import { IIWhiteListsDto } from "../../dtos/white-list";
+import { IAddEditWhiteListDto, IWhiteListsRequest } from "./props";
 
 const useAction = () => {
   const [successText, setSuccessText] = useState<string>("");
+
   const [success, successAction] = useBoolean(false);
+
   const [failSend, failSendAction] = useBoolean(false);
+
   const [loading, loadingAction] = useBoolean(false);
+
   const [failSendText, setFailSendText] = useState<string>("");
+
   const [isConfirmDialog, confirmDialogAction] = useBoolean(false);
+
   const [openAddWhiteList, setOpenAddWhiteList] = useState<boolean>(false);
+
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+
   const [delLoading, setDelLoading] = useState<boolean>(false);
-  const [dto, setDto] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-    rowCount: 0,
-    ketWord: "",
-  });
-  const [addEditWhiteListDto, setAddEditWhiteListDto] = useState<{
-    MeetingCode: string;
-    NotifyUserId: string;
-    type: "add" | "edit";
-    Id: string;
-  }>({
-    MeetingCode: "",
-    NotifyUserId: "",
-    type: "add",
-    Id: "",
-  });
+
+  const [whiteListsRequest, setWhiteListsRequest] =
+    useState<IWhiteListsRequest>({
+      pageIndex: 0,
+      pageSize: 10,
+      rowCount: 0,
+      keyword: "",
+    });
+
+  const [addEditWhiteListDto, setAddEditWhiteListDto] =
+    useState<IAddEditWhiteListDto>({
+      MeetingCode: "",
+      NotifyUserId: "",
+      type: "add",
+      Id: "",
+    });
+
   const [rows, setRows] = useState<IIWhiteListsDto[]>([]);
 
   const handleCopyMeetingLink = (link: string) => {
@@ -48,9 +57,9 @@ const useAction = () => {
 
   const getMeetingList = () => {
     const data = {
-      PageIndex: dto.pageIndex + 1,
-      PageSize: dto.pageSize,
-      KeyWord: dto.ketWord,
+      PageIndex: whiteListsRequest.pageIndex + 1,
+      PageSize: whiteListsRequest.pageSize,
+      KeyWord: whiteListsRequest.keyword,
     };
     loadingAction.setTrue();
 
@@ -58,7 +67,7 @@ const useAction = () => {
       .then((res) => {
         if (res && res.whitelist) {
           setRows(res.whitelist);
-          setDto((prev) => ({ ...prev, rowCount: res.count }));
+          setWhiteListsRequest((prev) => ({ ...prev, rowCount: res.count }));
           loadingAction.setFalse();
         } else {
           failSendAction.setTrue();
@@ -130,7 +139,7 @@ const useAction = () => {
 
   useEffect(() => {
     getMeetingList();
-  }, [dto.pageIndex, dto.pageSize]);
+  }, [whiteListsRequest.pageIndex, whiteListsRequest.pageSize]);
 
   // 延迟关闭警告提示
   useEffect(() => {
@@ -150,9 +159,9 @@ const useAction = () => {
     failSend,
     failSendText,
     successText,
-    dto,
+    whiteListsRequest,
     rows,
-    setDto,
+    setWhiteListsRequest,
     handleCopyMeetingLink,
     isConfirmDialog,
     confirmDialogAction,
