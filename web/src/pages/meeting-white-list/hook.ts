@@ -79,7 +79,7 @@ const useAction = () => {
       })
       .catch((err) => {
         failSendAction.setTrue();
-        setFailSendText("Table data update failed");
+        setFailSendText((err as Error).message);
         loadingAction.setFalse();
       });
   };
@@ -111,7 +111,7 @@ const useAction = () => {
         })
         .catch((err) => {
           failSendAction.setTrue();
-          setFailSendText(`${addEditWhiteListDto.type} failed`);
+          setFailSendText((err as Error).message);
         })
         .finally(() => setUpdateLoading(false));
     } else {
@@ -129,6 +129,10 @@ const useAction = () => {
           setSuccessText("Delete ok");
           confirmDialogAction.setFalse();
           getMeetingList();
+        })
+        .catch((err) => {
+          failSendAction.setTrue();
+          setFailSendText((err as Error).message);
         })
         .finally(() => setDelLoading(false));
     } else {
