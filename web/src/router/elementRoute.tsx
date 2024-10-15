@@ -6,10 +6,9 @@ import User from "../pages/user";
 import { RouteItem } from "../dtos/route";
 import MeetingList from "../pages/meeting-list";
 import { SendRequest } from "../pages/request";
-
+import GroupsIcon from "@mui/icons-material/Groups";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import SettingsIcon from "@mui/icons-material/Settings";
 import {
   Navigate,
   Route,
@@ -28,6 +27,7 @@ import IsAuthUser from "../pages/auth";
 import useAuth from "../auth";
 import { useEffect } from "react";
 import MeetingWhiteList from "../pages/meeting-white-list";
+import { Meeting } from "../pages/meeting";
 
 export const routerArray: RouteItem[] = [
   {
@@ -58,7 +58,6 @@ export const routerArray: RouteItem[] = [
       },
     ],
   },
-
   {
     path: "/role",
     head: "角色权限",
@@ -92,21 +91,24 @@ export const routerArray: RouteItem[] = [
       },
     ],
   },
-  {
-    path: "/whiteList",
-    head: "会议总结",
-    icons: <SettingsIcon />,
-    element: <MeetingWhiteList />,
-  },
-  {
-    path: "/none",
-    head: "",
-    element: <None />,
-  },
+
   {
     path: "/meeting",
     head: "",
-    element: <MeetingList />,
+    element: <Meeting />,
+    icons: <GroupsIcon />,
+    children: [
+      {
+        path: "",
+        title: "",
+        elementChild: <MeetingList />,
+      },
+      {
+        path: "/meeting/whiteList",
+        title: "总结白名单",
+        elementChild: <MeetingWhiteList />,
+      },
+    ],
   },
   {
     path: "/user",
@@ -119,6 +121,11 @@ export const routerArray: RouteItem[] = [
     head: "",
     // icons: <SettingsIcon />,
     element: <Manager />,
+  },
+  {
+    path: "/none",
+    head: "",
+    element: <None />,
   },
 ];
 

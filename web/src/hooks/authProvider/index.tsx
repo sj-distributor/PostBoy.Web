@@ -9,6 +9,7 @@ import {
 import { routerArray } from "../../router/elementRoute";
 import { RouteItem } from "../../dtos/route";
 import { GetAuthUser } from "../../api/user-management";
+import { useLocation } from "react-router-dom";
 
 interface AuthContextOptions {
   token: string;
@@ -26,6 +27,8 @@ export const AuthContext = createContext<AuthContextOptions>(null!);
 
 const AuthProvider = (props: { children: React.ReactNode }) => {
   const defaultToken = localStorage.getItem("token") as string;
+
+  const pathname = useLocation().pathname;
 
   const defaulUserName = localStorage.getItem("username") as string;
 
@@ -126,10 +129,16 @@ const AuthProvider = (props: { children: React.ReactNode }) => {
         (adminPermission || (item.path !== "/user" && item.path !== "/manager"))
     );
 
-    return adminPermission
+    const routers = adminPermission
       ? routerList
-      : routerList.filter((item) => item.path !== "/whiteList");
-  }, [currentUserRolePermissions]);
+      : routerList.filter((item) => item.path !== "/meeting/whiteList");
+
+    return pathname.includes("/meeting")
+      ? routers.map((item) =>
+          item.path === "/meeting" ? { ...item, head: "智能会议" } : item
+        )
+      : routerList.filter((item) => item.path !== "/meeting/whiteList");
+  }, [currentUserRolePermissions, pathname]);
 
   useEffect(() => {
     if (token) {

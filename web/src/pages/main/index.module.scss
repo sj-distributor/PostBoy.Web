@@ -24,27 +24,33 @@ $aClickColor: #30cea3;
       .item {
         font-size: 1rem;
         margin: 2rem 0;
+        display: flex;
+        position: relative;
+        justify-content: center;
 
         .itemNone {
           color: $aColor;
           text-decoration: none;
+          position: relative;
         }
 
         .itemClick {
           color: $aClickColor;
           text-decoration: none;
-          // font-weight: bolder;
+          position: relative;
         }
 
         .iconTitleContainer {
           display: flex;
           align-items: center;
           justify-content: center;
+          width: max-content;
         }
 
         .title {
           margin-left: 0.4rem;
           font-size: 1rem;
+          display: flex;
         }
       }
     }
@@ -67,4 +73,32 @@ $aClickColor: #30cea3;
       flex: 1;
     }
   }
+}
+
+.childrenItem {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.childrenItemNone {
+  color: $aColor;
+  text-decoration: none;
+  position: absolute;
+  left: 1.8rem;
+  white-space: nowrap;
+}
+
+.childrenItemClick {
+  color: $aClickColor;
+  position: absolute;
+  left: 1.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.childrenSettingIcon {
+  position: absolute;
+  right: 1rem;
+  cursor: pointer;
 }
