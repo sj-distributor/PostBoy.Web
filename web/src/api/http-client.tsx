@@ -51,6 +51,6 @@ export async function base<T>(
       }
     })
     .catch((error) => {
-      throw new Error(error.message);
+      throw new Error(error?.message);
     });
 }
