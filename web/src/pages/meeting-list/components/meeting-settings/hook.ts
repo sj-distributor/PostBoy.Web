@@ -535,6 +535,13 @@ const useAction = (props: MeetingSettingsProps) => {
     setAnnexFile(newFileList);
   };
 
+  const handelGetNewUserDataList = (data: IDepartmentAndUserListValue[]) => {
+    if (data.every((item) => item.type === DepartmentAndUserType.User)) {
+      return data.map((item) => item.name);
+    }
+    return getUserChildrenList(departmentAndUserList[0]?.data ?? [], data, []);
+  };
+
   const onCreateUpdateMeeting = () => {
     if (!loading) {
       loadingAction.setTrue();
@@ -555,11 +562,7 @@ const useAction = (props: MeetingSettingsProps) => {
       let attendeesList: string[] = [];
 
       participantList &&
-        (attendeesList = getUserChildrenList(
-          departmentAndUserList[0].data,
-          participantList,
-          []
-        ));
+        (attendeesList = handelGetNewUserDataList(participantList));
 
       const admin_userid = adminUser
         ? adminUser.length > 0
@@ -573,11 +576,7 @@ const useAction = (props: MeetingSettingsProps) => {
       } else {
         hostList &&
           (settingsData.hosts = {
-            userid: getUserChildrenList(
-              departmentAndUserList[0].data,
-              hostList,
-              []
-            ),
+            userid: handelGetNewUserDataList(hostList),
           });
       }
 
@@ -586,11 +585,7 @@ const useAction = (props: MeetingSettingsProps) => {
       } else {
         appointList &&
           (settingsData.ring_users = {
-            userid: getUserChildrenList(
-              departmentAndUserList[0].data,
-              appointList,
-              []
-            ),
+            userid: handelGetNewUserDataList(appointList),
           });
       }
 
@@ -820,6 +815,7 @@ const useAction = (props: MeetingSettingsProps) => {
         description,
         location,
         absentMember,
+        presentMember,
         password,
         enableWaitingRoom,
         allowEnterBeforeHost,
@@ -837,9 +833,23 @@ const useAction = (props: MeetingSettingsProps) => {
         meetingRecordType,
         enableCloudRecordSummary,
         meetingSummaryDistributionEnabled,
+        workWeChatCorpApplicationId,
+        workWeChatCorpId,
       } = data;
 
       setMeetingTitle(title);
+
+      loadingAction.setFalse();
+
+      const corp = corpsList?.find((item) => item.id === workWeChatCorpId);
+
+      const corpApp = corpAppList?.find(
+        (item) => item.id === workWeChatCorpApplicationId
+      );
+
+      corp && setCorpsValue(corp);
+
+      corpApp && setCorpAppValue(corpApp);
 
       setMeetingStartDate(dayjs.unix(meetingStart).format("YYYY-MM-DD"));
 
@@ -943,8 +953,13 @@ const useAction = (props: MeetingSettingsProps) => {
       setParticipantList((participant) => {
         let attendeesData: IDepartmentAndUserListValue[] = [];
 
-        absentMember.length > 0 &&
-          [...new Set(absentMember)].map((item) =>
+        const participantData = [
+          ...(presentMember ?? []),
+          ...(absentMember ?? []),
+        ];
+
+        participantData.length > 0 &&
+          [...new Set(participantData)].map((item) =>
             attendeesData.push({
               id: item,
               name: item,
