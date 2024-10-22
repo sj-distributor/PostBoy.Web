@@ -10,6 +10,7 @@ import {
   DialogTitle,
   Snackbar,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
@@ -18,6 +19,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import useAction from "./hook";
 
 import style from "./index.module.scss";
+import { IIWhiteListsDto } from "../../dtos/white-list";
 
 const MeetingWhiteList = () => {
   const {
@@ -57,24 +59,41 @@ const MeetingWhiteList = () => {
       minWidth: 100,
       align: "center",
       headerAlign: "center",
-    },
-
-    {
-      field: "createdDate",
-      headerName: "创建时间",
-      align: "center",
-      headerAlign: "center",
-      flex: 1,
-      minWidth: 160,
       renderCell: (params) => {
+        let ids = "";
+        params.row.whitelists?.map((item: IIWhiteListsDto, index: number) => {
+          ids +=
+            item.notifyUserId +
+            (params.row.whitelists.length > 0 &&
+            index !== params.row.whitelists.length - 1
+              ? ","
+              : "");
+        });
+
         return (
-          <span>
-            {dayjs(params.row.createdDate).format("YYYY-MM-DD HH:mm:ss")}
-          </span>
+          <Tooltip
+            title={
+              <div style={{ maxHeight: 400, overflowY: "auto" }}>{ids}</div>
+            }
+          >
+            <div>
+              {params.row.whitelists?.map(
+                (item: IIWhiteListsDto, index: number) => {
+                  return (
+                    <span key={item.id}>
+                      {item.notifyUserId}
+                      {params.row.whitelists.length > 0 &&
+                        index !== params.row.whitelists.length - 1 &&
+                        ","}
+                    </span>
+                  );
+                }
+              )}
+            </div>
+          </Tooltip>
         );
       },
     },
-
     {
       field: "fun",
       headerName: "操作",
@@ -88,13 +107,16 @@ const MeetingWhiteList = () => {
             size="small"
             style={{ marginRight: 16 }}
             onClick={() => {
+              const ids = params.row.whitelists?.map(
+                (item: IIWhiteListsDto) => item.notifyUserId
+              );
               setOpenAddWhiteList(true);
               setAddEditWhiteListDto((prev) => ({
                 ...prev,
                 MeetingCode: params.row.meetingCode,
-                NotifyUserId: params.row.notifyUserId,
+                NotifyUserId: ids,
                 type: "edit",
-                Id: params.row.id,
+                Id: params.row.meetingCode,
               }));
             }}
           >
@@ -107,7 +129,7 @@ const MeetingWhiteList = () => {
               confirmDialogAction.setTrue();
               setAddEditWhiteListDto((prev) => ({
                 ...prev,
-                Id: params.row.id,
+                Id: params.row.meetingCode,
               }));
             }}
           >
@@ -168,6 +190,7 @@ const MeetingWhiteList = () => {
               loading={loading}
               paginationMode="server"
               rowHeight={56}
+              getRowId={(row) => row.meetingCode}
               style={{ height: 700, width: "95%" }}
               rowCount={whiteListsRequest.rowCount}
               onPageChange={(value) =>
