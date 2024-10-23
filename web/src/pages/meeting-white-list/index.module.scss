@@ -114,3 +114,17 @@
   font-size: 1.8rem;
   cursor: pointer;
 }
+
+.userNameItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.addUsersTips {
+  margin-top: 0.5rem;
+  position: absolute;
+  font-size: 0.85rem;
+  color: #a19d9d;
+}

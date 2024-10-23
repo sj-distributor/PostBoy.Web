@@ -13,17 +13,17 @@ export interface IIWhiteListsDto {
   createdDate: string;
 }
 
+export interface IMeetingGroupsDto {
+  meetingCode: string;
+  whitelists: IIWhiteListsDto;
+}
+
 export interface IWhiteListsResponse {
-  whitelist: IIWhiteListsDto[];
+  groups: IMeetingGroupsDto[];
   count: number;
 }
 
-export interface IPostAddWhiteListsRequest {
-  MeetingCode: string;
-  NotifyUserId: string;
-}
-
-export interface IPostUpdateWhiteListsRequest
-  extends IPostAddWhiteListsRequest {
-  Id?: string;
+export interface IPostAddOrUpdateWhiteListsRequest {
+  meetingCode: string;
+  notifyUserIds: string[];
 }

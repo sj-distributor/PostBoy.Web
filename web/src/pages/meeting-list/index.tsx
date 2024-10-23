@@ -29,7 +29,10 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const asyncTootip = (title: string, style: string) => {
   return (
-    <Tooltip title={title} className={style}>
+    <Tooltip
+      title={<div style={{ maxHeight: 400, overflowY: "auto" }}>{title}</div>}
+      className={style}
+    >
       <span>{title}</span>
     </Tooltip>
   );

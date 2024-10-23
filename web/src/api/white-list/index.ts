@@ -1,8 +1,7 @@
 import {
   IGetWhiteListsRequest,
   IIWhiteListsDto,
-  IPostAddWhiteListsRequest,
-  IPostUpdateWhiteListsRequest,
+  IPostAddOrUpdateWhiteListsRequest,
   IWhiteListsResponse,
 } from "../../dtos/white-list";
 import { Get, Post } from "../http-client";
@@ -16,22 +15,26 @@ export const GetWhiteLists = async (data: IGetWhiteListsRequest) => {
   );
 };
 
-export const PostAddWhiteList = async (data: IPostAddWhiteListsRequest) => {
+export const PostAddWhiteList = async (
+  data: IPostAddOrUpdateWhiteListsRequest
+) => {
   return await Post<IIWhiteListsDto>(
-    "/api/WeChat/work/meeting/whitelist/add",
+    "/api/WeChat/work/meeting/whitelists/add",
     data
   );
 };
 
 export const PostUpdateWhiteList = async (
-  data: IPostUpdateWhiteListsRequest
+  data: IPostAddOrUpdateWhiteListsRequest
 ) => {
   return await Post<IIWhiteListsDto>(
-    "/api/WeChat/work/meeting/whitelist/update",
+    "/api/WeChat/work/meeting/whitelists/update",
     data
   );
 };
 
 export const PostDeleteWhiteList = async (id: string) => {
-  return await Post("/api/WeChat/work/meeting/whitelist/delete", { Ids: [id] });
+  return await Post("/api/WeChat/work/meeting/whitelist/delete", {
+    meetingCode: id,
+  });
 };

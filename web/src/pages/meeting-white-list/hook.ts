@@ -6,7 +6,7 @@ import {
   PostDeleteWhiteList,
   PostUpdateWhiteList,
 } from "../../api/white-list";
-import { IIWhiteListsDto } from "../../dtos/white-list";
+import { IIWhiteListsDto, IMeetingGroupsDto } from "../../dtos/white-list";
 import { IAddEditWhiteListDto, IWhiteListsRequest } from "./props";
 
 const useAction = () => {
@@ -44,7 +44,7 @@ const useAction = () => {
       Id: "",
     });
 
-  const [rows, setRows] = useState<IIWhiteListsDto[]>([]);
+  const [rows, setRows] = useState<IMeetingGroupsDto[]>([]);
 
   const handleCopyMeetingLink = (link: string) => {
     if (link) {
@@ -65,8 +65,8 @@ const useAction = () => {
 
     GetWhiteLists(data)
       .then((res) => {
-        if (res && res.whitelist) {
-          setRows(res.whitelist);
+        if (res && res.groups) {
+          setRows(res.groups ?? []);
           setWhiteListsRequest((prev) => ({ ...prev, rowCount: res.count }));
           loadingAction.setFalse();
         } else {
@@ -92,13 +92,14 @@ const useAction = () => {
           : PostUpdateWhiteList;
 
       setUpdateLoading(true);
+
+      const ids =
+        typeof addEditWhiteListDto.NotifyUserId !== "string"
+          ? addEditWhiteListDto.NotifyUserId
+          : addEditWhiteListDto.NotifyUserId.split(",").filter((item) => item);
       fun({
-        MeetingCode: addEditWhiteListDto.MeetingCode,
-        NotifyUserId: addEditWhiteListDto.NotifyUserId,
-        Id:
-          addEditWhiteListDto.type === "edit"
-            ? addEditWhiteListDto.Id
-            : undefined,
+        meetingCode: addEditWhiteListDto.MeetingCode,
+        notifyUserIds: ids,
       })
         .then((res) => {
           setAddEditWhiteListDto((prev) => ({
