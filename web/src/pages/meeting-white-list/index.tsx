@@ -249,24 +249,29 @@ const MeetingWhiteList = () => {
                 />
               </div>
             </div>
-            <div className={style.fromItem}>
-              <div className={style.title}>用户企微名</div>
-              <div className={style.widthFull}>
-                <TextField
-                  id="filled-start-adornment"
-                  placeholder="用户企微名"
-                  autoComplete="off"
-                  className={style.input}
-                  sx={{ width: "100%" }}
-                  variant="outlined"
-                  value={addEditWhiteListDto?.NotifyUserId}
-                  onChange={(e) =>
-                    setAddEditWhiteListDto((prev) => ({
-                      ...prev,
-                      NotifyUserId: e.target.value,
-                    }))
-                  }
-                />
+            <div className={style.widthFull}>
+              <div className={style.userNameItem}>
+                <div className={style.title}>用户企微名</div>
+                <div className={style.widthFull}>
+                  <TextField
+                    id="filled-start-adornment"
+                    placeholder="用户企微名"
+                    autoComplete="off"
+                    className={style.input}
+                    sx={{ width: "100%" }}
+                    variant="outlined"
+                    value={addEditWhiteListDto?.NotifyUserId}
+                    onChange={(e) =>
+                      setAddEditWhiteListDto((prev) => ({
+                        ...prev,
+                        NotifyUserId: e.target.value,
+                      }))
+                    }
+                  />
+                  <div className={style.addUsersTips}>
+                    使用英文分隔符以添加多个用户到白名单（如：a,b）
+                  </div>
+                </div>
               </div>
             </div>
           </DialogContent>
