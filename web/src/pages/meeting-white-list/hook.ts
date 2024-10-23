@@ -92,9 +92,11 @@ const useAction = () => {
           : PostUpdateWhiteList;
 
       setUpdateLoading(true);
-      const ids = addEditWhiteListDto.NotifyUserId.split(",").filter(
-        (item) => item
-      );
+
+      const ids =
+        typeof addEditWhiteListDto.NotifyUserId !== "string"
+          ? addEditWhiteListDto.NotifyUserId
+          : addEditWhiteListDto.NotifyUserId.split(",").filter((item) => item);
       fun({
         meetingCode: addEditWhiteListDto.MeetingCode,
         notifyUserIds: ids,

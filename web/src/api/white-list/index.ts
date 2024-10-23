@@ -34,5 +34,7 @@ export const PostUpdateWhiteList = async (
 };
 
 export const PostDeleteWhiteList = async (id: string) => {
-  return await Post("/api/WeChat/work/meeting/whitelist/delete", { Ids: [id] });
+  return await Post("/api/WeChat/work/meeting/whitelist/delete", {
+    meetingCode: id,
+  });
 };
